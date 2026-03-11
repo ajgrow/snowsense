@@ -4,3 +4,4 @@ Skriv navn og push for oblig 3:
 - Alex
 - Larissa
 - Lisa
+- Sondre
