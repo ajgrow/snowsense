@@ -1,0 +1,1 @@
+Testing if email adress is updated correctly. 
