@@ -1,6 +1,6 @@
 # IN2000 – Android app
 
-This is a repo for team 29's Android app project.
+This is the repo for team 29's Android app project.
 
 ## Team-members
 
