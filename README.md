@@ -1,4 +1,4 @@
-# IN2000 – Android app
+# IN2000 – Android app project
 
 This is the repo for team 29's Android app project.
 
