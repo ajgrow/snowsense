@@ -11,6 +11,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import in2000.prosjekt.in2000project.navigation.AppNavigation
 import in2000.prosjekt.in2000project.ui.theme.In2000projectTheme
 
 class MainActivity : ComponentActivity() {
@@ -19,7 +20,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             In2000projectTheme {
-                val navController
+                AppNavigation()
             }
         }
     }
