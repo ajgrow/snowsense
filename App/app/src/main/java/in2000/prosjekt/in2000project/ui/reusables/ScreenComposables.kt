@@ -4,9 +4,14 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Place
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -50,10 +55,42 @@ fun BottomBar(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TopBar(
+    modifier: Modifier = Modifier,
+    title: String
+){
+    CenterAlignedTopAppBar(
+        modifier =  modifier,
+        title = {Text(title)},
+        actions = {
+            IconButton(
+                onClick = {/*TODO*/}
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Settings,
+                    contentDescription = "Go to settings"
+                )
+            }
+        }
+
+
+    )
+}
+
 @Preview
 @Composable
 fun BottomBarPreview(
     modifier: Modifier = Modifier
 ){
     BottomBar(modifier)
+}
+
+@Preview
+@Composable
+fun TopBarPreview(
+    modifier: Modifier = Modifier
+){
+    TopBar(modifier, "TITLE")
 }
