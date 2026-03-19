@@ -15,6 +15,28 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TopBar(
+    modifier: Modifier = Modifier,
+    title: String
+){
+    CenterAlignedTopAppBar(
+        modifier =  modifier,
+        title = {Text(title)},
+        actions = {
+            IconButton(
+                onClick = {/*TODO*/}
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Settings,
+                    contentDescription = "Settings"
+                )
+            }
+        }
+    )
+}
+
 @Composable
 fun BottomBar(
     modifier: Modifier = Modifier
@@ -55,28 +77,13 @@ fun BottomBar(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+
+@Preview
 @Composable
-fun TopBar(
-    modifier: Modifier = Modifier,
-    title: String
+fun TopBarPreview(
+    modifier: Modifier = Modifier
 ){
-    CenterAlignedTopAppBar(
-        modifier =  modifier,
-        title = {Text(title)},
-        actions = {
-            IconButton(
-                onClick = {/*TODO*/}
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Settings,
-                    contentDescription = "Go to settings"
-                )
-            }
-        }
-
-
-    )
+    TopBar(modifier, "**title**")
 }
 
 @Preview
@@ -85,12 +92,4 @@ fun BottomBarPreview(
     modifier: Modifier = Modifier
 ){
     BottomBar(modifier)
-}
-
-@Preview
-@Composable
-fun TopBarPreview(
-    modifier: Modifier = Modifier
-){
-    TopBar(modifier, "TITLE")
 }
