@@ -1,5 +1,6 @@
 package in2000.prosjekt.in2000project.ui.reusables
 
+import android.R.attr.onClick
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Notifications
@@ -10,16 +11,21 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
+import in2000.prosjekt.in2000project.navigation.Screen
+
 @Composable
 fun BottomBar(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    navController: NavController
 ) {
     NavigationBar(
         modifier = modifier
     ) {
         NavigationBarItem(
             selected = true,
-            onClick = {/*TODO*/},
+            onClick = {navController.navigate(Screen.Home.route)},
             icon = {
                 Icon(
                     imageVector = Icons.Default.Home,
@@ -29,7 +35,7 @@ fun BottomBar(
         )
         NavigationBarItem(
             selected = false,
-            onClick = {/*TODO*/},
+            onClick = {navController.navigate(Screen.Map.route)},
             icon = {
                 Icon(
                     imageVector = Icons.Default.Place,
@@ -53,7 +59,7 @@ fun BottomBar(
 @Preview
 @Composable
 fun BottomBarPreview(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ){
-    BottomBar(modifier)
+    BottomBar(modifier, rememberNavController())
 }
