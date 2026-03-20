@@ -18,10 +18,10 @@ fun AppNavigation(){
 
     ) {
         composable(Screen.Home.route) {
-            HomeScreen()
+            HomeScreen(navController = navController)
         }
         composable(Screen.Map.route) {
-            MapScreen()
+            MapScreen(navController = navController)
         }
     }
 }
