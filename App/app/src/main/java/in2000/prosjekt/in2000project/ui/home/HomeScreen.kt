@@ -12,17 +12,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import in2000.prosjekt.in2000project.R
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import in2000.prosjekt.in2000project.ui.reusables.BottomBar
 import in2000.prosjekt.in2000project.ui.reusables.TopBar
 
 @Composable
 fun HomeScreen(
-    modifier: Modifier = Modifier
-
+    modifier: Modifier = Modifier,
+    navController : NavController
 ){
     Scaffold(
         topBar = {TopBar(title ="Home")},
-        bottomBar = {BottomBar()}
+        bottomBar = {BottomBar(modifier, navController)}
     ) {
         paddingValues ->
         Column(
@@ -54,5 +56,5 @@ fun Logo(
 fun HomeScreenPreview(
     modifier: Modifier = Modifier
 ){
-    HomeScreen()
+    HomeScreen(navController = rememberNavController())
 }
