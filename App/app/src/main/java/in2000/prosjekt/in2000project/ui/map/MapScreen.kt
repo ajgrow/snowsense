@@ -43,48 +43,26 @@ fun MapScreen(
     modifier: Modifier = Modifier,
     navController: NavController
 ) {
-    // Hardcoded sample data for the MVP.
-    val skiAreas = remember {
-        listOf(
-            SkiArea(
-                id = "1",
-                name = "Lyngen Touring Zone",
-                averageSnowfall = "Placeholder: 210 cm seasonal average",
-                averageRainfall = "Placeholder: 95 mm monthly average",
-                averageWind = "Placeholder: 7.8 m/s average wind speed",
-                averageTemperature = "Placeholder: -3.2°C winter average",
-                guideNotes = "Placeholder: Popular ski touring area with exposed alpine terrain"
-            ),
-            SkiArea(
-                id = "2",
-                name = "Tromsdalstinden Approach",
-                averageSnowfall = "Placeholder: 185 cm seasonal average",
-                averageRainfall = "Placeholder: 88 mm monthly average",
-                averageWind = "Placeholder: 6.9 m/s average wind speed",
-                averageTemperature = "Placeholder: -4.1°C winter average",
-                guideNotes = "Placeholder: Add route-specific snow and terrain notes here"
-            ),
-            SkiArea(
-                id = "3",
-                name = "Hemsedal Touring Area",
-                averageSnowfall = "Placeholder: 160 cm seasonal average",
-                averageRainfall = "Placeholder: 76 mm monthly average",
-                averageWind = "Placeholder: 5.4 m/s average wind speed",
-                averageTemperature = "Placeholder: -2.0°C winter average",
-                guideNotes = "Placeholder: Good beginner touring area with variable wind exposure"
-            )
+    // Hardcoded sample data for the MVP, however, when Frost API is ready this should move into the ViewModel
+    val skiArea = remember {
+        SkiArea(
+            id = "1",
+            name = "Lyngen Touring Zone",
+            averageSnowfall = "Placeholder: 210 cm seasonal average",
+            averageRainfall = "Placeholder: 95 mm monthly average",
+            averageWind = "Placeholder: 7.8 m/s average wind speed",
+            averageTemperature = "Placeholder: -3.2°C winter average",
+            guideNotes = "Placeholder: Popular ski touring area with exposed alpine terrain"
         )
     }
 
-    // This keeps track of which ski area the user has tapped.
-    // If it is null, no bottom sheet is shown.
+    //Controls whether the bottom sheet is visible or not by keeping track of if the user has clicked the map
+    //if this is set to null then the ModalBottomSheet is not open
     var selectedArea by remember { mutableStateOf<SkiArea?>(null) }
 
-    // This controls the state of the bottom sheet.
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
+    //this creates a state object or "controller" that
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
-    // Scaffold is the main screen layout.
-    // It lets you place a top bar, bottom bar, and screen content.
     Scaffold(
         topBar = {
             TopBar(modifier = Modifier, title = "Home")
@@ -119,7 +97,7 @@ fun MapScreen(
             // FakeMap is just a placeholder for now.
             // Later, this can be replaced with a real map.
             FakeMap(
-                areas = skiAreas,
+                areas = skiArea,
                 onAreaClick = { area ->
                     selectedArea = area
                 },
@@ -149,7 +127,7 @@ fun MapScreen(
 
 @Composable
 fun FakeMap(
-    areas: List<SkiArea>,
+    areas: SkiArea,
     onAreaClick: (SkiArea) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -182,29 +160,11 @@ fun FakeMap(
 
         // First fake marker
         FakeMapMarker(
-            label = areas[0].name,
+            label = areas.name,
             modifier = Modifier
                 .align(Alignment.TopStart)
                 .offset(x = 32.dp, y = 120.dp),
-            onClick = { onAreaClick(areas[0]) }
-        )
-
-        // Second fake marker
-        FakeMapMarker(
-            label = areas[1].name,
-            modifier = Modifier
-                .align(Alignment.Center)
-                .offset(x = 40.dp, y = (-20).dp),
-            onClick = { onAreaClick(areas[1]) }
-        )
-
-        // Third fake marker
-        FakeMapMarker(
-            label = areas[2].name,
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .offset(x = (-36).dp, y = (-90).dp),
-            onClick = { onAreaClick(areas[2]) }
+            onClick = { onAreaClick(areas) }
         )
     }
 }
