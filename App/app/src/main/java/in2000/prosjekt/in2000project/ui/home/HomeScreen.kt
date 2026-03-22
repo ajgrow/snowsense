@@ -4,8 +4,10 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -33,6 +35,8 @@ import androidx.navigation.compose.rememberNavController
 import in2000.prosjekt.in2000project.ui.reusables.BottomBar
 import in2000.prosjekt.in2000project.ui.reusables.TopBar
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 
 @Composable
 fun HomeScreen(
@@ -44,7 +48,7 @@ fun HomeScreen(
 
     // Mock data: these should eventually be moved to a ViewModel
     val favorites = listOf("Jotunheimen", "Rondane")
-    val recents = listOf("Jotunheimen", "Rondane", "Romsdalen", "Hardangervidda", "Lofoten")
+    val recents = listOf("Jotunheimen", "Rondane", "Romsdalen", "Hardangervidda", "Lofoten","Vesterålen",)
 
     Scaffold(
         modifier = modifier,
@@ -52,9 +56,10 @@ fun HomeScreen(
         bottomBar = {BottomBar(modifier, navController)}
     ) {
         paddingValues ->
+        // Using LazyColumn for the whole screen ensures everything is scrollable
         LazyColumn(
             modifier = Modifier
-                .fillMaxWidth()
+                .fillMaxSize()
                 .padding(paddingValues),
             contentPadding = PaddingValues(16.dp),          //adds padding around content
             verticalArrangement = Arrangement.spacedBy(24.dp),
@@ -81,7 +86,8 @@ fun LogoSection(
 ){
     Image(
         painterResource(R.drawable.logo_placeholder),
-        contentDescription = "Placeholder for Logo"
+        contentDescription = "App Logo",
+        modifier = modifier.size(130.dp)
     )
 }
 
@@ -128,7 +134,7 @@ fun FavoriteSection(
             horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             items(items){
-                area -> Text(area)
+                area -> AreaCard(area)
             }
         }
     }
@@ -149,9 +155,24 @@ fun RecentSection(
         )
 
         items.forEach{
-            area -> Text(area)
+            area -> AreaCard(area)
         }
 
+    }
+}
+
+@Composable
+fun AreaCard(
+    area: String,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier,
+    ) {
+        Text(
+            text = area,
+            modifier = Modifier.padding(16.dp)
+        )
     }
 }
 
