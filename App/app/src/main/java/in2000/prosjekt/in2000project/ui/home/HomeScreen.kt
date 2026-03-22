@@ -1,14 +1,17 @@
 package in2000.prosjekt.in2000project.ui.home
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -27,7 +30,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import in2000.prosjekt.in2000project.ui.reusables.BottomBar
 import in2000.prosjekt.in2000project.ui.reusables.TopBar
-
+import androidx.compose.foundation.lazy.items
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
@@ -35,6 +38,10 @@ fun HomeScreen(
 ){
     //Used in SearchSection. Should be moved to Viewmodel?
     var query by rememberSaveable { mutableStateOf("") }
+
+    // Mock data: these should eventually be moved to a ViewModel
+    val favorites = listOf("Jotunheimen", "Rondane")
+    val recents = listOf("Jotunheimen", "Rondane", "Romsdalen", "Hardangervidda", "Lofoten")
 
     Scaffold(
         topBar = {TopBar(title ="Home")},
@@ -52,7 +59,7 @@ fun HomeScreen(
                 query = query,
                 onQueryChange = {query = it},
                 onSearchClick = {/*TODO*/})
-            Text("**TODO: ADD FAVORITES**")
+            FavoriteSection(items = favorites)
             Text("**TODO: ADD PREVIOUS SEARCHES**")
         }
     }
@@ -92,6 +99,29 @@ fun SearchSection(
             }
         }
     )
+}
+
+@Composable
+fun FavoriteSection(
+    items: List<String>,
+    modifier: Modifier = Modifier
+){
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        Text(
+            text = "Favorites",
+            style = MaterialTheme.typography.titleMedium
+        )
+        LazyRow(
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            items(items){
+                area -> Text(area)
+            }
+        }
+    }
 }
 
 
