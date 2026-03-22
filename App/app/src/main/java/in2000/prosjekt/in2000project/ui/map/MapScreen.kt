@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -60,12 +59,13 @@ fun MapScreen(
     //if this is set to null then the ModalBottomSheet is not open
     var selectedArea by remember { mutableStateOf<SkiArea?>(null) }
 
-    //this creates a state object or "controller" that
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    //this creates a state object or "controller" that stores the UI for the bottom sheet
+    //when skipPartiallyExpanded = true, this means that the sheet opens fully instead of being partially expanded
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
 
     Scaffold(
         topBar = {
-            TopBar(modifier = Modifier, title = "Home")
+            TopBar(modifier = Modifier, title = "MapScreen")
         },
         bottomBar = {
             BottomBar(modifier, navController)
@@ -80,26 +80,25 @@ fun MapScreen(
                 .padding(paddingValues)
                 .padding(16.dp)
         ) {
-            // Screen title
+            // Title
             Text(
                 text = "Map",
                 style = MaterialTheme.typography.headlineMedium,
                 modifier = Modifier.padding(bottom = 8.dp)
             )
 
-            // Instructional text
+            // Instructions
             Text(
                 text = "Select an area to view historical climate details.",
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.padding(bottom = 16.dp)
             )
 
-            // FakeMap is just a placeholder for now.
-            // Later, this can be replaced with a real map.
+            // FakeMap is just a placeholder for now. Once we have mapbox API, we can change this.
             FakeMap(
-                areas = skiArea,
-                onAreaClick = { area ->
-                    selectedArea = area
+                area = skiArea,
+                onMapClick = {
+                    selectedArea = skiArea
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -108,14 +107,17 @@ fun MapScreen(
         }
     }
 
-    // Show the bottom sheet only when the user has selected an area.
-    if (selectedArea != null) {
+    // Let lets you use a value only if it exists, but if it's null then nothing happens
+    //This is for the bottom sheet - if there is a selectedArea, then it will open the bottom sheet
+    //otherwise it will not open the bottom sheet
+    selectedArea?.let { area ->
         ModalBottomSheet(
             onDismissRequest = { selectedArea = null },
             sheetState = sheetState
         ) {
             SkiAreaBottomSheetContent(
-                area = selectedArea!!,
+                // We pass the selected area (from the lambda) into the bottom sheet
+                area = area,
                 modifier = Modifier
                     .fillMaxWidth()
                     .heightIn(min = 320.dp)
@@ -127,8 +129,8 @@ fun MapScreen(
 
 @Composable
 fun FakeMap(
-    areas: SkiArea,
-    onAreaClick: (SkiArea) -> Unit,
+    area: SkiArea,
+    onMapClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     // This is a fake map box for the MVP.
@@ -139,6 +141,7 @@ fun FakeMap(
                 color = Color(0xFFDCEEFF),
                 shape = RoundedCornerShape(24.dp)
             )
+            .clickable { onMapClick() }
     ) {
         // "Map Placeholder" title inside the fake map
         Text(
@@ -149,7 +152,7 @@ fun FakeMap(
                 .padding(top = 16.dp)
         )
 
-        // Instruction text inside the fake map
+        // Instructions inside the map
         Text(
             text = "Tap a location",
             style = MaterialTheme.typography.bodyMedium,
@@ -158,36 +161,28 @@ fun FakeMap(
                 .padding(top = 44.dp)
         )
 
-        // First fake marker
-        FakeMapMarker(
-            label = areas.name,
+        // Marker
+        MapMarker(
+            label = area.name,
             modifier = Modifier
                 .align(Alignment.TopStart)
                 .offset(x = 32.dp, y = 120.dp),
-            onClick = { onAreaClick(areas) }
         )
     }
 }
 
 @Composable
-fun FakeMapMarker(
+fun MapMarker(
     label: String,
     modifier: Modifier = Modifier,
-    onClick: () -> Unit
 ) {
-    // This composable acts like a fake map marker.
-    // It includes a circular icon area and a label below it.
     Column(
-        modifier = modifier.clickable { onClick() },
+        modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         // Circular marker icon
         Box(
             modifier = Modifier
-                .background(
-                    color = Color(0xFF1565C0),
-                    shape = CircleShape
-                )
                 .padding(horizontal = 12.dp, vertical = 10.dp)
         ) {
             Text(
@@ -235,7 +230,7 @@ fun SkiAreaBottomSheetContent(
                 style = MaterialTheme.typography.headlineSmall
             )
 
-            // Section title
+            // Description of the content
             Text(
                 text = "Historical Climate Summary",
                 style = MaterialTheme.typography.titleMedium
