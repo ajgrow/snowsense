@@ -33,6 +33,9 @@ fun HomeScreen(
     modifier: Modifier = Modifier,
     navController : NavController
 ){
+    //Used in SearchSection. Should be moved to Viewmodel?
+    var query by rememberSaveable { mutableStateOf("") }
+
     Scaffold(
         topBar = {TopBar(title ="Home")},
         bottomBar = {BottomBar(modifier, navController)}
@@ -45,7 +48,10 @@ fun HomeScreen(
                 .padding(paddingValues)){
             //All content should go here
             Logo()
-            SearchSection(onSearchClick = {/*TODO*/})
+            SearchSection(
+                query = query,
+                onQueryChange = {query = it},
+                onSearchClick = {/*TODO*/})
             Text("**TODO: ADD FAVORITES**")
             Text("**TODO: ADD PREVIOUS SEARCHES**")
         }
@@ -64,15 +70,16 @@ fun Logo(
 
 @Composable
 fun SearchSection(
+    query: String,
     onSearchClick: () -> Unit,
+    onQueryChange: (String) -> Unit,
     modifier: Modifier = Modifier
 ){
-    var query by rememberSaveable { mutableStateOf("") }
 
     OutlinedTextField(
         modifier = modifier.fillMaxWidth(),
         value = query,
-        onValueChange = { query = it},
+        onValueChange = onQueryChange,
         placeholder = {Text("Search for area...")},
         singleLine = true,
         shape = RoundedCornerShape(50.dp),
