@@ -60,7 +60,7 @@ fun HomeScreen(
                 onQueryChange = {query = it},
                 onSearchClick = {/*TODO*/})
             FavoriteSection(items = favorites)
-            Text("**TODO: ADD PREVIOUS SEARCHES**")
+            RecentSection(items = recents)
         }
     }
 }
@@ -108,14 +108,14 @@ fun FavoriteSection(
 ){
     Column(
         modifier = modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
         Text(
             text = "Favorites",
             style = MaterialTheme.typography.titleMedium
         )
         LazyRow(
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             items(items){
                 area -> Text(area)
@@ -123,6 +123,29 @@ fun FavoriteSection(
         }
     }
 }
+
+@Composable
+fun RecentSection(
+    items: List<String>,
+    modifier: Modifier = Modifier
+){
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
+        Text(
+            text = "Recent searches",
+            style = MaterialTheme.typography.titleMedium
+        )
+
+        items.forEach{
+            area -> Text(area)
+        }
+
+    }
+}
+
+
 
 
 @Preview
