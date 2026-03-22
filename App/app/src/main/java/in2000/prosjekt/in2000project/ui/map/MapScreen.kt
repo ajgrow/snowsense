@@ -1,6 +1,5 @@
 package in2000.prosjekt.in2000project.ui.map
 
-import in2000.prosjekt.in2000project.data.SkiArea
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -31,8 +30,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import in2000.prosjekt.in2000project.data.SkiArea
 import in2000.prosjekt.in2000project.ui.reusables.BottomBar
 import in2000.prosjekt.in2000project.ui.reusables.TopBar
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
