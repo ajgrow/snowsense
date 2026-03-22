@@ -4,13 +4,24 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import in2000.prosjekt.in2000project.R
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
@@ -34,7 +45,7 @@ fun HomeScreen(
                 .padding(paddingValues)){
             //All content should go here
             Logo()
-            Text("**TODO: ADD SEARCHBAR**")
+            SearchSection(onSearchClick = {/*TODO*/})
             Text("**TODO: ADD FAVORITES**")
             Text("**TODO: ADD PREVIOUS SEARCHES**")
         }
@@ -50,6 +61,32 @@ fun Logo(
         contentDescription = "Placeholder for Logo"
     )
 }
+
+@Composable
+fun SearchSection(
+    onSearchClick: () -> Unit,
+    modifier: Modifier = Modifier
+){
+    var query by rememberSaveable { mutableStateOf("") }
+
+    OutlinedTextField(
+        modifier = modifier.fillMaxWidth(),
+        value = query,
+        onValueChange = { query = it},
+        placeholder = {Text("Search for area...")},
+        singleLine = true,
+        shape = RoundedCornerShape(50.dp),
+        trailingIcon = {
+            IconButton(onClick = onSearchClick) {
+                Icon(
+                    imageVector = Icons.Default.Search,
+                    contentDescription = "Search"
+                )
+            }
+        }
+    )
+}
+
 
 @Preview
 @Composable
