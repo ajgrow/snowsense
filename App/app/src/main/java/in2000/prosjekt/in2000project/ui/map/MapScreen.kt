@@ -35,7 +35,7 @@ import in2000.prosjekt.in2000project.ui.reusables.BottomBar
 import in2000.prosjekt.in2000project.ui.reusables.TopBar
 
 // This data class represents one ski touring area.
-// Each area has a name and some placeholder climate info.
+// Each area has a name and some placeholder climate info that we will use when we have frost
 data class SkiArea(
     val id: String,
     val name: String,
@@ -107,8 +107,7 @@ fun MapScreen() {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                // This makes sure your content is not hidden
-                // behind the top app bar or bottom app bar.
+                // Makes sure the content is not hidden behind the top app bar or bottom app bar.
                 .padding(paddingValues)
                 .padding(16.dp)
         ) {
@@ -119,7 +118,7 @@ fun MapScreen() {
                 modifier = Modifier.padding(bottom = 8.dp)
             )
 
-            // Small instruction text
+            // Instructional text
             Text(
                 text = "Select an area to view historical climate details.",
                 style = MaterialTheme.typography.bodyMedium,
