@@ -3,8 +3,10 @@ package in2000.prosjekt.in2000project.ui.home
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -31,6 +33,7 @@ import androidx.navigation.compose.rememberNavController
 import in2000.prosjekt.in2000project.ui.reusables.BottomBar
 import in2000.prosjekt.in2000project.ui.reusables.TopBar
 import androidx.compose.foundation.lazy.items
+
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
@@ -44,29 +47,36 @@ fun HomeScreen(
     val recents = listOf("Jotunheimen", "Rondane", "Romsdalen", "Hardangervidda", "Lofoten")
 
     Scaffold(
+        modifier = modifier,
         topBar = {TopBar(title ="Home")},
         bottomBar = {BottomBar(modifier, navController)}
     ) {
         paddingValues ->
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
+        LazyColumn(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(paddingValues)){
+                .padding(paddingValues),
+            contentPadding = PaddingValues(16.dp),          //adds padding around content
+            verticalArrangement = Arrangement.spacedBy(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ){
             //All content should go here
-            Logo()
-            SearchSection(
-                query = query,
-                onQueryChange = {query = it},
-                onSearchClick = {/*TODO*/})
-            FavoriteSection(items = favorites)
-            RecentSection(items = recents)
+            item{LogoSection()}
+
+            item {
+                SearchSection(
+                    query = query,
+                    onQueryChange = { query = it },
+                    onSearchClick = {/*TODO*/ })
+            }
+            item{FavoriteSection(items = favorites)}
+            item{RecentSection(items = recents)}
         }
     }
 }
 
 @Composable
-fun Logo(
+fun LogoSection(
     modifier: Modifier = Modifier
 ){
     Image(
