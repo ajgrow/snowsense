@@ -98,7 +98,7 @@ fun SearchSection(
     onQueryChange: (String) -> Unit,
     modifier: Modifier = Modifier
 ){
-
+    //We should add some rules to the searchSection, like restrictions on type of input and input length
     OutlinedTextField(
         modifier = modifier.fillMaxWidth(),
         value = query,
