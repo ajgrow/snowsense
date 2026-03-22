@@ -35,7 +35,6 @@ import in2000.prosjekt.in2000project.data.SkiArea
 import in2000.prosjekt.in2000project.ui.reusables.BottomBar
 import in2000.prosjekt.in2000project.ui.reusables.TopBar
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MapScreen(
@@ -133,8 +132,7 @@ fun FakeMap(
     onMapClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    // This is a fake map box for the MVP.
-    // It is just a styled container with clickable markers.
+    // This is the blue area on the MapScreen that is meant for where the map from MapBox will eventually go.
     Box(
         modifier = modifier
             .background(
@@ -143,7 +141,7 @@ fun FakeMap(
             )
             .clickable { onMapClick() }
     ) {
-        // "Map Placeholder" title inside the fake map
+        // "Map Placeholder" title inside the map area
         Text(
             text = "Map Placeholder",
             style = MaterialTheme.typography.titleMedium,
@@ -152,7 +150,7 @@ fun FakeMap(
                 .padding(top = 16.dp)
         )
 
-        // Instructions inside the map
+        // Instructions inside the map area
         Text(
             text = "Tap a location",
             style = MaterialTheme.typography.bodyMedium,
@@ -161,7 +159,7 @@ fun FakeMap(
                 .padding(top = 44.dp)
         )
 
-        // Marker
+        // Marker in the map area
         MapMarker(
             label = area.name,
             modifier = Modifier
@@ -180,7 +178,7 @@ fun MapMarker(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Circular marker icon
+        // Marker icon
         Box(
             modifier = Modifier
                 .padding(horizontal = 12.dp, vertical = 10.dp)
@@ -191,7 +189,7 @@ fun MapMarker(
             )
         }
 
-        // Label shown under the marker
+        // Label shown under the marker with the area name
         Surface(
             shape = RoundedCornerShape(12.dp),
             color = Color.White,
@@ -253,8 +251,7 @@ fun ClimateRow(
     label: String,
     value: String
 ) {
-    // This creates one labeled row of information
-    // inside the bottom sheet.
+    // This creates the rows of information within the bottom sheet i.e. Average snowfall, Average rainfall etc.
     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
         Text(
             text = label,
