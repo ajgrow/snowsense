@@ -30,6 +30,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import in2000.prosjekt.in2000project.data.SkiArea
 import in2000.prosjekt.in2000project.ui.reusables.BottomBar
 import in2000.prosjekt.in2000project.ui.reusables.TopBar
@@ -37,9 +39,11 @@ import in2000.prosjekt.in2000project.ui.reusables.TopBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MapScreen() {
+fun MapScreen(
+    modifier: Modifier = Modifier,
+    navController: NavController
+) {
     // Hardcoded sample data for the MVP.
-    // Later, this can come from your API instead.
     val skiAreas = remember {
         listOf(
             SkiArea(
@@ -83,12 +87,10 @@ fun MapScreen() {
     // It lets you place a top bar, bottom bar, and screen content.
     Scaffold(
         topBar = {
-            // Replace this with your real top app bar composable.
-            TopBar(modifier = Modifier, title = "TBD")
+            TopBar(modifier = Modifier, title = "Home")
         },
         bottomBar = {
-            // Replace this with your real bottom app bar composable.
-            BottomBar()
+            BottomBar(modifier, navController)
         }
     ) { paddingValues ->
 
@@ -308,40 +310,12 @@ fun ClimateRow(
             style = MaterialTheme.typography.bodyLarge
         )
     }
-=======
-import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
-import in2000.prosjekt.in2000project.ui.reusables.BottomBar
-import in2000.prosjekt.in2000project.ui.reusables.TopBar
-
-@Composable
-fun MapScreen(
-    modifier: Modifier = Modifier,
-    navController: NavController
-) {
-
-    Scaffold(
-        topBar = {TopBar(title ="Home")},
-        bottomBar = {BottomBar(modifier, navController)}
-    ) {
-            paddingValues ->
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(paddingValues)){
-            //All content should go here
-            Text("**TODO: ADD MAP**")
-        }
-    }
->>>>>>> d0daca118acc25039591f1ae666aa5fec00900e1
 }
 
 @Preview
 @Composable
 fun MapScreenPreview() {
-<<<<<<< HEAD
-    MapScreen()
+    MapScreen(navController = rememberNavController())
 }
 
 @Preview(showBackground = true)
@@ -360,7 +334,4 @@ fun BottomSheetPreview() {
     SkiAreaBottomSheetContent(
         area = sampleArea
     )
-=======
-    MapScreen(navController = rememberNavController())
->>>>>>> d0daca118acc25039591f1ae666aa5fec00900e1
 }
