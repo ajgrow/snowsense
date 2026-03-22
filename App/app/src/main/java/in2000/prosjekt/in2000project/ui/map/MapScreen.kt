@@ -1,6 +1,6 @@
 package in2000.prosjekt.in2000project.ui.map
 
-<<<<<<< HEAD
+import in2000.prosjekt.in2000project.data.SkiArea
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
@@ -20,42 +19,20 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
-=======
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
->>>>>>> d0daca118acc25039591f1ae666aa5fec00900e1
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-<<<<<<< HEAD
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-=======
->>>>>>> d0daca118acc25039591f1ae666aa5fec00900e1
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
-<<<<<<< HEAD
 import androidx.compose.ui.unit.dp
 import in2000.prosjekt.in2000project.ui.reusables.BottomBar
 import in2000.prosjekt.in2000project.ui.reusables.TopBar
-
-// This data class represents one ski touring area.
-// Each area has a name and some placeholder climate info that we will use when we have frost
-data class SkiArea(
-    val id: String,
-    val name: String,
-    val averageSnowfall: String,
-    val averageRainfall: String,
-    val averageWind: String,
-    val averageTemperature: String,
-    val guideNotes: String
-)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
