@@ -89,8 +89,14 @@ fun BottomBar(
             }
         )
         NavigationBarItem(
-            selected = false,
-            onClick = {/*TODO*/},
+            selected = currentRoute == Screen.Info.route,
+            onClick = {navController.navigate(Screen.Info.route){
+                popUpTo(navController.graph.findStartDestination().id) {
+                    saveState = true
+                }
+                launchSingleTop = true
+                restoreState = true
+            }},
             icon = {
                 Icon(
                     imageVector = Icons.Default.Info,
