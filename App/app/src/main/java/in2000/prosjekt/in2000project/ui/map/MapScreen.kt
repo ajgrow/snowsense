@@ -32,6 +32,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import in2000.prosjekt.in2000project.ui.map.MapboxMapScreen
 import in2000.prosjekt.in2000project.data.SkiArea
 import in2000.prosjekt.in2000project.ui.reusables.BottomBar
 import in2000.prosjekt.in2000project.ui.reusables.TopBar
@@ -93,8 +94,8 @@ fun MapScreen(
                 modifier = Modifier.padding(bottom = 16.dp)
             )
 
-            // FakeMap is just a placeholder for now. Once we have mapbox API, we can change this.
-            FakeMap(
+            //Map added here
+            Map(
                 onMapClick = {
                     isSheetOpen = true
                 },
@@ -127,7 +128,7 @@ fun MapScreen(
 }
 
 @Composable
-fun FakeMap(
+fun Map(
     onMapClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -140,23 +141,7 @@ fun FakeMap(
             )
             .clickable { onMapClick() }
     ) {
-        // "Map Placeholder" title inside the map area
-        Text(
-            text = "Map Placeholder",
-            style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier
-                .align(Alignment.TopCenter)
-                .padding(top = 16.dp)
-        )
-
-        // Instructions inside the map area
-        Text(
-            text = "Tap a location",
-            style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier
-                .align(Alignment.TopCenter)
-                .padding(top = 44.dp)
-        )
+        MapboxMapScreen()
     }
 }
 
