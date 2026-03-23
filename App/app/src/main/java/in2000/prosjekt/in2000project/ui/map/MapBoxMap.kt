@@ -4,14 +4,17 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import com.mapbox.geojson.Point
-import com.mapbox.maps.extension.compose.*
+import com.mapbox.maps.extension.compose.MapEffect
+import com.mapbox.maps.extension.compose.MapboxMap
 import com.mapbox.maps.extension.compose.animation.viewport.rememberMapViewportState
-import com.mapbox.maps.extension.style.layers.generated.*
+import com.mapbox.maps.extension.style.layers.addLayer
+import com.mapbox.maps.extension.style.layers.generated.fillLayer
+import com.mapbox.maps.extension.style.layers.generated.lineLayer
+import com.mapbox.maps.extension.style.sources.addSource
 import com.mapbox.maps.extension.style.sources.generated.geoJsonSource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import in2000.prosjekt.in2000project.repository.GeoJsonRepository
-
 @Composable
 fun MapScreen() {
     val viewportState = rememberMapViewportState {
