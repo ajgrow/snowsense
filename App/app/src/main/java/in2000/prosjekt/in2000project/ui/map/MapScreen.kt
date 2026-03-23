@@ -95,6 +95,7 @@ fun MapScreen(
             )
 
             //Map added here
+            //onMapClick is passed to the Map
             Map(
                 onMapClick = {
                     isSheetOpen = true
@@ -142,6 +143,8 @@ fun Map(
             .clickable { onMapClick() }
     ) {
         MapboxMapScreen(
+            //onMapClick is passed to the MapBoxMapScreen
+            //eventually polygons will be used
             onMapClick = onMapClick
         )
     }

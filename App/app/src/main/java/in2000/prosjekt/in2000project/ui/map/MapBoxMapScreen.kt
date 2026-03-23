@@ -42,6 +42,8 @@ fun MapboxMapScreen(
         modifier = Modifier.fillMaxSize(),
         mapViewportState = viewportState
     ) {
+
+        //this click listener just works generally on the map
         MapEffect(Unit) { mapView ->
             mapView.gestures.addOnMapClickListener {
                 onMapClick()
