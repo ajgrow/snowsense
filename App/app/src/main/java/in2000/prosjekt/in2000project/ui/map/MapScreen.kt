@@ -18,21 +18,18 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import in2000.prosjekt.in2000project.ui.map.MapboxMapScreen
 import in2000.prosjekt.in2000project.data.SkiArea
 import in2000.prosjekt.in2000project.ui.reusables.BottomBar
 import in2000.prosjekt.in2000project.ui.reusables.TopBar
@@ -58,10 +55,6 @@ fun MapScreen(
     //Controls whether the bottom sheet is visible or not by keeping track of if the user has clicked the map
     //if this is set to null then the ModalBottomSheet is not open
     var isSheetOpen by rememberSaveable { mutableStateOf(false) }
-
-    //this creates a state object or "controller" that stores the UI for the bottom sheet
-    //when skipPartiallyExpanded = true, this means that the sheet opens fully instead of being partially expanded
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
 
     Scaffold(
         topBar = {
@@ -111,7 +104,6 @@ fun MapScreen(
     if (isSheetOpen){
         ModalBottomSheet(
             onDismissRequest = { isSheetOpen = false },
-            sheetState = sheetState,
             containerColor = MaterialTheme.colorScheme.surface,
             tonalElevation = 0.dp,
             dragHandle = null
