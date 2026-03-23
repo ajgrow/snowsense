@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -95,7 +94,6 @@ fun MapScreen(
 
             // FakeMap is just a placeholder for now. Once we have mapbox API, we can change this.
             FakeMap(
-                area = skiArea,
                 onMapClick = {
                     selectedArea = skiArea
                 },
@@ -128,7 +126,6 @@ fun MapScreen(
 
 @Composable
 fun FakeMap(
-    area: SkiArea,
     onMapClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -158,52 +155,9 @@ fun FakeMap(
                 .align(Alignment.TopCenter)
                 .padding(top = 44.dp)
         )
-
-        // Marker in the map area
-        MapMarker(
-            label = area.name,
-            modifier = Modifier
-                .align(Alignment.TopStart)
-                .offset(x = 32.dp, y = 120.dp),
-        )
     }
 }
 
-@Composable
-fun MapMarker(
-    label: String,
-    modifier: Modifier = Modifier,
-) {
-    Column(
-        modifier = modifier,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        // Marker icon
-        Box(
-            modifier = Modifier
-                .padding(horizontal = 12.dp, vertical = 10.dp)
-        ) {
-            Text(
-                text = "📍",
-                color = Color.White
-            )
-        }
-
-        // Label shown under the marker with the area name
-        Surface(
-            shape = RoundedCornerShape(12.dp),
-            color = Color.White,
-            tonalElevation = 2.dp,
-            modifier = Modifier.padding(top = 6.dp)
-        ) {
-            Text(
-                text = label,
-                modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
-                style = MaterialTheme.typography.labelLarge
-            )
-        }
-    }
-}
 
 @Composable
 fun SkiAreaBottomSheetContent(
