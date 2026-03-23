@@ -13,4 +13,11 @@ object ApiKeys {
                 SECRETS_LOCATION_MSG.format("FROST_CLIENT_ID")
             }
         }
+
+    val mapboxAccessToken: String
+        get() = BuildConfig.MAPBOX_ACCESS_TOKEN.also {
+            require(it.isNotBlank()) {
+                SECRETS_LOCATION_MSG.format("MAPBOX_ACCESS_TOKEN")
+            }
+        }
 }
