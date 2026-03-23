@@ -26,6 +26,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -77,6 +78,7 @@ fun MapScreen(
             Text(
                 text = "Map",
                 style = MaterialTheme.typography.headlineMedium,
+                fontWeight = Bold,
                 modifier = Modifier.padding(bottom = 8.dp)
             )
 
