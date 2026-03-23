@@ -36,6 +36,15 @@ import in2000.prosjekt.in2000project.data.SkiArea
 import in2000.prosjekt.in2000project.ui.reusables.BottomBar
 import in2000.prosjekt.in2000project.ui.reusables.TopBar
 
+private val previewSkiArea = SkiArea(
+    id = "1",
+    name = "Galdhøpiggen Touring Zone",
+    avalancheDangerLevel = "High",
+    averageSnowfall = "210 cm seasonal average",
+    averagePrecipitation = "95 mm monthly average",
+    dailyMeanTemperature = "-3.2°C winter average"
+)
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MapScreen(
@@ -43,17 +52,7 @@ fun MapScreen(
     navController: NavController
 ) {
     // Hardcoded sample data for the MVP, however, when Frost API is ready this should move into the ViewModel
-    val skiArea = remember {
-        SkiArea(
-            id = "1",
-            name = "Lyngen Touring Zone",
-            averageSnowfall = "Placeholder: 210 cm seasonal average",
-            averageRainfall = "Placeholder: 95 mm monthly average",
-            averageWind = "Placeholder: 7.8 m/s average wind speed",
-            averageTemperature = "Placeholder: -3.2°C winter average",
-            guideNotes = "Placeholder: Popular ski touring area with exposed alpine terrain"
-        )
-    }
+    val skiArea = remember { previewSkiArea }
 
     //Controls whether the bottom sheet is visible or not by keeping track of if the user has clicked the map
     //if this is set to null then the ModalBottomSheet is not open
@@ -193,11 +192,10 @@ fun SkiAreaBottomSheetContent(
             HorizontalDivider()
 
             // Placeholder rows for climate information
+            ClimateRow(label = "Avalanche danger", value = area.avalancheDangerLevel)
             ClimateRow("Average snowfall", area.averageSnowfall)
-            ClimateRow("Average rainfall", area.averageRainfall)
-            ClimateRow("Average wind", area.averageWind)
-            ClimateRow("Average temperature", area.averageTemperature)
-            ClimateRow("Guide notes", area.guideNotes)
+            ClimateRow("Average precipitation", area.averagePrecipitation)
+            ClimateRow("Average temperature", area.dailyMeanTemperature)
         }
     }
 }
@@ -229,17 +227,7 @@ fun MapScreenPreview() {
 @Preview(showBackground = true)
 @Composable
 fun BottomSheetPreview() {
-    val sampleArea = SkiArea(
-        id = "1",
-        name = "Lyngen Touring Zone",
-        averageSnowfall = "210 cm seasonal average",
-        averageRainfall = "95 mm monthly average",
-        averageWind = "7.8 m/s average wind speed",
-        averageTemperature = "-3.2°C winter average",
-        guideNotes = "Popular ski touring area with exposed alpine terrain"
-    )
-
     SkiAreaBottomSheetContent(
-        area = sampleArea
+        area = previewSkiArea
     )
 }
