@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -22,6 +23,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -55,7 +57,7 @@ fun MapScreen(
 
     //Controls whether the bottom sheet is visible or not by keeping track of if the user has clicked the map
     //if this is set to null then the ModalBottomSheet is not open
-    var selectedArea by remember { mutableStateOf<SkiArea?>(null) }
+    var isSheetOpen by rememberSaveable { mutableStateOf(false) }
 
     //this creates a state object or "controller" that stores the UI for the bottom sheet
     //when skipPartiallyExpanded = true, this means that the sheet opens fully instead of being partially expanded
@@ -95,7 +97,7 @@ fun MapScreen(
             // FakeMap is just a placeholder for now. Once we have mapbox API, we can change this.
             FakeMap(
                 onMapClick = {
-                    selectedArea = skiArea
+                    isSheetOpen = true
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -104,20 +106,21 @@ fun MapScreen(
         }
     }
 
-    // Let lets you use a value only if it exists, but if it's null then nothing happens
-    //This is for the bottom sheet - if there is a selectedArea, then it will open the bottom sheet
-    //otherwise it will not open the bottom sheet
-    selectedArea?.let { area ->
+    //This is for the bottom sheet - if isSheetOpen is set to true, then it will open otherwise, it stays closed
+    if (isSheetOpen){
         ModalBottomSheet(
-            onDismissRequest = { selectedArea = null },
-            sheetState = sheetState
+            onDismissRequest = { isSheetOpen = false },
+            sheetState = sheetState,
+            containerColor = MaterialTheme.colorScheme.surface,
+            tonalElevation = 0.dp,
+            dragHandle = null
         ) {
             SkiAreaBottomSheetContent(
-                // We pass the selected area (from the lambda) into the bottom sheet
-                area = area,
+                area = skiArea,
                 modifier = Modifier
                     .fillMaxWidth()
                     .heightIn(min = 320.dp)
+                    .navigationBarsPadding()
                     .padding(bottom = 24.dp)
             )
         }
@@ -165,7 +168,6 @@ fun SkiAreaBottomSheetContent(
     modifier: Modifier = Modifier
 ) {
     // This is the content inside the bottom sheet.
-    // It shows the selected ski area's details.
     Surface(
         modifier = modifier.fillMaxWidth(),
         color = MaterialTheme.colorScheme.surface
