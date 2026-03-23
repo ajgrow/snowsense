@@ -15,8 +15,9 @@ import com.mapbox.maps.extension.style.sources.generated.geoJsonSource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import in2000.prosjekt.in2000project.repository.GeoJsonRepository
+
 @Composable
-fun MapScreen() {
+fun MapboxMapScreen() {
     val viewportState = rememberMapViewportState {
         setCameraOptions {
             center(Point.fromLngLat(10.0, 65.0))
