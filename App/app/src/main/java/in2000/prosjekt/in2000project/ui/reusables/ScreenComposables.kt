@@ -2,6 +2,7 @@ package in2000.prosjekt.in2000project.ui.reusables
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Settings
@@ -92,8 +93,8 @@ fun BottomBar(
             onClick = {/*TODO*/},
             icon = {
                 Icon(
-                    imageVector = Icons.Default.Notifications,
-                    contentDescription = "Go to notifications screen",
+                    imageVector = Icons.Default.Info,
+                    contentDescription = "Go to information screen",
                 )
             },
         )
