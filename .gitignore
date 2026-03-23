@@ -1,28 +1,14 @@
-*.iml
-.gradle
-/local.properties
-.idea/
-/.idea/caches/
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
+# OS junk
 .DS_Store
-/build
-/captures
-.externalNativeBuild
-.cxx
-local.properties
+Thumbs.db
 
-/app/build/
-*/build/
-.navigation/
+# IDE
+.idea/
+*.iml
+
+# Secrets / env
 .env
 .env.local
-/.idea/tasks.xml
-/.idea/gradle.xml
-/.idea/dictionaries
-Thumbs.db
-output.json
 
+# Build artifacts
+*/build/
