@@ -11,6 +11,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.mapbox.common.MapboxOptions
+import com.mapbox.maps.MapboxMap
+import com.mapbox.maps.extension.compose.MapboxMap
+import in2000.prosjekt.in2000project.data.ApiKeys
 import in2000.prosjekt.in2000project.navigation.AppNavigation
 import in2000.prosjekt.in2000project.ui.theme.In2000projectTheme
 
@@ -18,6 +22,10 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        // Must be set before calling MapBox composable.
+        MapboxOptions.accessToken = ApiKeys.mapboxAccessToken
+
         setContent {
             In2000projectTheme {
                 AppNavigation()

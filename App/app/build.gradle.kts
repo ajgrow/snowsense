@@ -40,6 +40,9 @@ android {
 }
 
 dependencies {
+    implementation("com.mapbox.maps:android-ndk27:11.19.0")
+    implementation("com.mapbox.extension:maps-compose-ndk27:11.19.0")
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
