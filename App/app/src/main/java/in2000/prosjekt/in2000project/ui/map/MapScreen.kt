@@ -141,7 +141,9 @@ fun Map(
             )
             .clickable { onMapClick() }
     ) {
-        MapboxMapScreen()
+        MapboxMapScreen(
+            onMapClick = onMapClick
+        )
     }
 }
 
