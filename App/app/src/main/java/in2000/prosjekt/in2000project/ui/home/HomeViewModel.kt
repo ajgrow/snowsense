@@ -35,10 +35,11 @@ class HomeViewModel: ViewModel(){
     }
 
     fun updateSearchQuery(query: String){
+        //make a copy of the current state and change the searchQuery to the new query
         _homeState.update { it.copy(searchQuery = query) }
     }
 
     fun onSearch(){
-        //TODO: Implement logic for search function 
+        //TODO: Implement logic for search function
     }
 }
