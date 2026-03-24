@@ -33,4 +33,12 @@ class HomeViewModel: ViewModel(){
             }
         }
     }
+
+    fun updateSearchQuery(query: String){
+        _homeState.update { it.copy(searchQuery = query) }
+    }
+
+    fun onSearch(){
+        //TODO: Implement logic for search function 
+    }
 }
