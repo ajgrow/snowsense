@@ -5,5 +5,6 @@ sealed class Screen(
 ) {
     object Home : Screen("home")
     object Map : Screen("map")
+    object Info : Screen("info")
 
 }
