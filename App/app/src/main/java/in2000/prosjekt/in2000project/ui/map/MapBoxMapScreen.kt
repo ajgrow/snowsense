@@ -12,12 +12,15 @@ import com.mapbox.maps.extension.style.layers.generated.fillLayer
 import com.mapbox.maps.extension.style.layers.generated.lineLayer
 import com.mapbox.maps.extension.style.sources.addSource
 import com.mapbox.maps.extension.style.sources.generated.geoJsonSource
+import com.mapbox.maps.plugin.gestures.gestures
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import in2000.prosjekt.in2000project.repository.GeoJsonRepository
 
 @Composable
-fun MapboxMapScreen() {
+fun MapboxMapScreen(
+    onMapClick: () -> Unit
+) {
     val viewportState = rememberMapViewportState {
         setCameraOptions {
             center(Point.fromLngLat(10.0, 65.0))
@@ -39,6 +42,15 @@ fun MapboxMapScreen() {
         modifier = Modifier.fillMaxSize(),
         mapViewportState = viewportState
     ) {
+
+        //this click listener just works generally on the map
+        MapEffect(Unit) { mapView ->
+            mapView.gestures.addOnMapClickListener {
+                onMapClick()
+                true //return true to show that the click was handled
+            }
+        }
+
         MapEffect(geoJson) { mapView ->
 
             val data = geoJson ?: return@MapEffect
