@@ -21,9 +21,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -36,26 +33,22 @@ import in2000.prosjekt.in2000project.ui.reusables.BottomBar
 import in2000.prosjekt.in2000project.ui.reusables.TopBar
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
-    navController : NavController
-){
-    //Used in SearchSection. Should be moved to Viewmodel?
-    var query by rememberSaveable { mutableStateOf("") }
-
-    // Mock data: these should eventually be moved to a ViewModel
-    val favorites = listOf("Jotunheimen", "Rondane")
-    val recents = listOf("Jotunheimen", "Rondane", "Romsdalen", "Hardangervidda", "Lofoten","Vesterålen",)
+    navController: NavController,
+    homeViewModel: HomeViewModel = viewModel()
+) {
+    val uiState by homeViewModel.homeState.collectAsStateWithLifecycle()
 
     Scaffold(
         modifier = modifier,
-        topBar = {TopBar(title ="Home")},
-        bottomBar = {BottomBar(modifier, navController)}
-    ) {
-        paddingValues ->
+        topBar = { TopBar(title = "Home") },
+        bottomBar = { BottomBar(modifier, navController) }
+    ) { paddingValues ->
         // Using LazyColumn for the whole screen ensures everything is scrollable
         LazyColumn(
             modifier = Modifier
@@ -64,18 +57,23 @@ fun HomeScreen(
             contentPadding = PaddingValues(16.dp),          //adds padding around content
             verticalArrangement = Arrangement.spacedBy(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
-        ){
+        ) {
             //All content should go here
-            item{LogoSection()}
+            item { LogoSection() }
 
             item {
                 SearchSection(
-                    query = query,
-                    onQueryChange = { query = it },
-                    onSearchClick = {/*TODO*/ })
+                    //get states from the viewmodel
+                    query = uiState.searchQuery,  
+                    onQueryChange = { newText -> 
+                        // newText is the updated string passed from OutlinedTextField's onValueChange in SearchSection
+                        homeViewModel.updateSearchQuery(newText) 
+                    },
+                    onSearchClick = { homeViewModel.onSearch() }
+                )
             }
-            item{FavoriteSection(items = favorites)}
-            item{RecentSection(items = recents)}
+            item { FavoriteSection(items = uiState.favorites) }
+            item { RecentSection(items = uiState.recentSearches) }
         }
     }
 }
@@ -83,7 +81,7 @@ fun HomeScreen(
 @Composable
 fun LogoSection(
     modifier: Modifier = Modifier
-){
+) {
     Image(
         painterResource(R.drawable.logo_placeholder),
         contentDescription = "App Logo",
@@ -97,13 +95,13 @@ fun SearchSection(
     onSearchClick: () -> Unit,
     onQueryChange: (String) -> Unit,
     modifier: Modifier = Modifier
-){
+) {
     //We should add some rules to the searchSection, like restrictions on type of input and input length
     OutlinedTextField(
         modifier = modifier.fillMaxWidth(),
         value = query,
         onValueChange = onQueryChange,
-        placeholder = {Text("Search for area...")},
+        placeholder = { Text("Search for area...") },
         singleLine = true,
         shape = RoundedCornerShape(50.dp),
         trailingIcon = {
@@ -121,7 +119,7 @@ fun SearchSection(
 fun FavoriteSection(
     items: List<String>,
     modifier: Modifier = Modifier
-){
+) {
     Column(
         modifier = modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(10.dp)
@@ -133,8 +131,8 @@ fun FavoriteSection(
         LazyRow(
             horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            items(items){
-                area -> AreaCard(area)
+            items(items) { area ->
+                AreaCard(area)
             }
         }
     }
@@ -144,7 +142,7 @@ fun FavoriteSection(
 fun RecentSection(
     items: List<String>,
     modifier: Modifier = Modifier
-){
+) {
     Column(
         modifier = modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(10.dp)
@@ -154,8 +152,8 @@ fun RecentSection(
             style = MaterialTheme.typography.titleMedium
         )
 
-        items.forEach{
-            area -> AreaCard(area)
+        items.forEach { area ->
+            AreaCard(area)
         }
 
     }
@@ -176,13 +174,10 @@ fun AreaCard(
     }
 }
 
-
-
-
 @Preview
 @Composable
 fun HomeScreenPreview(
     modifier: Modifier = Modifier
-){
+) {
     HomeScreen(navController = rememberNavController())
 }
