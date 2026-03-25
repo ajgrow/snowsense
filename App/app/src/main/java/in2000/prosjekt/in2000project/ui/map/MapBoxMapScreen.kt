@@ -31,17 +31,15 @@ private const val WMS_BASE =
 private const val WMS_OVERVIEW =
     "$WMS_BASE?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap" +
             "&BBOX={bbox-epsg-3857}&CRS=EPSG:3857&WIDTH=256&HEIGHT=256" +
-            "&LAYERS=PotensieltSkredfareOmr,Dekningskart" +
+            "&LAYERS=PotensieltSkredfareOmr" +
             "&STYLES=&FORMAT=image/png&TRANSPARENT=TRUE"
 
 // Detail layers
 private const val WMS_DETAIL =
     "$WMS_BASE?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap" +
             "&BBOX={bbox-epsg-3857}&CRS=EPSG:3857&WIDTH=256&HEIGHT=256" +
-            "&LAYERS=S3_snoskred_Aktsomhetsomrade," +
-            "S2_snoskred_u_skogeffekt_Aktsomhetsomrade," +
+            "&LAYERS=" +
             "S2_snoskred_m_skogeffekt_Aktsomhetsomrade," +
-            "Skog_med_betydning_for_snoskredfare" +
             "&STYLES=&FORMAT=image/png&TRANSPARENT=TRUE"
 
 @Composable
