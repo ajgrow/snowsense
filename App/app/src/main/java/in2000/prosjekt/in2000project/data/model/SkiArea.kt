@@ -1,4 +1,4 @@
-package in2000.prosjekt.in2000project.data
+package in2000.prosjekt.in2000project.data.model
 
 // This data class represents one ski touring area.
 // Each area has a name and some placeholder climate info that we will use when we have frost

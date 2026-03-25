@@ -15,7 +15,7 @@ import com.mapbox.maps.extension.style.sources.generated.geoJsonSource
 import com.mapbox.maps.plugin.gestures.gestures
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import in2000.prosjekt.in2000project.repository.GeoJsonRepository
+import in2000.prosjekt.in2000project.data.repository.GeoJsonRepository
 
 @Composable
 fun MapboxMapScreen(
