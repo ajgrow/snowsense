@@ -31,17 +31,15 @@ private const val WMS_BASE =
 private const val WMS_OVERVIEW =
     "$WMS_BASE?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap" +
             "&BBOX={bbox-epsg-3857}&CRS=EPSG:3857&WIDTH=256&HEIGHT=256" +
-            "&LAYERS=PotensieltSkredfareOmr,Dekningskart" +
+            "&LAYERS=PotensieltSkredfareOmr" +
             "&STYLES=&FORMAT=image/png&TRANSPARENT=TRUE"
 
 // Detail layers
 private const val WMS_DETAIL =
     "$WMS_BASE?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap" +
             "&BBOX={bbox-epsg-3857}&CRS=EPSG:3857&WIDTH=256&HEIGHT=256" +
-            "&LAYERS=S3_snoskred_Aktsomhetsomrade," +
-            "S2_snoskred_u_skogeffekt_Aktsomhetsomrade," +
+            "&LAYERS=" +
             "S2_snoskred_m_skogeffekt_Aktsomhetsomrade," +
-            "Skog_med_betydning_for_snoskredfare" +
             "&STYLES=&FORMAT=image/png&TRANSPARENT=TRUE"
 
 @Composable
@@ -89,14 +87,14 @@ fun MapboxMapScreen(
                             tiles(listOf(WMS_OVERVIEW))
                             tileSize(256)
                             minzoom(4)
-                            maxzoom(11)
+                            maxzoom(12)
                             attribution("© NVE")
                         }
                     )
                     style.addLayer(
                         rasterLayer("snoskred-overview-layer", "snoskred-overview-source") {
-                            rasterOpacity(0.75)
-                            maxZoom(11.0)
+                            rasterOpacity(0.5)
+                            maxZoom(11.5)
                         }
                     )
 
@@ -105,15 +103,15 @@ fun MapboxMapScreen(
                         rasterSource("snoskred-detail-source") {
                             tiles(listOf(WMS_DETAIL))
                             tileSize(256)
-                            minzoom(12)
+                            minzoom(8)
                             maxzoom(18)
                             attribution("© NVE")
                         }
                     )
                     style.addLayer(
                         rasterLayer("snoskred-detail-layer", "snoskred-detail-source") {
-                            rasterOpacity(0.75)
-                            minZoom(12.0)
+                            rasterOpacity(0.9)
+                            minZoom(8.0)
                         }
                     )
 
