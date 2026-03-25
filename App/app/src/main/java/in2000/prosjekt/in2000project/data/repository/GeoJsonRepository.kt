@@ -1,4 +1,4 @@
-package in2000.prosjekt.in2000project.repository
+package in2000.prosjekt.in2000project.data.repository
 
 import java.net.URL
 

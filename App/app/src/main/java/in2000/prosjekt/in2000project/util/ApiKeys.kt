@@ -1,7 +1,6 @@
-package in2000.prosjekt.in2000project.data
+package in2000.prosjekt.in2000project.util
 
 import in2000.prosjekt.in2000project.BuildConfig
-
 
 object ApiKeys {
     private const val SECRETS_LOCATION_MSG =

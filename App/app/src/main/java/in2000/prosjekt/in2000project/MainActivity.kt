@@ -14,7 +14,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.mapbox.common.MapboxOptions
 import com.mapbox.maps.MapboxMap
 import com.mapbox.maps.extension.compose.MapboxMap
-import in2000.prosjekt.in2000project.data.ApiKeys
+import in2000.prosjekt.in2000project.util.ApiKeys
 import in2000.prosjekt.in2000project.navigation.AppNavigation
 import in2000.prosjekt.in2000project.ui.theme.In2000projectTheme
 
