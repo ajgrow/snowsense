@@ -1,21 +1,48 @@
 package in2000.prosjekt.in2000project.ui.map
 
+import android.util.Log
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import com.mapbox.geojson.Point
+import com.mapbox.maps.Style
 import com.mapbox.maps.extension.compose.MapEffect
 import com.mapbox.maps.extension.compose.MapboxMap
 import com.mapbox.maps.extension.compose.animation.viewport.rememberMapViewportState
 import com.mapbox.maps.extension.style.layers.addLayer
 import com.mapbox.maps.extension.style.layers.generated.fillLayer
 import com.mapbox.maps.extension.style.layers.generated.lineLayer
+import com.mapbox.maps.extension.style.layers.generated.rasterLayer
 import com.mapbox.maps.extension.style.sources.addSource
 import com.mapbox.maps.extension.style.sources.generated.geoJsonSource
+import com.mapbox.maps.extension.style.sources.generated.rasterSource
 import com.mapbox.maps.plugin.gestures.gestures
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import in2000.prosjekt.in2000project.data.repository.GeoJsonRepository
+
+private const val TAG = "SnoskredWMS"
+
+private const val WMS_BASE =
+    "https://kart.nve.no/enterprise/services/SnoskredAktsomhet/MapServer/WMSServer"
+
+// Overview layers
+private const val WMS_OVERVIEW =
+    "$WMS_BASE?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap" +
+            "&BBOX={bbox-epsg-3857}&CRS=EPSG:3857&WIDTH=256&HEIGHT=256" +
+            "&LAYERS=PotensieltSkredfareOmr,Dekningskart" +
+            "&STYLES=&FORMAT=image/png&TRANSPARENT=TRUE"
+
+// Detail layers
+private const val WMS_DETAIL =
+    "$WMS_BASE?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap" +
+            "&BBOX={bbox-epsg-3857}&CRS=EPSG:3857&WIDTH=256&HEIGHT=256" +
+            "&LAYERS=S3_snoskred_Aktsomhetsomrade," +
+            "S2_snoskred_u_skogeffekt_Aktsomhetsomrade," +
+            "S2_snoskred_m_skogeffekt_Aktsomhetsomrade," +
+            "Skog_med_betydning_for_snoskredfare" +
+            "&STYLES=&FORMAT=image/png&TRANSPARENT=TRUE"
 
 @Composable
 fun MapboxMapScreen(
@@ -38,42 +65,85 @@ fun MapboxMapScreen(
         }
     }
 
-    MapboxMap(
-        modifier = Modifier.fillMaxSize(),
-        mapViewportState = viewportState
-    ) {
 
-        //this click listener just works generally on the map
-        MapEffect(Unit) { mapView ->
-            mapView.gestures.addOnMapClickListener {
-                onMapClick()
-                true //return true to show that the click was handled
+    Box(modifier = Modifier.fillMaxSize()) {
+        MapboxMap(
+            modifier = Modifier.fillMaxSize(),
+            mapViewportState = viewportState
+        ) {
+            //this click listener just works generally on the map
+            MapEffect(Unit) { mapView ->
+                mapView.gestures.addOnMapClickListener {
+                    onMapClick()
+                    true //return true to show that the click was handled
+                }
             }
-        }
 
-        MapEffect(geoJson) { mapView ->
+            MapEffect(Unit) { mapView ->
+                mapView.mapboxMap.loadStyle(Style.OUTDOORS) { style ->
+                    Log.d(TAG, "Style loaded, adding WMS sources")
 
-            val data = geoJson ?: return@MapEffect
-            val mapboxMap = mapView.mapboxMap
+                    // Low zoom data
+                    style.addSource(
+                        rasterSource("snoskred-overview-source") {
+                            tiles(listOf(WMS_OVERVIEW))
+                            tileSize(256)
+                            minzoom(4)
+                            maxzoom(11)
+                            attribution("© NVE")
+                        }
+                    )
+                    style.addLayer(
+                        rasterLayer("snoskred-overview-layer", "snoskred-overview-source") {
+                            rasterOpacity(0.75)
+                            maxZoom(11.0)
+                        }
+                    )
 
-            mapboxMap.getStyle { style ->
+                    // High zoom data
+                    style.addSource(
+                        rasterSource("snoskred-detail-source") {
+                            tiles(listOf(WMS_DETAIL))
+                            tileSize(256)
+                            minzoom(12)
+                            maxzoom(18)
+                            attribution("© NVE")
+                        }
+                    )
+                    style.addLayer(
+                        rasterLayer("snoskred-detail-layer", "snoskred-detail-source") {
+                            rasterOpacity(0.75)
+                            minZoom(12.0)
+                        }
+                    )
 
-                val source = geoJsonSource("nve-source") {
-                    data(data)
                 }
-                style.addSource(source)
+            }
 
-                val fillLayer = fillLayer("nve-fill", "nve-source") {
-                    fillColor("#ff0000")
-                    fillOpacity(0.8)
-                }
-                style.addLayer(fillLayer)
+            MapEffect(geoJson) { mapView ->
 
-                val lineLayer = lineLayer("nve-outline", "nve-source") {
-                    lineColor("#ff0000")
-                    lineWidth(2.5)
+                val data = geoJson ?: return@MapEffect
+                val mapboxMap = mapView.mapboxMap
+
+                mapboxMap.getStyle { style ->
+
+                    val source = geoJsonSource("nve-source") {
+                        data(data)
+                    }
+                    style.addSource(source)
+
+                    val fillLayer = fillLayer("nve-fill", "nve-source") {
+                        fillColor("#ff0000")
+                        fillOpacity(0.8)
+                    }
+                    style.addLayer(fillLayer)
+
+                    val lineLayer = lineLayer("nve-outline", "nve-source") {
+                        lineColor("#ff0000")
+                        lineWidth(2.5)
+                    }
+                    style.addLayer(lineLayer)
                 }
-                style.addLayer(lineLayer)
             }
         }
     }
