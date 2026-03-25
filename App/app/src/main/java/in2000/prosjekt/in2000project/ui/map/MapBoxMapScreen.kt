@@ -87,14 +87,14 @@ fun MapboxMapScreen(
                             tiles(listOf(WMS_OVERVIEW))
                             tileSize(256)
                             minzoom(4)
-                            maxzoom(11)
+                            maxzoom(12)
                             attribution("© NVE")
                         }
                     )
                     style.addLayer(
                         rasterLayer("snoskred-overview-layer", "snoskred-overview-source") {
-                            rasterOpacity(0.75)
-                            maxZoom(11.0)
+                            rasterOpacity(0.5)
+                            maxZoom(11.5)
                         }
                     )
 
@@ -103,15 +103,15 @@ fun MapboxMapScreen(
                         rasterSource("snoskred-detail-source") {
                             tiles(listOf(WMS_DETAIL))
                             tileSize(256)
-                            minzoom(12)
+                            minzoom(8)
                             maxzoom(18)
                             attribution("© NVE")
                         }
                     )
                     style.addLayer(
                         rasterLayer("snoskred-detail-layer", "snoskred-detail-source") {
-                            rasterOpacity(0.75)
-                            minZoom(12.0)
+                            rasterOpacity(0.9)
+                            minZoom(8.0)
                         }
                     )
 
