@@ -14,9 +14,12 @@ data class DangerLevel(
 )
 
 data class InfoUiState(
-    val aboutApp: String = "",
-    val teamInfo: String = "",
+    val title : String = "",
+    val teamTitle: String = "",
+    val aboutTeam: String = "",
+    val avalancheTitle: String = "",
     val avalancheGeneralInfo: String = "",
+    val dangerTitle: String = "",
     val dangerLevels: List<DangerLevel> = emptyList()
 )
 
@@ -28,9 +31,12 @@ class InfoViewModel: ViewModel(){
         viewModelScope.launch {
             _infoState.update { currentState ->
                 currentState.copy(
-                    aboutApp = "We are a group of incredibly talented, wonderfully creative, and pretty f***ing cool IN2000 students. We have been tasked with making the coooooooolest app you've ever seen and that's what we plan to do. This page is just FYI, but click back to Home or the Map for more :)",
-                    teamInfo = "The Team",
+                    title = "About the app",
+                    teamTitle = "The Team",
+                    aboutTeam = "We are a group of incredibly talented, wonderfully creative, and pretty f***ing cool IN2000 students. We have been tasked with making the coooooooolest app you've ever seen and that's what we plan to do. This page is just FYI, but click back to Home or the Map for more :)",
+                    avalancheTitle = "Avalanche Info",
                     avalancheGeneralInfo = "Avalanches have become increasingly more common as Global Climate Change keeps on keeping on. So when you're out shreddin', you gots ta be careful. That's why we created this app! We hope you enjoy it.",
+                    dangerTitle = "Avalanche Danger Levels",
                     dangerLevels = listOf(
                         DangerLevel(
                             level = "1 - Low",
