@@ -26,7 +26,8 @@ data class InfoUiState(
 class InfoViewModel: ViewModel(){
     private val _infoState = MutableStateFlow(InfoUiState())
     val infoState: StateFlow<InfoUiState> = _infoState.asStateFlow()
-    
+
+    //initialize with mock data 
     init {
         viewModelScope.launch {
             _infoState.update { currentState ->
