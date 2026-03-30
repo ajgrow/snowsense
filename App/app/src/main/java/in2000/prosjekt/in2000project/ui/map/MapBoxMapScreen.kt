@@ -18,9 +18,9 @@ import com.mapbox.maps.extension.style.sources.addSource
 import com.mapbox.maps.extension.style.sources.generated.geoJsonSource
 import com.mapbox.maps.extension.style.sources.generated.rasterSource
 import com.mapbox.maps.plugin.gestures.gestures
+import in2000.prosjekt.in2000project.data.repository.GeoJsonRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import in2000.prosjekt.in2000project.data.repository.GeoJsonRepository
 
 private const val TAG = "SnoskredWMS"
 
