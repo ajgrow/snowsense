@@ -108,30 +108,50 @@ fun LogoSection(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchSection(
-    query: String,
-    onSearchClick: () -> Unit,
-    onQueryChange: (String) -> Unit,
+    textFieldState : TextFieldState,
+    onSearch: (String) -> Unit,
+    searchResults: List<String>,
     modifier: Modifier = Modifier
 ) {
-    //We should add some rules to the searchSection, like restrictions on type of input and input length
-    OutlinedTextField(
-        modifier = modifier.fillMaxWidth(),
-        value = query,
-        onValueChange = onQueryChange,
-        placeholder = { Text("Search for area...") },
-        singleLine = true,
-        shape = RoundedCornerShape(50.dp),
-        trailingIcon = {
-            IconButton(onClick = onSearchClick) {
-                Icon(
-                    imageVector = Icons.Default.Search,
-                    contentDescription = "Search"
+    var expanded by rememberSaveable { mutableStateOf(false) }
+        //We should add some rules to the searchSection, like restrictions on type of input and input length
+        DockedSearchBar(
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+            inputField = {
+                SearchBarDefaults.InputField(
+                    query = textFieldState.text.toString(),
+                    onQueryChange = { textFieldState.edit { replace(0, length, it) } },
+                    onSearch = {
+                        onSearch(textFieldState.text.toString())
+                        expanded = false
+                    },
+                    expanded = expanded,
+                    onExpandedChange = { expanded = it },
+                    placeholder = { Text("Search") }
                 )
+            },
+            expanded = expanded,
+            onExpandedChange = { expanded = it }
+        ) {
+            Column(Modifier.verticalScroll(rememberScrollState())) {
+                searchResults.forEach { result ->
+                    ListItem(
+                        headlineContent = { Text(result) },
+                        modifier = Modifier
+                            .clickable {
+                                textFieldState.edit { replace(0, length, result) }
+                                expanded = false
+                            }
+                            .fillMaxWidth()
+                    )
+                }
             }
-        }
-    )
+    }
 }
 
 @Composable
