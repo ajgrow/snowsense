@@ -5,5 +5,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class Name (
     val representasjonspunkt: RepresentationPoint,
-    val stedsnavn: List<LocationName>
+    val skrivemåte: String
 )
