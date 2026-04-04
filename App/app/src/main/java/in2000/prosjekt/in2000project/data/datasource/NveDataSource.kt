@@ -9,6 +9,7 @@ import io.ktor.serialization.kotlinx.json.json
 import io.ktor.client.engine.android.Android
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.get
+import kotlin.collections.emptyList
 
 class NveDataSource {
 
@@ -16,6 +17,7 @@ class NveDataSource {
         install(ContentNegotiation){
             json(Json {
                 ignoreUnknownKeys = true
+                isLenient = true
             })
         }
     }
@@ -23,10 +25,16 @@ class NveDataSource {
     suspend fun getGeoJson(): GeoJson {
         return try {
             httpClient
-                .get("https://kart.nve.no/enterprise/rest/services/SnoskredAktsomhet/MapServer/1/query?where=1%3D1&outFields=objekttype,skredtype&outSR=4326&f=geojson")
+                .get("https://kart.nve.no/enterprise/rest/services/SnoskredAktsomhet/MapServer/1/query?where=1%3D1&outFields=objekttype,skredtype&returnGeometry=true&outSR=4326&f=geojson")
                 .body<GeoJson>()
         } catch (e: Exception){
-            GeoJson(emptyList())
+            e.printStackTrace()
+            println("Feil: ${e.message}")
+            GeoJson(
+                exceededTransferLimit = false,
+                features = emptyList(),
+                properties = null,
+                type = "FeatureCollection")
         }
     }
 }
