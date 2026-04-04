@@ -15,12 +15,15 @@ import com.mapbox.maps.extension.style.layers.generated.fillLayer
 import com.mapbox.maps.extension.style.layers.generated.lineLayer
 import com.mapbox.maps.extension.style.layers.generated.rasterLayer
 import com.mapbox.maps.extension.style.sources.addSource
+import com.mapbox.maps.extension.style.sources.generated.GeoJsonSource
 import com.mapbox.maps.extension.style.sources.generated.geoJsonSource
 import com.mapbox.maps.extension.style.sources.generated.rasterSource
+import com.mapbox.maps.extension.style.sources.getSourceAs
 import com.mapbox.maps.plugin.gestures.gestures
-import in2000.prosjekt.in2000project.data.repository.GeoJsonRepository
+import in2000.prosjekt.in2000project.data.model.GeoJson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.json.Json
 
 private const val TAG = "SnoskredWMS"
 
@@ -44,7 +47,8 @@ private const val WMS_DETAIL =
 
 @Composable
 fun MapboxMapScreen(
-    onMapClick: () -> Unit
+    onMapClick: () -> Unit,
+    geoJson: GeoJson?
 ) {
     val viewportState = rememberMapViewportState {
         setCameraOptions {
@@ -52,17 +56,6 @@ fun MapboxMapScreen(
             zoom(3.5)
         }
     }
-
-    // State to hold GeoJSON
-    var geoJson by remember { mutableStateOf<String?>(null) }
-
-    // Fetch data once
-    LaunchedEffect(Unit) {
-        geoJson = withContext(Dispatchers.IO) {
-            GeoJsonRepository.fetchGeoJson()
-        }
-    }
-
 
     Box(modifier = Modifier.fillMaxSize()) {
         MapboxMap(
@@ -119,28 +112,34 @@ fun MapboxMapScreen(
             }
 
             MapEffect(geoJson) { mapView ->
+                if (geoJson == null || geoJson?.features == null || geoJson.features.isEmpty()) return@MapEffect
 
-                val data = geoJson ?: return@MapEffect
+                val data = Json.encodeToString(geoJson)
                 val mapboxMap = mapView.mapboxMap
 
                 mapboxMap.getStyle { style ->
 
-                    val source = geoJsonSource("nve-source") {
-                        data(data)
-                    }
-                    style.addSource(source)
+                    val exSource = style.getSourceAs<GeoJsonSource>("nve-source")
+                    if (exSource != null){
+                        exSource.data(data)
+                    } else {
+                        val source = geoJsonSource("nve-source") {
+                            data(data)
+                        }
+                        style.addSource(source)
 
-                    val fillLayer = fillLayer("nve-fill", "nve-source") {
-                        fillColor("#ff0000")
-                        fillOpacity(0.8)
-                    }
-                    style.addLayer(fillLayer)
+                        val fillLayer = fillLayer("nve-fill", "nve-source") {
+                            fillColor("#ff0000")
+                            fillOpacity(0.8)
+                        }
+                        style.addLayer(fillLayer)
 
-                    val lineLayer = lineLayer("nve-outline", "nve-source") {
-                        lineColor("#ff0000")
-                        lineWidth(2.5)
+                        val lineLayer = lineLayer("nve-outline", "nve-source") {
+                            lineColor("#ff0000")
+                            lineWidth(2.5)
+                        }
+                        style.addLayer(lineLayer)
                     }
-                    style.addLayer(lineLayer)
                 }
             }
         }

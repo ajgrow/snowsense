@@ -19,6 +19,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -30,8 +31,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import in2000.prosjekt.in2000project.data.model.GeoJson
 import in2000.prosjekt.in2000project.data.model.SkiArea
 import in2000.prosjekt.in2000project.ui.reusables.BottomBar
 import in2000.prosjekt.in2000project.ui.reusables.TopBar
@@ -50,9 +53,13 @@ private val previewSkiArea = SkiArea(
 fun MapScreen(
     modifier: Modifier = Modifier,
     navController: NavController,
-    mapViewModel: MapViewModel
+    mapViewModel: MapViewModel = viewModel()
 ) {
     val mapUiState by mapViewModel.geoJsonUiState.collectAsState()
+
+    LaunchedEffect(Unit) {
+        mapViewModel.loadGeoJson()
+    }
 
     // Hardcoded sample data for the MVP, however, when Frost API is ready this should move into the ViewModel
     val skiArea = remember { previewSkiArea }
@@ -92,6 +99,7 @@ fun MapScreen(
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.padding(bottom = 16.dp)
             )
+            Text("Features: ${mapUiState.geoJson.features?.size}")
 
             //Map added here
             //onMapClick is passed to the Map
@@ -99,6 +107,7 @@ fun MapScreen(
                 onMapClick = {
                     isSheetOpen = true
                 },
+                geoJson = mapUiState.geoJson,
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f)
@@ -129,7 +138,8 @@ fun MapScreen(
 @Composable
 fun Map(
     onMapClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    geoJson: GeoJson?
 ) {
     // This is the blue area on the MapScreen that is meant for where the map from MapBox will eventually go.
     Box(
@@ -143,7 +153,8 @@ fun Map(
         MapboxMapScreen(
             //onMapClick is passed to the MapBoxMapScreen
             //eventually polygons will be used
-            onMapClick = onMapClick
+            onMapClick = onMapClick,
+            geoJson = geoJson
         )
     }
 }
