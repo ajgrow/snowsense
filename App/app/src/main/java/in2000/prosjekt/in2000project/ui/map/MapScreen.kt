@@ -19,6 +19,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -48,8 +49,11 @@ private val previewSkiArea = SkiArea(
 @Composable
 fun MapScreen(
     modifier: Modifier = Modifier,
-    navController: NavController
+    navController: NavController,
+    mapViewModel: MapViewModel
 ) {
+    val mapUiState by mapViewModel.geoJsonUiState.collectAsState()
+
     // Hardcoded sample data for the MVP, however, when Frost API is ready this should move into the ViewModel
     val skiArea = remember { previewSkiArea }
 
