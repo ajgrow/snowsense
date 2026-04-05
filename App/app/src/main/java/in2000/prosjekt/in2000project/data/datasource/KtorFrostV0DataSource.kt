@@ -2,6 +2,7 @@ package in2000.prosjekt.in2000project.data.datasource
 
 import in2000.prosjekt.in2000project.data.datasource.dto.FrostV0ObservationResponse
 import in2000.prosjekt.in2000project.data.datasource.dto.FrostV0SourceResponse
+import in2000.prosjekt.in2000project.data.model.Coordinate
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
@@ -11,12 +12,13 @@ class KtorFrostV0DataSource(
     private val client: HttpClient
 ): FrostV0DataSource {
     override suspend fun getNearestSource(
-        latitude: Double,
-        longitude: Double
+        coordinate: Coordinate
     ): FrostV0SourceResponse {
         return client.get("https://frost.met.no/sources/v0.jsonld") {
-            parameter("geometry", "nearest(POINT($longitude $latitude))")
-            parameter("nearestmaxcount", "1")
+            parameter("geometry",
+                "nearest(POINT(${coordinate.longitude} ${coordinate.latitude}))")
+            parameter("nearestmaxcount",
+                "1")
         }.body()
     }
 

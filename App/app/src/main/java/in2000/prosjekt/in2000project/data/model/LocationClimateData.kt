@@ -4,8 +4,7 @@ package in2000.prosjekt.in2000project.data.model
  * Climate statistics for a selected map point, based on the nearest weather station.
  * All climate values are nullable — null means the station doesn't measure that element.
  *
- * @property latitude Selected point's latitude in decimal degrees (WGS-84).
- * @property longitude Selected point's longitude in decimal degrees (WGS-84).
+ * @property coordinate The map point the user selected (WGS-84).
  * @property stationName Name of the nearest Frost weather station.
  * @property stationDistanceKm Distance in km from the selected point to the station.
  * @property stationElevationMasl Station elevation in meters above sea level.
@@ -17,8 +16,7 @@ package in2000.prosjekt.in2000project.data.model
  * @property elementErrors Description of missing elements, e.g. "Snow depth not available".
  */
 data class LocationClimateData(
-    val latitude: Double,
-    val longitude: Double,
+    val coordinate: Coordinate,
     val stationName: String?,
     val stationDistanceKm: Double?,
     val stationElevationMasl: Double?,

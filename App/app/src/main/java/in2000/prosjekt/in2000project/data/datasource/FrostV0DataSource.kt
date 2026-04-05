@@ -2,6 +2,7 @@ package in2000.prosjekt.in2000project.data.datasource
 
 import in2000.prosjekt.in2000project.data.datasource.dto.FrostV0ObservationResponse
 import in2000.prosjekt.in2000project.data.datasource.dto.FrostV0SourceResponse
+import in2000.prosjekt.in2000project.data.model.Coordinate
 
 /**
  * Data source for MET Norway's Frost API (frost.met.no).
@@ -12,14 +13,12 @@ interface FrostV0DataSource {
     /**
      * Finds the nearest weather station to the given coordinates.
      *
-     * @param latitude WGS-84 latitude in decimal degrees (e.g. 59.94).
-     * @param longitude WGS-84 longitude in decimal degrees (e.g. 10.72).
+     * @param coordinate The point to search from (WGS-84).
      * @return [FrostV0SourceResponse] containing the single nearest station with distance in km.
      * @throws java.io.IOException on network or I/O failures.
      */
     suspend fun getNearestSource(
-        latitude: Double,
-        longitude: Double
+        coordinate: Coordinate
     ): FrostV0SourceResponse
 
     /**
