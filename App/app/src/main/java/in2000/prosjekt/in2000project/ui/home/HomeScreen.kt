@@ -1,9 +1,12 @@
 package in2000.prosjekt.in2000project.ui.home
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -16,7 +19,6 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -32,9 +34,23 @@ import androidx.navigation.compose.rememberNavController
 import in2000.prosjekt.in2000project.ui.reusables.BottomBar
 import in2000.prosjekt.in2000project.ui.reusables.TopBar
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
+import androidx.compose.material3.DockedSearchBar
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.SearchBar
+import androidx.compose.material3.SearchBarDefaults
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.semantics.isTraversalGroup
+import androidx.compose.ui.semantics.semantics
 
 @Composable
 fun HomeScreen(
@@ -49,31 +65,34 @@ fun HomeScreen(
         topBar = { TopBar(title = "Home") },
         bottomBar = { BottomBar(modifier, navController) }
     ) { paddingValues ->
-        // Using LazyColumn for the whole screen ensures everything is scrollable
-        LazyColumn(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues),
-            contentPadding = PaddingValues(16.dp),          //adds padding around content
-            verticalArrangement = Arrangement.spacedBy(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            //All content should go here
-            item { LogoSection() }
+            LogoSection()
 
-            item {
-                SearchSection(
-                    //get states from the viewmodel
-                    query = uiState.searchQuery,  
-                    onQueryChange = { newText -> 
-                        // newText is the updated string passed from OutlinedTextField's onValueChange in SearchSection
-                        homeViewModel.updateSearchQuery(newText) 
-                    },
-                    onSearchClick = { homeViewModel.onSearch() }
-                )
+            SearchSection(
+                //get states from the viewmodel
+                modifier = Modifier,
+                textFieldState = uiState.searchTextFieldState,
+                onSearch = { homeViewModel.onSearch() },
+                searchResults = uiState.searchResults
+            )
+
+            LazyColumn(
+                modifier = Modifier.fillMaxWidth(),
+
+                contentPadding = PaddingValues(16.dp),          //adds padding around content
+                verticalArrangement = Arrangement.spacedBy(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+
+                item { FavoriteSection(items = uiState.favorites) }
+
+                item { RecentSection(items = uiState.recentSearches) }
             }
-            item { FavoriteSection(items = uiState.favorites) }
-            item { RecentSection(items = uiState.recentSearches) }
         }
     }
 }
@@ -89,30 +108,50 @@ fun LogoSection(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchSection(
-    query: String,
-    onSearchClick: () -> Unit,
-    onQueryChange: (String) -> Unit,
+    textFieldState : TextFieldState,
+    onSearch: (String) -> Unit,
+    searchResults: List<String>,
     modifier: Modifier = Modifier
 ) {
-    //We should add some rules to the searchSection, like restrictions on type of input and input length
-    OutlinedTextField(
-        modifier = modifier.fillMaxWidth(),
-        value = query,
-        onValueChange = onQueryChange,
-        placeholder = { Text("Search for area...") },
-        singleLine = true,
-        shape = RoundedCornerShape(50.dp),
-        trailingIcon = {
-            IconButton(onClick = onSearchClick) {
-                Icon(
-                    imageVector = Icons.Default.Search,
-                    contentDescription = "Search"
+    var expanded by rememberSaveable { mutableStateOf(false) }
+        //We should add some rules to the searchSection, like restrictions on type of input and input length
+        DockedSearchBar(
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+            inputField = {
+                SearchBarDefaults.InputField(
+                    query = textFieldState.text.toString(),
+                    onQueryChange = { textFieldState.edit { replace(0, length, it) } },
+                    onSearch = {
+                        onSearch(textFieldState.text.toString())
+                        expanded = false
+                    },
+                    expanded = expanded,
+                    onExpandedChange = { expanded = it },
+                    placeholder = { Text("Search") }
                 )
+            },
+            expanded = expanded,
+            onExpandedChange = { expanded = it }
+        ) {
+            Column(Modifier.verticalScroll(rememberScrollState())) {
+                searchResults.forEach { result ->
+                    ListItem(
+                        headlineContent = { Text(result) },
+                        modifier = Modifier
+                            .clickable {
+                                textFieldState.edit { replace(0, length, result) }
+                                expanded = false
+                            }
+                            .fillMaxWidth()
+                    )
+                }
             }
-        }
-    )
+    }
 }
 
 @Composable
