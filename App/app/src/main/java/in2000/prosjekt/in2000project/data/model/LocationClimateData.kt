@@ -1,29 +1,40 @@
 package in2000.prosjekt.in2000project.data.model
 
+import java.time.MonthDay
+
 /**
- * Climate statistics for a selected map point, based on the nearest weather station.
+ * Historical daily climate averages for a selected map point, based on the nearest weather station.
+ *
+ * Values represent the mean of daily observations across multiple years for a specific
+ * calendar period. For example: "average daily temperature for Mar 23 – Apr 22, based on
+ * 10 years of data."
+ *
  * All climate values are nullable — null means the station doesn't measure that element.
  *
- * @property coordinate The map point the user selected (WGS-84).
- * @property stationName Name of the nearest Frost weather station.
- * @property stationDistanceKm Distance in km from the selected point to the station.
- * @property stationElevationMasl Station elevation in meters above sea level.
- * @property meanTemperatureC Average of monthly mean temperatures across queried winters (°C).
- * @property meanPrecipitationMm Average monthly precipitation total (mm).
- * @property meanWindSpeedMs Average monthly wind speed (m/s).
- * @property maxSnowDepthCm Average of monthly max snow depth (cm). Many stations lack this.
- * @property dataYearsCount Number of winters that had data (e.g. "based on 5 winters").
- * @property elementErrors Description of missing elements, e.g. "Snow depth not available".
+ * @property periodStart First day of the queried calendar period (inclusive).
+ * @property periodEnd Last day of the queried calendar period (inclusive).
+ * @property yearsBack Number of years of historical data requested.
+ * @property dataPointCount Number of daily observations that contributed to the averages.
  */
 data class LocationClimateData(
+    // Location
     val coordinate: Coordinate,
     val stationName: String?,
     val stationDistanceKm: Double?,
     val stationElevationMasl: Double?,
-    val meanTemperatureC: Double?,
-    val meanPrecipitationMm: Double?,
-    val meanWindSpeedMs: Double?,
-    val maxSnowDepthCm: Double?,
-    val dataYearsCount: Int,
-    val elementErrors: String?
+
+    // Period metadata — describes what was queried
+    val periodStart: MonthDay,
+    val periodEnd: MonthDay,
+    val yearsBack: Int,
+
+    // Data quality
+    val dataPointCount: Int,
+    val elementErrors: String?,
+
+    // Daily averages
+    val avgDailyMeanTemperatureC: Double?,
+    val avgDailyPrecipitationMm: Double?,
+    val avgDailyMeanWindSpeedMs: Double?,
+    val avgDailyMaxSnowDepthCm: Double?,
 )
