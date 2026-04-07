@@ -2,23 +2,33 @@ package in2000.prosjekt.in2000project.data.repository
 
 import in2000.prosjekt.in2000project.data.model.Coordinate
 import in2000.prosjekt.in2000project.data.model.LocationClimateData
+import in2000.prosjekt.in2000project.data.model.NoObservationsException
+import java.time.MonthDay
 
 /**
  * Repository for accessing historical climate data.
- *
- * Abstracts the data source(s) so that the domain/UI layers
- * remain independent of network or local storage details.
+ * Abstracts the data source(s) so that the UI layer remains independent of network details.
  */
 interface ClimateRepository {
 
     /**
-     * Returns aggregated climate data for the given coordinates.
+     * Returns historical daily climate averages for the given location and period.
+     *
+     * Queries the same calendar period ([periodStart] to [periodEnd]) across [yearsBack] years
+     * and computes the mean of all daily observations per element.
      *
      * @param coordinate The map point to fetch climate data for (WGS-84).
-     * @return [LocationClimateData] containing the climate observations for the location.
-     * @throws java.io.IOException on network or I/O failures.
+     * @param periodStart First day of the period (inclusive), e.g. March 23.
+     * @param periodEnd Last day of the period (inclusive), e.g. April 22.
+     * @param yearsBack Number of years to include (e.g. 10 → queries 2017–2026 if current year is 2026).
+     * @return [LocationClimateData] with averaged daily values and metadata.
+     * @throws java.io.IOException on network failures.
+     * @throws NoObservationsException if the station has no data for the requested period.
      */
     suspend fun getClimateDataForLocation(
-        coordinate: Coordinate
+        coordinate: Coordinate,
+        periodStart: MonthDay,
+        periodEnd: MonthDay,
+        yearsBack: Int,
     ): LocationClimateData
 }
