@@ -10,11 +10,6 @@ import java.time.MonthDay
  * 10 years of data."
  *
  * All climate values are nullable — null means the station doesn't measure that element.
- *
- * @property periodStart First day of the queried calendar period (inclusive).
- * @property periodEnd Last day of the queried calendar period (inclusive).
- * @property yearsBack Number of years of historical data requested.
- * @property dataPointCount Number of daily observations that contributed to the averages.
  */
 data class LocationClimateData(
     // Location
@@ -30,7 +25,6 @@ data class LocationClimateData(
 
     // Data quality
     val dataPointCount: Int,
-    val elementErrors: String?,
 
     // Daily averages
     val avgDailyMeanTemperatureC: Double?,
