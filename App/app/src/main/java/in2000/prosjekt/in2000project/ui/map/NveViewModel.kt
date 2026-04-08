@@ -17,7 +17,7 @@ data class MapScreenUiState(
         properties = null,
         type = "FeatureCollection"))
 
-class MapViewModel (): ViewModel() {
+class NveViewModel (): ViewModel() {
 
     private val nveRepository = NveRepository()
     private val _geoJsonUiState = MutableStateFlow(MapScreenUiState())
@@ -26,7 +26,7 @@ class MapViewModel (): ViewModel() {
     fun loadGeoJson(){
         viewModelScope.launch {
             val geoJson = nveRepository.getGeoJson()
-            Log.d("MapViewModel", "Antall Features hentet fra NVE: ${geoJson.features?.size?:0}")
+            Log.d("NveViewModel", "Antall Features hentet fra NVE: ${geoJson.features?.size?:0}")
             _geoJsonUiState.update { currentState ->
                 currentState.copy(geoJson = geoJson)
             }

@@ -9,6 +9,7 @@ import io.ktor.serialization.kotlinx.json.json
 import io.ktor.client.engine.android.Android
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.get
+import io.ktor.client.request.parameter
 import kotlin.collections.emptyList
 
 class NveDataSource {
@@ -22,18 +23,34 @@ class NveDataSource {
         }
     }
 
-    suspend fun getGeoJson(): GeoJson {
+    suspend fun getGeoJson(lat: Double, lon: Double, buffer: Int): GeoJson {
         return try {
             httpClient
-                .get("https://kart.nve.no/enterprise/rest/services/SnoskredAktsomhet/MapServer/1/query?where=1%3D1&outFields=objekttype,skredtype&returnGeometry=true&outSR=4326&f=geojson")
+                .get("https://kart.nve.no/enterprise/rest/services/SnoskredAktsomhet/MapServer/3/query"){
+                    parameter("where", "1=1")
+
+                    parameter(
+                        "geometry",
+                        """{"x":$lon, "y":$lat, "spatialReference":{"wkid":4326}}"""
+                    )
+
+                    parameter("geometryType", "esriGeometryPoint")
+                    parameter("inSR", "4326")
+                    parameter("spatialRel", "esriSpatialRelIntersects")
+
+                    parameter("distance", buffer.toString())
+                    parameter("units", "esriSRUnit_Meter")
+
+                    parameter("outFields", "objekttype,skredstype")
+                    parameter("returnGeometry", "true")
+                    parameter("outSR", "4326")
+                    parameter("f", "geojson")
+                }
                 .body<GeoJson>()
         } catch (e: Exception){
             e.printStackTrace()
-            println("Feil: ${e.message}")
             GeoJson(
-                exceededTransferLimit = false,
                 features = emptyList(),
-                properties = null,
                 type = "FeatureCollection")
         }
     }
