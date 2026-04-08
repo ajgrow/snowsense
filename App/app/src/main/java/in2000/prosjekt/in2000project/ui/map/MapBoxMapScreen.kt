@@ -48,7 +48,7 @@ private const val WMS_DETAIL =
 @Composable
 fun MapboxMapScreen(
     onMapClick: () -> Unit,
-    geoJson: GeoJson?
+    //geoJson: GeoJson?
 ) {
     val viewportState = rememberMapViewportState {
         setCameraOptions {
@@ -111,7 +111,7 @@ fun MapboxMapScreen(
                 }
             }
 
-            MapEffect(geoJson) { mapView ->
+/*            MapEffect(geoJson) { mapView ->
                 if (geoJson == null || geoJson?.features == null || geoJson.features.isEmpty()) return@MapEffect
 
                 val data = Json.encodeToString(geoJson)
@@ -141,7 +141,7 @@ fun MapboxMapScreen(
                         style.addLayer(lineLayer)
                     }
                 }
-            }
+            }*/
         }
     }
 }
