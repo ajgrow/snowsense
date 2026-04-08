@@ -8,4 +8,6 @@ package in2000.prosjekt.in2000project.data.model
 class NoObservationsException(
     val stationName: String?,
     message: String = "No observations available for the requested period"
+        + if (stationName != null) " at station $stationName"
+          else ""
 ) : Exception(message)
