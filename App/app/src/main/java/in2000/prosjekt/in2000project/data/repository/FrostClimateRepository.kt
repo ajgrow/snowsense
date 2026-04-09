@@ -10,6 +10,7 @@ import in2000.prosjekt.in2000project.data.model.NoObservationsException
 import in2000.prosjekt.in2000project.data.model.NoStationFoundException
 import java.time.LocalDate
 import java.time.MonthDay
+import java.time.Year
 
 class FrostClimateRepository(
     private val frostV0DataSource: FrostV0DataSource
@@ -112,17 +113,31 @@ internal fun buildRepeatingTimeRange(
 
     val oldestStartYear = referenceDate.year - yearsBack
 
-    val firstStart = periodStart.atYear(oldestStartYear)
+    val firstStart = periodStart.atYearClamped(oldestStartYear)
 
     val crossesYearBoundary = periodStart.isAfter(periodEnd)
 
     val endYear = if (crossesYearBoundary) oldestStartYear + 1
                   else oldestStartYear
 
-    val firstEnd = periodEnd.atYear(endYear).plusDays(1)
+    val firstEnd = periodEnd.atYearClamped(endYear).plusDays(1)
 
     return "R${yearsBack + 1}/$firstStart/$firstEnd/P1Y"
 }
+
+/**
+ * Like [MonthDay.atYear] but clamps to the last valid day of the month
+ *  instead of throwing on e.g. Feb 29 in a non-leap year.
+ */
+private fun MonthDay.atYearClamped(
+    year: Int
+): LocalDate
+    = LocalDate.of(
+        year,
+        month,
+        minOf(
+            dayOfMonth,
+            month.length(Year.isLeap(year.toLong()))))
 
 /**
  * Groups daily observations by elementId and computes the flat mean for each
