@@ -125,12 +125,16 @@ internal fun buildRepeatingTimeRange(
 }
 
 /**
- * Groups daily observations by elementId and computes the flat mean for each element.
- * Elements with no observations are absent from the returned map.
+ * Groups daily observations by elementId and computes the flat mean for each
+ * element. Elements with no observations are absent from the returned map.
  */
 internal fun averageByElement(
     observations: List<FrostV0Observation>
 ): Map<String, Double>
     = observations
         .groupBy { it.elementId }
-        .mapValues { entry -> entry.value.map { it.value }.average() }
+        .mapValues { groupedObservations ->
+            groupedObservations.value
+                .map { observation -> observation.value }
+                .average()
+        }
