@@ -33,7 +33,7 @@ class FrostClimateRepository(
         periodEnd: MonthDay,
         yearsBack: Int,
     ): LocationClimateData {
-        require(yearsBack > 0)
+        require(yearsBack >= 0)
 
         val station = getNearestStation(coordinate)
 
@@ -108,7 +108,7 @@ internal fun buildRepeatingTimeRange(
     yearsBack: Int,
     referenceDate: LocalDate = LocalDate.now(),
 ): String {
-    require(yearsBack > 0)
+    require(yearsBack >= 0)
 
     val oldestStartYear = referenceDate.year - yearsBack
 
