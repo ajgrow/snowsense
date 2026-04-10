@@ -1,5 +1,6 @@
 package in2000.prosjekt.in2000project.ui.reusables
 
+import android.annotation.SuppressLint
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Info
@@ -45,6 +46,7 @@ fun TopBar(
     )
 }
 
+@SuppressLint("RestrictedApi")
 @Composable
 fun BottomBar(
     modifier: Modifier = Modifier,
@@ -74,13 +76,16 @@ fun BottomBar(
         )
         NavigationBarItem(
             selected = currentRoute == Screen.Map.route,
-            onClick = {navController.navigate(Screen.Map.route){
-                popUpTo(navController.graph.findStartDestination().id) {
-                    saveState = true
+            onClick = {
+                navController.navigate(Screen.Map.createRoute("65.0,10.0"))
+                {
+                    popUpTo(navController.graph.findStartDestination().id) {
+                        saveState = true
+                    }
+                    launchSingleTop = true
+                    restoreState = false
                 }
-                launchSingleTop = true
-                restoreState = true
-            }},
+            },
             icon = {
                 Icon(
                     imageVector = Icons.Default.Place,

@@ -55,6 +55,7 @@ import androidx.compose.ui.semantics.isTraversalGroup
 import androidx.compose.ui.semantics.semantics
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
+import in2000.prosjekt.in2000project.data.model.Location
 import in2000.prosjekt.in2000project.navigation.Screen
 
 @Composable
@@ -119,7 +120,7 @@ fun LogoSection(
 fun SearchSection(
     textFieldState : TextFieldState,
     onSearch: (String) -> Unit,
-    searchResults: List<String>,
+    searchResults: List<Location>,
     modifier: Modifier = Modifier,
     navController: NavController
 ) {
@@ -151,20 +152,22 @@ fun SearchSection(
             Column(Modifier.verticalScroll(rememberScrollState())) {
                 searchResults.forEach { result ->
                     ListItem(
-                        headlineContent = { Text(result) },
+                        headlineContent = { Text(result.skrivemåte) },
                         modifier = Modifier
                             .clickable (
                                 onClick = {
-
-                                    navController.navigate(Screen.Map.route) {
+                                    Log.d("fuckedupmap", "${result.representasjonspunkt.nord}")
+                                    navController.navigate(
+                                        Screen.Map.createRoute("${result.representasjonspunkt.nord},${result.representasjonspunkt.øst}")
+                                    ) {
                                         popUpTo(navController.graph.findStartDestination().id) {
                                             saveState = true
                                         }
-                                        launchSingleTop = true
-                                        restoreState = true
+                                        launchSingleTop = false
+                                        restoreState = false
                                     }
 
-                                    textFieldState.edit { replace(0, length, result) }
+                                    textFieldState.edit { replace(0, length, result.skrivemåte) }
                                     expanded = false
                                 }
                             )

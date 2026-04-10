@@ -1,5 +1,6 @@
 package in2000.prosjekt.in2000project.ui.map
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -48,7 +49,8 @@ private val previewSkiArea = SkiArea(
 @Composable
 fun MapScreen(
     modifier: Modifier = Modifier,
-    navController: NavController
+    navController: NavController,
+    coordinates: String = "65.0,10.0"
 ) {
     // Hardcoded sample data for the MVP, however, when Frost API is ready this should move into the ViewModel
     val skiArea = remember { previewSkiArea }
@@ -56,7 +58,7 @@ fun MapScreen(
     //Controls whether the bottom sheet is visible or not by keeping track of if the user has clicked the map
     //if this is set to null then the ModalBottomSheet is not open
     var isSheetOpen by rememberSaveable { mutableStateOf(false) }
-
+    Log.d("fuckedupmap", "fikk disse kordinater ${coordinates}")
     Scaffold(
         topBar = {
             TopBar(modifier = Modifier, title = "MapScreen")
@@ -97,7 +99,8 @@ fun MapScreen(
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(1f)
+                    .weight(1f),
+                coordinates
             )
         }
     }
@@ -125,7 +128,8 @@ fun MapScreen(
 @Composable
 fun Map(
     onMapClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    coordinates: String
 ) {
     // This is the blue area on the MapScreen that is meant for where the map from MapBox will eventually go.
     Box(
@@ -139,7 +143,8 @@ fun Map(
         MapboxMapScreen(
             //onMapClick is passed to the MapBoxMapScreen
             //eventually polygons will be used
-            onMapClick = onMapClick
+            onMapClick = onMapClick,
+            coordinates = coordinates
         )
     }
 }

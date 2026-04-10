@@ -44,11 +44,16 @@ private const val WMS_DETAIL =
 
 @Composable
 fun MapboxMapScreen(
-    onMapClick: () -> Unit
+    onMapClick: () -> Unit,
+    coordinates: String
 ) {
+
+    val coordinateStrings = coordinates.split(",")
+    val lat = coordinateStrings[0].toDouble()
+    val lon = coordinateStrings[1].toDouble()
     val viewportState = rememberMapViewportState {
         setCameraOptions {
-            center(Point.fromLngLat(10.0, 65.0))
+            center(Point.fromLngLat(lon, lat))
             zoom(3.5)
         }
     }
