@@ -1,5 +1,7 @@
 package in2000.prosjekt.in2000project.ui.home
 
+import android.R.attr.onClick
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -51,6 +53,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.semantics.isTraversalGroup
 import androidx.compose.ui.semantics.semantics
+import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.compose.currentBackStackEntryAsState
+import in2000.prosjekt.in2000project.navigation.Screen
 
 @Composable
 fun HomeScreen(
@@ -78,7 +83,8 @@ fun HomeScreen(
                 modifier = Modifier,
                 textFieldState = uiState.searchTextFieldState,
                 onSearch = { homeViewModel.onSearch() },
-                searchResults = uiState.searchResults
+                searchResults = uiState.searchResults,
+                navController = navController
             )
 
             LazyColumn(
@@ -114,8 +120,12 @@ fun SearchSection(
     textFieldState : TextFieldState,
     onSearch: (String) -> Unit,
     searchResults: List<String>,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    navController: NavController
 ) {
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
+
     var expanded by rememberSaveable { mutableStateOf(false) }
         //We should add some rules to the searchSection, like restrictions on type of input and input length
         DockedSearchBar(
@@ -143,10 +153,21 @@ fun SearchSection(
                     ListItem(
                         headlineContent = { Text(result) },
                         modifier = Modifier
-                            .clickable {
-                                textFieldState.edit { replace(0, length, result) }
-                                expanded = false
-                            }
+                            .clickable (
+                                onClick = {
+
+                                    navController.navigate(Screen.Map.route) {
+                                        popUpTo(navController.graph.findStartDestination().id) {
+                                            saveState = true
+                                        }
+                                        launchSingleTop = true
+                                        restoreState = true
+                                    }
+
+                                    textFieldState.edit { replace(0, length, result) }
+                                    expanded = false
+                                }
+                            )
                             .fillMaxWidth()
                     )
                 }
