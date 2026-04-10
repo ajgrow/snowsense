@@ -88,6 +88,10 @@ class FrostClimateRepository(
         .firstOrNull()
         ?: throw NoStationFoundException(coordinate)
 
+    /**
+     * Incredibly naive and unreliable implementation of slab avalanche
+     * risk assessment.
+     */
     suspend fun getSlabAvalancheRiskForLocation(
         coordinate: Coordinate
     ) : LocationSlabAvalancheRiskData {
@@ -109,15 +113,68 @@ class FrostClimateRepository(
             elements = ELEMENTS_CSV,
             referenceTime)
 
+        var warmPrecip = 0.0
+        var coldPrecip = 0.0
 
+        var warmPrecipStreak = 0
+        var coldPrecipStreak = 0
 
+        for (obs in observationResponse.data.sortedByDescending { it.referenceTime }) {
+            val temp = obs.observations.firstOrNull{ it.elementId == ELEMENT_TEMP }?.value
+            val precip = obs.observations.firstOrNull{ it.elementId == ELEMENT_PRECIP }?.value
 
+            if (temp == null || precip == null)
+                continue
 
+            // Snow-to-Liquid-Ratio
+            val getSLR = { t: Double ->
+                when {
+                    t <= -15.0 -> 20.0
+                    t <= -5.0 -> 10.0
+                    t <= 0.0 -> 7.0
+                    else -> 4.0
+                }
+            }
+
+            if (temp > -5.0) {
+                if (warmPrecip > 150.0 && coldPrecip > 10.0)
+                    return LocationSlabAvalancheRiskData(
+                        coordinate = coordinate,
+                        dangerLevel = "High",
+                        dataReliability = 1.0
+                    )
+
+                if (warmPrecipStreak == 0)
+                    warmPrecip = precip * getSLR(temp)
+                else
+                    warmPrecip += precip * getSLR(temp)
+
+                warmPrecipStreak++
+                coldPrecipStreak = 0
+            }
+            else {
+                if (coldPrecipStreak == 0)
+                    coldPrecip = precip * getSLR(temp)
+                else
+                    coldPrecip += precip * getSLR(temp)
+
+                coldPrecipStreak++
+                warmPrecipStreak = 0
+            }
+        }
+
+        if (warmPrecip > 150.0 && coldPrecip > 10.0)
+            return LocationSlabAvalancheRiskData(
+                coordinate = coordinate,
+                dangerLevel = "High",
+                dataReliability = 1.0
+            )
 
         return LocationSlabAvalancheRiskData(
             coordinate = coordinate,
-            dangerLevel = "1",
-            dataReliability = 1.0)
+            dangerLevel = "Low",
+            dataReliability = 1.0
+        )
     }
 
 }
