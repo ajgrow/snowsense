@@ -113,6 +113,22 @@ class FrostClimateRepository(
             elements = ELEMENTS_CSV,
             referenceTime)
 
+        val totalPrecip = observationResponse.data.takeLast(3).sumOf { it.observations.firstOrNull{ it.elementId == ELEMENT_PRECIP }?.value ?: 0.0}
+
+        var newSnowLoad = when (totalPrecip) {
+            in 0.0..12.0 -> 0
+            in 12.0..25.0 -> 8
+            in 25.0..37.0 -> 15
+            in 37.0..62.0 -> 20
+            else -> 25
+        }
+
+
+
+        var weakLayerDepth = 0.0
+        var slabLayerDepth = 0.0
+        var temperatureTrend = 0.0 //based on 3-day average
+
         var warmPrecip = 0.0
         var coldPrecip = 0.0
 
