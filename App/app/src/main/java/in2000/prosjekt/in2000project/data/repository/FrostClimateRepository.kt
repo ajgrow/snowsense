@@ -6,6 +6,7 @@ import in2000.prosjekt.in2000project.data.datasource.dto.FrostV0Observation
 import in2000.prosjekt.in2000project.data.datasource.dto.FrostV0Source
 import in2000.prosjekt.in2000project.data.model.Coordinate
 import in2000.prosjekt.in2000project.data.model.LocationClimateData
+import in2000.prosjekt.in2000project.data.model.LocationSlabAvalancheRiskData
 import in2000.prosjekt.in2000project.data.model.NoObservationsException
 import in2000.prosjekt.in2000project.data.model.NoStationFoundException
 import java.time.LocalDate
@@ -86,8 +87,40 @@ class FrostClimateRepository(
         .data
         .firstOrNull()
         ?: throw NoStationFoundException(coordinate)
-}
 
+    suspend fun getSlabAvalancheRiskForLocation(
+        coordinate: Coordinate
+    ) : LocationSlabAvalancheRiskData {
+
+        val currentDate = LocalDate.now()
+
+        val startDate = currentDate.minusDays(21)
+
+        val station = getNearestStation(coordinate)
+
+        val referenceTime = buildRepeatingTimeRange(
+            MonthDay.of(startDate.monthValue, startDate.dayOfMonth),
+            MonthDay.of(currentDate.monthValue, currentDate.dayOfMonth),
+            0
+        )
+
+        val observationResponse = frostV0DataSource.getObservations(
+            sourceId = station.id,
+            elements = ELEMENTS_CSV,
+            referenceTime)
+
+
+
+
+
+
+        return LocationSlabAvalancheRiskData(
+            coordinate = coordinate,
+            dangerLevel = "1",
+            dataReliability = 1.0)
+    }
+
+}
 // --- Helper functions (top-level for independent testability) ---
 
 /**
