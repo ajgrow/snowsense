@@ -89,7 +89,7 @@ fun InfoScreen(
                 }
             }
 
-            //replaced the function "DangerLevelsColumn" with a "items" composable
+            //replaced the function "DangerLevelsColumn" with an "items" composable
             items(uiState.dangerLevels) { dangerLevel ->
                 DangerLevelItem(
                     level = dangerLevel.level,
