@@ -171,10 +171,10 @@ class FrostClimateRepository(
         }
 
         val slabFormation = when{
-            slabLayerDepth <= 17.0 -> 0.0
-            slabLayerDepth <= 50.0 -> 10.0
-            slabLayerDepth <= 100.0 -> 18.0
-            else -> 25.0
+            slabLayerDepth <= 17.0 -> 0
+            slabLayerDepth <= 50.0 -> 10
+            slabLayerDepth <= 100.0 -> 18
+            else -> 25
         }
 
         val weakLayerPresence = when (weakLayerDepth) {
@@ -187,10 +187,10 @@ class FrostClimateRepository(
         val totalScore = newSnowLoad + weakLayerPresence + slabFormation + tempTrend
 
         val dangerLevelType = when (totalScore) {
-            in 0.0..15.0 -> DangerLevelType.UNLIKELY
-            in 16.0..35.0 -> DangerLevelType.LOW
-            in 36.0..55.0 -> DangerLevelType.MODERATE
-            in 56.0..75.0 -> DangerLevelType.HIGH
+            in 0..15 -> DangerLevelType.UNLIKELY
+            in 16..35 -> DangerLevelType.LOW
+            in 36..55 -> DangerLevelType.MODERATE
+            in 56..75 -> DangerLevelType.HIGH
             else -> DangerLevelType.VERY_HIGH
         }
 
