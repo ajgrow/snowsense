@@ -96,25 +96,30 @@ class FrostClimateRepository(
         coordinate: Coordinate
     ) : LocationSlabAvalancheRiskData {
 
+        //define time range
         val currentDate = LocalDate.now()
-
         val startDate = currentDate.minusDays(21)
 
+        //find nearest station
         val station = getNearestStation(coordinate)
 
+        //build time query
         val referenceTime = buildRepeatingTimeRange(
             MonthDay.of(startDate.monthValue, startDate.dayOfMonth),
             MonthDay.of(currentDate.monthValue, currentDate.dayOfMonth),
             0
         )
 
+        //fetch temperature and precipitation
         val observationResponse = frostV0DataSource.getObservations(
             sourceId = station.id,
             elements = ELEMENTS_CSV,
             referenceTime)
 
+        //recent snowfall estimate from last 3 days
         val totalPrecip = observationResponse.data.takeLast(3).sumOf { it.observations.firstOrNull{ it.elementId == ELEMENT_PRECIP }?.value ?: 0.0}
 
+        //Score for newSnowLoad
         var newSnowLoad = when (totalPrecip) {
             in 0.0..12.0 -> 0
             in 12.0..25.0 -> 8
@@ -123,11 +128,18 @@ class FrostClimateRepository(
             else -> 25
         }
 
-        // Assumes at least one existing observation
+        // Temperature metrics - Assumes at least one existing observation
         val threeDayTempAverage = observationResponse.data.takeLast(3).map { it.observations.firstOrNull{ it.elementId == ELEMENT_TEMP }?.value}.filterNotNull().average()
         val lastTemp = observationResponse.data.filter { it.observations.firstOrNull{ obs -> obs.elementId == ELEMENT_TEMP } != null }.lastOrNull()?.observations?.firstOrNull{ obs -> obs.elementId == ELEMENT_TEMP }?.value
 
+        var tempChange = if (lastTemp != null) lastTemp - threeDayTempAverage else 0.0
 
+        val tempTrend = when {
+            tempChange < 1.0 -> 0
+            tempChange in 1.0..3.0 -> 8
+            tempChange in 3.0..6.0 -> 14
+            else -> 20
+        }
 
         var warmPrecip = 0.0
         var coldPrecip = 0.0
@@ -135,6 +147,7 @@ class FrostClimateRepository(
         var warmPrecipStreak = 0
         var coldPrecipStreak = 0
 
+        //loop through observations from newest to oldest - get temp and precip or skip if missing
         for (obs in observationResponse.data.sortedByDescending { it.referenceTime }) {
             val temp = obs.observations.firstOrNull{ it.elementId == ELEMENT_TEMP }?.value
             val precip = obs.observations.firstOrNull{ it.elementId == ELEMENT_PRECIP }?.value
@@ -152,28 +165,39 @@ class FrostClimateRepository(
                 }
             }
 
+            //if temp is warm
             if (temp > -5.0) {
+                //AND there is a thick slab of heavy snow sitting on top a thin slab of light snow
                 if (warmPrecip > 150.0 && coldPrecip > 10.0)
+                    //return high danger
                     return LocationSlabAvalancheRiskData(
                         coordinate = coordinate,
                         dangerLevel = "High",
                         dataReliability = 1.0
                     )
 
+                //AND if warm streak is current at 0, set warmPrecip equal to the precip of the day
                 if (warmPrecipStreak == 0)
                     warmPrecip = precip * getSLR(temp)
+                //OR if it's not at 0, keep adding the latest precip to the warmPrecip
                 else
                     warmPrecip += precip * getSLR(temp)
 
+                //start a new warmPrecipStreak and restart the coldPrecipStreak
                 warmPrecipStreak++
                 coldPrecipStreak = 0
             }
+            //if it's COLD
             else {
+                //AND coldPrecipStreak is set to 0
                 if (coldPrecipStreak == 0)
+                    //set coldPrecip equal to the precip of the day
                     coldPrecip = precip * getSLR(temp)
+                    //OR if it's not at 0, keep adding the latest precip to the coldPrecip
                 else
                     coldPrecip += precip * getSLR(temp)
 
+                //add to the coldPrecipStreak and restart the warmPrecipStreak
                 coldPrecipStreak++
                 warmPrecipStreak = 0
             }
@@ -182,44 +206,7 @@ class FrostClimateRepository(
 
         var weakLayerDepth = 0.0
         var slabLayerDepth = 0.0
-        var weakLayerBase = false
 
-
-
-        var coldPrecip1 = 0.0
-        for (obs in observationResponse.data.sortedBy { it.referenceTime }) {
-            val temp = obs.observations.firstOrNull { it.elementId == ELEMENT_TEMP }?.value   ?: continue
-            val precip = obs.observations.firstOrNull { it.elementId == ELEMENT_PRECIP }?.value ?: 0.0
-
-            if (temp <= 0.0) {
-                coldPrecip1 += precip
-            }
-            else if (precip > 2.0) {
-                weakLayerDepth = coldPrecip1
-                coldPrecip1 = 0.0
-            }
-
-            if (temp > -5.0 && !weakLayerBase){
-                slabLayerDepth += (precip / 10.0)
-            }
-            else if (temp <= -5.0){
-                weakLayerBase = true
-            }
-        }
-
-        val slabFormation = when{
-            slabLayerDepth <= 5.0 -> 0
-            slabLayerDepth <= 15.0 -> 10
-            slabLayerDepth <= 30.0 -> 18
-            else -> 25
-        }
-
-        val weakLayerPresence = when (weakLayerDepth) {
-            in 0.0 .. 12.0 -> 0
-            in 12.0 .. 25.0 -> 10
-            in 25.0 .. 50.0 -> 20
-            else -> 30
-        }
 
         if (warmPrecip > 150.0 && coldPrecip > 10.0)
             return LocationSlabAvalancheRiskData(
