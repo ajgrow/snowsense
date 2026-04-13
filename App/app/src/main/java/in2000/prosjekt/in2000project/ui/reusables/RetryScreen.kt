@@ -58,8 +58,8 @@ fun RetryScreen (modifier: Modifier = Modifier, navController: NavController) {
 
 @Composable
 fun RetryScreen(
-    title: String = "Something went wrong",
-    message: String = "Please check your connection and try again.",
+    title: String,
+    message: String,
     onRetry: () -> Unit,
     navController: NavController,
     modifier: Modifier = Modifier
@@ -97,10 +97,4 @@ fun RetryScreen(
             }
         }
     }
-}
-
-@Preview
-@Composable
-fun MapRetryScreenPreview() {
-    MapRetryScreen(navController = rememberNavController())
 }
