@@ -172,11 +172,7 @@ class FrostClimateRepository(
                 //AND there is a thick slab of heavy snow sitting on top a thin slab of light snow
                 if (warmPrecip > 150.0 && coldPrecip > 10.0)
                     //return high danger
-                    return LocationSlabAvalancheRiskData(
-                        coordinate = coordinate,
-                        dangerLevel = dangerLevel,
-                        dataReliability = 1.0
-                    )
+                    break
 
                 //AND if warm streak is current at 0, set warmPrecip equal to the precip of the day
                 if (warmPrecipStreak == 0)
@@ -210,8 +206,44 @@ class FrostClimateRepository(
         var slabLayerDepth = 0.0
 
 
+        var weakLayerBase = false
 
-        val totalScore = newSnowLoad + weakLayerDepth + slabLayerDepth + tempTrend
+        var coldPrecip1 = 0.0
+        for (obs in observationResponse.data.sortedBy { it.referenceTime }) {
+            val temp = obs.observations.firstOrNull { it.elementId == ELEMENT_TEMP }?.value   ?: continue
+            val precip = obs.observations.firstOrNull { it.elementId == ELEMENT_PRECIP }?.value ?: 0.0
+
+            if (temp <= 0.0) {
+                coldPrecip1 += precip
+            }
+            else if (precip > 2.0) {
+                weakLayerDepth = coldPrecip1
+                coldPrecip1 = 0.0
+            }
+
+            if (temp > -5.0 && !weakLayerBase){
+                slabLayerDepth += (precip / 10.0)
+            }
+            else if (temp <= -5.0){
+                weakLayerBase = true
+            }
+        }
+
+        val slabFormation = when{
+            slabLayerDepth <= 5.0 -> 0.0
+            slabLayerDepth <= 15.0 -> 10.0
+            slabLayerDepth <= 30.0 -> 18.0
+            else -> 25.0
+        }
+
+        val weakLayerPresence = when (weakLayerDepth) {
+            in 0.0 .. 12.0 -> 0
+            in 12.0 .. 25.0 -> 10
+            in 25.0 .. 50.0 -> 20
+            else -> 30
+        }
+
+        val totalScore = newSnowLoad + weakLayerPresence + slabFormation + tempTrend
 
         val dangerLevelType = when (totalScore) {
             in 0.0..15.0 -> DangerLevelType.UNLIKELY
