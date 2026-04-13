@@ -37,29 +37,35 @@ class InfoViewModel: ViewModel(){
                     dangerLevels = listOf(
                         DangerLevel(
                             level = "1 - Low",
-                            longDescription = "NICE! This means generally safe avalanche conditions. Natural and human-triggered avalanches are unlikely. GO! GO! GO!"
+                            description = "NICE! This means generally safe avalanche conditions. Natural and human-triggered avalanches are unlikely. GO! GO! GO!"
                         ),
                         DangerLevel(
                             level = "2 - Moderate",
-                            longDescription = "Hmmm... maybe think twice before taking this on? Heightened avalanche conditions on some terrain features. Human-triggered avalanches are definitely possible."
+                            description = "Hmmm... maybe think twice before taking this on? Heightened avalanche conditions on some terrain features. Human-triggered avalanches are definitely possible."
                         ),
                         DangerLevel(
                             level = "3 - Considerable",
-                            longDescription = "YIKES, POSSIBLE DEATH - Dangerous avalanche conditions. PLEASE DON'T GO! Human-triggered avalanches are likely and natural avalanches are possible."
+                            description = "YIKES, POSSIBLE DEATH - Dangerous avalanche conditions. PLEASE DON'T GO! Human-triggered avalanches are likely and natural avalanches are possible."
                         ),
                         DangerLevel(
                             level = "4 - High",
-                            longDescription = "DEATH IS LIKELY - DO NOT GO!! Very dangerous avalanche conditions. Human-triggered avalanches are very likely and natural avalanches are likely."
+                            description = "DEATH IS LIKELY - DO NOT GO!! Very dangerous avalanche conditions. Human-triggered avalanches are very likely and natural avalanches are likely."
                         ),
                         DangerLevel(
                             level = "5 - Extreme",
-                            longDescription = "CERTAIN DEATH!! At this point, it might be time to book a flight south. Avoid all avalanche terrain. Large natural avalanches are certain or nearly certain."
+                            description = "CERTAIN DEATH!! At this point, it might be time to book a flight south. Avoid all avalanche terrain. Large natural avalanches are certain or nearly certain."
                         )
                     )
                 )
             }
         }
     }
-
-    //We can add functions her later if we wish to update states in the infoscreen, but for now we have nothing we wish to change
 }
+
+/**
+ * Fake data class for the danger levels for presentation purposes
+ */
+data class DangerLevel(
+    val level: String,
+    val description: String
+)
