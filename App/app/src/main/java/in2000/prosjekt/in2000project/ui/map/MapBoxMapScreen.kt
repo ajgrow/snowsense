@@ -117,32 +117,6 @@ fun MapboxMapScreen(
 
                 }
             }
-
-            MapEffect(geoJson) { mapView ->
-
-                val data = geoJson ?: return@MapEffect
-                val mapboxMap = mapView.mapboxMap
-
-                mapboxMap.getStyle { style ->
-
-                    val source = geoJsonSource("nve-source") {
-                        data(data)
-                    }
-                    style.addSource(source)
-
-                    val fillLayer = fillLayer("nve-fill", "nve-source") {
-                        fillColor("#ff0000")
-                        fillOpacity(0.8)
-                    }
-                    style.addLayer(fillLayer)
-
-                    val lineLayer = lineLayer("nve-outline", "nve-source") {
-                        lineColor("#ff0000")
-                        lineWidth(2.5)
-                    }
-                    style.addLayer(lineLayer)
-                }
-            }
         }
     }
 }
