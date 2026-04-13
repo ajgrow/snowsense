@@ -8,10 +8,6 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-data class DangerLevel(
-    val level: String,
-    val description: String
-)
 
 data class InfoUiState(
     val title : String = "",
@@ -41,23 +37,23 @@ class InfoViewModel: ViewModel(){
                     dangerLevels = listOf(
                         DangerLevel(
                             level = "1 - Low",
-                            description = "NICE! This means generally safe avalanche conditions. Natural and human-triggered avalanches are unlikely. GO! GO! GO!"
+                            longDescription = "NICE! This means generally safe avalanche conditions. Natural and human-triggered avalanches are unlikely. GO! GO! GO!"
                         ),
                         DangerLevel(
                             level = "2 - Moderate",
-                            description = "Hmmm... maybe think twice before taking this on? Heightened avalanche conditions on some terrain features. Human-triggered avalanches are definitely possible."
+                            longDescription = "Hmmm... maybe think twice before taking this on? Heightened avalanche conditions on some terrain features. Human-triggered avalanches are definitely possible."
                         ),
                         DangerLevel(
                             level = "3 - Considerable",
-                            description = "YIKES, POSSIBLE DEATH - Dangerous avalanche conditions. PLEASE DON'T GO! Human-triggered avalanches are likely and natural avalanches are possible."
+                            longDescription = "YIKES, POSSIBLE DEATH - Dangerous avalanche conditions. PLEASE DON'T GO! Human-triggered avalanches are likely and natural avalanches are possible."
                         ),
                         DangerLevel(
                             level = "4 - High",
-                            description = "DEATH IS LIKELY - DO NOT GO!! Very dangerous avalanche conditions. Human-triggered avalanches are very likely and natural avalanches are likely."
+                            longDescription = "DEATH IS LIKELY - DO NOT GO!! Very dangerous avalanche conditions. Human-triggered avalanches are very likely and natural avalanches are likely."
                         ),
                         DangerLevel(
                             level = "5 - Extreme",
-                            description = "CERTAIN DEATH!! At this point, it might be time to book a flight south. Avoid all avalanche terrain. Large natural avalanches are certain or nearly certain."
+                            longDescription = "CERTAIN DEATH!! At this point, it might be time to book a flight south. Avoid all avalanche terrain. Large natural avalanches are certain or nearly certain."
                         )
                     )
                 )
