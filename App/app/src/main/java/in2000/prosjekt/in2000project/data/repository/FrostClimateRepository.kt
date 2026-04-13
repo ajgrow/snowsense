@@ -127,26 +127,7 @@ class FrostClimateRepository(
         val threeDayTempAverage = observationResponse.data.takeLast(3).map { it.observations.firstOrNull{ it.elementId == ELEMENT_TEMP }?.value}.filterNotNull().average()
         val lastTemp = observationResponse.data.filter { it.observations.firstOrNull{ obs -> obs.elementId == ELEMENT_TEMP } != null }.lastOrNull()?.observations?.firstOrNull{ obs -> obs.elementId == ELEMENT_TEMP }?.value
 
-        var coldPrecip1 = 0.0
-        for (obs in observationResponse.data.sortedBy { it.referenceTime }) {
-            val temp = obs.observations.firstOrNull { it.elementId == ELEMENT_TEMP }?.value   ?: continue
-            val precip = obs.observations.firstOrNull { it.elementId == ELEMENT_PRECIP }?.value ?: 0.0
 
-            if (temp <= 0.0) {
-                coldPrecip1 += precip
-            }
-            else if (precip > 2.0) {
-                weakLayerDepth = coldPrecip1
-                coldPrecip1 = 0.0
-            }
-        }
-
-        val weakLayerPresence = when (weakLayerDepth) {
-            in 0.0 .. 12.0 -> 0
-            in 12.0 .. 25.0 -> 10
-            in 25.0 .. 50.0 -> 20
-            else -> 30
-        }
 
         var warmPrecip = 0.0
         var coldPrecip = 0.0
@@ -202,6 +183,27 @@ class FrostClimateRepository(
         var weakLayerDepth = 0.0
         var slabLayerDepth = 0.0
 
+
+        var coldPrecip1 = 0.0
+        for (obs in observationResponse.data.sortedBy { it.referenceTime }) {
+            val temp = obs.observations.firstOrNull { it.elementId == ELEMENT_TEMP }?.value   ?: continue
+            val precip = obs.observations.firstOrNull { it.elementId == ELEMENT_PRECIP }?.value ?: 0.0
+
+            if (temp <= 0.0) {
+                coldPrecip1 += precip
+            }
+            else if (precip > 2.0) {
+                weakLayerDepth = coldPrecip1
+                coldPrecip1 = 0.0
+            }
+        }
+
+        val weakLayerPresence = when (weakLayerDepth) {
+            in 0.0 .. 12.0 -> 0
+            in 12.0 .. 25.0 -> 10
+            in 25.0 .. 50.0 -> 20
+            else -> 30
+        }
 
         if (warmPrecip > 150.0 && coldPrecip > 10.0)
             return LocationSlabAvalancheRiskData(
