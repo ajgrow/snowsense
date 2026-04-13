@@ -33,6 +33,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import in2000.prosjekt.in2000project.data.model.SkiArea
 import in2000.prosjekt.in2000project.ui.reusables.BottomBar
+import in2000.prosjekt.in2000project.ui.reusables.RetryScreen
 import in2000.prosjekt.in2000project.ui.reusables.TopBar
 
 private val previewSkiArea = SkiArea(
@@ -65,6 +66,26 @@ fun MapScreen(
             BottomBar(modifier, navController)
         }
     ) { paddingValues ->
+
+        when (MapUIState) {
+            is MapUIState.Loading -> {
+                LoadingView()
+            }
+
+            is MapUIState.RetryAction -> {
+                RetryScreen(
+                    title = "Map failed to load",
+                    message = "No internet connection",
+                    onRetry = { /* TO DO*/ },
+                    navController = navController
+                )
+            }
+
+            is MapUIState.Success -> {
+                MapContent(...)
+            }
+        }
+        }
 
         // Main screen content
         Column(
