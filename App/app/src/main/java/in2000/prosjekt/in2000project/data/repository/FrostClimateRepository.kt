@@ -5,6 +5,8 @@ import in2000.prosjekt.in2000project.data.datasource.FrostV0DataSource
 import in2000.prosjekt.in2000project.data.datasource.dto.FrostV0Observation
 import in2000.prosjekt.in2000project.data.datasource.dto.FrostV0Source
 import in2000.prosjekt.in2000project.data.model.Coordinate
+import in2000.prosjekt.in2000project.data.model.DangerLevel
+import in2000.prosjekt.in2000project.data.model.DangerLevelType
 import in2000.prosjekt.in2000project.data.model.LocationClimateData
 import in2000.prosjekt.in2000project.data.model.LocationSlabAvalancheRiskData
 import in2000.prosjekt.in2000project.data.model.NoObservationsException
@@ -172,7 +174,7 @@ class FrostClimateRepository(
                     //return high danger
                     return LocationSlabAvalancheRiskData(
                         coordinate = coordinate,
-                        dangerLevel = "High",
+                        dangerLevel = dangerLevel,
                         dataReliability = 1.0
                     )
 
@@ -208,16 +210,40 @@ class FrostClimateRepository(
         var slabLayerDepth = 0.0
 
 
+
+        val totalScore = newSnowLoad + weakLayerDepth + slabLayerDepth + tempTrend
+
+        val dangerLevelType = when (totalScore) {
+            in 0.0..15.0 -> DangerLevelType.UNLIKELY
+            in 16.0..35.0 -> DangerLevelType.LOW
+            in 36.0..55.0 -> DangerLevelType.MODERATE
+            in 56.0..75.0 -> DangerLevelType.HIGH
+            else -> DangerLevelType.VERY_HIGH
+        }
+
+        /*
+        val longDescription = when (dangerLevelType) {
+            DangerLevelType.UNLIKELY -> "Snowpack appears mostly stable with little recent loading or warming."
+            DangerLevelType.LOW -> "Some instability may exist, but overall slab avalanche risk is limited."
+            DangerLevelType.MODERATE -> "Recent snow loading, weak layers, or warming may create unstable slab conditions."
+            DangerLevelType.HIGH -> "Significant slab avalanche conditions are present due to loading and/or warming."
+            DangerLevelType.VERY_HIGH -> "Very unstable snowpack with strong indicators of slab avalanche danger."
+        }*/
+
+        val dangerLevel = DangerLevel(
+            type = dangerLevelType,
+        )
+
         if (warmPrecip > 150.0 && coldPrecip > 10.0)
             return LocationSlabAvalancheRiskData(
                 coordinate = coordinate,
-                dangerLevel = "High",
+                dangerLevel = dangerLevel,
                 dataReliability = 1.0
             )
 
         return LocationSlabAvalancheRiskData(
             coordinate = coordinate,
-            dangerLevel = "Low",
+            dangerLevel = dangerLevel,
             dataReliability = 1.0
         )
     }
