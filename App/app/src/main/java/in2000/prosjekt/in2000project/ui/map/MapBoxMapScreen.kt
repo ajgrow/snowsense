@@ -38,7 +38,7 @@ private const val WMS_DETAIL =
 
 @Composable
 fun MapboxMapScreen(
-    onMapClick: () -> Unit,
+    onMapClick: (Point) -> Unit,
 ) {
     val viewportState = rememberMapViewportState {
         setCameraOptions {
@@ -54,8 +54,9 @@ fun MapboxMapScreen(
         ) {
             //this click listener just works generally on the map
             MapEffect(Unit) { mapView ->
-                mapView.gestures.addOnMapClickListener {
-                    onMapClick()
+                mapView.gestures.addOnMapClickListener {point ->
+
+                    onMapClick(point)
                     true //return true to show that the click was handled
                 }
             }

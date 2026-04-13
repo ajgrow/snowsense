@@ -5,7 +5,6 @@ package in2000.prosjekt.in2000project.data.model
 data class SkiArea(
     val id: String,
     val name: String,
-    val avalancheDangerLevel: String,
     val averageSnowfall: String,
     val averagePrecipitation: String,
     val dailyMeanTemperature: String
