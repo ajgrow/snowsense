@@ -182,6 +182,8 @@ class FrostClimateRepository(
 
         var weakLayerDepth = 0.0
         var slabLayerDepth = 0.0
+        var weakLayerBase = false
+
 
 
         var coldPrecip1 = 0.0
@@ -196,6 +198,20 @@ class FrostClimateRepository(
                 weakLayerDepth = coldPrecip1
                 coldPrecip1 = 0.0
             }
+
+            if (temp > -5.0 && !weakLayerBase){
+                slabLayerDepth += (precip / 10.0)
+            }
+            else if (temp <= -5.0){
+                weakLayerBase = true
+            }
+        }
+
+        val slabFormation = when{
+            slabLayerDepth <= 5.0 -> 0
+            slabLayerDepth <= 15.0 -> 10
+            slabLayerDepth <= 30.0 -> 18
+            else -> 25
         }
 
         val weakLayerPresence = when (weakLayerDepth) {
