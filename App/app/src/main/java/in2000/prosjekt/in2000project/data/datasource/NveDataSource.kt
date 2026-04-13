@@ -38,10 +38,10 @@ class NveDataSource {
                     parameter("inSR", "4326")
                     parameter("spatialRel", "esriSpatialRelIntersects")
 
-                    parameter("distance", buffer.toString())
+                    parameter("distance", buffer)
                     parameter("units", "esriSRUnit_Meter")
 
-                    parameter("outFields", "objekttype,skredstype")
+                    parameter("outFields", "objekttype,skredtype")
                     parameter("returnGeometry", "true")
                     parameter("outSR", "4326")
                     parameter("f", "geojson")
