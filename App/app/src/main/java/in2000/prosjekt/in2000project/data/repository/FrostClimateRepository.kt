@@ -123,11 +123,9 @@ class FrostClimateRepository(
             else -> 25
         }
 
-
-
-        var weakLayerDepth = 0.0
-        var slabLayerDepth = 0.0
-        var temperatureTrend = 0.0 //based on 3-day average
+        // Assumes at least one existing observation
+        val threeDayTempAverage = observationResponse.data.takeLast(3).map { it.observations.firstOrNull{ it.elementId == ELEMENT_TEMP }?.value}.filterNotNull().average()
+        val lastTemp = observationResponse.data.filter { it.observations.firstOrNull{ obs -> obs.elementId == ELEMENT_TEMP } != null }.lastOrNull()?.observations?.firstOrNull{ obs -> obs.elementId == ELEMENT_TEMP }?.value
 
         var warmPrecip = 0.0
         var coldPrecip = 0.0
@@ -178,6 +176,11 @@ class FrostClimateRepository(
                 warmPrecipStreak = 0
             }
         }
+
+
+        var weakLayerDepth = 0.0
+        var slabLayerDepth = 0.0
+
 
         if (warmPrecip > 150.0 && coldPrecip > 10.0)
             return LocationSlabAvalancheRiskData(
