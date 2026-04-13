@@ -11,19 +11,10 @@ import com.mapbox.maps.extension.compose.MapEffect
 import com.mapbox.maps.extension.compose.MapboxMap
 import com.mapbox.maps.extension.compose.animation.viewport.rememberMapViewportState
 import com.mapbox.maps.extension.style.layers.addLayer
-import com.mapbox.maps.extension.style.layers.generated.fillLayer
-import com.mapbox.maps.extension.style.layers.generated.lineLayer
 import com.mapbox.maps.extension.style.layers.generated.rasterLayer
 import com.mapbox.maps.extension.style.sources.addSource
-import com.mapbox.maps.extension.style.sources.generated.GeoJsonSource
-import com.mapbox.maps.extension.style.sources.generated.geoJsonSource
 import com.mapbox.maps.extension.style.sources.generated.rasterSource
-import com.mapbox.maps.extension.style.sources.getSourceAs
 import com.mapbox.maps.plugin.gestures.gestures
-import in2000.prosjekt.in2000project.data.model.GeoJson
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import kotlinx.serialization.json.Json
 
 private const val TAG = "SnoskredWMS"
 
@@ -48,7 +39,6 @@ private const val WMS_DETAIL =
 @Composable
 fun MapboxMapScreen(
     onMapClick: () -> Unit,
-    //geoJson: GeoJson?
 ) {
     val viewportState = rememberMapViewportState {
         setCameraOptions {
@@ -107,41 +97,8 @@ fun MapboxMapScreen(
                             minZoom(8.0)
                         }
                     )
-
                 }
             }
-
-/*            MapEffect(geoJson) { mapView ->
-                if (geoJson == null || geoJson?.features == null || geoJson.features.isEmpty()) return@MapEffect
-
-                val data = Json.encodeToString(geoJson)
-                val mapboxMap = mapView.mapboxMap
-
-                mapboxMap.getStyle { style ->
-
-                    val exSource = style.getSourceAs<GeoJsonSource>("nve-source")
-                    if (exSource != null){
-                        exSource.data(data)
-                    } else {
-                        val source = geoJsonSource("nve-source") {
-                            data(data)
-                        }
-                        style.addSource(source)
-
-                        val fillLayer = fillLayer("nve-fill", "nve-source") {
-                            fillColor("#ff0000")
-                            fillOpacity(0.8)
-                        }
-                        style.addLayer(fillLayer)
-
-                        val lineLayer = lineLayer("nve-outline", "nve-source") {
-                            lineColor("#ff0000")
-                            lineWidth(2.5)
-                        }
-                        style.addLayer(lineLayer)
-                    }
-                }
-            }*/
         }
     }
 }

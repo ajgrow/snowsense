@@ -53,13 +53,8 @@ private val previewSkiArea = SkiArea(
 fun MapScreen(
     modifier: Modifier = Modifier,
     navController: NavController,
-    //nveViewModel: NveViewModel = viewModel()
 ) {
-/*    val mapUiState by nveViewModel.geoJsonUiState.collectAsState()
 
-    LaunchedEffect(Unit) {
-        nveViewModel.loadGeoJson()
-    }*/
 
     // Hardcoded sample data for the MVP, however, when Frost API is ready this should move into the ViewModel
     val skiArea = remember { previewSkiArea }
@@ -99,7 +94,6 @@ fun MapScreen(
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.padding(bottom = 16.dp)
             )
-            //Text("Features: ${mapUiState.geoJson.features?.size}")
 
             //Map added here
             //onMapClick is passed to the Map
@@ -139,7 +133,6 @@ fun MapScreen(
 fun Map(
     onMapClick: () -> Unit,
     modifier: Modifier = Modifier,
-    //geoJson: GeoJson?
 ) {
     // This is the blue area on the MapScreen that is meant for where the map from MapBox will eventually go.
     Box(
@@ -154,7 +147,6 @@ fun Map(
             //onMapClick is passed to the MapBoxMapScreen
             //eventually polygons will be used
             onMapClick = onMapClick,
-            //geoJson = geoJson
         )
     }
 }
