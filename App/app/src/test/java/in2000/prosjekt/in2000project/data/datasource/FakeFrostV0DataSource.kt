@@ -9,85 +9,11 @@ class FakeFrostV0DataSource : FrostV0DataSource {
     // ── Canned responses ──
 
     /** Override per test to control getNearestSource output. */
-    var sourceResponse = FrostV0SourceResponse(
-        data = listOf(
-            FrostV0Source(
-                id = "SN18700",
-                name = "Blindern",
-                shortName = "Blindern",
-                geometry = FrostV0Point(
-                    type = "Point",
-                    coordinates = listOf(59.94, 10.72),
-                ),
-                distance = 1.2,
-                masl = 94.0,
-                validFrom = "1937-01-01",
-                county = "Oslo",
-                municipality = "Oslo",
-            )
-        )
-    )
+    var sourceResponse = makeSourceResponse(makeSource())
 
     /** Override per test to control getObservations output. */
-    var observationResponse = FrostV0ObservationResponse(
-        currentItemCount = 6,
-        totalItemCount = 6,
-        data = listOf(
-            FrostV0ObservationsAtRefTime(
-                sourceId = "SN18700",
-                referenceTime = "2024-04-01T00:00:00.000Z",
-                observations = listOf(
-                    FrostV0Observation(
-                        "mean(air_temperature P1D)",
-                        -2.0,
-                        "degC",
-                        "PT0H",
-                        "P1D",
-                    ),
-                    FrostV0Observation(
-                        "sum(precipitation_amount P1D)",
-                        4.5,
-                        "mm",
-                        "PT0H",
-                        "P1D",
-                    ),
-                    FrostV0Observation(
-                        "mean(wind_speed P1D)",
-                        3.0,
-                        "m/s",
-                        "PT0H",
-                        "P1D",
-                    ),
-                )
-            ),
-            FrostV0ObservationsAtRefTime(
-                sourceId = "SN18700",
-                referenceTime = "2025-04-01T00:00:00.000Z",
-                observations = listOf(
-                    FrostV0Observation(
-                        "mean(air_temperature P1D)",
-                        -4.0,
-                        "degC",
-                        "PT0H",
-                        "P1D",
-                    ),
-                    FrostV0Observation(
-                        "sum(precipitation_amount P1D)",
-                        6.5,
-                        "mm",
-                        "PT0H",
-                        "P1D",
-                    ),
-                    FrostV0Observation(
-                        "mean(wind_speed P1D)",
-                        5.0,
-                        "m/s",
-                        "PT0H",
-                        "P1D",
-                    ),
-                )
-            ),
-        )
+    var observationResponse = makeObsResponse(
+        makeDay(temp = 2.0, precip = 1.5, wind = 3.0, snow = 45.0),
     )
 
     /** Set to true to simulate network errors. */

@@ -1,6 +1,6 @@
 package in2000.prosjekt.in2000project.data.repository
 
-import in2000.prosjekt.in2000project.data.datasource.FakeFrostV0DataSource
+import in2000.prosjekt.in2000project.data.datasource.*
 import in2000.prosjekt.in2000project.data.datasource.dto.*
 import in2000.prosjekt.in2000project.data.model.Coordinate
 import in2000.prosjekt.in2000project.data.model.NoObservationsException
@@ -49,14 +49,22 @@ class FrostClimateRepositoryTest {
         assertEquals("SN18700", fakeDataSource.lastSourceId)
         // Verify all four elements are present in the CSV (order doesn't matter)
         val elements = fakeDataSource.lastElements!!
-        assertTrue("Missing temperature",
-            elements.contains("mean(air_temperature P1D)"))
-        assertTrue("Missing precipitation",
-            elements.contains("sum(precipitation_amount P1D)"))
-        assertTrue("Missing wind",
-            elements.contains("mean(wind_speed P1D)"))
-        assertTrue("Missing snow",
-            elements.contains("max(surface_snow_thickness P1D)"))
+        assertTrue(
+            "Missing temperature",
+            elements.contains("mean(air_temperature P1D)")
+        )
+        assertTrue(
+            "Missing precipitation",
+            elements.contains("sum(precipitation_amount P1D)")
+        )
+        assertTrue(
+            "Missing wind",
+            elements.contains("mean(wind_speed P1D)")
+        )
+        assertTrue(
+            "Missing snow",
+            elements.contains("max(surface_snow_thickness P1D)")
+        )
     }
 
     // ── Output mapping ──
@@ -78,21 +86,19 @@ class FrostClimateRepositoryTest {
     @Test
     fun nullableStationFields_mappedAsNull() = runTest {
         // Real stations sometimes lack elevation or distance data.
-        fakeDataSource.sourceResponse = FrostV0SourceResponse(
-            data = listOf(
-                FrostV0Source(
-                    id = "SN99999",
-                    name = "Mystery Station",
-                    shortName = "Mystery",
-                    geometry = FrostV0Point(
-                        type = "Point", coordinates = listOf(70.0, 25.0),
-                    ),
-                    distance = null,
-                    masl = null,
-                    validFrom = null,
-                    county = null,
-                    municipality = null,
-                )
+        fakeDataSource.sourceResponse = makeSourceResponse(
+            makeSource(
+                id = "SN99999",
+                name = "Mystery Station",
+                shortName = "Mystery",
+                geometry = FrostV0Point(
+                    type = "Point", coordinates = listOf(70.0, 25.0),
+                ),
+                distance = null,
+                masl = null,
+                validFrom = null,
+                county = null,
+                municipality = null,
             )
         )
         val result = repository.getClimateDataForLocation(
@@ -109,7 +115,11 @@ class FrostClimateRepositoryTest {
 
     @Test
     fun dailyAverages_computedCorrectly() = runTest {
-        // Default fake: temp -2,-4 → avg -3; precip 4.5,6.5 → avg 5.5; wind 3,5 → avg 4.
+        // temp -2,-4 → avg -3; precip 4.5,6.5 → avg 5.5; wind 3,5 → avg 4.
+        fakeDataSource.observationResponse = makeObsResponse(
+            makeDay("2024-04-01T00:00:00.000Z", temp = -2.0, precip = 4.5, wind = 3.0),
+            makeDay("2025-04-01T00:00:00.000Z", temp = -4.0, precip = 6.5, wind = 5.0),
+        )
         val result = repository.getClimateDataForLocation(
             Coordinate(59.9, 10.7),
             MonthDay.of(3, 23),
@@ -124,7 +134,10 @@ class FrostClimateRepositoryTest {
 
     @Test
     fun missingElement_returnsNullAverage() = runTest {
-        // Default fake has no snow depth observations — should map to null, not 0 or NaN.
+        // No snow depth observations — should map to null, not 0 or NaN.
+        fakeDataSource.observationResponse = makeObsResponse(
+            makeDay("2024-04-01T00:00:00.000Z", temp = -2.0, precip = 4.5, wind = 3.0),
+        )
         val result = repository.getClimateDataForLocation(
             Coordinate(59.9, 10.7),
             MonthDay.of(3, 23),
@@ -154,7 +167,11 @@ class FrostClimateRepositoryTest {
 
     @Test
     fun dataPointCount_countsAllObservations() = runTest {
-        // Default fake: 2 ref times × 3 elements = 6 total observations.
+        // 2 ref times × 3 elements = 6 total observations.
+        fakeDataSource.observationResponse = makeObsResponse(
+            makeDay("2024-04-01T00:00:00.000Z", temp = -2.0, precip = 4.5, wind = 3.0),
+            makeDay("2025-04-01T00:00:00.000Z", temp = -4.0, precip = 6.5, wind = 5.0),
+        )
         val result = repository.getClimateDataForLocation(
             Coordinate(59.9, 10.7),
             MonthDay.of(3, 23),
@@ -169,9 +186,7 @@ class FrostClimateRepositoryTest {
 
     @Test(expected = NoObservationsException::class)
     fun emptyObservations_throwsNoObservationsException() = runTest {
-        fakeDataSource.observationResponse = FrostV0ObservationResponse(
-            currentItemCount = 0, totalItemCount = 0, data = emptyList(),
-        )
+        fakeDataSource.observationResponse = makeObsResponse()
         repository.getClimateDataForLocation(
             Coordinate(59.9, 10.7),
             MonthDay.of(3, 23),
@@ -183,16 +198,8 @@ class FrostClimateRepositoryTest {
     @Test(expected = NoObservationsException::class)
     fun nonEmptyDataButEmptyObservations_throwsNoObservationsException() = runTest {
         // API can return non-empty data with zero observations inside each entry.
-        fakeDataSource.observationResponse = FrostV0ObservationResponse(
-            currentItemCount = 0,
-            totalItemCount = 0,
-            data = listOf(
-                FrostV0ObservationsAtRefTime(
-                    sourceId = "SN18700",
-                    referenceTime = "2025-04-01T00:00:00.000Z",
-                    observations = emptyList(),
-                ),
-            ),
+        fakeDataSource.observationResponse = makeObsResponse(
+            makeDay("2025-04-01T00:00:00.000Z"),
         )
         repository.getClimateDataForLocation(
             Coordinate(59.9, 10.7),
@@ -204,7 +211,7 @@ class FrostClimateRepositoryTest {
 
     @Test(expected = NoStationFoundException::class)
     fun emptySourceResponse_throwsNoStationFoundException() = runTest {
-        fakeDataSource.sourceResponse = FrostV0SourceResponse(data = emptyList())
+        fakeDataSource.sourceResponse = makeSourceResponse()
         repository.getClimateDataForLocation(
             Coordinate(59.9, 10.7),
             MonthDay.of(3, 23),
