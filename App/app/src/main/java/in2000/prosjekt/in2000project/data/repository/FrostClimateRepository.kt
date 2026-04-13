@@ -129,6 +129,27 @@ class FrostClimateRepository(
         var slabLayerDepth = 0.0
         var temperatureTrend = 0.0 //based on 3-day average
 
+        var coldPrecip1 = 0.0
+        for (obs in observationResponse.data.sortedBy { it.referenceTime }) {
+            val temp = obs.observations.firstOrNull { it.elementId == ELEMENT_TEMP }?.value   ?: continue
+            val precip = obs.observations.firstOrNull { it.elementId == ELEMENT_PRECIP }?.value ?: 0.0
+
+            if (temp <= 0.0) {
+                coldPrecip1 += precip
+            }
+            else if (precip > 2.0) {
+                weakLayerDepth = coldPrecip1
+                coldPrecip1 = 0.0
+            }
+        }
+
+        val weakLayerPresence = when (weakLayerDepth) {
+            in 0.0 .. 12.0 -> 0
+            in 12.0 .. 25.0 -> 10
+            in 25.0 .. 50.0 -> 20
+            else -> 30
+        }
+
         var warmPrecip = 0.0
         var coldPrecip = 0.0
 
