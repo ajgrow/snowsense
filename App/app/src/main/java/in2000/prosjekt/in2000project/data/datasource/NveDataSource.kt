@@ -1,12 +1,14 @@
 package in2000.prosjekt.in2000project.data.datasource
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.net.URL
 
 class NveDataSource {
     private val url =
         "https://kart.nve.no/enterprise/rest/services/SnoskredAktsomhet/MapServer/1/query?where=1%3D1&outFields=objekttype,skredtype&outSR=4326&f=geojson"
 
-    suspend fun fetchGeoJson(): String{
-        return URL(url).readText()
+    suspend fun fetchGeoJson(): String = withContext(Dispatchers.IO){
+        URL(url).readText()
     }
 }
