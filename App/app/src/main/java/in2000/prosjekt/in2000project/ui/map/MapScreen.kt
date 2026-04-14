@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -24,17 +25,20 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import in2000.prosjekt.in2000project.data.model.SkiArea
 import in2000.prosjekt.in2000project.ui.reusables.BottomBar
 import in2000.prosjekt.in2000project.ui.reusables.RetryScreen
 import in2000.prosjekt.in2000project.ui.reusables.TopBar
+import in2000.prosjekt.in2000project.ui.map.MapUIState
 
 private val previewSkiArea = SkiArea(
     id = "1",
@@ -45,11 +49,29 @@ private val previewSkiArea = SkiArea(
     dailyMeanTemperature = "-3.2°C winter average"
 )
 
+
+/*
+
+//for use when the VM is ready
+@Composable
+fun MapScreenState(
+    viewModel: MapScreenViewModel = viewModel()
+) {
+    val uiState by viewModel.uiState.collectAsState()
+
+    MapScreen(
+        mapUIState = uiState,
+        navController = rememberNavController()
+    )
+}
+ */
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MapScreen(
     modifier: Modifier = Modifier,
-    navController: NavController
+    navController: NavController,
+    mapUIState: MapUIState = MapUIState.Success
 ) {
     // Hardcoded sample data for the MVP, however, when Frost API is ready this should move into the ViewModel
     val skiArea = remember { previewSkiArea }
@@ -67,59 +89,79 @@ fun MapScreen(
         }
     ) { paddingValues ->
 
-        when (MapUIState) {
-            is MapUIState.Loading -> {
-                LoadingView()
-            }
-
+        when (mapUIState) {
             is MapUIState.RetryAction -> {
                 RetryScreen(
                     title = "Map failed to load",
                     message = "No internet connection",
-                    onRetry = { /* TO DO*/ },
-                    navController = navController
+                    onRetry = { },
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues)
                 )
             }
 
             is MapUIState.Success -> {
-                MapContent(...)
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues)
+                        .padding(16.dp)
+                ) {
+                    Text(
+                        text = "Map",
+                        style = MaterialTheme.typography.headlineMedium,
+                        fontWeight = Bold,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+
+                    Text(
+                        text = "Select an area to view historical climate details.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(bottom = 16.dp)
+                    )
+
+                    Map(
+                        onMapClick = {
+                            isSheetOpen = true
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f)
+                    )
+                }
             }
-        }
-        }
 
-        // Main screen content
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                // Makes sure the content is not hidden behind the top app bar or bottom app bar.
-                .padding(paddingValues)
-                .padding(16.dp)
-        ) {
-            // Title
-            Text(
-                text = "Map",
-                style = MaterialTheme.typography.headlineMedium,
-                fontWeight = Bold,
-                modifier = Modifier.padding(bottom = 8.dp)
-            )
+            is MapUIState.Loading -> {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues)
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
 
-            // Instructions
-            Text(
-                text = "Select an area to view historical climate details.",
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(bottom = 16.dp)
-            )
+                ) {
+                    // The "Loading Wheel"
+                    CircularProgressIndicator(
+                        modifier = Modifier.padding(bottom = 16.dp),
+                        color = MaterialTheme.colorScheme.primary
+                    )
 
-            //Map added here
-            //onMapClick is passed to the Map
-            Map(
-                onMapClick = {
-                    isSheetOpen = true
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-            )
+                    Text(
+                        text = "Loading map...",
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                }
+            }
+
+            is MapUIState.Error -> {
+                RetryScreen(
+                    title = "Something went wrong",
+                    message = "Unable to load the map.",
+                    onRetry = {}
+                )
+            }
         }
     }
 
@@ -226,7 +268,7 @@ fun ClimateRow(
 @Preview
 @Composable
 fun MapScreenPreview() {
-    MapScreen(navController = rememberNavController())
+    MapScreen(navController = rememberNavController(), mapUIState = MapUIState.RetryAction)
 }
 
 @Preview(showBackground = true)
