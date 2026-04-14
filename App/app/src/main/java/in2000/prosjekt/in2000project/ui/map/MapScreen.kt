@@ -19,6 +19,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -29,6 +30,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import in2000.prosjekt.in2000project.data.model.SkiArea
@@ -47,34 +49,34 @@ private val previewSkiArea = SkiArea(
 )
 
 
-/*
-
 //for use when the VM is ready
 @Composable
 fun MapScreenState(
-    viewModel: MapScreenViewModel = viewModel()
+    navController: NavController,
+    viewModel: MapViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
     MapScreen(
+        navController = navController,
         mapUIState = uiState,
-        navController = rememberNavController()
+        onRetry = { viewModel.getMapData() }
     )
 }
- */
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MapScreen(
     modifier: Modifier = Modifier,
     navController: NavController,
-    mapUIState: MapUIState = MapUIState.RetryAction
+    mapUIState: MapUIState,
+    onRetry: () -> Unit
 ) {
     // Hardcoded sample data for the MVP, however, when Frost API is ready this should move into the ViewModel
     val skiArea = remember { previewSkiArea }
 
     //Controls whether the bottom sheet is visible or not by keeping track of if the user has clicked the map
-    //if this is set to null then the ModalBottomSheet is not open
     var isSheetOpen by rememberSaveable { mutableStateOf(false) }
 
     Scaffold(
@@ -86,65 +88,54 @@ fun MapScreen(
         }
     ) { paddingValues ->
 
-        when (mapUIState) {
-            is MapUIState.RetryAction -> {
-                RetryView(
-                    title = "Map failed to load",
-                    message = "No internet connection",
-                    onRetry = { },
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(paddingValues)
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .padding(16.dp)
+        ) {
+            Text(
+                text = "Map",
+                style = MaterialTheme.typography.headlineMedium,
+                fontWeight = Bold,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+
+            Text(
+                text = "Select an area to view historical climate details.",
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+            ) {
+                Map(
+                    geoJson = (mapUIState as? MapUIState.Success)?.geoJson,
+                    onMapClick = {
+                        isSheetOpen = true
+                    },
+                    modifier = Modifier.fillMaxSize()
                 )
-            }
 
-            is MapUIState.Success -> {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(paddingValues)
-                        .padding(16.dp)
-                ) {
-                    Text(
-                        text = "Map",
-                        style = MaterialTheme.typography.headlineMedium,
-                        fontWeight = Bold,
-                        modifier = Modifier.padding(bottom = 8.dp)
-                    )
+                when (mapUIState) {
+                    is MapUIState.Loading -> {
+                        OverlayStatusCard(
+                            message = "Loading avalanche overlay..."
+                        )
+                    }
 
-                    Text(
-                        text = "Select an area to view historical climate details.",
-                        style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.padding(bottom = 16.dp)
-                    )
+                    is MapUIState.Error -> {
+                        OverlayRetryCard(
+                            message = "Could not load avalanche overlay.",
+                            onRetry = onRetry
+                        )
+                    }
 
-                    Map(
-                        onMapClick = {
-                            isSheetOpen = true
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1f)
-                    )
+                    is MapUIState.Success -> Unit
                 }
-            }
-
-            is MapUIState.Loading -> {
-                LoadingView(
-                    message = "Loading map...",
-                    modifier = Modifier.padding(paddingValues)
-                )
-            }
-
-            is MapUIState.Error -> {
-                RetryView(
-                    title = "Something went wrong",
-                    message = "Unable to load the map.",
-                    onRetry = {},
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(paddingValues)
-                )
             }
         }
     }
@@ -171,6 +162,7 @@ fun MapScreen(
 
 @Composable
 fun Map(
+    geoJson: String?,
     onMapClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -181,9 +173,9 @@ fun Map(
                 color = Color(0xFFDCEEFF),
                 shape = RoundedCornerShape(24.dp)
             )
-            .clickable { onMapClick() }
     ) {
         MapboxMapScreen(
+            geoJson = geoJson,
             //onMapClick is passed to the MapBoxMapScreen
             //eventually polygons will be used
             onMapClick = onMapClick
@@ -251,8 +243,12 @@ fun ClimateRow(
 
 @Preview
 @Composable
-fun MapScreenPreview() {
-    MapScreen(navController = rememberNavController(), mapUIState = MapUIState.RetryAction)
+fun MapScreenErrorPreview() {
+    MapScreen(
+        navController = rememberNavController(),
+        mapUIState = MapUIState.Error,
+        onRetry = {}
+    )
 }
 
 @Preview(showBackground = true)
