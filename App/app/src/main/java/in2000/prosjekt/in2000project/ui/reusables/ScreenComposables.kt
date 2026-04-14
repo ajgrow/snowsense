@@ -77,7 +77,7 @@ fun BottomBar(
         NavigationBarItem(
             selected = currentRoute == Screen.Map.route,
             onClick = {
-                navController.navigate(Screen.Map.createRoute("65.0,10.0"))
+                navController.navigate(Screen.Map.route)
                 {
                     popUpTo(navController.graph.findStartDestination().id) {
                         saveState = true
