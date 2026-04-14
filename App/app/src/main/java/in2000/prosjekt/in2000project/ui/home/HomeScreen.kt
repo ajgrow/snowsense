@@ -156,7 +156,6 @@ fun SearchSection(
                         modifier = Modifier
                             .clickable (
                                 onClick = {
-                                    Log.d("fuckedupmap", "${result.representasjonspunkt.nord}")
                                     navController.navigate(
                                         Screen.Map.createRoute("${result.representasjonspunkt.nord},${result.representasjonspunkt.øst}")
                                     ) {
