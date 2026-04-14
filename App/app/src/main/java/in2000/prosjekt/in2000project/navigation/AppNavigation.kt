@@ -8,6 +8,7 @@ import androidx.navigation.compose.rememberNavController
 import in2000.prosjekt.in2000project.ui.home.HomeScreen
 import in2000.prosjekt.in2000project.ui.information.InfoScreen
 import in2000.prosjekt.in2000project.ui.map.MapScreen
+import in2000.prosjekt.in2000project.ui.map.MapScreenState
 
 @Composable
 fun AppNavigation(){
@@ -22,7 +23,7 @@ fun AppNavigation(){
             HomeScreen(navController = navController)
         }
         composable(Screen.Map.route) {
-            MapScreen(navController = navController)
+            MapScreenState(navController = navController)
         }
         composable(Screen.Info.route) {
             InfoScreen(navController = navController)
