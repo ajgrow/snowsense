@@ -15,7 +15,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun RetryScreen(
+fun RetryView(
     title: String,
     message: String,
     onRetry: () -> Unit,
@@ -51,5 +51,5 @@ fun RetryScreen(
 @Preview
 @Composable
 fun RetryScreenPreview() {
-    RetryScreen(title = "Error", message = "No internet connection", onRetry = {})
+    RetryView(title = "Error", message = "No internet connection", onRetry = {})
 }
