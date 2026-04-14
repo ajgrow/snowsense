@@ -1,8 +1,8 @@
 package in2000.prosjekt.in2000project.ui.map
 
 sealed interface MapUIState {
-    data class LoadedMap() : MapUIState
-    object RetryAction : MapUIState
-    object Error : MapUIState
-    object Loading : MapUIState
+    data object Loading : MapUIState
+    data object Success : MapUIState
+    data object RetryAction : MapUIState
+    data object Error : MapUIState
 }
