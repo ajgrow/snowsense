@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -25,20 +24,18 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import in2000.prosjekt.in2000project.data.model.SkiArea
 import in2000.prosjekt.in2000project.ui.reusables.BottomBar
-import in2000.prosjekt.in2000project.ui.reusables.RetryScreen
+import in2000.prosjekt.in2000project.ui.reusables.LoadingView
+import in2000.prosjekt.in2000project.ui.reusables.RetryView
 import in2000.prosjekt.in2000project.ui.reusables.TopBar
-import in2000.prosjekt.in2000project.ui.map.MapUIState
 
 private val previewSkiArea = SkiArea(
     id = "1",
@@ -91,7 +88,7 @@ fun MapScreen(
 
         when (mapUIState) {
             is MapUIState.RetryAction -> {
-                RetryScreen(
+                RetryView(
                     title = "Map failed to load",
                     message = "No internet connection",
                     onRetry = { },
@@ -133,40 +130,27 @@ fun MapScreen(
             }
 
             is MapUIState.Loading -> {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(paddingValues)
-                        .padding(16.dp),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
-
-                ) {
-                    // The "Loading Wheel"
-                    CircularProgressIndicator(
-                        modifier = Modifier.padding(bottom = 16.dp),
-                        color = MaterialTheme.colorScheme.primary
-                    )
-
-                    Text(
-                        text = "Loading map...",
-                        style = MaterialTheme.typography.bodyLarge
-                    )
-                }
+                LoadingView(
+                    message = "Loading map...",
+                    modifier = Modifier.padding(paddingValues)
+                )
             }
 
             is MapUIState.Error -> {
-                RetryScreen(
+                RetryView(
                     title = "Something went wrong",
                     message = "Unable to load the map.",
-                    onRetry = {}
+                    onRetry = {},
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues)
                 )
             }
         }
     }
 
     //This is for the bottom sheet - if isSheetOpen is set to true, then it will open otherwise, it stays closed
-    if (isSheetOpen){
+    if (isSheetOpen && mapUIState is MapUIState.Success){
         ModalBottomSheet(
             onDismissRequest = { isSheetOpen = false },
             containerColor = MaterialTheme.colorScheme.surface,
