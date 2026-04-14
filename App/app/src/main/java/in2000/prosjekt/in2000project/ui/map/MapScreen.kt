@@ -68,7 +68,7 @@ fun MapScreenState(
 fun MapScreen(
     modifier: Modifier = Modifier,
     navController: NavController,
-    mapUIState: MapUIState = MapUIState.Success
+    mapUIState: MapUIState = MapUIState.RetryAction
 ) {
     // Hardcoded sample data for the MVP, however, when Frost API is ready this should move into the ViewModel
     val skiArea = remember { previewSkiArea }
