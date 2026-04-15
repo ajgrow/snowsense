@@ -28,7 +28,7 @@ class NveViewModel (): ViewModel() {
     fun avalancheChecker(lat: Double, lon: Double){
         viewModelScope.launch {
 
-            val geoJson = nveRepository.getGeoJson(lat, lon, 300)
+            val geoJson = nveRepository.getGeoJson(lat, lon, 10)
             val isDanger = geoJson.features?.isNotEmpty() == true
 
             _dangerCheckUiState.update { currentState ->
