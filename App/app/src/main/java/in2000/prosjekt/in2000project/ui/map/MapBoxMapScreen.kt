@@ -13,18 +13,13 @@ import com.mapbox.maps.extension.compose.MapEffect
 import com.mapbox.maps.extension.compose.MapboxMap
 import com.mapbox.maps.extension.compose.animation.viewport.rememberMapViewportState
 import com.mapbox.maps.extension.style.layers.addLayer
-import com.mapbox.maps.extension.style.layers.generated.fillLayer
-import com.mapbox.maps.extension.style.layers.generated.lineLayer
 import com.mapbox.maps.extension.style.layers.generated.rasterLayer
 import com.mapbox.maps.extension.style.sources.addSource
-import com.mapbox.maps.extension.style.sources.generated.geoJsonSource
 import com.mapbox.maps.extension.style.sources.generated.rasterSource
 import com.mapbox.maps.plugin.gestures.gestures
 import com.mapbox.maps.toCameraOptions
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import in2000.prosjekt.in2000project.data.repository.GeoJsonRepository
-
 object MapCameraRepository {
     var lastCameraOptions: CameraOptions? = null
 }
@@ -50,7 +45,7 @@ private const val WMS_DETAIL =
 
 @Composable
 fun MapboxMapScreen(
-    onMapClick: () -> Unit,
+    onMapClick: (Point) -> Unit,
     coordinates: String
 ) {
     val (hasSearch, searchLat, searchLng) = remember(coordinates) {
@@ -104,24 +99,17 @@ fun MapboxMapScreen(
         }
     }
 
-    var geoJson by remember { mutableStateOf<String?>(null) }
-
-    LaunchedEffect(Unit) {
-        geoJson = withContext(Dispatchers.IO) {
-            GeoJsonRepository.fetchGeoJson()
-        }
-    }
-
     Box(modifier = Modifier.fillMaxSize()) {
-        key(mapRecreateKey) {
+        key(mapRecreateKey){
             MapboxMap(
                 modifier = Modifier.fillMaxSize(),
                 mapViewportState = viewportState
             ) {
                 //this click listener just works generally on the map
                 MapEffect(Unit) { mapView ->
-                    mapView.gestures.addOnMapClickListener {
-                        onMapClick()
+                    mapView.gestures.addOnMapClickListener {point ->
+
+                        onMapClick(point)
                         true //return true to show that the click was handled
                     }
                 }
@@ -165,7 +153,6 @@ fun MapboxMapScreen(
                         )
                     }
                 }
-
                 MapEffect(Unit) { mapView ->
                     idleSubscription = mapView.mapboxMap.subscribeMapIdle {
                         viewportState.cameraState?.toCameraOptions()?.let {
