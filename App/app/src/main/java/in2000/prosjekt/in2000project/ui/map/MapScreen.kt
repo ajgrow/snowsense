@@ -152,7 +152,7 @@ fun Map(
                 color = Color(0xFFDCEEFF),
                 shape = RoundedCornerShape(24.dp)
             )
-            .clickable { onMapClick() }
+            .clickable { onMapClick(0.0, 0.0) }
     ) {
         MapboxMapScreen(
             //onMapClick is passed to the MapBoxMapScreen

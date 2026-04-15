@@ -18,8 +18,7 @@ import com.mapbox.maps.extension.style.sources.addSource
 import com.mapbox.maps.extension.style.sources.generated.rasterSource
 import com.mapbox.maps.plugin.gestures.gestures
 import com.mapbox.maps.toCameraOptions
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+
 object MapCameraRepository {
     var lastCameraOptions: CameraOptions? = null
 }
@@ -107,7 +106,7 @@ fun MapboxMapScreen(
             ) {
                 //this click listener just works generally on the map
                 MapEffect(Unit) { mapView ->
-                    mapView.gestures.addOnMapClickListener {point ->
+                    mapView.gestures.addOnMapClickListener { point ->
 
                         onMapClick(point)
                         true //return true to show that the click was handled
