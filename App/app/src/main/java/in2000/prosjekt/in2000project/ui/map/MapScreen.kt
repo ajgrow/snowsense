@@ -35,8 +35,6 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import in2000.prosjekt.in2000project.data.model.SkiArea
 import in2000.prosjekt.in2000project.ui.reusables.BottomBar
-import in2000.prosjekt.in2000project.ui.reusables.LoadingView
-import in2000.prosjekt.in2000project.ui.reusables.RetryView
 import in2000.prosjekt.in2000project.ui.reusables.TopBar
 
 private val previewSkiArea = SkiArea(
@@ -113,7 +111,6 @@ fun MapScreen(
                     .weight(1f)
             ) {
                 Map(
-                    geoJson = (mapUIState as? MapUIState.Success)?.geoJson,
                     onMapClick = {
                         isSheetOpen = true
                     },
@@ -141,7 +138,7 @@ fun MapScreen(
     }
 
     //This is for the bottom sheet - if isSheetOpen is set to true, then it will open otherwise, it stays closed
-    if (isSheetOpen && mapUIState is MapUIState.Success){
+    if (isSheetOpen){
         ModalBottomSheet(
             onDismissRequest = { isSheetOpen = false },
             containerColor = MaterialTheme.colorScheme.surface,
@@ -162,23 +159,17 @@ fun MapScreen(
 
 @Composable
 fun Map(
-    geoJson: String?,
     onMapClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    // This is the blue area on the MapScreen that is meant for where the map from MapBox will eventually go.
     Box(
-        modifier = modifier
-            .background(
-                color = Color(0xFFDCEEFF),
-                shape = RoundedCornerShape(24.dp)
-            )
+        modifier = modifier.background(
+            color = Color(0xFFDCEEFF),
+            shape = RoundedCornerShape(24.dp)
+        )
     ) {
         MapboxMapScreen(
-            geoJson = geoJson,
-            //onMapClick is passed to the MapBoxMapScreen
-            //eventually polygons will be used
-            onMapClick = onMapClick
+            onMapClick = { onMapClick() }
         )
     }
 }
