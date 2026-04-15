@@ -19,6 +19,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -29,8 +31,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import in2000.prosjekt.in2000project.data.model.GeoJson
 import in2000.prosjekt.in2000project.data.model.SkiArea
 import in2000.prosjekt.in2000project.ui.reusables.BottomBar
 import in2000.prosjekt.in2000project.ui.reusables.TopBar
@@ -38,7 +43,6 @@ import in2000.prosjekt.in2000project.ui.reusables.TopBar
 private val previewSkiArea = SkiArea(
     id = "1",
     name = "Galdhøpiggen Touring Zone",
-    avalancheDangerLevel = "High",
     averageSnowfall = "210 cm seasonal average",
     averagePrecipitation = "95 mm monthly average",
     dailyMeanTemperature = "-3.2°C winter average"
@@ -48,15 +52,23 @@ private val previewSkiArea = SkiArea(
 @Composable
 fun MapScreen(
     modifier: Modifier = Modifier,
-    navController: NavController
+    navController: NavController,
+    nveViewModel: NveViewModel = viewModel()
 ) {
+
     // Hardcoded sample data for the MVP, however, when Frost API is ready this should move into the ViewModel
     val skiArea = remember { previewSkiArea }
 
+    val dangerCheckUiState by nveViewModel.dangerCheckUiState.collectAsState()
     //Controls whether the bottom sheet is visible or not by keeping track of if the user has clicked the map
     //if this is set to null then the ModalBottomSheet is not open
     var isSheetOpen by rememberSaveable { mutableStateOf(false) }
 
+    val avalancheStatus = when {
+        dangerCheckUiState.isDanger == true -> "High"
+        dangerCheckUiState.isDanger == false -> "Low"
+        else -> "Haven't checked"
+    }
     Scaffold(
         topBar = {
             TopBar(modifier = Modifier, title = "MapScreen")
@@ -92,9 +104,11 @@ fun MapScreen(
             //Map added here
             //onMapClick is passed to the Map
             Map(
-                onMapClick = {
+                onMapClick = { lat, lon ->
                     isSheetOpen = true
+                    nveViewModel.avalancheChecker(lat, lon)
                 },
+                //geoJson = mapUiState.geoJson,
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f)
@@ -112,6 +126,7 @@ fun MapScreen(
         ) {
             SkiAreaBottomSheetContent(
                 area = skiArea,
+                avalancheStatus = avalancheStatus,
                 modifier = Modifier
                     .fillMaxWidth()
                     .heightIn(min = 320.dp)
@@ -124,8 +139,8 @@ fun MapScreen(
 
 @Composable
 fun Map(
-    onMapClick: () -> Unit,
-    modifier: Modifier = Modifier
+    onMapClick: (Double, Double) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     // This is the blue area on the MapScreen that is meant for where the map from MapBox will eventually go.
     Box(
@@ -134,12 +149,13 @@ fun Map(
                 color = Color(0xFFDCEEFF),
                 shape = RoundedCornerShape(24.dp)
             )
-            .clickable { onMapClick() }
     ) {
         MapboxMapScreen(
             //onMapClick is passed to the MapBoxMapScreen
             //eventually polygons will be used
-            onMapClick = onMapClick
+            onMapClick = { point ->
+                onMapClick(point.latitude(), point.longitude())
+            }
         )
     }
 }
@@ -148,6 +164,7 @@ fun Map(
 @Composable
 fun SkiAreaBottomSheetContent(
     area: SkiArea,
+    avalancheStatus: String,
     modifier: Modifier = Modifier
 ) {
     // This is the content inside the bottom sheet.
@@ -176,7 +193,8 @@ fun SkiAreaBottomSheetContent(
             HorizontalDivider()
 
             // Placeholder rows for climate information
-            ClimateRow(label = "Avalanche danger", value = area.avalancheDangerLevel)
+            //ClimateRow(label = "Avalanche danger", value = area.avalancheDangerLevel)
+            ClimateRow(label = "Avalanche danger", value = avalancheStatus)
             ClimateRow("Average snowfall", area.averageSnowfall)
             ClimateRow("Average precipitation", area.averagePrecipitation)
             ClimateRow("Average temperature", area.dailyMeanTemperature)
@@ -208,10 +226,13 @@ fun MapScreenPreview() {
     MapScreen(navController = rememberNavController())
 }
 
+
 @Preview(showBackground = true)
 @Composable
 fun BottomSheetPreview() {
     SkiAreaBottomSheetContent(
-        area = previewSkiArea
+        area = previewSkiArea,
+        avalancheStatus = "High"
     )
 }
+

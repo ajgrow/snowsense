@@ -11,16 +11,10 @@ import com.mapbox.maps.extension.compose.MapEffect
 import com.mapbox.maps.extension.compose.MapboxMap
 import com.mapbox.maps.extension.compose.animation.viewport.rememberMapViewportState
 import com.mapbox.maps.extension.style.layers.addLayer
-import com.mapbox.maps.extension.style.layers.generated.fillLayer
-import com.mapbox.maps.extension.style.layers.generated.lineLayer
 import com.mapbox.maps.extension.style.layers.generated.rasterLayer
 import com.mapbox.maps.extension.style.sources.addSource
-import com.mapbox.maps.extension.style.sources.generated.geoJsonSource
 import com.mapbox.maps.extension.style.sources.generated.rasterSource
 import com.mapbox.maps.plugin.gestures.gestures
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import in2000.prosjekt.in2000project.data.repository.GeoJsonRepository
 
 private const val TAG = "SnoskredWMS"
 
@@ -44,7 +38,7 @@ private const val WMS_DETAIL =
 
 @Composable
 fun MapboxMapScreen(
-    onMapClick: () -> Unit
+    onMapClick: (Point) -> Unit,
 ) {
     val viewportState = rememberMapViewportState {
         setCameraOptions {
@@ -53,17 +47,6 @@ fun MapboxMapScreen(
         }
     }
 
-    // State to hold GeoJSON
-    var geoJson by remember { mutableStateOf<String?>(null) }
-
-    // Fetch data once
-    LaunchedEffect(Unit) {
-        geoJson = withContext(Dispatchers.IO) {
-            GeoJsonRepository.fetchGeoJson()
-        }
-    }
-
-
     Box(modifier = Modifier.fillMaxSize()) {
         MapboxMap(
             modifier = Modifier.fillMaxSize(),
@@ -71,8 +54,9 @@ fun MapboxMapScreen(
         ) {
             //this click listener just works generally on the map
             MapEffect(Unit) { mapView ->
-                mapView.gestures.addOnMapClickListener {
-                    onMapClick()
+                mapView.gestures.addOnMapClickListener {point ->
+
+                    onMapClick(point)
                     true //return true to show that the click was handled
                 }
             }
@@ -114,33 +98,6 @@ fun MapboxMapScreen(
                             minZoom(8.0)
                         }
                     )
-
-                }
-            }
-
-            MapEffect(geoJson) { mapView ->
-
-                val data = geoJson ?: return@MapEffect
-                val mapboxMap = mapView.mapboxMap
-
-                mapboxMap.getStyle { style ->
-
-                    val source = geoJsonSource("nve-source") {
-                        data(data)
-                    }
-                    style.addSource(source)
-
-                    val fillLayer = fillLayer("nve-fill", "nve-source") {
-                        fillColor("#ff0000")
-                        fillOpacity(0.8)
-                    }
-                    style.addLayer(fillLayer)
-
-                    val lineLayer = lineLayer("nve-outline", "nve-source") {
-                        lineColor("#ff0000")
-                        lineWidth(2.5)
-                    }
-                    style.addLayer(lineLayer)
                 }
             }
         }
