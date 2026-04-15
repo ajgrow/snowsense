@@ -53,7 +53,8 @@ private val previewSkiArea = SkiArea(
 fun MapScreen(
     modifier: Modifier = Modifier,
     navController: NavController,
-    nveViewModel: NveViewModel = viewModel()
+    nveViewModel: NveViewModel = viewModel(),
+    coordinates: String = "65.0,10.0"
 ) {
 
     // Hardcoded sample data for the MVP, however, when Frost API is ready this should move into the ViewModel
@@ -111,7 +112,8 @@ fun MapScreen(
                 //geoJson = mapUiState.geoJson,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(1f)
+                    .weight(1f),
+                coordinates
             )
         }
     }
@@ -141,6 +143,7 @@ fun MapScreen(
 fun Map(
     onMapClick: (Double, Double) -> Unit,
     modifier: Modifier = Modifier,
+    coordinates: String
 ) {
     // This is the blue area on the MapScreen that is meant for where the map from MapBox will eventually go.
     Box(
@@ -149,13 +152,15 @@ fun Map(
                 color = Color(0xFFDCEEFF),
                 shape = RoundedCornerShape(24.dp)
             )
+            .clickable { onMapClick(0.0, 0.0) }
     ) {
         MapboxMapScreen(
             //onMapClick is passed to the MapBoxMapScreen
             //eventually polygons will be used
             onMapClick = { point ->
                 onMapClick(point.latitude(), point.longitude())
-            }
+            },
+            coordinates = coordinates
         )
     }
 }
