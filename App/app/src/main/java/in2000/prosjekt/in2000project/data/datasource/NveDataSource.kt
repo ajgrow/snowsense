@@ -1,27 +1,15 @@
 package in2000.prosjekt.in2000project.data.datasource
 
 import in2000.prosjekt.in2000project.data.model.GeoJson
-import io.ktor.client.HttpClient
+import in2000.prosjekt.in2000project.network.KtorClient
 import io.ktor.client.call.body
-import java.net.URL
-import kotlinx.serialization.json.Json
-import io.ktor.serialization.kotlinx.json.json
-import io.ktor.client.engine.android.Android
-import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter
 import kotlin.collections.emptyList
 
 class NveDataSource {
 
-    private val httpClient = HttpClient(Android){
-        install(ContentNegotiation){
-            json(Json {
-                ignoreUnknownKeys = true
-                isLenient = true
-            })
-        }
-    }
+    private val httpClient = KtorClient.client
 
     suspend fun getGeoJson(lat: Double, lon: Double, buffer: Int): GeoJson {
         return try {
