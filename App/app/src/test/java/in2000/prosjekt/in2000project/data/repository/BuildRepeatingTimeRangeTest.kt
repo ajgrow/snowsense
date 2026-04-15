@@ -104,6 +104,8 @@ class BuildRepeatingTimeRangeTest {
         assertEquals("R2/2025-02-01/2025-03-01/P1Y", result)
     }
 
+    // ── yearsBack negative test, equivalence partitioning and boundary values  ──
+
     @Test(expected = IllegalArgumentException::class)
     fun negativeYearsBack_throwsIllegalArgument() {
         buildRepeatingTimeRange(
@@ -112,5 +114,17 @@ class BuildRepeatingTimeRangeTest {
             yearsBack = -1,
             referenceDate = LocalDate.of(2026, 4, 7),
         )
+    }
+
+    @Test
+    fun zeroYearsBack_returnsOneRepetition() {
+        val result = buildRepeatingTimeRange(
+            periodStart = MonthDay.of(3, 1),
+            periodEnd = MonthDay.of(3, 31),
+            yearsBack = 0,
+            referenceDate = LocalDate.of(2026, 4, 7),
+        )
+
+        assertEquals("R1/2026-03-01/2026-04-01/P1Y", result)
     }
 }
