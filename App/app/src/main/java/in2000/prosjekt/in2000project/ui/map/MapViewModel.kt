@@ -31,8 +31,7 @@ class MapViewModel : ViewModel() {
             _uiState.value = MapUIState.Loading
 
             _uiState.value = try {
-                val geoJson = GeoJsonRepository.fetchGeoJson()
-                MapUIState.Success(geoJson)
+                MapUIState.Success
             } catch (e: Exception) {
                 e.printStackTrace()
                 MapUIState.Error
