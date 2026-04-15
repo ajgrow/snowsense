@@ -33,7 +33,7 @@ class BuildRepeatingTimeRangeTest {
 
     @Test
     fun endDateAddsOneDayForHalfOpenInterval() {
-        // Frost uses half-open intervals [start, end), so inclusive end is +1 day in output.
+        // Frost uses half-open [start, end), so inclusive end is +1 day.
         val result = buildRepeatingTimeRange(
             periodStart = MonthDay.of(4, 1),
             periodEnd = MonthDay.of(4, 30),
@@ -82,7 +82,7 @@ class BuildRepeatingTimeRangeTest {
 
     @Test
     fun leapYearBoundary_periodEndingFeb28() {
-        // The +1 day half-open adjustment lands on Feb 29 when oldest year is a leap year.
+        // The end date +1 day lands on Feb 29 when oldest year is a leap year.
         val result = buildRepeatingTimeRange(
             periodStart = MonthDay.of(2, 1),
             periodEnd = MonthDay.of(2, 28),
@@ -94,7 +94,7 @@ class BuildRepeatingTimeRangeTest {
 
     @Test
     fun nonLeapYearBoundary_periodEndingFeb28() {
-        // Same period but oldest year is non-leap — +1 day lands on Mar 1.
+        // The end date +1 day should land on Mar 1 when oldest year is non-leap.
         val result = buildRepeatingTimeRange(
             periodStart = MonthDay.of(2, 1),
             periodEnd = MonthDay.of(2, 28),
@@ -102,6 +102,30 @@ class BuildRepeatingTimeRangeTest {
             referenceDate = LocalDate.of(2026, 4, 1),
         )
         assertEquals("R2/2025-02-01/2025-03-01/P1Y", result)
+    }
+
+    @Test
+    fun nonleapYearBoundaryClamping_periodEndingFeb29() {
+        // Should land on Mar 1 without any issues despite choosing Feb 29.
+        val result = buildRepeatingTimeRange(
+            periodStart = MonthDay.of(2, 1),
+            periodEnd = MonthDay.of(2, 29),
+            yearsBack = 1,
+            referenceDate = LocalDate.of(2024, 2, 1),
+        )
+        assertEquals("R2/2023-02-01/2023-03-01/P1Y", result)
+    }
+
+    @Test
+    fun nonleapYearBoundaryClamping_periodStartingFeb29() {
+        // Should clamp to Feb 28 when oldest year is non-leap.
+        val result = buildRepeatingTimeRange(
+            periodStart = MonthDay.of(2, 29),
+            periodEnd = MonthDay.of(3, 31),
+            yearsBack = 1,
+            referenceDate = LocalDate.of(2024, 2, 1),
+        )
+        assertEquals("R2/2023-02-28/2023-04-01/P1Y", result)
     }
 
     // ── yearsBack negative test, equivalence partitioning and boundary values  ──
