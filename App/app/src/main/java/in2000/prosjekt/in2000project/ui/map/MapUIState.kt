@@ -6,7 +6,8 @@ import in2000.prosjekt.in2000project.data.model.LocationClimateData
 
 data class MapScreenState(
     val overlayState: OverlayState = OverlayState.Loading,
-    val climateState: ClimateState = ClimateState.Idle
+    val climateState: ClimateState = ClimateState.Idle,
+    val coordinates: String = "65.0,10.0"
 )
 
 sealed interface OverlayState {
