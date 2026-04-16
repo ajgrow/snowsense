@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import androidx.compose.runtime.snapshotFlow
-import in2000.prosjekt.in2000project.data.model.LocationDTO
 import in2000.prosjekt.in2000project.data.model.NamedLocation
 import kotlinx.coroutines.flow.debounce
 

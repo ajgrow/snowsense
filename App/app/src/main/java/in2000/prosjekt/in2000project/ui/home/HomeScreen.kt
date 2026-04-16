@@ -42,7 +42,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.runtime.setValue
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
-import in2000.prosjekt.in2000project.data.model.LocationDTO
 import in2000.prosjekt.in2000project.data.model.NamedLocation
 import in2000.prosjekt.in2000project.navigation.Screen
 
