@@ -38,4 +38,12 @@ class MapViewModel : ViewModel() {
             }
         }
     }
+
+    fun onOverlayLoaded() {
+        _uiState.value = MapUIState.Success
+    }
+
+    fun onOverlayError() {
+        _uiState.value = MapUIState.Error
+    }
 }
