@@ -39,6 +39,9 @@ private const val WMS_DETAIL =
 @Composable
 fun MapboxMapScreen(
     onMapClick: (Point) -> Unit,
+    onOverlayError: () -> Unit,
+    onOverlayLoaded: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     val viewportState = rememberMapViewportState {
         setCameraOptions {
@@ -62,7 +65,13 @@ fun MapboxMapScreen(
             }
 
             MapEffect(Unit) { mapView ->
+                mapView.mapboxMap.subscribeMapLoadingError { error ->
+                    Log.e(TAG, "Map loading error: ${error.message}")
+                    onOverlayError()
+                }
+
                 mapView.mapboxMap.loadStyle(Style.OUTDOORS) { style ->
+                    onOverlayLoaded()
                     Log.d(TAG, "Style loaded, adding WMS sources")
 
                     // Low zoom data
