@@ -47,20 +47,19 @@ private val previewSkiArea = SkiArea(
 
 //for use when the VM is ready
 @Composable
-fun MapScreenState(
+fun MapRoute(
     navController: NavController,
+    coordinates: String,
     viewModel: MapViewModel = viewModel(),
-    nveViewModel: NveViewModel = viewModel(),
-    coordinates: String = "65.0,10.0"
+    nveViewModel: NveViewModel = viewModel()
 ) {
-    val uiState by viewModel.uiState.collectAsState()
+    val screenState by viewModel.screenState.collectAsState()
 
     MapScreen(
         navController = navController,
-        mapUIState = uiState,
+        screenState = screenState,
         nveViewModel = nveViewModel,
-        coordinates = coordinates,
-        onRetry = { viewModel.getMapData() },
+        onOverlayRetry = { viewModel.onOverlayLoading() },
         onOverlayLoaded = {viewModel.onOverlayLoaded()},
         onOverlayError = {viewModel.onOverlayError()}
     )
@@ -72,10 +71,9 @@ fun MapScreenState(
 fun MapScreen(
     modifier: Modifier = Modifier,
     navController: NavController,
-    mapUIState: MapUIState,
+    screenState: MapScreenState,
     nveViewModel: NveViewModel,
-    coordinates: String,
-    onRetry: () -> Unit,
+    onOverlayRetry: () -> Unit,
     onOverlayLoaded: () -> Unit,
     onOverlayError: () -> Unit
 ) {
@@ -144,25 +142,41 @@ fun MapScreen(
                     onOverlayLoaded = onOverlayLoaded,
                     modifier = Modifier
                         .fillMaxSize(),
-                    coordinates = coordinates
+                    coordinates = screenState.coordinates
                 )
 
 
-                when (mapUIState) {
-                    is MapUIState.Loading -> {
+                when (screenState.overlayState) {
+                    is OverlayState.Loading -> {
                         OverlayStatusCard(
                             message = "Loading avalanche overlay..."
                         )
                     }
 
-                    is MapUIState.Error -> {
+                    is OverlayState.Error -> {
                         OverlayRetryCard(
                             message = "Could not load avalanche overlay.",
-                            onRetry = onRetry
+                            onRetry = onOverlayRetry
                         )
                     }
 
-                    is MapUIState.Success -> Unit
+                    is OverlayState.Success -> Unit
+                }
+
+                when (screenState.climateState) {
+                    is ClimateState.Idle -> Unit
+
+                    is ClimateState.Loading -> {
+                        /*TO DO*/
+                    }
+
+                    is ClimateState.Error -> {
+                        /*TO DO*/
+                    }
+
+                    is ClimateState.Success -> {
+                        /*TO DO*/
+                    }
                 }
             }
         }
@@ -280,10 +294,13 @@ fun ClimateRow(
 fun MapScreenErrorPreview() {
     MapScreen(
         navController = rememberNavController(),
-        mapUIState = MapUIState.Error,
+        screenState = MapScreenState(
+            overlayState = OverlayState.Error,
+            climateState = ClimateState.Idle,
+            coordinates = "65.0,10.0"
+        ),
         nveViewModel = viewModel(),
-        coordinates = "65.0,10.0",
-        onRetry = {},
+        onOverlayRetry = {},
         onOverlayLoaded = {},
         onOverlayError = {}
     )
