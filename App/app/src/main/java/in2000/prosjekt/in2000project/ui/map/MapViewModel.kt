@@ -45,10 +45,4 @@ class MapViewModel : ViewModel() {
     fun onOverlayError() {
         _uiState.value = MapUIState.Error
     }
-
-    fun fetchClimateData(lat, lon) {
-        viewModelScope.launch {
-
-        }
-    }
 }
