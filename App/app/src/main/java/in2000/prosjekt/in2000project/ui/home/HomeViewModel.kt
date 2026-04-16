@@ -11,12 +11,13 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import androidx.compose.runtime.snapshotFlow
-import in2000.prosjekt.in2000project.data.model.Location
+import in2000.prosjekt.in2000project.data.model.LocationDTO
+import in2000.prosjekt.in2000project.data.model.NamedLocation
 import kotlinx.coroutines.flow.debounce
 
 data class HomeUiState(
     val searchTextFieldState: TextFieldState = TextFieldState(),
-    val searchResults: List<Location> = emptyList(),
+    val searchResults: List<NamedLocation> = emptyList(),
     val favorites: List<String> = emptyList(),
     val recentSearches: List<String> = emptyList()
 )
