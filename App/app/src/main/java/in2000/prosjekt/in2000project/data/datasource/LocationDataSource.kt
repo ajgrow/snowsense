@@ -1,7 +1,7 @@
 package in2000.prosjekt.in2000project.data.datasource
 
-import in2000.prosjekt.in2000project.data.model.LocationResponse
 import in2000.prosjekt.in2000project.data.model.Location
+import in2000.prosjekt.in2000project.data.model.LocationResponse
 import in2000.prosjekt.in2000project.network.KtorClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
