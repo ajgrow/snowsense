@@ -58,7 +58,9 @@ fun MapScreenState(
     MapScreen(
         navController = navController,
         mapUIState = uiState,
-        onRetry = { viewModel.getMapData() }
+        onRetry = { viewModel.getMapData() },
+        onOverlayLoaded = {viewModel.onOverlayLoaded()},
+        onOverlayError = {viewModel.onOverlayError()}
     )
 }
 
@@ -69,7 +71,9 @@ fun MapScreen(
     modifier: Modifier = Modifier,
     navController: NavController,
     mapUIState: MapUIState,
-    onRetry: () -> Unit
+    onRetry: () -> Unit,
+    onOverlayLoaded: () -> Unit,
+    onOverlayError: () -> Unit
 ) {
     // Hardcoded sample data for the MVP, however, when Frost API is ready this should move into the ViewModel
     val skiArea = remember { previewSkiArea }
@@ -114,6 +118,8 @@ fun MapScreen(
                     onMapClick = {
                         isSheetOpen = true
                     },
+                    onOverlayError = onOverlayError,
+                    onOverlayLoaded = onOverlayLoaded,
                     modifier = Modifier.fillMaxSize()
                 )
 
@@ -160,6 +166,8 @@ fun MapScreen(
 @Composable
 fun Map(
     onMapClick: () -> Unit,
+    onOverlayError: () -> Unit,
+    onOverlayLoaded: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -169,7 +177,9 @@ fun Map(
         )
     ) {
         MapboxMapScreen(
-            onMapClick = { onMapClick() }
+            onMapClick = { onMapClick() },
+            onOverlayError = { onOverlayError() },
+            onOverlayLoaded = { onOverlayLoaded() }
         )
     }
 }
@@ -238,7 +248,9 @@ fun MapScreenErrorPreview() {
     MapScreen(
         navController = rememberNavController(),
         mapUIState = MapUIState.Error,
-        onRetry = {}
+        onRetry = {},
+        onOverlayLoaded = {},
+        onOverlayError = {}
     )
 }
 
