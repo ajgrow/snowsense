@@ -1,7 +1,6 @@
 package in2000.prosjekt.in2000project.ui.map
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -40,7 +39,6 @@ import in2000.prosjekt.in2000project.ui.reusables.TopBar
 private val previewSkiArea = SkiArea(
     id = "1",
     name = "Galdhøpiggen Touring Zone",
-    avalancheDangerLevel = "High",
     averageSnowfall = "210 cm seasonal average",
     averagePrecipitation = "95 mm monthly average",
     dailyMeanTemperature = "-3.2°C winter average"
@@ -51,13 +49,17 @@ private val previewSkiArea = SkiArea(
 @Composable
 fun MapScreenState(
     navController: NavController,
-    viewModel: MapViewModel = viewModel()
+    viewModel: MapViewModel = viewModel(),
+    nveViewModel: NveViewModel = viewModel(),
+    coordinates: String = "65.0,10.0"
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
     MapScreen(
         navController = navController,
         mapUIState = uiState,
+        nveViewModel = nveViewModel,
+        coordinates = coordinates,
         onRetry = { viewModel.getMapData() },
         onOverlayLoaded = {viewModel.onOverlayLoaded()},
         onOverlayError = {viewModel.onOverlayError()}
@@ -71,16 +73,26 @@ fun MapScreen(
     modifier: Modifier = Modifier,
     navController: NavController,
     mapUIState: MapUIState,
+    nveViewModel: NveViewModel,
+    coordinates: String,
     onRetry: () -> Unit,
     onOverlayLoaded: () -> Unit,
     onOverlayError: () -> Unit
 ) {
+
     // Hardcoded sample data for the MVP, however, when Frost API is ready this should move into the ViewModel
     val skiArea = remember { previewSkiArea }
 
+    val dangerCheckUiState by nveViewModel.dangerCheckUiState.collectAsState()
     //Controls whether the bottom sheet is visible or not by keeping track of if the user has clicked the map
+    //if this is set to null then the ModalBottomSheet is not open
     var isSheetOpen by rememberSaveable { mutableStateOf(false) }
 
+    val avalancheStatus = when {
+        dangerCheckUiState.isDanger == true -> "High"
+        dangerCheckUiState.isDanger == false -> "Low"
+        else -> "Haven't checked"
+    }
     Scaffold(
         topBar = {
             TopBar(modifier = Modifier, title = "MapScreen")
@@ -90,12 +102,15 @@ fun MapScreen(
         }
     ) { paddingValues ->
 
+        //Main screen content
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                // Makes sure the content is not hidden behind the top app bar or bottom app bar.
                 .padding(paddingValues)
                 .padding(16.dp)
         ) {
+            // Title
             Text(
                 text = "Map",
                 style = MaterialTheme.typography.headlineMedium,
@@ -103,25 +118,35 @@ fun MapScreen(
                 modifier = Modifier.padding(bottom = 8.dp)
             )
 
+            // Instructions
             Text(
                 text = "Select an area to view historical climate details.",
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.padding(bottom = 16.dp)
             )
 
+
+
+
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f)
             ) {
+                //Map added here
+                //onMapClick is passed to the Map
                 Map(
-                    onMapClick = {
+                    onMapClick = { lat, lon ->
                         isSheetOpen = true
+                        nveViewModel.avalancheChecker(lat, lon)
                     },
                     onOverlayError = onOverlayError,
                     onOverlayLoaded = onOverlayLoaded,
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier
+                        .fillMaxSize(),
+                    coordinates = coordinates
                 )
+
 
                 when (mapUIState) {
                     is MapUIState.Loading -> {
@@ -153,6 +178,7 @@ fun MapScreen(
         ) {
             SkiAreaBottomSheetContent(
                 area = skiArea,
+                avalancheStatus = avalancheStatus,
                 modifier = Modifier
                     .fillMaxWidth()
                     .heightIn(min = 320.dp)
@@ -165,21 +191,27 @@ fun MapScreen(
 
 @Composable
 fun Map(
-    onMapClick: () -> Unit,
+    onMapClick: (Double,Double) -> Unit,
     onOverlayError: () -> Unit,
     onOverlayLoaded: () -> Unit,
+    coordinates: String,
     modifier: Modifier = Modifier
 ) {
+    // This is the blue area on the MapScreen that is meant for where the map from MapBox will eventually go.
     Box(
-        modifier = modifier.background(
-            color = Color(0xFFDCEEFF),
-            shape = RoundedCornerShape(24.dp)
-        )
+        modifier = modifier
+            .background(
+                color = Color(0xFFDCEEFF),
+                shape = RoundedCornerShape(24.dp)
+            )
     ) {
         MapboxMapScreen(
-            onMapClick = { onMapClick() },
+            onMapClick = { point ->
+                onMapClick(point.latitude(), point.longitude())
+            },
             onOverlayError = { onOverlayError() },
-            onOverlayLoaded = { onOverlayLoaded() }
+            onOverlayLoaded = { onOverlayLoaded() },
+            coordinates = coordinates
         )
     }
 }
@@ -188,6 +220,7 @@ fun Map(
 @Composable
 fun SkiAreaBottomSheetContent(
     area: SkiArea,
+    avalancheStatus: String,
     modifier: Modifier = Modifier
 ) {
     // This is the content inside the bottom sheet.
@@ -216,7 +249,7 @@ fun SkiAreaBottomSheetContent(
             HorizontalDivider()
 
             // Placeholder rows for climate information
-            ClimateRow(label = "Avalanche danger", value = area.avalancheDangerLevel)
+            ClimateRow(label = "Avalanche danger", value = avalancheStatus)
             ClimateRow("Average snowfall", area.averageSnowfall)
             ClimateRow("Average precipitation", area.averagePrecipitation)
             ClimateRow("Average temperature", area.dailyMeanTemperature)
@@ -248,16 +281,20 @@ fun MapScreenErrorPreview() {
     MapScreen(
         navController = rememberNavController(),
         mapUIState = MapUIState.Error,
+        nveViewModel = viewModel(),
+        coordinates = "65.0,10.0",
         onRetry = {},
         onOverlayLoaded = {},
         onOverlayError = {}
     )
 }
 
+
 @Preview(showBackground = true)
 @Composable
 fun BottomSheetPreview() {
     SkiAreaBottomSheetContent(
-        area = previewSkiArea
+        area = previewSkiArea,
+        avalancheStatus = "High"
     )
 }

@@ -4,7 +4,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Location (
-    val name: String,
-    val north: Double,
-    val east: Double
+    val representasjonspunkt: RepresentationPoint,
+    val skrivemåte: String
 )
