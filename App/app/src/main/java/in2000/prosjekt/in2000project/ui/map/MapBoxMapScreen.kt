@@ -39,13 +39,16 @@ private const val WMS_DETAIL =
     "$WMS_BASE?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap" +
             "&BBOX={bbox-epsg-3857}&CRS=EPSG:3857&WIDTH=256&HEIGHT=256" +
             "&LAYERS=" +
-            "S2_snoskred_m_skogeffekt_Aktsomhetsomrade," +
+            "S2_snoskred_m_skogeffekt_Aktsomhetsomrade" +
             "&STYLES=&FORMAT=image/png&TRANSPARENT=TRUE"
 
 @Composable
 fun MapboxMapScreen(
     onMapClick: (Point) -> Unit,
-    coordinates: String
+    coordinates: String,
+    onOverlayError: () -> Unit,
+    onOverlayLoaded: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     val (hasSearch, searchLat, searchLng) = remember(coordinates) {
         if (coordinates.isNotBlank() && coordinates != "0,0") {
@@ -99,7 +102,7 @@ fun MapboxMapScreen(
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        key(mapRecreateKey){
+        key(mapRecreateKey) {
             MapboxMap(
                 modifier = Modifier.fillMaxSize(),
                 mapViewportState = viewportState
@@ -114,7 +117,13 @@ fun MapboxMapScreen(
                 }
 
                 MapEffect(Unit) { mapView ->
+                    mapView.mapboxMap.subscribeMapLoadingError { error ->
+                        Log.e(TAG, "Map loading error: ${error.message}")
+                        onOverlayError()
+                    }
+
                     mapView.mapboxMap.loadStyle(Style.OUTDOORS) { style ->
+                        onOverlayLoaded()
                         Log.d(TAG, "Style loaded, adding WMS sources")
 
                         // Low zoom data
@@ -152,6 +161,7 @@ fun MapboxMapScreen(
                         )
                     }
                 }
+
                 MapEffect(Unit) { mapView ->
                     idleSubscription = mapView.mapboxMap.subscribeMapIdle {
                         viewportState.cameraState?.toCameraOptions()?.let {
@@ -163,3 +173,4 @@ fun MapboxMapScreen(
         }
     }
 }
+

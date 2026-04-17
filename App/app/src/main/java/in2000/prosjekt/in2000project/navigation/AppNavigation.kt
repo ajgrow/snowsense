@@ -11,6 +11,7 @@ import androidx.navigation.navArgument
 import in2000.prosjekt.in2000project.ui.home.HomeScreen
 import in2000.prosjekt.in2000project.ui.information.InfoScreen
 import in2000.prosjekt.in2000project.ui.map.MapScreen
+import in2000.prosjekt.in2000project.ui.map.MapScreenState
 
 @Composable
 fun AppNavigation(){
@@ -34,7 +35,7 @@ fun AppNavigation(){
         ) { backStackEntry ->
             val coordinates = backStackEntry.arguments?.getString("coordinates")!!
             Log.d("fuckedupmap",coordinates)
-            MapScreen(navController = navController, coordinates = coordinates)
+            MapScreenState(navController = navController, coordinates = coordinates)
         }
         composable(Screen.Info.route) {
             InfoScreen(navController = navController)
