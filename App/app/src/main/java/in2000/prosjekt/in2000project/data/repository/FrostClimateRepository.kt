@@ -119,7 +119,7 @@ class FrostClimateRepository(
             referenceTime)
 
         //recent snowfall estimate from last 3 days
-        val totalPrecip = observationResponse.data.takeLast(3).sumOf { it.observations.firstOrNull{ it.elementId == ELEMENT_PRECIP }?.value ?: 0.0}
+        val totalPrecip = observationResponse.data.take(3).sumOf { it.observations.firstOrNull{ it.elementId == ELEMENT_PRECIP }?.value ?: 0.0}
 
         //Score for newSnowLoad
         var newSnowLoad = when (totalPrecip) {
@@ -131,8 +131,8 @@ class FrostClimateRepository(
         }
 
         // Temperature metrics - Assumes at least one existing observation
-        val threeDayTempAverage = observationResponse.data.takeLast(3).map { it.observations.firstOrNull{ it.elementId == ELEMENT_TEMP }?.value}.filterNotNull().average()
-        val lastTemp = observationResponse.data.filter { it.observations.firstOrNull{ obs -> obs.elementId == ELEMENT_TEMP } != null }.lastOrNull()?.observations?.firstOrNull{ obs -> obs.elementId == ELEMENT_TEMP }?.value
+        val threeDayTempAverage = observationResponse.data.take(3).map { it.observations.firstOrNull{ it.elementId == ELEMENT_TEMP }?.value}.filterNotNull().average()
+        val lastTemp = observationResponse.data.filter { it.observations.firstOrNull{ obs -> obs.elementId == ELEMENT_TEMP } != null }.firstOrNull()?.observations?.firstOrNull{ obs -> obs.elementId == ELEMENT_TEMP }?.value
 
         var tempChange = if (lastTemp != null) lastTemp - threeDayTempAverage else 0.0
 
@@ -162,8 +162,8 @@ class FrostClimateRepository(
                 coldPrecip1 = 0.0
             }
 
-            if (temp > -5.0 && !weakLayerBase){
-                slabLayerDepth += (precip / 10.0)
+            if (temp > -5.0 && weakLayerBase){
+                slabLayerDepth += precip
             }
             else if (temp <= -5.0){
                 weakLayerBase = true
