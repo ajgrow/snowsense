@@ -17,10 +17,6 @@ class MapViewModel : ViewModel() {
 
     var coordinates by mutableStateOf("65.0,10.0")
 
-    fun updateLocation(coordinates: String) {
-        this.coordinates = coordinates
-    }
-
     init {
         getMapData()
     }
@@ -44,11 +40,5 @@ class MapViewModel : ViewModel() {
 
     fun onOverlayError() {
         _uiState.value = MapUIState.Error
-    }
-
-    fun fetchClimateData(lat, lon) {
-        viewModelScope.launch {
-
-        }
     }
 }
