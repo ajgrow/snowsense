@@ -1,11 +1,12 @@
 package in2000.prosjekt.in2000project.data.repository
 
 import in2000.prosjekt.in2000project.data.datasource.NveDataSource
+import in2000.prosjekt.in2000project.data.model.GeoJson
 
 class NveRepository (
-    private val nveDataSource: NveDataSource
+    private val nveDataSource: NveDataSource = NveDataSource()
 ) {
-    suspend fun getGeoJson(): String{
-        return nveDataSource.fetchGeoJson()
+    suspend fun getGeoJson(lat: Double, lon: Double, buffer: Int): GeoJson {
+        return nveDataSource.getGeoJson(lat, lon, buffer)
     }
 }

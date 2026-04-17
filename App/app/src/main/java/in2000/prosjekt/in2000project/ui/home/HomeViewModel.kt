@@ -11,11 +11,12 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import androidx.compose.runtime.snapshotFlow
+import in2000.prosjekt.in2000project.data.model.NamedLocation
 import kotlinx.coroutines.flow.debounce
 
 data class HomeUiState(
     val searchTextFieldState: TextFieldState = TextFieldState(),
-    val searchResults: List<String> = emptyList(),
+    val searchResults: List<NamedLocation> = emptyList(),
     val favorites: List<String> = emptyList(),
     val recentSearches: List<String> = emptyList()
 )
@@ -37,7 +38,7 @@ class HomeViewModel: ViewModel(){
                     if (query.isNotBlank()) {
                         val built = queryBuilder.buildQuery(query)
                         val results = locationRepository.getNames(built)
-                        _homeState.update { it.copy(searchResults = results.map { it.skrivemåte }) }
+                        _homeState.update { it.copy(searchResults = results) }
                     } else {
                         _homeState.update { it.copy(searchResults = emptyList()) }
                     }
@@ -66,7 +67,7 @@ class HomeViewModel: ViewModel(){
         val query = queryBuilder.buildQuery(_homeState.value.searchTextFieldState.text.toString())
         viewModelScope.launch {
             val results = locationRepository.getNames(query)
-            _homeState.update { it.copy(searchResults = results.map { it.skrivemåte }) }
+            _homeState.update { it.copy(searchResults = results) }
         }
     }
 }
