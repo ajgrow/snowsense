@@ -18,6 +18,8 @@ import com.mapbox.maps.extension.style.sources.addSource
 import com.mapbox.maps.extension.style.sources.generated.rasterSource
 import com.mapbox.maps.plugin.gestures.gestures
 import com.mapbox.maps.toCameraOptions
+import in2000.prosjekt.in2000project.ui.settings.SettingsViewModel
+import in2000.prosjekt.in2000project.ui.settings.ThemeMode
 
 object MapCameraRepository {
     var lastCameraOptions: CameraOptions? = null
@@ -48,8 +50,20 @@ fun MapboxMapScreen(
     coordinates: String,
     onOverlayError: () -> Unit,
     onOverlayLoaded: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    settingsViewModel: SettingsViewModel
 ) {
+    val themeMode = settingsViewModel.themeMode.value
+    val mapStyle = when (themeMode){
+        ThemeMode.DARK -> Style.DARK
+        ThemeMode.LIGHT -> Style.OUTDOORS
+        ThemeMode.SYSTEM ->
+            if (androidx.compose.foundation.isSystemInDarkTheme())
+                Style.DARK
+            else
+                Style.OUTDOORS
+    }
+
     val (hasSearch, searchLat, searchLng) = remember(coordinates) {
         if (coordinates.isNotBlank() && coordinates != "0,0") {
             val parts = coordinates.split(",")
@@ -121,8 +135,7 @@ fun MapboxMapScreen(
                         Log.e(TAG, "Map loading error: ${error.message}")
                         onOverlayError()
                     }
-
-                    mapView.mapboxMap.loadStyle(Style.OUTDOORS) { style ->
+                    mapView.mapboxMap.loadStyle(mapStyle) { style ->
                         onOverlayLoaded()
                         Log.d(TAG, "Style loaded, adding WMS sources")
 
@@ -173,4 +186,3 @@ fun MapboxMapScreen(
         }
     }
 }
-

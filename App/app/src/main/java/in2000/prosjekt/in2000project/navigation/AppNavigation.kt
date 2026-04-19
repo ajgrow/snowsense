@@ -49,7 +49,10 @@ fun AppNavigation(){
             ) { backStackEntry ->
                 val coordinates = backStackEntry.arguments?.getString("coordinates")!!
                 Log.d("fuckedupmap",coordinates)
-                MapScreenState(navController = navController, coordinates = coordinates)
+                MapScreenState(
+                    navController = navController,
+                    coordinates = coordinates,
+                    settingsViewModel = settingsViewModel)
             }
             composable(Screen.Info.route) {
                 InfoScreen(navController = navController)
