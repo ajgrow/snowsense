@@ -95,7 +95,7 @@ fun MapScreen(
     }
     Scaffold(
         topBar = {
-            TopBar(modifier = Modifier, title = "MapScreen")
+            TopBar(modifier = Modifier, title = "MapScreen", navController = navController)
         },
         bottomBar = {
             BottomBar(modifier, navController)
