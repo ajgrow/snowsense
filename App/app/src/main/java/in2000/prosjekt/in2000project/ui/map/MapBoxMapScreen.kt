@@ -7,7 +7,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import com.mapbox.common.Cancelable
 import com.mapbox.geojson.Point
+import com.mapbox.maps.CameraBounds
+import com.mapbox.maps.CameraBoundsOptions
 import com.mapbox.maps.CameraOptions
+import com.mapbox.maps.CoordinateBounds
 import com.mapbox.maps.Style
 import com.mapbox.maps.extension.compose.MapEffect
 import com.mapbox.maps.extension.compose.MapboxMap
@@ -43,6 +46,7 @@ private const val WMS_DETAIL =
             "&LAYERS=" +
             "S2_snoskred_m_skogeffekt_Aktsomhetsomrade" +
             "&STYLES=&FORMAT=image/png&TRANSPARENT=TRUE"
+
 
 @Composable
 fun MapboxMapScreen(
@@ -121,6 +125,23 @@ fun MapboxMapScreen(
                 modifier = Modifier.fillMaxSize(),
                 mapViewportState = viewportState
             ) {
+                MapEffect(Unit) { mapView ->
+                    val mapBoxMap = mapView.mapboxMap
+
+                    val bounds = CoordinateBounds(
+                        Point.fromLngLat(2.5, 55.9),
+                        Point.fromLngLat(31.5, 71.5)
+                    )
+
+                    mapBoxMap.setBounds(
+                        CameraBoundsOptions.Builder()
+                            .bounds(bounds)
+                            .minZoom(3.5)
+                            .maxZoom(18.0)
+                            .build()
+                    )
+                }
+
                 //this click listener just works generally on the map
                 MapEffect(Unit) { mapView ->
                     mapView.gestures.addOnMapClickListener { point ->
