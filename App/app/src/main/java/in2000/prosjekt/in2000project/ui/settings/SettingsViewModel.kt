@@ -10,7 +10,15 @@ class SettingsViewModel : ViewModel(){
     private val _themeMode = mutableStateOf(ThemeMode.SYSTEM)
     val themeMode  = _themeMode
 
+    private val _textSizeMode = mutableStateOf(TextSizeMode.MEDIUM)
+    val textSizeMode = _textSizeMode
+
+
     fun setTheme(mode: ThemeMode){
         _themeMode.value = mode
+    }
+
+    fun setTextSize(mode: TextSizeMode){
+        _textSizeMode.value = mode
     }
 }

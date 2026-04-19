@@ -92,6 +92,33 @@ fun SettingScreen(
                 onClick = {settingsViewModel.setTheme(ThemeMode.DARK)},
                 modifier = Modifier.padding(horizontal = 16.dp)
             )
+
+
+            Text(
+                text = "Text Size",
+                modifier = Modifier.padding(16.dp)
+            )
+
+            ThemeOption(
+                title = "Small",
+                selected = settingsViewModel.textSizeMode.value == TextSizeMode.SMALL,
+                onClick = {settingsViewModel.setTextSize(TextSizeMode.SMALL)},
+                modifier = Modifier.padding(horizontal = 16.dp)
+            )
+
+            ThemeOption(
+                title = "Medium",
+                selected = settingsViewModel.textSizeMode.value == TextSizeMode.MEDIUM,
+                onClick = {settingsViewModel.setTextSize(TextSizeMode.MEDIUM)},
+                modifier = Modifier.padding(horizontal = 16.dp)
+            )
+
+            ThemeOption(
+                title = "Large",
+                selected = settingsViewModel.textSizeMode.value == TextSizeMode.LARGE,
+                onClick = {settingsViewModel.setTextSize(TextSizeMode.LARGE)},
+                modifier = Modifier.padding(horizontal = 16.dp)
+            )
         }
     }
 }

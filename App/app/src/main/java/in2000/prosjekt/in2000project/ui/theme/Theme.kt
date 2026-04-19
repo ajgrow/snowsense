@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
+import in2000.prosjekt.in2000project.ui.settings.TextSizeMode
 import in2000.prosjekt.in2000project.ui.settings.ThemeMode
 
 private val DarkColorScheme = darkColorScheme(
@@ -38,6 +39,7 @@ private val LightColorScheme = lightColorScheme(
 @Composable
 fun In2000projectTheme(
     themeMode: ThemeMode = ThemeMode.SYSTEM,
+    textSizeMode: TextSizeMode = TextSizeMode.MEDIUM,
     // Dynamic color is available on Android 12+
     dynamicColor: Boolean = true,
     content: @Composable () -> Unit
@@ -57,9 +59,23 @@ fun In2000projectTheme(
         else -> LightColorScheme
     }
 
+    val chosenTypography = when (textSizeMode){
+        TextSizeMode.SMALL -> Typography.copy(
+            bodyLarge = Typography.bodyLarge.copy(fontSize = Typography.bodyLarge.fontSize * 0.85f),
+            titleLarge = Typography.titleLarge.copy(fontSize = Typography.titleLarge.fontSize * 0.85f)
+        )
+
+        TextSizeMode.MEDIUM -> Typography
+
+        TextSizeMode.LARGE -> Typography.copy(
+            bodyLarge = Typography.bodyLarge.copy(fontSize = Typography.bodyLarge.fontSize * 1.2f),
+            titleLarge = Typography.titleLarge.copy(fontSize = Typography.titleLarge.fontSize * 1.2f)
+        )
+    }
+
     MaterialTheme(
         colorScheme = colorScheme,
-        typography = Typography,
+        typography = chosenTypography,
         content = content
     )
 }
