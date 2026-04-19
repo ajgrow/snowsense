@@ -53,7 +53,7 @@ fun MapboxMapScreen(
     modifier: Modifier = Modifier,
     settingsViewModel: SettingsViewModel
 ) {
-    val themeMode = settingsViewModel.themeMode.value
+    val themeMode = settingsViewModel.themeMode
     val mapStyle = when (themeMode){
         ThemeMode.DARK -> Style.DARK
         ThemeMode.LIGHT -> Style.OUTDOORS

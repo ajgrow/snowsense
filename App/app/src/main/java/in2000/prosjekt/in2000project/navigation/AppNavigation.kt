@@ -22,9 +22,9 @@ fun AppNavigation(){
 
     val settingsViewModel: SettingsViewModel = viewModel()
 
-    val themeMode = settingsViewModel.themeMode.value
+    val themeMode = settingsViewModel.themeMode
 
-    val textSizeMode = settingsViewModel.textSizeMode.value
+    val textSizeMode = settingsViewModel.textSizeMode
 
 
     In2000projectTheme(

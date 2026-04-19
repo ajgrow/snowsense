@@ -41,6 +41,9 @@ fun SettingScreen(
         color = MaterialTheme.colorScheme.background
     ) {
 
+        val themeMode = settingsViewModel.themeMode
+        val textSizeMode = settingsViewModel.textSizeMode
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -74,21 +77,21 @@ fun SettingScreen(
 
             ThemeOption(
                 title = "Use device setting",
-                selected = settingsViewModel.themeMode.value == ThemeMode.SYSTEM,
+                selected = themeMode == ThemeMode.SYSTEM,
                 onClick = {settingsViewModel.setTheme(ThemeMode.SYSTEM)},
                 modifier = Modifier.padding(horizontal = 16.dp)
             )
 
             ThemeOption(
                 title = "Light Mode",
-                selected = settingsViewModel.themeMode.value == ThemeMode.LIGHT,
+                selected = themeMode == ThemeMode.LIGHT,
                 onClick = {settingsViewModel.setTheme(ThemeMode.LIGHT)},
                 modifier = Modifier.padding(horizontal = 16.dp)
             )
 
             ThemeOption(
                 title = "Dark Mode",
-                selected = settingsViewModel.themeMode.value == ThemeMode.DARK,
+                selected = themeMode == ThemeMode.DARK,
                 onClick = {settingsViewModel.setTheme(ThemeMode.DARK)},
                 modifier = Modifier.padding(horizontal = 16.dp)
             )
@@ -101,21 +104,21 @@ fun SettingScreen(
 
             ThemeOption(
                 title = "Small",
-                selected = settingsViewModel.textSizeMode.value == TextSizeMode.SMALL,
+                selected = textSizeMode == TextSizeMode.SMALL,
                 onClick = {settingsViewModel.setTextSize(TextSizeMode.SMALL)},
                 modifier = Modifier.padding(horizontal = 16.dp)
             )
 
             ThemeOption(
                 title = "Medium",
-                selected = settingsViewModel.textSizeMode.value == TextSizeMode.MEDIUM,
+                selected = textSizeMode == TextSizeMode.MEDIUM,
                 onClick = {settingsViewModel.setTextSize(TextSizeMode.MEDIUM)},
                 modifier = Modifier.padding(horizontal = 16.dp)
             )
 
             ThemeOption(
                 title = "Large",
-                selected = settingsViewModel.textSizeMode.value == TextSizeMode.LARGE,
+                selected = textSizeMode == TextSizeMode.LARGE,
                 onClick = {settingsViewModel.setTextSize(TextSizeMode.LARGE)},
                 modifier = Modifier.padding(horizontal = 16.dp)
             )
