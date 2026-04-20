@@ -278,7 +278,7 @@ fun MapScreenErrorPreview() {
         screenState = MapScreenState(
             overlayState = OverlayState.Error,
             climateState = ClimateState.Idle,
-            coordinates = "65.0,10.0"
+            coordinates = coordinate
         ),
         nveViewModel = viewModel(),
         onMapClick = { _, _ -> },
