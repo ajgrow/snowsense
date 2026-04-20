@@ -16,6 +16,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -50,12 +51,22 @@ fun MapRoute(
     viewModel: MapViewModel = viewModel(),
     nveViewModel: NveViewModel = viewModel()
 ) {
+
+    //creates a coroutine, calls a suspend function and pushes coordinates to viewMmodel when they change
+    LaunchedEffect(coordinates) {
+        viewModel.updateLocation(coordinates)
+    }
+
     val screenState by viewModel.screenState.collectAsState()
 
     MapScreen(
         navController = navController,
         screenState = screenState,
         nveViewModel = nveViewModel,
+        onMapClick = { lat, lon ->
+            viewModel.onMapClick(lat, lon)
+            nveViewModel.avalancheChecker(lat, lon)
+        },
         onOverlayRetry = { viewModel.onOverlayLoading() },
         onOverlayLoaded = {viewModel.onOverlayLoaded()},
         onOverlayError = {viewModel.onOverlayError()}
@@ -70,6 +81,7 @@ fun MapScreen(
     navController: NavController,
     screenState: MapScreenState,
     nveViewModel: NveViewModel,
+    onMapClick: (Double, Double) -> Unit,
     onOverlayRetry: () -> Unit,
     onOverlayLoaded: () -> Unit,
     onOverlayError: () -> Unit
@@ -133,7 +145,7 @@ fun MapScreen(
                 MapboxView(
                     onMapClick = { point ->
                         isSheetOpen = true
-                        nveViewModel.avalancheChecker(point.latitude(), point.longitude())
+                        onMapClick(point.latitude(), point.longitude())
                     },
                     onOverlayError = onOverlayError,
                     onOverlayLoaded = onOverlayLoaded,
@@ -269,6 +281,7 @@ fun MapScreenErrorPreview() {
             coordinates = "65.0,10.0"
         ),
         nveViewModel = viewModel(),
+        onMapClick = { _, _ -> },
         onOverlayRetry = {},
         onOverlayLoaded = {},
         onOverlayError = {}
