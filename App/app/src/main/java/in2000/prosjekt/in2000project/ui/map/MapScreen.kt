@@ -149,7 +149,6 @@ fun MapScreen(
                     settingsViewModel = settingsViewModel
                 )
 
-
                 when (mapUIState) {
                     is MapUIState.Loading -> {
                         OverlayStatusCard(
