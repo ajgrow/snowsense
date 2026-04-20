@@ -33,6 +33,7 @@ import androidx.navigation.compose.rememberNavController
 import in2000.prosjekt.in2000project.data.model.SkiArea
 import in2000.prosjekt.in2000project.ui.reusables.BottomBar
 import in2000.prosjekt.in2000project.ui.reusables.TopBar
+import java.time.MonthDay
 
 private val previewSkiArea = SkiArea(
     id = "1",
@@ -151,7 +152,7 @@ fun MapScreen(
                     onOverlayLoaded = onOverlayLoaded,
                     modifier = Modifier
                         .fillMaxSize(),
-                    coordinates = screenState.coordinates
+                    coordinates = screenState.coordinates.toString()
                 )
 
 
@@ -278,7 +279,10 @@ fun MapScreenErrorPreview() {
         screenState = MapScreenState(
             overlayState = OverlayState.Error,
             climateState = ClimateState.Idle,
-            coordinates = coordinate
+            coordinates = null,
+            periodStart = MonthDay.now(),
+            periodEnd = MonthDay.now(),
+            yearsBack = 1
         ),
         nveViewModel = viewModel(),
         onMapClick = { _, _ -> },
