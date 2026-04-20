@@ -144,7 +144,6 @@ fun MapScreen(
                     coordinates = coordinates
                 )
 
-
                 when (mapUIState) {
                     is MapUIState.Loading -> {
                         OverlayStatusCard(
