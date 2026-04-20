@@ -5,7 +5,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import com.mapbox.common.Cancelable
 import com.mapbox.geojson.Point
+import com.mapbox.maps.CameraBoundsOptions
 import com.mapbox.maps.CameraOptions
+import com.mapbox.maps.CoordinateBounds
 import com.mapbox.maps.Style
 import com.mapbox.maps.extension.compose.MapEffect
 import com.mapbox.maps.extension.compose.MapboxMap
@@ -159,6 +161,21 @@ fun MapboxView(
                         MapCameraRepository.updateCameraOptions(it)
                     }
                 }
+
+                val mapBoxMap = mapView.mapboxMap
+
+                val bounds = CoordinateBounds(
+                    Point.fromLngLat(2.5, 55.9),
+                    Point.fromLngLat(31.5, 71.5)
+                )
+
+                mapBoxMap.setBounds(
+                    CameraBoundsOptions.Builder()
+                        .bounds(bounds)
+                        .minZoom(3.5)
+                        .maxZoom(18.0)
+                        .build()
+                )
             }
         }
     }
