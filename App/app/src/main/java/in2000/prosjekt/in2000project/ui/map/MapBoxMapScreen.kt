@@ -2,9 +2,17 @@ package in2000.prosjekt.in2000project.ui.map
 
 import android.util.Log
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import com.mapbox.common.Cancelable
 import com.mapbox.geojson.Point
 import com.mapbox.maps.CameraBounds
@@ -12,13 +20,16 @@ import com.mapbox.maps.CameraBoundsOptions
 import com.mapbox.maps.CameraOptions
 import com.mapbox.maps.CoordinateBounds
 import com.mapbox.maps.Style
+import com.mapbox.maps.dsl.cameraOptions
 import com.mapbox.maps.extension.compose.MapEffect
 import com.mapbox.maps.extension.compose.MapboxMap
 import com.mapbox.maps.extension.compose.animation.viewport.rememberMapViewportState
+import com.mapbox.maps.extension.style.expressions.dsl.generated.zoom
 import com.mapbox.maps.extension.style.layers.addLayer
 import com.mapbox.maps.extension.style.layers.generated.rasterLayer
 import com.mapbox.maps.extension.style.sources.addSource
 import com.mapbox.maps.extension.style.sources.generated.rasterSource
+import com.mapbox.maps.plugin.animation.MapAnimationOptions
 import com.mapbox.maps.plugin.gestures.gestures
 import com.mapbox.maps.toCameraOptions
 
@@ -190,6 +201,51 @@ fun MapboxMapScreen(
                         }
                     }
                 }
+            }
+        }
+        Column(
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(16.dp)
+        ) {
+            Button(
+                onClick = {
+                    val currentZoom = viewportState
+                        .cameraState?.zoom ?: 10.0
+                    viewportState.easeTo(
+                        cameraOptions {
+                            zoom(currentZoom + 1.0)
+                        },
+                        MapAnimationOptions.Builder()
+                            .duration(300)
+                            .build()
+                    )
+                }
+            ) {
+                Text(
+                    text = "+"
+                )
+            }
+
+            Spacer(Modifier.height(8.dp))
+
+            Button(
+                onClick = {
+                    val currentZoom = viewportState
+                        .cameraState?.zoom ?: 10.0
+                    viewportState.easeTo(
+                        cameraOptions {
+                            zoom(currentZoom - 1.0)
+                        },
+                        MapAnimationOptions.Builder()
+                            .duration(300)
+                            .build()
+                    )
+                }
+            ) {
+                Text(
+                    text = "-"
+                )
             }
         }
     }
