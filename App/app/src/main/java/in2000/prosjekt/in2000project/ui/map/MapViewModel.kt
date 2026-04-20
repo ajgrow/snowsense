@@ -18,8 +18,17 @@ class MapViewModel(
     private val frostClimateRepository: FrostClimateRepository
 ) : ViewModel() {
 
+    //Using MapScreenState() instead of <MapScreenState>(MapScreenState.Loading) because
+    //it's a data class rather than just one sealed interface. This is because two things can fail instead
+    //of just one. Both the WMS overlay can fail as well as the climate data. This means that
+    //we base this off the MapScreenState() data class rather than just one sealed interface.
     private val _screenState = MutableStateFlow(MapScreenState())
     val screenState: StateFlow<MapScreenState> = _screenState.asStateFlow()
+
+    //.copy() creates a new instance of the data class with a few of the properties changed while
+    //everything else stays the same. StateFlow needs to identify the change but can't if you
+    //just mutate the existing object in place and the UI won't update. However, if you create a copy(),
+    //the old value is replaced with a new one which triggers recomposition
 
 
     fun updateLocation(coordinates: String) {
@@ -46,33 +55,82 @@ class MapViewModel(
         )
     }
 
+    //set climateState to Loading until success.
+    //use coordinates from UI to call getClimateDataForLocation() using coordinates and time period
     fun fetchClimateData(lat: Double, lon: Double) {
         viewModelScope.launch {
             _screenState.value = _screenState.value.copy(
                 climateState = ClimateState.Loading
             )
 
-            val today = LocalDate.now()
-            val twoWeeksAgo = today.minusDays(14)
-
-            _screenState.value = try {
+            try {
+                val current = _screenState.value
                 val climateData = frostClimateRepository.getClimateDataForLocation(
                     coordinate = Coordinate(lat, lon),
-                    periodStart = MonthDay.from(twoWeeksAgo),
-                    periodEnd = MonthDay.from(today),
-                    yearsBack = 0
+                    periodStart = current.periodStart,
+                    periodEnd = current.periodEnd,
+                    yearsBack = current.yearsBack
                 )
 
-                _screenState.value.copy(
+                _screenState.value = _screenState.value.copy(
                     climateState = ClimateState.Success(climateData)
                 )
             } catch (e: Exception) {
                 e.printStackTrace()
 
-                _screenState.value.copy(
+                _screenState.value = _screenState.value.copy(
                     climateState = ClimateState.Error
                 )
             }
         }
     }
+
+    //when user taps map, fetches the info with the default date range
+    fun onMapClick(lat: Double, lon: Double) {
+        _screenState.value = _screenState.value.copy(
+            coordinates = "$lat,$lon"
+        )
+        fetchClimateData(lat, lon)
+    }
+
+    fun onPeriodStart(start: MonthDay) {
+        val current = _screenState.value
+        val end = setTimeBoundary(start, current.periodEnd)
+
+        _screenState.value = _screenState.value.copy(
+            periodStart = start,
+            periodEnd = end
+        )
+
+        refetchIfLocationKnown()
+    }
+
+    fun onPeriodEnd(end: MonthDay) {
+        val current = _screenState.value
+        val start = setTimeBoundary(current.periodStart, end)
+
+        _screenState.value = _screenState.value.copy(
+            periodStart = start,
+            periodEnd = end
+        )
+
+        refetchIfLocationKnown()
+    }
+
+    fun onYearsBack(yearsBack: Int) {
+        _screenState.value = _screenState.value.copy(
+            yearsBack = yearsBack
+        )
+
+        refetchIfLocationKnown()
+    }
+
+    private fun refetchIfLocationKnown() {
+
+    }
+
+    private fun setTimeBoundary(start: MonthDay, end: MonthDay): MonthDay {
+        {/* TO DO*/ }
+    }
 }
+
