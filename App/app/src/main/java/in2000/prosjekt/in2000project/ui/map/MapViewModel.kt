@@ -21,8 +21,6 @@ class MapViewModel(
     private val _screenState = MutableStateFlow(MapScreenState())
     val screenState: StateFlow<MapScreenState> = _screenState.asStateFlow()
 
-    var coordinates by mutableStateOf("65.0,10.0")
-        private set
 
     fun updateLocation(coordinates: String) {
         _screenState.value = _screenState.value.copy(
