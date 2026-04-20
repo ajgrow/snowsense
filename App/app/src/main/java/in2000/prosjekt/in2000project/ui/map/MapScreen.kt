@@ -1,6 +1,5 @@
 package in2000.prosjekt.in2000project.ui.map
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -9,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -25,7 +23,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -133,10 +130,10 @@ fun MapScreen(
             ) {
                 //Map added here
                 //onMapClick is passed to the Map
-                Map(
-                    onMapClick = { lat, lon ->
+                MapboxView(
+                    onMapClick = { point ->
                         isSheetOpen = true
-                        nveViewModel.avalancheChecker(lat, lon)
+                        nveViewModel.avalancheChecker(point.latitude(), point.longitude())
                     },
                     onOverlayError = onOverlayError,
                     onOverlayLoaded = onOverlayLoaded,
@@ -202,34 +199,6 @@ fun MapScreen(
         }
     }
 }
-
-@Composable
-fun Map(
-    onMapClick: (Double,Double) -> Unit,
-    onOverlayError: () -> Unit,
-    onOverlayLoaded: () -> Unit,
-    coordinates: String,
-    modifier: Modifier = Modifier
-) {
-    // This is the blue area on the MapScreen that is meant for where the map from MapBox will eventually go.
-    Box(
-        modifier = modifier
-            .background(
-                color = Color(0xFFDCEEFF),
-                shape = RoundedCornerShape(24.dp)
-            )
-    ) {
-        MapboxMapScreen(
-            onMapClick = { point ->
-                onMapClick(point.latitude(), point.longitude())
-            },
-            onOverlayError = { onOverlayError() },
-            onOverlayLoaded = { onOverlayLoaded() },
-            coordinates = coordinates
-        )
-    }
-}
-
 
 @Composable
 fun SkiAreaBottomSheetContent(
