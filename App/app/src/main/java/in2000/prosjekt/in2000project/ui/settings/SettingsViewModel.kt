@@ -14,19 +14,31 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
 
     private val prefs = application.getSharedPreferences("settings", Context.MODE_PRIVATE)
 
-    var themeMode by mutableStateOf(ThemeMode.valueOf(prefs.getString("theme_mode", ThemeMode.SYSTEM.name)!!))
+    var themeMode by mutableStateOf(
+        ThemeMode.valueOf(
+            prefs.getString(
+                "theme_mode", ThemeMode.SYSTEM.name)!!
+        )
+    )
 
-    var textSizeMode by mutableStateOf(TextSizeMode.valueOf(prefs.getString("text_size_mode", TextSizeMode.MEDIUM.name)!!))
+    var textSizeMode by mutableStateOf(
+        TextSizeMode.valueOf(
+            prefs.getString(
+                "text_size_mode", TextSizeMode.MEDIUM.name)!!
+        )
+    )
 
 
 
     fun setTheme(mode: ThemeMode){
         themeMode = mode
-        prefs.edit().putString("theme_mode", mode.name).apply()
+        prefs.edit().putString(
+            "theme_mode", mode.name).apply()
     }
 
     fun setTextSize(mode: TextSizeMode){
         textSizeMode = mode
-        prefs.edit().putString("text_size_mode", mode.name).apply()
+        prefs.edit().putString(
+            "text_size_mode", mode.name).apply()
     }
 }
