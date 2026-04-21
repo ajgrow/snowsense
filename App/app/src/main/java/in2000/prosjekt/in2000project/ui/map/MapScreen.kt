@@ -1,5 +1,6 @@
 package in2000.prosjekt.in2000project.ui.map
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
