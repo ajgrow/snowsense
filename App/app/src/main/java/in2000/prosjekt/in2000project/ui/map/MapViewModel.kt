@@ -128,7 +128,7 @@ class MapViewModel(
     }
 
     private fun refetchIfLocationKnown() {
-        val coordinate = _screenState.value.coordinate ?: return
+        val coordinate = _screenState.value.climateCoordinate ?: return
         fetchClimateData(coordinate.latitude, coordinate.longitude)
     }
 

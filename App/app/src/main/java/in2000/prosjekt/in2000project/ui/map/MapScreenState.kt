@@ -3,12 +3,13 @@ package in2000.prosjekt.in2000project.ui.map
 import in2000.prosjekt.in2000project.data.model.LocationClimateData
 import java.time.MonthDay
 import in2000.prosjekt.in2000project.data.model.Coordinate
+import in2000.prosjekt.in2000project.data.model.SkiArea
 
 
 data class MapScreenState(
     val overlayState: OverlayState = OverlayState.Loading,
     val climateState: ClimateState = ClimateState.Idle,
-    val coordinates: Coordinate? = null,
+    val climateCoordinate: Coordinate? = null,
     val periodStart: MonthDay = MonthDay.now(),
     val periodEnd: MonthDay = MonthDay.now(),
     val yearsBack: Int = 1

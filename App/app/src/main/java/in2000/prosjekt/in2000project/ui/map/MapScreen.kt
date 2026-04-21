@@ -159,7 +159,7 @@ fun MapScreen(
                     onOverlayLoaded = onOverlayLoaded,
                     modifier = Modifier
                         .fillMaxSize(),
-                    coordinates = screenState.coordinate
+                    coordinates = coordinates
                 )
 
 
