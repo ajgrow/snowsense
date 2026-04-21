@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import in2000.prosjekt.in2000project.data.model.Coordinate
 import in2000.prosjekt.in2000project.data.model.SkiArea
 import in2000.prosjekt.in2000project.ui.reusables.BottomBar
 import in2000.prosjekt.in2000project.ui.reusables.TopBar
@@ -48,14 +49,14 @@ private val previewSkiArea = SkiArea(
 @Composable
 fun MapRoute(
     navController: NavController,
-    coordinates: String,
+    coordinates: Coordinate,
     viewModel: MapViewModel = viewModel(),
     nveViewModel: NveViewModel = viewModel()
 ) {
 
-    //creates a coroutine, calls a suspend function and pushes coordinates to viewMmodel when they change
+    //creates a coroutine, calls a suspend function and pushes coordinates to viewModel when they change
     LaunchedEffect(coordinates) {
-        viewModel.updateLocation(coordinates)
+        viewModel.updateSearchLocation(coordinates)
     }
 
     val screenState by viewModel.screenState.collectAsState()
@@ -152,7 +153,7 @@ fun MapScreen(
                     onOverlayLoaded = onOverlayLoaded,
                     modifier = Modifier
                         .fillMaxSize(),
-                    coordinates = screenState.coordinates.toString()
+                    coordinates = screenState.coordinate
                 )
 
 
