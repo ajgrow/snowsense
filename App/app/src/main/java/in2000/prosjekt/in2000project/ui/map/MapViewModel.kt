@@ -126,7 +126,13 @@ class MapViewModel(
     }
 
     private fun refetchIfLocationKnown() {
-
+        val coordinates = _screenState.value.coordinates
+        if (coordinates.isBlank() || coordinates == "0,0") return
+        val parts = coordinates.split(",")
+        if (parts.size != 2) return
+        val lat = parts[0].toDoubleOrNull() ?: return
+        val lon = parts[1].toDoubleOrNull() ?: return
+        fetchClimateData(lat, lon)
     }
 
     private fun setTimeBoundary(start: MonthDay, end: MonthDay): MonthDay {
