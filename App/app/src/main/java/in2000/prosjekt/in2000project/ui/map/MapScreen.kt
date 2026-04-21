@@ -30,10 +30,13 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import in2000.prosjekt.in2000project.data.model.Coordinate
+import in2000.prosjekt.in2000project.MainActivity
 import in2000.prosjekt.in2000project.data.model.SkiArea
+import in2000.prosjekt.in2000project.data.model.toSkiArea
+import in2000.prosjekt.in2000project.data.repository.FrostClimateRepository
 import in2000.prosjekt.in2000project.ui.reusables.BottomBar
 import in2000.prosjekt.in2000project.ui.reusables.TopBar
+import org.koin.compose.viewmodel.koinViewModel
 import java.time.MonthDay
 
 private val previewSkiArea = SkiArea(
@@ -44,34 +47,29 @@ private val previewSkiArea = SkiArea(
     dailyMeanTemperature = "-3.2°C winter average"
 )
 
-
 //for use when the VM is ready
 @Composable
 fun MapRoute(
     navController: NavController,
-    coordinates: Coordinate,
-    viewModel: MapViewModel = viewModel(),
+    coordinates: String,
+    mapViewModel: MapViewModel = koinViewModel(),
     nveViewModel: NveViewModel = viewModel()
 ) {
-
-    //creates a coroutine, calls a suspend function and pushes coordinates to viewModel when they change
-    LaunchedEffect(coordinates) {
-        viewModel.updateSearchLocation(coordinates)
-    }
-
-    val screenState by viewModel.screenState.collectAsState()
+    val screenState by mapViewModel.screenState.collectAsState()
 
     MapScreen(
         navController = navController,
         screenState = screenState,
         nveViewModel = nveViewModel,
         onMapClick = { lat, lon ->
-            viewModel.onMapClick(lat, lon)
+            mapViewModel.onMapClick(lat, lon)
             nveViewModel.avalancheChecker(lat, lon)
         },
-        onOverlayRetry = { viewModel.onOverlayLoading() },
-        onOverlayLoaded = {viewModel.onOverlayLoaded()},
-        onOverlayError = {viewModel.onOverlayError()}
+        coordinates = coordinates,
+        onOverlayRetry = { mapViewModel.onOverlayLoading() },
+        onOverlayLoaded = { mapViewModel.onOverlayLoaded()},
+        onOverlayError = { mapViewModel.onOverlayError()},
+        onSheetDismiss = { mapViewModel.onSheetDismissed() }
     )
 }
 
@@ -84,6 +82,7 @@ fun MapScreen(
     screenState: MapScreenState,
     nveViewModel: NveViewModel,
     onMapClick: (Double, Double) -> Unit,
+    coordinates: String,
     onOverlayRetry: () -> Unit,
     onOverlayLoaded: () -> Unit,
     onOverlayError: () -> Unit
@@ -280,13 +279,14 @@ fun MapScreenErrorPreview() {
         screenState = MapScreenState(
             overlayState = OverlayState.Error,
             climateState = ClimateState.Idle,
-            coordinates = null,
+            climateCoordinate = null,
             periodStart = MonthDay.now(),
             periodEnd = MonthDay.now(),
             yearsBack = 1
         ),
         nveViewModel = viewModel(),
         onMapClick = { _, _ -> },
+        coordinates = "",
         onOverlayRetry = {},
         onOverlayLoaded = {},
         onOverlayError = {}
