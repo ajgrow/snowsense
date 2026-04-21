@@ -31,10 +31,10 @@ class MapViewModel(
     //the old value is replaced with a new one which triggers recomposition
 
 
-    fun updateLocation(coordinates: String) {
-        _screenState.value = _screenState.value.copy(
-            coordinates = coordinates
-        )
+    fun updateSearchLocation(coordinate: Coordinate?) {
+        val coordinate = coordinate ?: return
+        _screenState.value = _screenState.value.copy(coordinate = coordinate)
+        fetchClimateData(coordinate.latitude, coordinate.longitude)
     }
 
     fun onOverlayLoading() {
@@ -88,7 +88,7 @@ class MapViewModel(
     //when user taps map, fetches the info with the default date range
     fun onMapClick(lat: Double, lon: Double) {
         _screenState.value = _screenState.value.copy(
-            coordinates = "$lat,$lon"
+            coordinates = Coordinate(lat, lon)
         )
         fetchClimateData(lat, lon)
     }
@@ -126,17 +126,13 @@ class MapViewModel(
     }
 
     private fun refetchIfLocationKnown() {
-        val coordinates = _screenState.value.coordinates
-        if (coordinates.isBlank() || coordinates == "0,0") return
-        val parts = coordinates.split(",")
-        if (parts.size != 2) return
-        val lat = parts[0].toDoubleOrNull() ?: return
-        val lon = parts[1].toDoubleOrNull() ?: return
-        fetchClimateData(lat, lon)
+        val coordinate = _screenState.value.coordinate ?: return
+        fetchClimateData(coordinate.latitude, coordinate.longitude)
     }
 
     private fun setTimeBoundary(start: MonthDay, end: MonthDay): MonthDay {
-        {/* TO DO*/ }
+        // TO DO - enforce max 1 month range
+        return end
     }
 }
 
