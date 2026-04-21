@@ -18,6 +18,7 @@ import com.mapbox.maps.extension.style.sources.addSource
 import com.mapbox.maps.extension.style.sources.generated.rasterSource
 import com.mapbox.maps.plugin.gestures.gestures
 import com.mapbox.maps.toCameraOptions
+import in2000.prosjekt.in2000project.data.model.Coordinate
 
 /*
 This global object is bad practice but it works and I
@@ -53,11 +54,12 @@ private const val WMS_DETAIL =
 @Composable
 fun MapboxView(
     onMapClick: (Point) -> Unit,
-    coordinates: String,
+    coordinates: Coordinate?,
     onOverlayError: () -> Unit,
     onOverlayLoaded: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    //this area needs to be changed now that we're parsing the coordinate in AppNavigation!!
     val (hasSearch, searchLat, searchLng) = remember(coordinates) {
         if (coordinates.isNotBlank() && coordinates != "0,0") {
             val parts = coordinates.split(",")
