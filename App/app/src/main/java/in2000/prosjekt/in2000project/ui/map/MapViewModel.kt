@@ -66,6 +66,7 @@ class MapViewModel(
                     climateState = ClimateState.Success(climateData)
                 )
             } catch (e: Exception) {
+                Log.d("ClimateData", "Something went wrong: " + Log.getStackTraceString(e))
                 e.printStackTrace()
 
                 _screenState.value = _screenState.value.copy(
