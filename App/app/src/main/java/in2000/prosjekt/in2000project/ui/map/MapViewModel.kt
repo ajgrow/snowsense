@@ -79,7 +79,7 @@ class MapViewModel(
     //when user taps map, fetches the info with the default date range
     fun onMapClick(lat: Double, lon: Double) {
         _screenState.value = _screenState.value.copy(
-            coordinates = Coordinate(lat, lon)
+            climateCoordinate = Coordinate(lat, lon)
         )
         fetchClimateData(lat, lon)
     }
