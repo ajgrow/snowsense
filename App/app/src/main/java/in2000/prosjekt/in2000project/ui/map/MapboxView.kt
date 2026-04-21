@@ -167,6 +167,7 @@ fun MapboxView(
                             rasterLayer("snoskred-detail-layer", "snoskred-detail-source") {
                                 rasterOpacity(0.9)
                                 minZoom(8.0)
+                                rasterHueRotate(160.0)
                             }
                         )
                     }
