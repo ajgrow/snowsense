@@ -11,10 +11,11 @@ class LocationRepository {
     suspend fun getNames(query:String) : List<NamedLocation> {
         return dataSource.getNamesResponse(query)?.map {
             NamedLocation(
-                Coordinate(
+                name = it.skrivemåte,
+                coordinate = Coordinate(
                     it.representasjonspunkt.øst,
                     it.representasjonspunkt.nord
-                ), it.skrivemåte)
+                ))
         } ?: emptyList()
     }
 }

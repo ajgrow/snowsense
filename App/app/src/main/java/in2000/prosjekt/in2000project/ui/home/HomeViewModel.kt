@@ -11,14 +11,15 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import androidx.compose.runtime.snapshotFlow
+import in2000.prosjekt.in2000project.data.model.Coordinate
 import in2000.prosjekt.in2000project.data.model.NamedLocation
 import kotlinx.coroutines.flow.debounce
 
 data class HomeUiState(
     val searchTextFieldState: TextFieldState = TextFieldState(),
     val searchResults: List<NamedLocation> = emptyList(),
-    val favorites: List<String> = emptyList(),
-    val recentSearches: List<String> = emptyList()
+    val favorites: List<NamedLocation> = emptyList(),
+    val recentSearches: List<NamedLocation> = emptyList()
 )
 
 class HomeViewModel: ViewModel(){
@@ -51,8 +52,8 @@ class HomeViewModel: ViewModel(){
             _homeState.update { currentState ->
                 //make a new copy of currentState (HomeUiState) with these changes, and update _homeState accordingly (.update)
                 currentState.copy(
-                    favorites = listOf("Jotunheimen", "Rondane"),
-                    recentSearches = listOf("Jotunheimen", "Rondane", "Romsdalen", "Hardangervidda", "Lofoten", "Vesterålen")
+                    favorites = emptyList(),
+                    recentSearches = emptyList()
                 )
             }
         }
@@ -61,6 +62,18 @@ class HomeViewModel: ViewModel(){
     fun updateSearchTextFieldState(textFieldState: TextFieldState){
         //make a copy of the current state and change the searchQuery to the new query
         _homeState.update { it.copy(searchTextFieldState = textFieldState) }
+    }
+
+    fun addRecentSearch(location: NamedLocation) {
+        _homeState.update {
+            it.copy(recentSearches = (it.recentSearches + location).distinct())
+        }
+    }
+
+    fun removeRecentSearch(location: NamedLocation) {
+        _homeState.update {
+            it.copy(recentSearches = it.recentSearches - location)
+        }
     }
 
     fun onSearch(){

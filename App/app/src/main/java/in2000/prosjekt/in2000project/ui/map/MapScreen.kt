@@ -154,7 +154,8 @@ fun MapScreen(
                 //onMapClick is passed to the Map
                 MapboxView(
                     onMapClick = { point ->
-                        onMapClick(point.latitude(), point.longitude())
+                        isSheetOpen = true
+                        nveViewModel.avalancheChecker(point.latitude(), point.longitude())
                     },
                     onOverlayError = onOverlayError,
                     onOverlayLoaded = onOverlayLoaded,
