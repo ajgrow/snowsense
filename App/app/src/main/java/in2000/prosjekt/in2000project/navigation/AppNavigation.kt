@@ -7,6 +7,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import in2000.prosjekt.in2000project.data.model.Coordinate
 import in2000.prosjekt.in2000project.ui.home.HomeScreen
 import in2000.prosjekt.in2000project.ui.information.InfoScreen
 import in2000.prosjekt.in2000project.ui.map.MapRoute
@@ -32,6 +33,9 @@ fun AppNavigation(){
             )
         ) { backStackEntry ->
             val coordinates = backStackEntry.arguments?.getString("coordinates") ?: "65.0,10.0"
+            val parts = coordinates.split(",")
+            val coordinate = Coordinate(parts[0].toDouble(), parts[1].toDouble())
+            MapRoute(navController = navController, coordinate = coordinate)
             Log.d("fuckedupmap",coordinates)
             MapRoute(navController = navController, coordinates = coordinates)
         }
