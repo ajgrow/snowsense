@@ -85,16 +85,24 @@ fun MapScreen(
     coordinates: String,
     onOverlayRetry: () -> Unit,
     onOverlayLoaded: () -> Unit,
-    onOverlayError: () -> Unit
+    onOverlayError: () -> Unit,
+    onSheetDismiss: () -> Unit
 ) {
-
-    // Hardcoded sample data for the MVP, however, when Frost API is ready this should move into the ViewModel
-    val skiArea = remember { previewSkiArea }
+    val skiArea = when (val state = screenState.climateState) {
+        is ClimateState.Success -> state.data.toSkiArea()
+        else -> previewSkiArea
+    }
 
     val dangerCheckUiState by nveViewModel.dangerCheckUiState.collectAsState()
     //Controls whether the bottom sheet is visible or not by keeping track of if the user has clicked the map
     //if this is set to null then the ModalBottomSheet is not open
     var isSheetOpen by rememberSaveable { mutableStateOf(false) }
+
+    LaunchedEffect(screenState.climateState) {
+        if (screenState.climateState is ClimateState.Success) {
+            isSheetOpen = true
+        }
+    }
 
     val avalancheStatus = when {
         dangerCheckUiState.isDanger == true -> "High"
@@ -145,7 +153,6 @@ fun MapScreen(
                 //onMapClick is passed to the Map
                 MapboxView(
                     onMapClick = { point ->
-                        isSheetOpen = true
                         onMapClick(point.latitude(), point.longitude())
                     },
                     onOverlayError = onOverlayError,
@@ -178,14 +185,18 @@ fun MapScreen(
 
                     is ClimateState.Loading -> {
                         /*TO DO*/
+                        Log.d("ClimateData", "Loading...")
                     }
 
                     is ClimateState.Error -> {
                         /*TO DO*/
+                        Log.d("ClimateData", "Error")
                     }
 
                     is ClimateState.Success -> {
-                        /*TO DO*/
+                        val success = screenState.climateState
+                        val climateData = success.data
+                        Log.d("ClimateData", climateData.toString())
                     }
                 }
             }
@@ -289,7 +300,8 @@ fun MapScreenErrorPreview() {
         coordinates = "",
         onOverlayRetry = {},
         onOverlayLoaded = {},
-        onOverlayError = {}
+        onOverlayError = {},
+        onSheetDismiss = {}
     )
 }
 

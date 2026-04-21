@@ -6,6 +6,8 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import in2000.prosjekt.in2000project.data.model.Coordinate
+import in2000.prosjekt.in2000project.data.model.LocationClimateData
+import in2000.prosjekt.in2000project.data.model.SkiArea
 import in2000.prosjekt.in2000project.data.repository.FrostClimateRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -134,5 +136,12 @@ class MapViewModel(
         // TO DO - enforce max 1 month range
         return end
     }
+
+    fun onSheetDismissed() {
+        _screenState.value = _screenState.value.copy(
+            climateState = ClimateState.Idle
+        )
+    }
+
 }
 
