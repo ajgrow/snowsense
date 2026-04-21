@@ -9,3 +9,18 @@ data class SkiArea(
     val averagePrecipitation: String,
     val dailyMeanTemperature: String
 )
+
+
+fun LocationClimateData.toSkiArea() = SkiArea(
+    id = "${coordinate.latitude},${coordinate.longitude}",
+    name = stationName ?: "Selected Area",
+    averageSnowfall = avgDailyMaxSnowDepthCm
+        ?.let { "%.1f cm daily average".format(it) }
+        ?: "No data",
+    averagePrecipitation = avgDailyPrecipitationMm
+        ?.let { "%.1f mm daily average".format(it) }
+        ?: "No data",
+    dailyMeanTemperature = avgDailyMeanTemperatureC
+        ?.let { "%.1f°C daily average".format(it) }
+        ?: "No data"
+)
