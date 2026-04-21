@@ -66,13 +66,24 @@ fun HomeScreen(
         ) {
             LogoSection()
 
+            val onNavigateToMap = { coordinate: String ->
+                navController.navigate(Screen.Map.createRoute(coordinate)) {
+                    popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                    launchSingleTop = false
+                    restoreState = false
+                }
+            }
+
             SearchSection(
                 //get states from the viewmodel
                 modifier = Modifier,
                 textFieldState = uiState.searchTextFieldState,
                 onSearch = { homeViewModel.onSearch() },
                 searchResults = uiState.searchResults,
-                navController = navController
+                onNavigateToMap = onNavigateToMap,
+                onSelectResult = { result ->
+                    homeViewModel.addRecentSearch(result)
+                }
             )
 
             LazyColumn(
@@ -82,10 +93,21 @@ fun HomeScreen(
                 verticalArrangement = Arrangement.spacedBy(24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                item {
+                    FavoriteSection(
+                        items = uiState.favorites,
+                        modifier = Modifier,
+                        onNavigateToMap = onNavigateToMap
+                    )
+                }
 
-                item { FavoriteSection(items = uiState.favorites) }
-
-                item { RecentSection(items = uiState.recentSearches) }
+                item {
+                    RecentSection(
+                        items = uiState.recentSearches,
+                        modifier = Modifier,
+                        onNavigateToMap = onNavigateToMap
+                    )
+                }
             }
         }
     }
@@ -106,14 +128,12 @@ fun LogoSection(
 @Composable
 fun SearchSection(
     textFieldState : TextFieldState,
-    onSearch: (String) -> Unit,
     searchResults: List<NamedLocation>,
     modifier: Modifier = Modifier,
-    navController: NavController
+    onSearch: (String) -> Unit,
+    onSelectResult: (location: NamedLocation) -> Unit,
+    onNavigateToMap: (coordinate: String) -> Unit
 ) {
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = navBackStackEntry?.destination?.route
-
     var expanded by rememberSaveable { mutableStateOf(false) }
         //We should add some rules to the searchSection, like restrictions on type of input and input length
         DockedSearchBar(
@@ -141,22 +161,12 @@ fun SearchSection(
                     ListItem(
                         headlineContent = { Text(result.name) },
                         modifier = Modifier
-                            .clickable (
-                                onClick = {
-                                    navController.navigate(
-                                        Screen.Map.createRoute("${result.coordinate.longitude},${result.coordinate.latitude}")
-                                    ) {
-                                        popUpTo(navController.graph.findStartDestination().id) {
-                                            saveState = true
-                                        }
-                                        launchSingleTop = false
-                                        restoreState = false
-                                    }
-
-                                    textFieldState.edit { replace(0, length, result.name) }
-                                    expanded = false
-                                }
-                            )
+                            .clickable {
+                                onNavigateToMap("${result.coordinate.longitude},${result.coordinate.latitude}")
+                                onSelectResult(result)
+                                textFieldState.edit { replace(0, length, result.name) }
+                                expanded = false
+                            }
                             .fillMaxWidth()
                     )
                 }
@@ -166,8 +176,9 @@ fun SearchSection(
 
 @Composable
 fun FavoriteSection(
-    items: List<String>,
-    modifier: Modifier = Modifier
+    items: List<NamedLocation>,
+    modifier: Modifier = Modifier,
+    onNavigateToMap: (coordinate: String) -> Unit
 ) {
     Column(
         modifier = modifier.fillMaxWidth(),
@@ -180,8 +191,8 @@ fun FavoriteSection(
         LazyRow(
             horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            items(items) { area ->
-                AreaCard(area)
+            items(items) { location ->
+                LocationCard(location, onNavigateToMap = onNavigateToMap)
             }
         }
     }
@@ -189,8 +200,9 @@ fun FavoriteSection(
 
 @Composable
 fun RecentSection(
-    items: List<String>,
-    modifier: Modifier = Modifier
+    items: List<NamedLocation>,
+    modifier: Modifier = Modifier,
+    onNavigateToMap: (coordinate: String) -> Unit
 ) {
     Column(
         modifier = modifier.fillMaxWidth(),
@@ -201,23 +213,29 @@ fun RecentSection(
             style = MaterialTheme.typography.titleMedium
         )
 
-        items.forEach { area ->
-            AreaCard(area)
+        items.forEach { location ->
+            LocationCard(
+                location,
+                onNavigateToMap = onNavigateToMap
+            )
         }
-
     }
 }
 
 @Composable
-fun AreaCard(
-    area: String,
-    modifier: Modifier = Modifier
+fun LocationCard(
+    location: NamedLocation,
+    modifier: Modifier = Modifier,
+    onNavigateToMap: (coordinate: String) -> Unit
 ) {
     Card(
         modifier = modifier,
+        onClick = {
+            onNavigateToMap("${location.coordinate.longitude},${location.coordinate.latitude}")
+        }
     ) {
         Text(
-            text = area,
+            text = location.name,
             modifier = Modifier.padding(16.dp)
         )
     }
