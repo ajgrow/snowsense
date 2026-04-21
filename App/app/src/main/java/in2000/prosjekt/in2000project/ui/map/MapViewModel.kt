@@ -27,13 +27,6 @@ class MapViewModel(
     //just mutate the existing object in place and the UI won't update. However, if you create a copy(),
     //the old value is replaced with a new one which triggers recomposition
 
-
-    fun updateSearchLocation(coordinate: Coordinate?) {
-        val coordinate = coordinate ?: return
-        _screenState.value = _screenState.value.copy(coordinate = coordinate)
-        fetchClimateData(coordinate.latitude, coordinate.longitude)
-    }
-
     fun onOverlayLoading() {
         _screenState.value = _screenState.value.copy(
             overlayState = OverlayState.Loading
