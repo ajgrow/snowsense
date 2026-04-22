@@ -5,6 +5,7 @@ import in2000.prosjekt.in2000project.data.datasource.dto.*
 import in2000.prosjekt.in2000project.data.model.Coordinate
 import in2000.prosjekt.in2000project.data.model.NoObservationsException
 import in2000.prosjekt.in2000project.data.model.NoStationFoundException
+import in2000.prosjekt.in2000project.data.model.enums.ElementType
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
@@ -127,9 +128,13 @@ class FrostClimateRepositoryTest {
             10,
         )
 
-        assertEquals(-3.0, result.avgDailyMeanTemperatureC!!, 0.001)
-        assertEquals(5.5, result.avgDailyPrecipitationMm!!, 0.001)
-        assertEquals(4.0, result.avgDailyMeanWindSpeedMs!!, 0.001)
+        val temp = result.dailyAverages.find { it.type == ElementType.MEAN_TEMPERATURE }?.value
+        val precip = result.dailyAverages.find { it.type == ElementType.PRECIPITATION }?.value
+        val wind = result.dailyAverages.find { it.type == ElementType.WIND_SPEED }?.value
+
+        assertEquals(-3.0, temp!!, 0.001)
+        assertEquals(5.5, precip!!, 0.001)
+        assertEquals(4.0, wind!!, 0.001)
     }
 
     @Test
@@ -145,7 +150,9 @@ class FrostClimateRepositoryTest {
             10,
         )
 
-        assertNull(result.avgDailyMaxSnowDepthCm)
+        val snow = result.dailyAverages.find { it.type == ElementType.SNOW_DEPTH }?.value
+
+        assertNull(snow)
     }
 
     @Test
