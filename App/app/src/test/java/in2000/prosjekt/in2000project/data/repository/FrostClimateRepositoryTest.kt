@@ -128,10 +128,10 @@ class FrostClimateRepositoryTest {
             10,
         )
 
-        val temp2024 = result.yearlyAverages.find { it.year == 2024 && it.type == ElementType.MEAN_TEMPERATURE }?.value
-        val temp2025 = result.yearlyAverages.find { it.year == 2025 && it.type == ElementType.MEAN_TEMPERATURE }?.value
-        val precip2024 = result.yearlyAverages.find { it.year == 2024 && it.type == ElementType.PRECIPITATION }?.value
-        val wind2025 = result.yearlyAverages.find { it.year == 2025 && it.type == ElementType.WIND_SPEED }?.value
+        val temp2024 = result.yearlyAverages.find { it.year == 2024 && it.type == ElementType.MEAN_TEMPERATURE }?.avgValue
+        val temp2025 = result.yearlyAverages.find { it.year == 2025 && it.type == ElementType.MEAN_TEMPERATURE }?.avgValue
+        val precip2024 = result.yearlyAverages.find { it.year == 2024 && it.type == ElementType.PRECIPITATION }?.avgValue
+        val wind2025 = result.yearlyAverages.find { it.year == 2025 && it.type == ElementType.WIND_SPEED }?.avgValue
 
         assertEquals(-2.0, temp2024!!, 0.001)
         assertEquals(-4.0, temp2025!!, 0.001)
@@ -152,7 +152,7 @@ class FrostClimateRepositoryTest {
             10,
         )
 
-        val snow = result.yearlyAverages.find { it.year == 2024 && it.type == ElementType.SNOW_DEPTH }?.value
+        val snow = result.yearlyAverages.find { it.year == 2024 && it.type == ElementType.SNOW_DEPTH }?.avgValue
 
         assertNull(snow)
     }
