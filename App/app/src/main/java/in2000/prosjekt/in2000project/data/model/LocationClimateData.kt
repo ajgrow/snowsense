@@ -26,7 +26,7 @@ data class LocationClimateData(
     // Data quality
     val dataPointCount: Int,
 
-    // Daily averages
-    val dailyAverages: List<LocationClimateDataPoint>
+    // yearly averages
+    val yearlyAverages: List<LocationClimateDataPoint>
 
 )
