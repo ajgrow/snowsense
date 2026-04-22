@@ -38,34 +38,44 @@ class FrostClimateRepository(
     ): LocationClimateData {
         require(yearsBack >= 0)
 
+        // 1. Find the nearest weather station that can provide data.
         val station = getNearestStation(coordinate)
 
+        // 2. Build the ISO-8601 repeating time range string (e.g., R10/2014-03-01/2014-04-01/P1Y).
         val referenceTime = buildRepeatingTimeRange(
             periodStart,
             periodEnd,
             yearsBack,
         )
 
+        // 3. Fetch observations for the specified elements and time range.
         val obsResponse = frostV0DataSource.getObservations(
             sourceId = station.id,
             elements = ELEMENTS_CSV,
             referenceTime = referenceTime,
         )
 
+        // 4. Flatten all nested observations to check if any data was returned at all.
         val allObservations = obsResponse.data.flatMap { it.observations }
 
-        if (allObservations.isEmpty())
+        if (allObservations.isEmpty()) {
             throw NoObservationsException(
                 stationName = station.name,
                 message = "Station ${station.name} has no observations for " +
                         "$periodStart–$periodEnd over the last $yearsBack years",
             )
+        }
 
-        val averages = averageByElement(allObservations)
+        // 5. Process the data year-by-year to calculate averages for each element.
+        val yearlyAverages = obsResponse.data
+            .groupBy { it.referenceTime.take(4).toIntOrNull() ?: 0 }
+            .flatMap { (year, yearData) ->
+                val yearObservations = yearData.flatMap { it.observations }
+                val averages = averageByElement(yearObservations)
+                buildYearlyAverages(year, averages)
+            }
 
-        //Transforms averages to a list of LocationClimateDataPoint
-        val dailyAverages = buildDailyAverages(averages)
-
+        // 6. Map the processed results into the final domain model.
         return LocationClimateData(
             coordinate = coordinate,
             stationName = station.name,
@@ -75,7 +85,7 @@ class FrostClimateRepository(
             periodEnd = periodEnd,
             yearsBack = yearsBack,
             dataPointCount = allObservations.size,
-            dailyAverages = dailyAverages
+            yearlyAverages = yearlyAverages
         )
     }
 
@@ -89,18 +99,23 @@ class FrostClimateRepository(
         ?: throw NoStationFoundException(coordinate)
 
 
-    //Builds the list of [LocationClimateDataPoint] from the averages map.
-    private fun buildDailyAverages(
+    /**
+     * Builds a list of [LocationClimateDataPoint] for a specific year.
+     *
+     * Maps the element-id strings used by the Frost API to our internal [ElementType] enum.
+     * Values not present in the [averages] map will be null.
+     */
+    private fun buildYearlyAverages(
+        year: Int,
         averages: Map<String, Double>
     ): List<LocationClimateDataPoint> = listOf(
-        //This creates a pair of the elementType and its corresponding string constant
         ElementType.MEAN_TEMPERATURE to ELEMENT_TEMP,
         ElementType.PRECIPITATION to ELEMENT_PRECIP,
         ElementType.WIND_SPEED to ELEMENT_WIND,
         ElementType.SNOW_DEPTH to ELEMENT_SNOW
     )
         .map { (type, element) ->
-        LocationClimateDataPoint(type = type, value = averages[element])
+            LocationClimateDataPoint(year = year, type = type, value = averages[element])
         }
 }
 
