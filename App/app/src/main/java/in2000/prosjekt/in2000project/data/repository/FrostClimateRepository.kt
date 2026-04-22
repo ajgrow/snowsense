@@ -115,7 +115,7 @@ class FrostClimateRepository(
         ElementType.SNOW_DEPTH to ELEMENT_SNOW
     )
         .map { (type, element) ->
-            LocationClimateDataPoint(year = year, type = type, value = averages[element])
+            LocationClimateDataPoint(year = year, type = type, avgValue = averages[element])
         }
 }
 
