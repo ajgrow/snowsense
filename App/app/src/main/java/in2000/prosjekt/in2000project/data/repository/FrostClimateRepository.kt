@@ -63,25 +63,8 @@ class FrostClimateRepository(
 
         val averages = averageByElement(allObservations)
 
-        val dailyAverages = listOf(
-            LocationClimateDataPoint(
-                type = ElementType.MEAN_TEMPERATURE,
-                value = averages[ELEMENT_TEMP]
-            ),
-            LocationClimateDataPoint(
-                type = ElementType.PRECIPITATION,
-                value = averages[ELEMENT_PRECIP]
-            ),
-            LocationClimateDataPoint(
-                type = ElementType.WIND_SPEED,
-                value = averages[ELEMENT_WIND]
-            ),
-            LocationClimateDataPoint(
-                type = ElementType.SNOW_DEPTH,
-                value = averages[ELEMENT_SNOW]
-            )
-
-        )
+        //Transforms averages to a list of LocationClimateDataPoint
+        val dailyAverages = buildDailyAverages(averages)
 
         return LocationClimateData(
             coordinate = coordinate,
@@ -99,73 +82,87 @@ class FrostClimateRepository(
     /** Returns the nearest station to [coordinate], or throws [NoStationFoundException]. */
     private suspend fun getNearestStation(
         coordinate: Coordinate
-    ): FrostV0Source
-        = frostV0DataSource
+    ): FrostV0Source = frostV0DataSource
         .getNearestSource(coordinate)
         .data
         .firstOrNull()
         ?: throw NoStationFoundException(coordinate)
+
+
+    //Builds the list of [LocationClimateDataPoint] from the averages map.
+    private fun buildDailyAverages(
+        averages: Map<String, Double>
+    ): List<LocationClimateDataPoint> = listOf(
+        //This creates a pair of the elementType and its corresponding string constant
+        ElementType.MEAN_TEMPERATURE to ELEMENT_TEMP,
+        ElementType.PRECIPITATION to ELEMENT_PRECIP,
+        ElementType.WIND_SPEED to ELEMENT_WIND,
+        ElementType.SNOW_DEPTH to ELEMENT_SNOW
+    )
+        .map { (type, element) ->
+        LocationClimateDataPoint(type = type, value = averages[element])
+        }
 }
 
 // --- Helper functions (top-level for independent testability) ---
 
-/**
- * Builds a Frost v0 repeating-interval referenceTime string.
- *
- * Returns e.g. "R10/2017-03-23/2017-04-23/P1Y" which tells Frost:
- * "give me data for Mar 23–Apr 22 (inclusive), repeated yearly for 10 years."
- *
- * Handles year-boundary crossings (e.g. Dec 15 – Jan 15).
- *
- * @param periodStart First day of the window (inclusive).
- * @param periodEnd Last day of the window (inclusive). +1 day added internally for Frost's half-open interval.
- * @param yearsBack How many years back to include observations from.
- * @param referenceDate Used to determine which years to query. Pass explicitly in tests for deterministic results.
- */
-internal fun buildRepeatingTimeRange(
-    periodStart: MonthDay,
-    periodEnd: MonthDay,
-    yearsBack: Int,
-    referenceDate: LocalDate = LocalDate.now(),
-): String {
-    require(yearsBack >= 0)
+    /**
+     * Builds a Frost v0 repeating-interval referenceTime string.
+     *
+     * Returns e.g. "R10/2017-03-23/2017-04-23/P1Y" which tells Frost:
+     * "give me data for Mar 23–Apr 22 (inclusive), repeated yearly for 10 years."
+     *
+     * Handles year-boundary crossings (e.g. Dec 15 – Jan 15).
+     *
+     * @param periodStart First day of the window (inclusive).
+     * @param periodEnd Last day of the window (inclusive). +1 day added internally for Frost's half-open interval.
+     * @param yearsBack How many years back to include observations from.
+     * @param referenceDate Used to determine which years to query. Pass explicitly in tests for deterministic results.
+     */
+    internal fun buildRepeatingTimeRange(
+        periodStart: MonthDay,
+        periodEnd: MonthDay,
+        yearsBack: Int,
+        referenceDate: LocalDate = LocalDate.now(),
+    ): String {
+        require(yearsBack >= 0)
 
-    val oldestStartYear = referenceDate.year - yearsBack
+        val oldestStartYear = referenceDate.year - yearsBack
 
-    val firstStart = periodStart.atYearClamped(oldestStartYear)
+        val firstStart = periodStart.atYearClamped(oldestStartYear)
 
-    val crossesYearBoundary = periodStart.isAfter(periodEnd)
+        val crossesYearBoundary = periodStart.isAfter(periodEnd)
 
-    val endYear = if (crossesYearBoundary) oldestStartYear + 1
-                  else oldestStartYear
+        val endYear = if (crossesYearBoundary) oldestStartYear + 1
+        else oldestStartYear
 
-    val firstEnd = periodEnd.atYearClamped(endYear).plusDays(1)
+        val firstEnd = periodEnd.atYearClamped(endYear).plusDays(1)
 
-    return "R${yearsBack + 1}/$firstStart/$firstEnd/P1Y"
-}
+        return "R${yearsBack + 1}/$firstStart/$firstEnd/P1Y"
+    }
 
-/**
- * Like [MonthDay.atYear] but clamps to the last valid day of the month
- *  instead of throwing on e.g. Feb 29 in a non-leap year.
- */
-private fun MonthDay.atYearClamped(
-    year: Int
-): LocalDate
-    = LocalDate.of(
+    /**
+     * Like [MonthDay.atYear] but clamps to the last valid day of the month
+     *  instead of throwing on e.g. Feb 29 in a non-leap year.
+     */
+    private fun MonthDay.atYearClamped(
+        year: Int
+    ): LocalDate = LocalDate.of(
         year,
         month,
         minOf(
             dayOfMonth,
-            month.length(Year.isLeap(year.toLong()))))
+            month.length(Year.isLeap(year.toLong()))
+        )
+    )
 
-/**
- * Groups daily observations by elementId and computes the flat mean for each
- * element. Elements with no observations are absent from the returned map.
- */
-internal fun averageByElement(
-    observations: List<FrostV0Observation>
-): Map<String, Double>
-    = observations
+    /**
+     * Groups daily observations by elementId and computes the flat mean for each
+     * element. Elements with no observations are absent from the returned map.
+     */
+    internal fun averageByElement(
+        observations: List<FrostV0Observation>
+    ): Map<String, Double> = observations
         .groupBy { it.elementId }
         .mapValues { groupedObservations ->
             groupedObservations.value
