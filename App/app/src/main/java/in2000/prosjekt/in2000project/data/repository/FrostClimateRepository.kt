@@ -167,10 +167,7 @@ class FrostClimateRepository(
         month,
         minOf(
             dayOfMonth,
-            month.length(Year.isLeap(year.toLong()))
-        )
-    )
-
+            month.length(Year.isLeap(year.toLong()))))
     /**
      * Groups daily observations by elementId and computes the flat mean for each
      * element. Elements with no observations are absent from the returned map.
