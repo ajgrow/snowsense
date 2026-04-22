@@ -174,10 +174,11 @@ class FrostClimateRepository(
      */
     internal fun averageByElement(
         observations: List<FrostV0Observation>
-    ): Map<String, Double> = observations
-        .groupBy { it.elementId }
-        .mapValues { groupedObservations ->
-            groupedObservations.value
-                .map { observation -> observation.value }
-                .average()
+    ): Map<String, Double>
+        = observations
+            .groupBy { it.elementId }
+            .mapValues { groupedObservations ->
+                groupedObservations.value
+                    .map { observation -> observation.value }
+                    .average()
         }
