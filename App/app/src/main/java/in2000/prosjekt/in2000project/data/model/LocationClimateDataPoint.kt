@@ -4,7 +4,8 @@ import in2000.prosjekt.in2000project.data.model.enums.ElementType
 import in2000.prosjekt.in2000project.data.model.enums.MeasurementUnit
 
 data class LocationClimateDataPoint(
+    val year: Int,
     val type: ElementType,
     val unit: MeasurementUnit = type.unit,
-    val value: Double?
+    val avgValue: Double?
 )
