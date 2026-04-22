@@ -28,14 +28,15 @@ import in2000.prosjekt.in2000project.navigation.Screen
 @Composable
 fun TopBar(
     modifier: Modifier = Modifier,
-    title: String
+    title: String,
+    navController: NavController
 ){
     CenterAlignedTopAppBar(
         modifier =  modifier,
         title = {Text(title)},
         actions = {
             IconButton(
-                onClick = {/*TODO*/}
+                onClick = {navController.navigate(Screen.Settings.route)}
             ) {
                 Icon(
                     imageVector = Icons.Default.Settings,
@@ -118,7 +119,7 @@ fun BottomBar(
 fun TopBarPreview(
     modifier: Modifier = Modifier
 ){
-    TopBar(modifier, "**title**")
+    TopBar(modifier, "**title**", navController = rememberNavController())
 }
 
 @Preview
