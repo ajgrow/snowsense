@@ -211,6 +211,7 @@ fun MapboxView(
                             .withIconImage(bitmap)
                             .withIconSize(0.3)
                         pointAnnotationManager.create(pointAnnotationOptions)
+
                     }
 
                     mapView.gestures.addOnMapClickListener { point ->
