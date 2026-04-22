@@ -6,11 +6,13 @@ import in2000.prosjekt.in2000project.data.datasource.dto.FrostV0Observation
 import in2000.prosjekt.in2000project.data.datasource.dto.FrostV0Source
 import in2000.prosjekt.in2000project.data.model.Coordinate
 import in2000.prosjekt.in2000project.data.model.LocationClimateData
+import in2000.prosjekt.in2000project.data.model.LocationClimateDataPoint
 import in2000.prosjekt.in2000project.data.model.NoObservationsException
 import in2000.prosjekt.in2000project.data.model.NoStationFoundException
 import java.time.LocalDate
 import java.time.MonthDay
 import java.time.Year
+import in2000.prosjekt.in2000project.data.model.enums.ElementType
 
 class FrostClimateRepository(
     private val frostV0DataSource: FrostV0DataSource
@@ -61,6 +63,26 @@ class FrostClimateRepository(
 
         val averages = averageByElement(allObservations)
 
+        val dailyAverages = listOf(
+            LocationClimateDataPoint(
+                type = ElementType.MEAN_TEMPERATURE,
+                value = averages[ELEMENT_TEMP]
+            ),
+            LocationClimateDataPoint(
+                type = ElementType.PRECIPITATION,
+                value = averages[ELEMENT_PRECIP]
+            ),
+            LocationClimateDataPoint(
+                type = ElementType.WIND_SPEED,
+                value = averages[ELEMENT_WIND]
+            ),
+            LocationClimateDataPoint(
+                type = ElementType.SNOW_DEPTH,
+                value = averages[ELEMENT_SNOW]
+            )
+
+        )
+
         return LocationClimateData(
             coordinate = coordinate,
             stationName = station.name,
@@ -70,10 +92,7 @@ class FrostClimateRepository(
             periodEnd = periodEnd,
             yearsBack = yearsBack,
             dataPointCount = allObservations.size,
-            avgDailyMeanTemperatureC = averages[ELEMENT_TEMP],
-            avgDailyPrecipitationMm = averages[ELEMENT_PRECIP],
-            avgDailyMeanWindSpeedMs = averages[ELEMENT_WIND],
-            avgDailyMaxSnowDepthCm = averages[ELEMENT_SNOW],
+            dailyAverages = dailyAverages
         )
     }
 
