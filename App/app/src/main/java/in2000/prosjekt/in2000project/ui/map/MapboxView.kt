@@ -209,6 +209,7 @@ fun MapboxView(
                         val pointAnnotationOptions = PointAnnotationOptions()
                             .withPoint(point)
                             .withIconImage(bitmap)
+                            .withIconSize(0.3)
                         pointAnnotationManager.create(pointAnnotationOptions)
                     }
 
