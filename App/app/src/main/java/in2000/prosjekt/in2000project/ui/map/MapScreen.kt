@@ -32,6 +32,7 @@ import androidx.navigation.compose.rememberNavController
 import in2000.prosjekt.in2000project.data.model.SkiArea
 import in2000.prosjekt.in2000project.ui.reusables.BottomBar
 import in2000.prosjekt.in2000project.ui.reusables.TopBar
+import in2000.prosjekt.in2000project.ui.settings.SettingsViewModel
 
 private val previewSkiArea = SkiArea(
     id = "1",
@@ -48,7 +49,8 @@ fun MapScreenState(
     navController: NavController,
     viewModel: MapViewModel = viewModel(),
     nveViewModel: NveViewModel = viewModel(),
-    coordinates: String = "65.0,10.0"
+    coordinates: String = "65.0,10.0",
+    settingsViewModel: SettingsViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -59,7 +61,8 @@ fun MapScreenState(
         coordinates = coordinates,
         onRetry = { viewModel.getMapData() },
         onOverlayLoaded = {viewModel.onOverlayLoaded()},
-        onOverlayError = {viewModel.onOverlayError()}
+        onOverlayError = {viewModel.onOverlayError()},
+        settingsViewModel = settingsViewModel
     )
 }
 
@@ -74,7 +77,8 @@ fun MapScreen(
     coordinates: String,
     onRetry: () -> Unit,
     onOverlayLoaded: () -> Unit,
-    onOverlayError: () -> Unit
+    onOverlayError: () -> Unit,
+    settingsViewModel: SettingsViewModel
 ) {
 
     // Hardcoded sample data for the MVP, however, when Frost API is ready this should move into the ViewModel
@@ -92,7 +96,7 @@ fun MapScreen(
     }
     Scaffold(
         topBar = {
-            TopBar(modifier = Modifier, title = "MapScreen")
+            TopBar(modifier = Modifier, title = "MapScreen", navController = navController)
         },
         bottomBar = {
             BottomBar(modifier, navController)
@@ -141,7 +145,8 @@ fun MapScreen(
                     onOverlayLoaded = onOverlayLoaded,
                     modifier = Modifier
                         .fillMaxSize(),
-                    coordinates = coordinates
+                    coordinates = coordinates,
+                    settingsViewModel = settingsViewModel
                 )
 
                 when (mapUIState) {
@@ -253,7 +258,8 @@ fun MapScreenErrorPreview() {
         coordinates = "65.0,10.0",
         onRetry = {},
         onOverlayLoaded = {},
-        onOverlayError = {}
+        onOverlayError = {},
+        settingsViewModel = viewModel()
     )
 }
 

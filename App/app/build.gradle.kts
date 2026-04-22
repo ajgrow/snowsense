@@ -81,4 +81,8 @@ dependencies {
 
     // Test
     testImplementation(libs.kotlinx.coroutines.test)
+
+    //DataStore
+    implementation("androidx.datastore:datastore-preferences:1.1.1")
+
 }

@@ -31,7 +31,7 @@ fun InfoScreen(
     Scaffold(
         modifier = modifier,
         topBar = {
-            TopBar(modifier = Modifier, title = "Information")
+            TopBar(modifier = Modifier, title = "Information", navController = navController)
         },
         bottomBar = {
             BottomBar(modifier, navController)
