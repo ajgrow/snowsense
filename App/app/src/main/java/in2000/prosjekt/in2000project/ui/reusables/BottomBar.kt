@@ -55,7 +55,7 @@ fun BottomBar(
                         saveState = true
                     }
                     launchSingleTop = true
-                    restoreState = false
+                    restoreState = true
                 }
             },
             icon = {
