@@ -115,7 +115,7 @@ class FrostClimateRepositoryTest {
     }
 
     @Test
-    fun dailyAverages_computedCorrectly() = runTest {
+    fun yearlyAverages_computedCorrectly() = runTest {
         // temp -2,-4 → avg -3; precip 4.5,6.5 → avg 5.5; wind 3,5 → avg 4.
         fakeDataSource.observationResponse = makeObsResponse(
             makeDay("2024-04-01T00:00:00.000Z", temp = -2.0, precip = 4.5, wind = 3.0),
@@ -128,13 +128,15 @@ class FrostClimateRepositoryTest {
             10,
         )
 
-        val temp = result.dailyAverages.find { it.type == ElementType.MEAN_TEMPERATURE }?.value
-        val precip = result.dailyAverages.find { it.type == ElementType.PRECIPITATION }?.value
-        val wind = result.dailyAverages.find { it.type == ElementType.WIND_SPEED }?.value
+        val temp2024 = result.yearlyAverages.find { it.year == 2024 && it.type == ElementType.MEAN_TEMPERATURE }?.value
+        val temp2025 = result.yearlyAverages.find { it.year == 2025 && it.type == ElementType.MEAN_TEMPERATURE }?.value
+        val precip2024 = result.yearlyAverages.find { it.year == 2024 && it.type == ElementType.PRECIPITATION }?.value
+        val wind2025 = result.yearlyAverages.find { it.year == 2025 && it.type == ElementType.WIND_SPEED }?.value
 
-        assertEquals(-3.0, temp!!, 0.001)
-        assertEquals(5.5, precip!!, 0.001)
-        assertEquals(4.0, wind!!, 0.001)
+        assertEquals(-2.0, temp2024!!, 0.001)
+        assertEquals(-4.0, temp2025!!, 0.001)
+        assertEquals(4.5, precip2024!!, 0.001)
+        assertEquals(5.0, wind2025!!, 0.001)
     }
 
     @Test
@@ -150,7 +152,7 @@ class FrostClimateRepositoryTest {
             10,
         )
 
-        val snow = result.dailyAverages.find { it.type == ElementType.SNOW_DEPTH }?.value
+        val snow = result.yearlyAverages.find { it.year == 2024 && it.type == ElementType.SNOW_DEPTH }?.value
 
         assertNull(snow)
     }
