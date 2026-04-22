@@ -127,11 +127,6 @@ fun MapboxView(
                 mapViewportState = viewportState
             ) {
                 MapEffect(Unit) { mapView ->
-                    //this click listener just works generally on the map
-                    mapView.gestures.addOnMapClickListener { point ->
-                        onMapClick(point)
-                        true //return true to show that the click was handled
-                    }
 
                     mapView.mapboxMap.subscribeMapLoadingError { error ->
                         Log.e(TAG, "Map loading error: ${error.message}")
@@ -219,6 +214,7 @@ fun MapboxView(
 
                     }
 
+                    //this click listener just works generally on the map
                     mapView.gestures.addOnMapClickListener { point ->
                         addPin(point)
                         onMapClick(point)
