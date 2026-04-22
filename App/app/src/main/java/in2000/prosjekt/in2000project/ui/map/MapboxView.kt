@@ -35,6 +35,8 @@ import com.mapbox.maps.plugin.annotation.generated.PointAnnotationOptions
 import com.mapbox.maps.plugin.annotation.generated.createPointAnnotationManager
 import com.mapbox.maps.plugin.gestures.gestures
 import com.mapbox.maps.toCameraOptions
+import in2000.prosjekt.in2000project.ui.settings.SettingsViewModel
+import in2000.prosjekt.in2000project.ui.settings.ThemeMode
 import in2000.prosjekt.in2000project.R
 
 /*
@@ -74,8 +76,21 @@ fun MapboxView(
     coordinates: String,
     onOverlayError: () -> Unit,
     onOverlayLoaded: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    settingsViewModel: SettingsViewModel
 ) {
+
+    val themeMode = settingsViewModel.themeMode
+    val mapStyle = when (themeMode){
+        ThemeMode.DARK -> Style.DARK
+        ThemeMode.LIGHT -> Style.OUTDOORS
+        ThemeMode.SYSTEM ->
+            if (androidx.compose.foundation.isSystemInDarkTheme())
+                Style.DARK
+            else
+                Style.OUTDOORS
+    }
+
     val (hasSearch, searchLat, searchLng) = remember(coordinates) {
         if (coordinates.isNotBlank() && coordinates != "0,0") {
             val parts = coordinates.split(",")
@@ -133,7 +148,7 @@ fun MapboxView(
                         onOverlayError()
                     }
 
-                    mapView.mapboxMap.loadStyle(Style.OUTDOORS) { style ->
+                    mapView.mapboxMap.loadStyle(mapStyle) { style ->
                         onOverlayLoaded()
                         Log.d(TAG, "Style loaded, adding WMS sources")
 
