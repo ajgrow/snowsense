@@ -5,7 +5,6 @@ import in2000.prosjekt.in2000project.network.KtorClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter
-import kotlin.collections.emptyList
 
 class NveDataSource {
 

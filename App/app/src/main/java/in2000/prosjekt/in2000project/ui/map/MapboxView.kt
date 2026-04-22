@@ -2,13 +2,24 @@ package in2000.prosjekt.in2000project.ui.map
 
 import android.util.Log
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import com.mapbox.common.Cancelable
 import com.mapbox.geojson.Point
+import com.mapbox.maps.CameraBoundsOptions
 import com.mapbox.maps.CameraOptions
+import com.mapbox.maps.CoordinateBounds
 import com.mapbox.maps.Style
+import com.mapbox.maps.dsl.cameraOptions
 import com.mapbox.maps.extension.compose.MapEffect
 import com.mapbox.maps.extension.compose.MapboxMap
 import com.mapbox.maps.extension.compose.animation.viewport.rememberMapViewportState
@@ -16,11 +27,21 @@ import com.mapbox.maps.extension.style.layers.addLayer
 import com.mapbox.maps.extension.style.layers.generated.rasterLayer
 import com.mapbox.maps.extension.style.sources.addSource
 import com.mapbox.maps.extension.style.sources.generated.rasterSource
+import com.mapbox.maps.plugin.animation.MapAnimationOptions
 import com.mapbox.maps.plugin.gestures.gestures
 import com.mapbox.maps.toCameraOptions
 
+/*
+This global object is bad practice but it works and I
+have not found any other practical working alternatives.
+*/
 object MapCameraRepository {
     var lastCameraOptions: CameraOptions? = null
+        private set
+
+    fun updateCameraOptions(options: CameraOptions) {
+        lastCameraOptions = options
+    }
 }
 private const val TAG = "SnoskredWMS"
 
@@ -38,14 +59,16 @@ private const val WMS_OVERVIEW =
 private const val WMS_DETAIL =
     "$WMS_BASE?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap" +
             "&BBOX={bbox-epsg-3857}&CRS=EPSG:3857&WIDTH=256&HEIGHT=256" +
-            "&LAYERS=" +
-            "S2_snoskred_m_skogeffekt_Aktsomhetsomrade," +
+            "&LAYERS=S2_snoskred_m_skogeffekt_Aktsomhetsomrade" +
             "&STYLES=&FORMAT=image/png&TRANSPARENT=TRUE"
 
 @Composable
-fun MapboxMapScreen(
+fun MapboxView(
     onMapClick: (Point) -> Unit,
-    coordinates: String
+    coordinates: String,
+    onOverlayError: () -> Unit,
+    onOverlayLoaded: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     val (hasSearch, searchLat, searchLng) = remember(coordinates) {
         if (coordinates.isNotBlank() && coordinates != "0,0") {
@@ -62,7 +85,7 @@ fun MapboxMapScreen(
                 .center(Point.fromLngLat(searchLng, searchLat))
                 .zoom(12.0)
                 .build()
-                .also { MapCameraRepository.lastCameraOptions = it }
+                .also { MapCameraRepository.updateCameraOptions(it) }
         } else {
             MapCameraRepository.lastCameraOptions ?: CameraOptions.Builder()
                 .center(Point.fromLngLat(10.75, 59.91))
@@ -75,46 +98,42 @@ fun MapboxMapScreen(
         setCameraOptions(initialCamera)
     }
 
-    var idleSubscription by remember { mutableStateOf<Cancelable?>(null) }
-
-    DisposableEffect(Unit) {
-        onDispose {
-            viewportState.cameraState?.toCameraOptions()?.let {
-                MapCameraRepository.lastCameraOptions = it
-            }
-            idleSubscription?.cancel()
-        }
-    }
 
     val mapRecreateKey = remember(hasSearch, searchLat, searchLng) {
         if (hasSearch) System.currentTimeMillis() else "default"
     }
 
-
-
     DisposableEffect(Unit) {
         onDispose {
-
+            viewportState.cameraState?.toCameraOptions()?.let {
+                MapCameraRepository.updateCameraOptions(it)
+            }
         }
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        key(mapRecreateKey){
+    key(mapRecreateKey) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+        ){
             MapboxMap(
-                modifier = Modifier.fillMaxSize(),
+                modifier = modifier,
                 mapViewportState = viewportState
             ) {
-                //this click listener just works generally on the map
                 MapEffect(Unit) { mapView ->
+                    //this click listener just works generally on the map
                     mapView.gestures.addOnMapClickListener { point ->
-
                         onMapClick(point)
                         true //return true to show that the click was handled
                     }
-                }
 
-                MapEffect(Unit) { mapView ->
+                    mapView.mapboxMap.subscribeMapLoadingError { error ->
+                        Log.e(TAG, "Map loading error: ${error.message}")
+                        onOverlayError()
+                    }
+
                     mapView.mapboxMap.loadStyle(Style.OUTDOORS) { style ->
+                        onOverlayLoaded()
                         Log.d(TAG, "Style loaded, adding WMS sources")
 
                         // Low zoom data
@@ -148,18 +167,80 @@ fun MapboxMapScreen(
                             rasterLayer("snoskred-detail-layer", "snoskred-detail-source") {
                                 rasterOpacity(0.9)
                                 minZoom(8.0)
+                                rasterHueRotate(160.0)
                             }
                         )
                     }
-                }
-                MapEffect(Unit) { mapView ->
+
+                    var idleSubscription: Cancelable? = null
                     idleSubscription = mapView.mapboxMap.subscribeMapIdle {
                         viewportState.cameraState?.toCameraOptions()?.let {
-                            MapCameraRepository.lastCameraOptions = it
+                            MapCameraRepository.updateCameraOptions(it)
                         }
                     }
+
+                    val mapBoxMap = mapView.mapboxMap
+
+                    val bounds = CoordinateBounds(
+                        Point.fromLngLat(2.5, 55.9),
+                        Point.fromLngLat(31.5, 71.5)
+                    )
+
+                    mapBoxMap.setBounds(
+                        CameraBoundsOptions.Builder()
+                            .bounds(bounds)
+                            .minZoom(3.5)
+                            .maxZoom(18.0)
+                            .build()
+                    )
+                }
+            }
+            Column(
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(16.dp)
+            ) {
+                Button(
+                    onClick = {
+                        val currentZoom = viewportState
+                            .cameraState?.zoom ?: 10.0
+                        viewportState.easeTo(
+                            cameraOptions {
+                                zoom(currentZoom + 1.0)
+                            },
+                            MapAnimationOptions.Builder()
+                                .duration(300)
+                                .build()
+                        )
+                    }
+                ) {
+                    Text(
+                        text = "+"
+                    )
+                }
+
+                Spacer(Modifier.height(8.dp))
+
+                Button(
+                    onClick = {
+                        val currentZoom = viewportState
+                            .cameraState?.zoom ?: 10.0
+                        viewportState.easeTo(
+                            cameraOptions {
+                                zoom(currentZoom - 1.0)
+                            },
+                            MapAnimationOptions.Builder()
+                                .duration(300)
+                                .build()
+                        )
+                    }
+                ) {
+                    Text(
+                        text = "-"
+                    )
                 }
             }
         }
     }
 }
+
