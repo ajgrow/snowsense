@@ -85,4 +85,8 @@ dependencies {
     //DataStore
     implementation("androidx.datastore:datastore-preferences:1.1.1")
 
+    // Graph
+    implementation("com.patrykandpatrick.vico:compose:1.13.1")
+    implementation("androidx.compose.foundation:foundation:1.6.0")
+
 }

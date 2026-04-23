@@ -1,18 +1,25 @@
 package in2000.prosjekt.in2000project.ui.map
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SheetState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -22,6 +29,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.tooling.preview.Preview
@@ -29,6 +37,12 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.patrykandpatrick.vico.compose.axis.horizontal.rememberBottomAxis
+import com.patrykandpatrick.vico.compose.axis.vertical.rememberStartAxis
+import com.patrykandpatrick.vico.compose.chart.Chart
+import com.patrykandpatrick.vico.compose.chart.line.lineChart
+import com.patrykandpatrick.vico.core.entry.entryModelOf
+import com.patrykandpatrick.vico.core.entry.entryOf
 import in2000.prosjekt.in2000project.data.model.SkiArea
 import in2000.prosjekt.in2000project.ui.reusables.BottomBar
 import in2000.prosjekt.in2000project.ui.reusables.TopBar
@@ -52,6 +66,8 @@ fun MapScreenState(
     coordinates: String = "65.0,10.0",
     settingsViewModel: SettingsViewModel = viewModel()
 ) {
+    val sheetState by viewModel.sheetState.collectAsState()
+
     val uiState by viewModel.uiState.collectAsState()
 
     MapScreen(
@@ -62,7 +78,11 @@ fun MapScreenState(
         onRetry = { viewModel.getMapData() },
         onOverlayLoaded = {viewModel.onOverlayLoaded()},
         onOverlayError = {viewModel.onOverlayError()},
-        settingsViewModel = settingsViewModel
+        settingsViewModel = settingsViewModel,
+        sheetState = sheetState,
+        onOpenSheet = { viewModel.openSheet()},
+        onCloseSheet = { viewModel.closeSheet()},
+        onChangeSheet = { viewModel.changeSheetView()}
     )
 }
 
@@ -78,7 +98,11 @@ fun MapScreen(
     onRetry: () -> Unit,
     onOverlayLoaded: () -> Unit,
     onOverlayError: () -> Unit,
-    settingsViewModel: SettingsViewModel
+    settingsViewModel: SettingsViewModel,
+    sheetState: MapUISheetState,
+    onOpenSheet: () -> Unit,
+    onCloseSheet: () -> Unit,
+    onChangeSheet: () -> Unit
 ) {
 
     // Hardcoded sample data for the MVP, however, when Frost API is ready this should move into the ViewModel
@@ -87,7 +111,6 @@ fun MapScreen(
     val dangerCheckUiState by nveViewModel.dangerCheckUiState.collectAsState()
     //Controls whether the bottom sheet is visible or not by keeping track of if the user has clicked the map
     //if this is set to null then the ModalBottomSheet is not open
-    var isSheetOpen by rememberSaveable { mutableStateOf(false) }
 
     val avalancheStatus = when {
         dangerCheckUiState.isDanger == true -> "High"
@@ -138,7 +161,7 @@ fun MapScreen(
                 //onMapClick is passed to the Map
                 MapboxView(
                     onMapClick = { point ->
-                        isSheetOpen = true
+                        onOpenSheet()
                         nveViewModel.avalancheChecker(point.latitude(), point.longitude())
                     },
                     onOverlayError = onOverlayError,
@@ -170,9 +193,9 @@ fun MapScreen(
     }
 
     //This is for the bottom sheet - if isSheetOpen is set to true, then it will open otherwise, it stays closed
-    if (isSheetOpen){
+    if (sheetState.isSheetOpen){
         ModalBottomSheet(
-            onDismissRequest = { isSheetOpen = false },
+            onDismissRequest = onCloseSheet,
             containerColor = MaterialTheme.colorScheme.surface,
             tonalElevation = 0.dp,
             dragHandle = null
@@ -184,7 +207,9 @@ fun MapScreen(
                     .fillMaxWidth()
                     .heightIn(min = 320.dp)
                     .navigationBarsPadding()
-                    .padding(bottom = 24.dp)
+                    .padding(bottom = 24.dp),
+                sheetView = sheetState.sheetView,
+                onChangeSheet = onChangeSheet
             )
         }
     }
@@ -194,7 +219,10 @@ fun MapScreen(
 fun SkiAreaBottomSheetContent(
     area: SkiArea,
     avalancheStatus: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    sheetView: SheetView,
+    onChangeSheet: () -> Unit,
+
 ) {
     // This is the content inside the bottom sheet.
     Surface(
@@ -207,25 +235,144 @@ fun SkiAreaBottomSheetContent(
                 .padding(horizontal = 20.dp, vertical = 16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            // Area name
-            Text(
-                text = area.name,
-                style = MaterialTheme.typography.headlineSmall
-            )
 
-            // Description of the content
-            Text(
-                text = "Historical Climate Summary",
-                style = MaterialTheme.typography.titleMedium
-            )
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {onChangeSheet() }
+                    .padding(vertical = 8.dp),
+                contentAlignment = Alignment.Center
+            ){
+                if (sheetView == SheetView.RISK){
+                    Text("Show Trends")
+                } else {
+                    Text("Shoe Risk")
+                }
+            }
 
-            HorizontalDivider()
+            when (sheetView){
+                SheetView.RISK -> {
+                    // Area name
+                    Text(
+                        text = area.name,
+                        style = MaterialTheme.typography.headlineSmall
+                    )
 
-            // Placeholder rows for climate information
-            ClimateRow(label = "Avalanche danger", value = avalancheStatus)
-            ClimateRow("Average snowfall", area.averageSnowfall)
-            ClimateRow("Average precipitation", area.averagePrecipitation)
-            ClimateRow("Average temperature", area.dailyMeanTemperature)
+                    // Description of the content
+                    Text(
+                        text = "Historical Climate Summary",
+                        style = MaterialTheme.typography.titleMedium
+                    )
+
+                    HorizontalDivider()
+
+                    // Placeholder rows for climate information
+                    ClimateRow(label = "Avalanche danger", value = avalancheStatus)
+                    ClimateRow("Average snowfall", area.averageSnowfall)
+                    ClimateRow("Average precipitation", area.averagePrecipitation)
+                    ClimateRow("Average temperature", area.dailyMeanTemperature)
+                }
+
+                SheetView.TRENDS ->{
+                    val pagerState = rememberPagerState(pageCount =  {3 })
+                    Text(
+                        text = area.name,
+                        style = MaterialTheme.typography.headlineSmall
+                    )
+
+                    Text(
+                        text = "Climate Trends",
+                        style = MaterialTheme.typography.titleMedium
+                    )
+
+                    HorizontalDivider()
+
+                    val temperatureData = listOf(
+                        2018 to -2f,
+                        2019 to -1f,
+                        2020 to 0f,
+                        2021 to -3f,
+                        2022 to 3f
+                    )
+
+                    val percipitationData = listOf(
+                        2018 to 80f,
+                        2019 to 95f,
+                        2020 to 100f,
+                        2021 to 90f,
+                        2022 to 110f
+                    )
+
+                    val snowfallData = listOf(
+                        2018 to 200f,
+                        2019 to 220f,
+                        2020 to 210f,
+                        2021 to 230f,
+                        2022 to 240f
+                    )
+
+                    HorizontalPager(
+                        state = pagerState,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(220.dp)
+                    ) {page ->
+                        val (title, data) = when (page){
+                            0 -> "Temperature (°C)" to temperatureData
+                            1 -> "Percipitation (mm)" to percipitationData
+                            else -> "Snowfall (cm)" to snowfallData
+                        }
+
+                        val entries = remember(data) {
+                            data.map { (year, value) ->
+                                entryOf(year.toFloat(), value)
+                            }
+                        }
+
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                text = title,
+                                style = MaterialTheme.typography.titleMedium
+                            )
+
+                            Chart(
+                                chart = lineChart(),
+                                model = entryModelOf(entries),
+                                startAxis = rememberStartAxis(),
+                                bottomAxis = rememberBottomAxis(),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(180.dp)
+                            )
+                        }
+                    }
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        repeat(3){ index ->
+                            val selected = pagerState.currentPage == index
+
+                            Box(
+                                modifier = Modifier
+                                    .padding(4.dp)
+                                    .height(10.dp)
+                                    .fillMaxWidth(0.02f)
+                                    .background(color =
+                                        if(selected)
+                                            MaterialTheme.colorScheme.primary
+                                        else
+                                            MaterialTheme.colorScheme.outline
+                                    )
+                            )
+                        }
+                    }
+
+                }
+            }
         }
     }
 }
@@ -259,7 +406,14 @@ fun MapScreenErrorPreview() {
         onRetry = {},
         onOverlayLoaded = {},
         onOverlayError = {},
-        settingsViewModel = viewModel()
+        settingsViewModel = viewModel(),
+        sheetState = MapUISheetState(
+            isSheetOpen = true,
+            sheetView = SheetView.RISK
+        ),
+        onOpenSheet = {},
+        onCloseSheet = {},
+        onChangeSheet = {}
     )
 }
 
@@ -269,6 +423,8 @@ fun MapScreenErrorPreview() {
 fun BottomSheetPreview() {
     SkiAreaBottomSheetContent(
         area = previewSkiArea,
-        avalancheStatus = "High"
+        avalancheStatus = "High",
+        sheetView = SheetView.RISK,
+        onChangeSheet = {}
     )
 }
