@@ -185,21 +185,12 @@ class FrostClimateRepository(
         val totalScore = newSnowLoad + weakLayerPresence + slabFormation + tempTrend
 
         val dangerLevelType = when (totalScore) {
-            in 0..15 -> DangerLevelType.UNLIKELY
-            in 16..35 -> DangerLevelType.LOW
-            in 36..55 -> DangerLevelType.MODERATE
+            in 0..15 -> DangerLevelType.LOW
+            in 16..35 -> DangerLevelType.MODERATE
+            in 36..55 -> DangerLevelType.CONSIDERABLE
             in 56..75 -> DangerLevelType.HIGH
             else -> DangerLevelType.VERY_HIGH
         }
-
-        /*
-        val longDescription = when (dangerLevelType) {
-            DangerLevelType.UNLIKELY -> "Snowpack appears mostly stable with little recent loading or warming."
-            DangerLevelType.LOW -> "Some instability may exist, but overall slab avalanche risk is limited."
-            DangerLevelType.MODERATE -> "Recent snow loading, weak layers, or warming may create unstable slab conditions."
-            DangerLevelType.HIGH -> "Significant slab avalanche conditions are present due to loading and/or warming."
-            DangerLevelType.VERY_HIGH -> "Very unstable snowpack with strong indicators of slab avalanche danger."
-        }*/
 
         val dangerLevel = DangerLevel(
             type = dangerLevelType,
