@@ -2,9 +2,9 @@ package in2000.prosjekt.in2000project.data.model
 
 
 enum class DangerLevelType(val level: Int, val label: String) {
-    UNLIKELY(1, "Unlikely"),
-    LOW(2, "Low"),
-    MODERATE(3, "Moderate"),
+    LOW(1, "Low"),
+    MODERATE(2, "Moderate"),
+    CONSIDERABLE(3, "Considerable"),
     HIGH(4, "High"),
     VERY_HIGH(5, "Very High")
 }
