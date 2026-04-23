@@ -57,10 +57,8 @@ class FrostClimateRepository(
 
         if (allObservations.isEmpty())
             throw NoObservationsException(
-                stationName = station.name,
-                message = "Station ${station.name} has no observations for " +
-                        "$periodStart–$periodEnd over the last $yearsBack years",
-            )
+                station.name, periodStart, periodEnd, yearsBack)
+
 
         val averages = averageByElement(allObservations)
 
