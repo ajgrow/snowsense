@@ -15,6 +15,7 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -89,6 +90,10 @@ fun MapScreen(
     //if this is set to null then the ModalBottomSheet is not open
     var isSheetOpen by rememberSaveable { mutableStateOf(false) }
 
+    var skipPartiallyExpanded by rememberSaveable {mutableStateOf(false)}
+
+    val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = skipPartiallyExpanded)
+
     val avalancheStatus = when {
         dangerCheckUiState.isDanger == true -> "High"
         dangerCheckUiState.isDanger == false -> "Low"
@@ -125,9 +130,6 @@ fun MapScreen(
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.padding(bottom = 16.dp)
             )
-
-
-
 
             Box(
                 modifier = Modifier
@@ -173,11 +175,11 @@ fun MapScreen(
     if (isSheetOpen){
         ModalBottomSheet(
             onDismissRequest = { isSheetOpen = false },
+            sheetState = bottomSheetState,
             containerColor = MaterialTheme.colorScheme.surface,
-            tonalElevation = 0.dp,
-            dragHandle = null
+            tonalElevation = 0.dp
         ) {
-            SkiAreaBottomSheetContent(
+            BottomSheetContent(
                 area = skiArea,
                 avalancheStatus = avalancheStatus,
                 modifier = Modifier
@@ -191,7 +193,7 @@ fun MapScreen(
 }
 
 @Composable
-fun SkiAreaBottomSheetContent(
+fun BottomSheetContent(
     area: SkiArea,
     avalancheStatus: String,
     modifier: Modifier = Modifier
@@ -267,7 +269,7 @@ fun MapScreenErrorPreview() {
 @Preview(showBackground = true)
 @Composable
 fun BottomSheetPreview() {
-    SkiAreaBottomSheetContent(
+    BottomSheetContent(
         area = previewSkiArea,
         avalancheStatus = "High"
     )
