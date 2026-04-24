@@ -32,6 +32,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import in2000.prosjekt.in2000project.data.model.SkiArea
+import in2000.prosjekt.in2000project.data.model.toSkiArea
 import in2000.prosjekt.in2000project.ui.reusables.BottomBar
 import in2000.prosjekt.in2000project.ui.reusables.TopBar
 import org.koin.compose.viewmodel.koinViewModel
@@ -69,7 +70,8 @@ fun MapRoute(
         onOverlayRetry = { mapViewModel.onOverlayLoading() },
         onOverlayLoaded = { mapViewModel.onOverlayLoaded()},
         onOverlayError = { mapViewModel.onOverlayError()},
-        onSheetDismiss = { mapViewModel.onSheetDismissed() }
+        onSheetDismiss = { mapViewModel.onSheetDismissed() },
+        settingsViewModel = settingsViewModel
     )
 }
 
@@ -86,8 +88,7 @@ fun MapScreen(
     onOverlayRetry: () -> Unit,
     onOverlayLoaded: () -> Unit,
     onOverlayError: () -> Unit,
-    onSheetDismiss: () -> Unit
-    onOverlayError: () -> Unit,
+    onSheetDismiss: () -> Unit,
     settingsViewModel: SettingsViewModel
 ) {
     val skiArea = when (val state = screenState.climateState) {
@@ -306,7 +307,6 @@ fun MapScreenErrorPreview() {
         onOverlayLoaded = {},
         onOverlayError = {},
         onSheetDismiss = {},
-        onOverlayError = {},
         settingsViewModel = viewModel()
     )
 }

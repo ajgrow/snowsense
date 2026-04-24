@@ -10,8 +10,8 @@ data class MapScreenState(
     val overlayState: OverlayState = OverlayState.Loading,
     val climateState: ClimateState = ClimateState.Idle,
     val climateCoordinate: Coordinate? = null,
-    val periodStart: MonthDay = MonthDay.now(),
-    val periodEnd: MonthDay = MonthDay.now(),
+    val periodStart: MonthDay = MonthDay.of(1, 1),
+    val periodEnd: MonthDay = MonthDay.of(12, 31),
     val yearsBack: Int = 1
 )
 
