@@ -3,11 +3,16 @@ package in2000.prosjekt.in2000project.ui.map
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -21,6 +26,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -34,6 +40,7 @@ import in2000.prosjekt.in2000project.data.model.SkiArea
 import in2000.prosjekt.in2000project.ui.reusables.BottomBar
 import in2000.prosjekt.in2000project.ui.reusables.TopBar
 import in2000.prosjekt.in2000project.ui.settings.SettingsViewModel
+import kotlinx.coroutines.launch
 
 private val previewSkiArea = SkiArea(
     id = "1",
@@ -93,6 +100,8 @@ fun MapScreen(
     var skipPartiallyExpanded by rememberSaveable {mutableStateOf(false)}
 
     val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = skipPartiallyExpanded)
+
+    val scope = rememberCoroutineScope()
 
     val avalancheStatus = when {
         dangerCheckUiState.isDanger == true -> "High"
@@ -177,7 +186,8 @@ fun MapScreen(
             onDismissRequest = { isSheetOpen = false },
             sheetState = bottomSheetState,
             containerColor = MaterialTheme.colorScheme.surface,
-            tonalElevation = 0.dp
+            tonalElevation = 0.dp,
+            modifier = Modifier.fillMaxHeight()
         ) {
             BottomSheetContent(
                 area = skiArea,
@@ -198,36 +208,50 @@ fun BottomSheetContent(
     avalancheStatus: String,
     modifier: Modifier = Modifier
 ) {
+
+    val climateRows = listOf(
+        "Avalanche status" to avalancheStatus,
+        "Average snowfall" to "TODO",
+        "Average rainfall" to "TODO",
+        "Average temperature" to "TODO"
+    )
+
     // This is the content inside the bottom sheet.
     Surface(
         modifier = modifier.fillMaxWidth(),
         color = MaterialTheme.colorScheme.surface
     ) {
-        Column(
+        LazyColumn(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 20.dp, vertical = 16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            // Area name
-            Text(
-                text = area.name,
-                style = MaterialTheme.typography.headlineSmall
-            )
 
-            // Description of the content
-            Text(
-                text = "Historical Climate Summary",
-                style = MaterialTheme.typography.titleMedium
-            )
+            item {
+                // Area name
+                Text(
+                    text = area.name,
+                    style = MaterialTheme.typography.headlineSmall
+                )
 
-            HorizontalDivider()
+                // Description of the content
+                Text(
+                    text = "Historical Climate Summary",
+                    style = MaterialTheme.typography.titleMedium
+                )
+            }
 
-            // Placeholder rows for climate information
-            ClimateRow(label = "Avalanche danger", value = avalancheStatus)
-            ClimateRow("Average snowfall", area.averageSnowfall)
-            ClimateRow("Average precipitation", area.averagePrecipitation)
-            ClimateRow("Average temperature", area.dailyMeanTemperature)
+            item {
+                HorizontalDivider()
+            }
+
+            items(climateRows) { row ->
+                ClimateRow(
+                    label = row.first,
+                    value = row.second)
+
+            }
         }
     }
 }
