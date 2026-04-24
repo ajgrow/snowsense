@@ -1,6 +1,9 @@
 package in2000.prosjekt.in2000project.ui.map
 
 import android.util.Log
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import in2000.prosjekt.in2000project.data.model.Coordinate
@@ -133,4 +136,3 @@ class MapViewModel(
     }
 
 }
-

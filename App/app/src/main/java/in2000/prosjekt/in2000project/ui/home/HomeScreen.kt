@@ -55,7 +55,7 @@ fun HomeScreen(
 
     Scaffold(
         modifier = modifier,
-        topBar = { TopBar(title = "Home") },
+        topBar = { TopBar(title = "Home", navController = navController) },
         bottomBar = { BottomBar(modifier, navController) }
     ) { paddingValues ->
         Column(

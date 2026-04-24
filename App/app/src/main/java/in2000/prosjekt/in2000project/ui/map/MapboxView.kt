@@ -1,14 +1,26 @@
 package in2000.prosjekt.in2000project.ui.map
 
+import android.graphics.BitmapFactory
 import android.util.Log
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import com.mapbox.common.Cancelable
 import com.mapbox.geojson.Point
 import com.mapbox.maps.CameraBoundsOptions
 import com.mapbox.maps.CameraOptions
 import com.mapbox.maps.CoordinateBounds
 import com.mapbox.maps.Style
+import com.mapbox.maps.dsl.cameraOptions
 import com.mapbox.maps.extension.compose.MapEffect
 import com.mapbox.maps.extension.compose.MapboxMap
 import com.mapbox.maps.extension.compose.animation.viewport.rememberMapViewportState
@@ -16,8 +28,16 @@ import com.mapbox.maps.extension.style.layers.addLayer
 import com.mapbox.maps.extension.style.layers.generated.rasterLayer
 import com.mapbox.maps.extension.style.sources.addSource
 import com.mapbox.maps.extension.style.sources.generated.rasterSource
+import com.mapbox.maps.plugin.animation.MapAnimationOptions
+import com.mapbox.maps.plugin.annotation.annotations
+import com.mapbox.maps.plugin.annotation.generated.PointAnnotationManager
+import com.mapbox.maps.plugin.annotation.generated.PointAnnotationOptions
+import com.mapbox.maps.plugin.annotation.generated.createPointAnnotationManager
 import com.mapbox.maps.plugin.gestures.gestures
 import com.mapbox.maps.toCameraOptions
+import in2000.prosjekt.in2000project.ui.settings.SettingsViewModel
+import in2000.prosjekt.in2000project.ui.settings.ThemeMode
+import in2000.prosjekt.in2000project.R
 
 /*
 This global object is bad practice but it works and I
@@ -56,8 +76,21 @@ fun MapboxView(
     coordinates: String,
     onOverlayError: () -> Unit,
     onOverlayLoaded: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    settingsViewModel: SettingsViewModel
 ) {
+
+    val themeMode = settingsViewModel.themeMode
+    val mapStyle = when (themeMode){
+        ThemeMode.DARK -> Style.DARK
+        ThemeMode.LIGHT -> Style.OUTDOORS
+        ThemeMode.SYSTEM ->
+            if (androidx.compose.foundation.isSystemInDarkTheme())
+                Style.DARK
+            else
+                Style.OUTDOORS
+    }
+
     val (hasSearch, searchLat, searchLng) = remember(coordinates) {
         if (coordinates.isNotBlank() && coordinates != "0,0") {
             val parts = coordinates.split(",")
@@ -100,42 +133,45 @@ fun MapboxView(
     }
 
     key(mapRecreateKey) {
-        MapboxMap(
-            modifier = modifier,
-            mapViewportState = viewportState
-        ) {
-            MapEffect(Unit) { mapView ->
-                //this click listener just works generally on the map
-                mapView.gestures.addOnMapClickListener { point ->
-                    onMapClick(point)
-                    true //return true to show that the click was handled
-                }
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+        ){
+            MapboxMap(
+                modifier = modifier,
+                mapViewportState = viewportState
+            ) {
+                MapEffect(Unit) { mapView ->
+                    mapView.gestures.addOnMapClickListener { point ->
+                        onMapClick(point)
+                        true //return true to show that the click was handled
+                    }
 
-                mapView.mapboxMap.subscribeMapLoadingError { error ->
-                    Log.e(TAG, "Map loading error: ${error.message}")
-                    onOverlayError()
-                }
+                    mapView.mapboxMap.subscribeMapLoadingError { error ->
+                        Log.e(TAG, "Map loading error: ${error.message}")
+                        onOverlayError()
+                    }
 
-                mapView.mapboxMap.loadStyle(Style.OUTDOORS) { style ->
-                    onOverlayLoaded()
-                    Log.d(TAG, "Style loaded, adding WMS sources")
+                    mapView.mapboxMap.loadStyle(mapStyle) { style ->
+                        onOverlayLoaded()
+                        Log.d(TAG, "Style loaded, adding WMS sources")
 
-                    // Low zoom data
-                    style.addSource(
-                        rasterSource("snoskred-overview-source") {
-                            tiles(listOf(WMS_OVERVIEW))
-                            tileSize(256)
-                            minzoom(4)
-                            maxzoom(12)
-                            attribution("© NVE")
-                        }
-                    )
-                    style.addLayer(
-                        rasterLayer("snoskred-overview-layer", "snoskred-overview-source") {
-                            rasterOpacity(0.5)
-                            maxZoom(11.5)
-                        }
-                    )
+                        // Low zoom data
+                        style.addSource(
+                            rasterSource("snoskred-overview-source") {
+                                tiles(listOf(WMS_OVERVIEW))
+                                tileSize(256)
+                                minzoom(4)
+                                maxzoom(12)
+                                attribution("© NVE")
+                            }
+                        )
+                        style.addLayer(
+                            rasterLayer("snoskred-overview-layer", "snoskred-overview-source") {
+                                rasterOpacity(0.5)
+                                maxZoom(11.5)
+                            }
+                        )
 
                         // High zoom data
                         style.addSource(
@@ -170,13 +206,97 @@ fun MapboxView(
                     Point.fromLngLat(31.5, 71.5)
                 )
 
-                mapBoxMap.setBounds(
-                    CameraBoundsOptions.Builder()
-                        .bounds(bounds)
-                        .minZoom(3.5)
-                        .maxZoom(18.0)
-                        .build()
-                )
+                    mapBoxMap.setBounds(
+                        CameraBoundsOptions.Builder()
+                            .bounds(bounds)
+                            .minZoom(3.5)
+                            .maxZoom(18.0)
+                            .build()
+                    )
+
+
+                    val annotationApi = mapView.annotations
+                    val pointAnnotationManager: PointAnnotationManager = annotationApi.createPointAnnotationManager()
+
+                    fun addPin(point: Point){
+                        pointAnnotationManager.deleteAll()
+                        val bitmap = BitmapFactory.decodeResource(
+                            mapView.context.resources,
+                            R.drawable.red_marker
+                        )
+
+                        val pointAnnotationOptions = PointAnnotationOptions()
+                            .withPoint(point)
+                            .withIconImage(bitmap)
+                            .withIconSize(0.3)
+                        pointAnnotationManager.create(pointAnnotationOptions)
+
+                    }
+
+                    //this click listener just works generally on the map
+                    mapView.gestures.addOnMapClickListener { point ->
+                        addPin(point)
+                        onMapClick(point)
+                        true
+                    }
+
+                    if (hasSearch && searchLat != null && searchLng != null){
+                        val searchPoint = Point.fromLngLat(searchLng, searchLat)
+
+                        mapView.mapboxMap.setCamera(
+                            CameraOptions
+                                .Builder()
+                                .center(searchPoint)
+                                .zoom(12.0)
+                                .build())
+                        addPin(searchPoint)
+                    }
+                }
+            }
+            Column(
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(16.dp)
+            ) {
+                Button(
+                    onClick = {
+                        val currentZoom = viewportState
+                            .cameraState?.zoom ?: 10.0
+                        viewportState.easeTo(
+                            cameraOptions {
+                                zoom(currentZoom + 1.0)
+                            },
+                            MapAnimationOptions.Builder()
+                                .duration(300)
+                                .build()
+                        )
+                    }
+                ) {
+                    Text(
+                        text = "+"
+                    )
+                }
+
+                Spacer(Modifier.height(8.dp))
+
+                Button(
+                    onClick = {
+                        val currentZoom = viewportState
+                            .cameraState?.zoom ?: 10.0
+                        viewportState.easeTo(
+                            cameraOptions {
+                                zoom(currentZoom - 1.0)
+                            },
+                            MapAnimationOptions.Builder()
+                                .duration(300)
+                                .build()
+                        )
+                    }
+                ) {
+                    Text(
+                        text = "-"
+                    )
+                }
             }
         }
     }

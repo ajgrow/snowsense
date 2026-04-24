@@ -31,14 +31,12 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import in2000.prosjekt.in2000project.MainActivity
 import in2000.prosjekt.in2000project.data.model.SkiArea
-import in2000.prosjekt.in2000project.data.model.toSkiArea
-import in2000.prosjekt.in2000project.data.repository.FrostClimateRepository
 import in2000.prosjekt.in2000project.ui.reusables.BottomBar
 import in2000.prosjekt.in2000project.ui.reusables.TopBar
 import org.koin.compose.viewmodel.koinViewModel
 import java.time.MonthDay
+import in2000.prosjekt.in2000project.ui.settings.SettingsViewModel
 
 private val previewSkiArea = SkiArea(
     id = "1",
@@ -54,7 +52,8 @@ fun MapRoute(
     navController: NavController,
     coordinates: String,
     mapViewModel: MapViewModel = koinViewModel(),
-    nveViewModel: NveViewModel = viewModel()
+    nveViewModel: NveViewModel = viewModel(),
+    settingsViewModel: SettingsViewModel = viewModel()
 ) {
     val screenState by mapViewModel.screenState.collectAsState()
 
@@ -88,6 +87,8 @@ fun MapScreen(
     onOverlayLoaded: () -> Unit,
     onOverlayError: () -> Unit,
     onSheetDismiss: () -> Unit
+    onOverlayError: () -> Unit,
+    settingsViewModel: SettingsViewModel
 ) {
     val skiArea = when (val state = screenState.climateState) {
         is ClimateState.Success -> state.data.toSkiArea()
@@ -112,7 +113,7 @@ fun MapScreen(
     }
     Scaffold(
         topBar = {
-            TopBar(modifier = Modifier, title = "MapScreen")
+            TopBar(modifier = Modifier, title = "MapScreen", navController = navController)
         },
         bottomBar = {
             BottomBar(modifier, navController)
@@ -161,7 +162,8 @@ fun MapScreen(
                     onOverlayLoaded = onOverlayLoaded,
                     modifier = Modifier
                         .fillMaxSize(),
-                    coordinates = coordinates
+                    coordinates = coordinates,
+                    settingsViewModel = settingsViewModel
                 )
 
 
@@ -303,7 +305,9 @@ fun MapScreenErrorPreview() {
         onOverlayRetry = {},
         onOverlayLoaded = {},
         onOverlayError = {},
-        onSheetDismiss = {}
+        onSheetDismiss = {},
+        onOverlayError = {},
+        settingsViewModel = viewModel()
     )
 }
 
