@@ -15,8 +15,6 @@ class MapViewModel : ViewModel() {
     private val _uiState = MutableStateFlow<MapUIState>(MapUIState.Loading)
     val uiState: StateFlow<MapUIState> = _uiState.asStateFlow()
 
-    private val _sheetState = MutableStateFlow(MapUISheetState())
-    val sheetState = _sheetState.asStateFlow()
 
     init {
         getMapData()
@@ -40,31 +38,5 @@ class MapViewModel : ViewModel() {
 
     fun onOverlayError() {
         _uiState.value = MapUIState.Error
-    }
-
-    fun openSheet(){
-        _sheetState.update {
-            it.copy(isSheetOpen = true)
-        }
-    }
-
-    fun closeSheet(){
-        _sheetState.update {
-            it.copy(
-                isSheetOpen = false,
-                sheetView = SheetView.RISK
-            )
-        }
-    }
-
-    fun changeSheetView(){
-        _sheetState.update {
-            it.copy(
-                sheetView = if (it.sheetView == SheetView.RISK)
-                    SheetView.TRENDS
-                else
-                    SheetView.RISK
-            )
-        }
     }
 }

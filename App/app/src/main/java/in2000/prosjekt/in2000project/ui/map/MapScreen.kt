@@ -20,13 +20,16 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SheetState
+import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -41,12 +44,15 @@ import com.patrykandpatrick.vico.compose.axis.horizontal.rememberBottomAxis
 import com.patrykandpatrick.vico.compose.axis.vertical.rememberStartAxis
 import com.patrykandpatrick.vico.compose.chart.Chart
 import com.patrykandpatrick.vico.compose.chart.line.lineChart
+import com.patrykandpatrick.vico.compose.component.textComponent
+import com.patrykandpatrick.vico.core.component.text.textComponent
 import com.patrykandpatrick.vico.core.entry.entryModelOf
 import com.patrykandpatrick.vico.core.entry.entryOf
 import in2000.prosjekt.in2000project.data.model.SkiArea
 import in2000.prosjekt.in2000project.ui.reusables.BottomBar
 import in2000.prosjekt.in2000project.ui.reusables.TopBar
 import in2000.prosjekt.in2000project.ui.settings.SettingsViewModel
+import kotlinx.coroutines.launch
 
 private val previewSkiArea = SkiArea(
     id = "1",
@@ -66,7 +72,6 @@ fun MapScreenState(
     coordinates: String = "65.0,10.0",
     settingsViewModel: SettingsViewModel = viewModel()
 ) {
-    val sheetState by viewModel.sheetState.collectAsState()
 
     val uiState by viewModel.uiState.collectAsState()
 
@@ -79,10 +84,6 @@ fun MapScreenState(
         onOverlayLoaded = {viewModel.onOverlayLoaded()},
         onOverlayError = {viewModel.onOverlayError()},
         settingsViewModel = settingsViewModel,
-        sheetState = sheetState,
-        onOpenSheet = { viewModel.openSheet()},
-        onCloseSheet = { viewModel.closeSheet()},
-        onChangeSheet = { viewModel.changeSheetView()}
     )
 }
 
@@ -99,11 +100,11 @@ fun MapScreen(
     onOverlayLoaded: () -> Unit,
     onOverlayError: () -> Unit,
     settingsViewModel: SettingsViewModel,
-    sheetState: MapUISheetState,
-    onOpenSheet: () -> Unit,
-    onCloseSheet: () -> Unit,
-    onChangeSheet: () -> Unit
 ) {
+    val sheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = false
+    )
+    val scope = rememberCoroutineScope()
 
     // Hardcoded sample data for the MVP, however, when Frost API is ready this should move into the ViewModel
     val skiArea = remember { previewSkiArea }
@@ -161,7 +162,9 @@ fun MapScreen(
                 //onMapClick is passed to the Map
                 MapboxView(
                     onMapClick = { point ->
-                        onOpenSheet()
+                        scope.launch {
+                            sheetState.show()
+                        }
                         nveViewModel.avalancheChecker(point.latitude(), point.longitude())
                     },
                     onOverlayError = onOverlayError,
@@ -193,9 +196,13 @@ fun MapScreen(
     }
 
     //This is for the bottom sheet - if isSheetOpen is set to true, then it will open otherwise, it stays closed
-    if (sheetState.isSheetOpen){
+    if (sheetState.currentValue != SheetValue.Hidden) {
         ModalBottomSheet(
-            onDismissRequest = onCloseSheet,
+            onDismissRequest = {
+                scope.launch {
+                    sheetState.hide()
+                }
+            },
             containerColor = MaterialTheme.colorScheme.surface,
             tonalElevation = 0.dp,
             dragHandle = null
@@ -208,22 +215,23 @@ fun MapScreen(
                     .heightIn(min = 320.dp)
                     .navigationBarsPadding()
                     .padding(bottom = 24.dp),
-                sheetView = sheetState.sheetView,
-                onChangeSheet = onChangeSheet
+                sheetState = sheetState,
             )
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SkiAreaBottomSheetContent(
     area: SkiArea,
     avalancheStatus: String,
     modifier: Modifier = Modifier,
-    sheetView: SheetView,
-    onChangeSheet: () -> Unit,
-
+    sheetState: SheetState
 ) {
+    val isExpanded = sheetState.currentValue == SheetValue.Expanded
+    val pagerState = rememberPagerState(pageCount = {3 })
+
     // This is the content inside the bottom sheet.
     Surface(
         modifier = modifier.fillMaxWidth(),
@@ -235,23 +243,6 @@ fun SkiAreaBottomSheetContent(
                 .padding(horizontal = 20.dp, vertical = 16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable {onChangeSheet() }
-                    .padding(vertical = 8.dp),
-                contentAlignment = Alignment.Center
-            ){
-                if (sheetView == SheetView.RISK){
-                    Text("Show Trends")
-                } else {
-                    Text("Shoe Risk")
-                }
-            }
-
-            when (sheetView){
-                SheetView.RISK -> {
                     // Area name
                     Text(
                         text = area.name,
@@ -271,106 +262,105 @@ fun SkiAreaBottomSheetContent(
                     ClimateRow("Average snowfall", area.averageSnowfall)
                     ClimateRow("Average precipitation", area.averagePrecipitation)
                     ClimateRow("Average temperature", area.dailyMeanTemperature)
+
+            if (isExpanded){
+                Text(
+                    text = "Climate Trends",
+                    style = MaterialTheme.typography.titleMedium
+                )
+
+                HorizontalDivider()
+
+                val temperatureData = listOf(
+                    2018 to -2f,
+                    2019 to -1f,
+                    2020 to 0f,
+                    2021 to -3f,
+                    2022 to 3f
+                )
+
+                val percipitationData = listOf(
+                    2018 to 80f,
+                    2019 to 95f,
+                    2020 to 100f,
+                    2021 to 90f,
+                    2022 to 110f
+                )
+
+                val snowfallData = listOf(
+                    2018 to 200f,
+                    2019 to 220f,
+                    2020 to 210f,
+                    2021 to 230f,
+                    2022 to 240f
+                )
+
+                HorizontalPager(
+                    state = pagerState,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(220.dp)
+                ) {page ->
+                    val (title, data) = when (page){
+                        0 -> "Temperature (°C)" to temperatureData
+                        1 -> "Percipitation (mm)" to percipitationData
+                        else -> "Snowfall (cm)" to snowfallData
+                    }
+
+                    val entries = remember(data) {
+                        data.map { (year, value) ->
+                            entryOf(year.toFloat(), value)
+                        }
+                    }
+
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = title,
+                            style = MaterialTheme.typography.titleMedium
+                        )
+
+                        Chart(
+                            chart = lineChart(),
+                            model = entryModelOf(entries),
+                            startAxis = rememberStartAxis(
+                                label = textComponent(
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                )
+                            ),
+                            bottomAxis = rememberBottomAxis(
+                                label = textComponent(
+                                    color = MaterialTheme.colorScheme.onSurface
+                                )
+                            ),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(180.dp)
+                        )
+                    }
                 }
 
-                SheetView.TRENDS ->{
-                    val pagerState = rememberPagerState(pageCount =  {3 })
-                    Text(
-                        text = area.name,
-                        style = MaterialTheme.typography.headlineSmall
-                    )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    repeat(3){ index ->
+                        val selected = pagerState.currentPage == index
 
-                    Text(
-                        text = "Climate Trends",
-                        style = MaterialTheme.typography.titleMedium
-                    )
-
-                    HorizontalDivider()
-
-                    val temperatureData = listOf(
-                        2018 to -2f,
-                        2019 to -1f,
-                        2020 to 0f,
-                        2021 to -3f,
-                        2022 to 3f
-                    )
-
-                    val percipitationData = listOf(
-                        2018 to 80f,
-                        2019 to 95f,
-                        2020 to 100f,
-                        2021 to 90f,
-                        2022 to 110f
-                    )
-
-                    val snowfallData = listOf(
-                        2018 to 200f,
-                        2019 to 220f,
-                        2020 to 210f,
-                        2021 to 230f,
-                        2022 to 240f
-                    )
-
-                    HorizontalPager(
-                        state = pagerState,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(220.dp)
-                    ) {page ->
-                        val (title, data) = when (page){
-                            0 -> "Temperature (°C)" to temperatureData
-                            1 -> "Percipitation (mm)" to percipitationData
-                            else -> "Snowfall (cm)" to snowfallData
-                        }
-
-                        val entries = remember(data) {
-                            data.map { (year, value) ->
-                                entryOf(year.toFloat(), value)
-                            }
-                        }
-
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Text(
-                                text = title,
-                                style = MaterialTheme.typography.titleMedium
-                            )
-
-                            Chart(
-                                chart = lineChart(),
-                                model = entryModelOf(entries),
-                                startAxis = rememberStartAxis(),
-                                bottomAxis = rememberBottomAxis(),
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(180.dp)
-                            )
-                        }
+                        Box(
+                            modifier = Modifier
+                                .padding(4.dp)
+                                .height(10.dp)
+                                .fillMaxWidth(0.02f)
+                                .background(color =
+                                    if(selected)
+                                        MaterialTheme.colorScheme.primary
+                                    else
+                                        MaterialTheme.colorScheme.outline
+                                )
+                        )
                     }
-
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Center
-                    ) {
-                        repeat(3){ index ->
-                            val selected = pagerState.currentPage == index
-
-                            Box(
-                                modifier = Modifier
-                                    .padding(4.dp)
-                                    .height(10.dp)
-                                    .fillMaxWidth(0.02f)
-                                    .background(color =
-                                        if(selected)
-                                            MaterialTheme.colorScheme.primary
-                                        else
-                                            MaterialTheme.colorScheme.outline
-                                    )
-                            )
-                        }
-                    }
-
                 }
             }
         }
@@ -407,24 +397,20 @@ fun MapScreenErrorPreview() {
         onOverlayLoaded = {},
         onOverlayError = {},
         settingsViewModel = viewModel(),
-        sheetState = MapUISheetState(
-            isSheetOpen = true,
-            sheetView = SheetView.RISK
-        ),
-        onOpenSheet = {},
-        onCloseSheet = {},
-        onChangeSheet = {}
     )
 }
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Preview(showBackground = true)
 @Composable
 fun BottomSheetPreview() {
+    val sheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = false
+    )
     SkiAreaBottomSheetContent(
         area = previewSkiArea,
         avalancheStatus = "High",
-        sheetView = SheetView.RISK,
-        onChangeSheet = {}
+        sheetState = sheetState
     )
 }
