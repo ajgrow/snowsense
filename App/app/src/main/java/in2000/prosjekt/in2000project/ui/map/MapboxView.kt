@@ -142,9 +142,29 @@ fun MapboxView(
                 mapViewportState = viewportState
             ) {
                 MapEffect(Unit) { mapView ->
+                    val annotationApi = mapView.annotations
+                    val pointAnnotationManager: PointAnnotationManager = annotationApi.createPointAnnotationManager()
+
+                    fun addPin(point: Point){
+                        pointAnnotationManager.deleteAll()
+                        val bitmap = BitmapFactory.decodeResource(
+                            mapView.context.resources,
+                            R.drawable.red_marker
+                        )
+
+                        val pointAnnotationOptions = PointAnnotationOptions()
+                            .withPoint(point)
+                            .withIconImage(bitmap)
+                            .withIconSize(0.3)
+                        pointAnnotationManager.create(pointAnnotationOptions)
+
+                    }
+
+                    //this click listener just works generally on the map
                     mapView.gestures.addOnMapClickListener { point ->
+                        addPin(point)
                         onMapClick(point)
-                        true //return true to show that the click was handled
+                        true
                     }
 
                     mapView.mapboxMap.subscribeMapLoadingError { error ->
@@ -192,19 +212,19 @@ fun MapboxView(
                         )
                     }
 
-                var idleSubscription: Cancelable? = null
-                idleSubscription = mapView.mapboxMap.subscribeMapIdle {
-                    viewportState.cameraState?.toCameraOptions()?.let {
-                        MapCameraRepository.updateCameraOptions(it)
+                    var idleSubscription: Cancelable? = null
+                    idleSubscription = mapView.mapboxMap.subscribeMapIdle {
+                        viewportState.cameraState?.toCameraOptions()?.let {
+                            MapCameraRepository.updateCameraOptions(it)
+                        }
                     }
-                }
 
-                val mapBoxMap = mapView.mapboxMap
+                    val mapBoxMap = mapView.mapboxMap
 
-                val bounds = CoordinateBounds(
-                    Point.fromLngLat(2.5, 55.9),
-                    Point.fromLngLat(31.5, 71.5)
-                )
+                    val bounds = CoordinateBounds(
+                        Point.fromLngLat(2.5, 55.9),
+                        Point.fromLngLat(31.5, 71.5)
+                    )
 
                     mapBoxMap.setBounds(
                         CameraBoundsOptions.Builder()
@@ -215,30 +235,7 @@ fun MapboxView(
                     )
 
 
-                    val annotationApi = mapView.annotations
-                    val pointAnnotationManager: PointAnnotationManager = annotationApi.createPointAnnotationManager()
 
-                    fun addPin(point: Point){
-                        pointAnnotationManager.deleteAll()
-                        val bitmap = BitmapFactory.decodeResource(
-                            mapView.context.resources,
-                            R.drawable.red_marker
-                        )
-
-                        val pointAnnotationOptions = PointAnnotationOptions()
-                            .withPoint(point)
-                            .withIconImage(bitmap)
-                            .withIconSize(0.3)
-                        pointAnnotationManager.create(pointAnnotationOptions)
-
-                    }
-
-                    //this click listener just works generally on the map
-                    mapView.gestures.addOnMapClickListener { point ->
-                        addPin(point)
-                        onMapClick(point)
-                        true
-                    }
 
                     if (hasSearch && searchLat != null && searchLng != null){
                         val searchPoint = Point.fromLngLat(searchLng, searchLat)
