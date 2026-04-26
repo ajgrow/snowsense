@@ -11,16 +11,12 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class MapViewModel : ViewModel() {
-
     private val _uiState = MutableStateFlow<MapUIState>(MapUIState.Loading)
     val uiState: StateFlow<MapUIState> = _uiState.asStateFlow()
-
-    var coordinates by mutableStateOf("65.0,10.0")
 
     init {
         getMapData()
     }
-
     fun getMapData() {
         viewModelScope.launch {
             _uiState.value = MapUIState.Loading
