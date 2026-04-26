@@ -13,6 +13,7 @@ import java.time.LocalDate
 import java.time.MonthDay
 import java.time.Year
 import in2000.prosjekt.in2000project.data.model.enums.ElementType
+import in2000.prosjekt.in2000project.data.model.enums.MeasurementUnit
 
 class FrostClimateRepository(
     private val frostV0DataSource: FrostV0DataSource
@@ -108,14 +109,27 @@ class FrostClimateRepository(
     private fun buildYearlyAverages(
         year: Int,
         averages: Map<String, Double>
-    ): List<LocationClimateDataPoint> = listOf(
-        ElementType.MEAN_TEMPERATURE to ELEMENT_TEMP,
-        ElementType.PRECIPITATION to ELEMENT_PRECIP,
-        ElementType.WIND_SPEED to ELEMENT_WIND,
-        ElementType.SNOW_DEPTH to ELEMENT_SNOW
-    )
+    ): List<LocationClimateDataPoint>
+    = listOf(
+            ElementType.MEAN_TEMPERATURE to ELEMENT_TEMP,
+            ElementType.PRECIPITATION to ELEMENT_PRECIP,
+            ElementType.WIND_SPEED to ELEMENT_WIND,
+            ElementType.SNOW_DEPTH to ELEMENT_SNOW)
         .map { (type, element) ->
-            LocationClimateDataPoint(year = year, type = type, avgValue = averages[element])
+            LocationClimateDataPoint(
+                year,
+                type,
+                type.defaultUnit,
+                averages[element])
+        }
+
+    /** The default measurement unit for each [ElementType]. */
+    private val ElementType.defaultUnit: MeasurementUnit
+        get() = when (this) {
+            ElementType.MEAN_TEMPERATURE -> MeasurementUnit.CELSIUS
+            ElementType.PRECIPITATION -> MeasurementUnit.MILLIMETERS
+            ElementType.WIND_SPEED -> MeasurementUnit.METERS_PER_SECOND
+            ElementType.SNOW_DEPTH -> MeasurementUnit.CENTIMETERS
         }
 }
 
