@@ -23,21 +23,29 @@ value class FrostReferenceTime private constructor(val value: String) {
          * [endDate] is inclusive but is converted to next day in the output
          * to match the Frost API's half-open interval.
          *
+         * When [totalPeriods] is 1, produces a simple date range (`start/end`).
+         * When greater than 1, produces a repeating interval (`R{n}/start/end/P1Y`).
+         *
          * @throws IllegalArgumentException if [startDate] is not before [endDate]
-         *   or [repeatPeriods] is less than 1.
+         *   or [totalPeriods] is less than 1.
          */
         fun of(
             startDate: LocalDate,
             endDate: LocalDate,
-            repeatPeriods: Int = 1,
+            totalPeriods: Int = 1,
         ): FrostReferenceTime {
-            require(startDate < endDate){
-                "startDate must be before endDate" }
-            require(repeatPeriods >= 1) {
-                "repeatPeriods must be at least 1" }
+            require(startDate <= endDate){
+                "startDate can't be after endDate" }
+            require(totalPeriods >= 1) {
+                "totalPeriods must be at least 1" }
+
+            val endDate = endDate.plusDays(1).toString()
+
+            if (totalPeriods == 1)
+                return FrostReferenceTime("$startDate/$endDate")
 
             return FrostReferenceTime(
-                "R$repeatPeriods/$startDate/${endDate.plusDays(1)}/P1Y")
+                "R$totalPeriods/$startDate/$endDate/P1Y")
         }
 
         /**

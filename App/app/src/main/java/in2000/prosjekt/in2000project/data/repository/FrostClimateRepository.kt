@@ -31,11 +31,11 @@ class FrostClimateRepository(
         val station = getNearestStation(coordinate)
 
         // ISO-8601 repeating time range (R10/2014-03-01/2014-04-01/P1Y)
-        val referenceTime = createReferenceTimeString(
+        val referenceTime = FrostReferenceTime.fromMonthDayRange(
             periodStart,
             periodEnd,
             yearsBack,
-        )
+        ).value
 
         val obsResponse = frostV0DataSource.getObservations(
             station.id,
@@ -98,11 +98,11 @@ class FrostClimateRepository(
         val station = getNearestStation(coordinate)
 
         //build time query
-        val referenceTime = createReferenceTimeString(
+        val referenceTime = FrostReferenceTime.fromMonthDayRange(
             MonthDay.of(startDate.monthValue, startDate.dayOfMonth),
             MonthDay.of(currentDate.monthValue, currentDate.dayOfMonth),
             0
-        )
+        ).value
 
         //fetch temperature and precipitation
         val observationResponse = frostV0DataSource.getObservations(
@@ -231,44 +231,6 @@ private val ElementType.defaultUnit: MeasurementUnit
 
 private val elementsCsv: String =
     ElementType.entries.joinToString(",") { it.frostElementId }
-
-    /**
-     * Creates a Frost v0 ISO-8601 referenceTime string.
-     *
-     * Returns e.g. "R10/2017-03-23/2017-04-23/P1Y" which tells Frost:
-     * "give me data for Mar 23–Apr 22 (inclusive), repeated yearly for 10 years."
-     *
-     * Handles year-boundary crossings (e.g. Dec 15 – Jan 15).
-     *
-     * @param periodStart First day of the window (inclusive).
-     * @param periodEnd Last day of the window (inclusive). +1 day added internally for Frost's half-open interval.
-     * @param yearsBack How many years back to include observations from.
-     * @param referenceDate Used to determine which years to query. Pass explicitly in tests for deterministic results.
-     */
-    internal fun createReferenceTimeString(
-        periodStart: MonthDay,
-        periodEnd: MonthDay,
-        yearsBack: Int,
-        referenceDate: LocalDate = LocalDate.now(),
-    ): String {
-        require(yearsBack >= 0)
-
-        val oldestStartYear = referenceDate.year - yearsBack
-
-        val firstStart = periodStart.atYear(oldestStartYear)
-
-        val crossesYearBoundary = periodStart.isAfter(periodEnd)
-
-        val endYear = if (crossesYearBoundary) oldestStartYear + 1
-        else oldestStartYear
-
-        val firstEnd = periodEnd.atYear(endYear).plusDays(1)
-
-        if (yearsBack == 0)
-            return "$firstStart/$firstEnd"
-
-        return "R${yearsBack + 1}/$firstStart/$firstEnd/P1Y"
-    }
 
     /** Mean observation value per Frost elementId. */
     internal fun averageByElement(
