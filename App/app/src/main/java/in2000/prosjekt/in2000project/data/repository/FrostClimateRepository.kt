@@ -196,7 +196,6 @@ class FrostClimateRepository(
         return LocationSlabAvalancheRiskData(
             coordinate = coordinate,
             dangerLevel = dangerLevel,
-            dataReliability = 1.0
         )
     }
 
