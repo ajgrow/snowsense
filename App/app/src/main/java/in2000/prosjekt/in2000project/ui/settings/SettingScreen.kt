@@ -1,5 +1,6 @@
 package in2000.prosjekt.in2000project.ui.settings
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -26,7 +27,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
+import androidx.activity.compose.LocalActivity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -49,7 +50,8 @@ fun SettingScreen(
         val themeMode = settingsViewModel.themeMode
         val textSizeMode = settingsViewModel.textSizeMode
         val languageMode = settingsViewModel.languageMode
-        val activity = LocalContext.current as Activity
+        val activity = LocalActivity.current
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -143,12 +145,12 @@ fun SettingScreen(
                     val locale = Locale.forLanguageTag("en")
                     Locale.setDefault(locale)
 
-                    val config = activity.resources.configuration
-                    config.setLocale(locale)
+                    val config = activity?.resources?.configuration
+                    config?.setLocale(locale)
 
-                    activity.resources.updateConfiguration(config, activity.resources.displayMetrics)
+                    activity?.resources?.updateConfiguration(config, activity?.resources?.displayMetrics)
 
-                    activity.recreate()
+                    activity?.recreate()
                 }
             )
 
@@ -161,12 +163,12 @@ fun SettingScreen(
                     val locale = Locale("nb")
                     Locale.setDefault(locale)
 
-                    val config = activity.resources.configuration
-                    config.setLocale(locale)
+                    val config = activity?.resources?.configuration
+                    config?.setLocale(locale)
 
-                    activity.resources.updateConfiguration(config, activity.resources.displayMetrics)
+                    activity?.resources?.updateConfiguration(config, activity?.resources?.displayMetrics)
 
-                    activity.recreate()
+                    activity?.recreate()
                 }
 
             )
