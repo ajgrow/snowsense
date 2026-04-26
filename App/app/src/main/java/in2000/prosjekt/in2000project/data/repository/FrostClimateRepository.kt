@@ -29,7 +29,7 @@ class FrostClimateRepository(
         val station = getNearestStation(coordinate)
 
         // ISO-8601 repeating time range (R10/2014-03-01/2014-04-01/P1Y)
-        val referenceTime = buildRepeatingTimeRange(
+        val referenceTime = createReferenceTimeString(
             periodStart,
             periodEnd,
             yearsBack,
@@ -114,7 +114,7 @@ private val elementsCsv: String =
     ElementType.entries.joinToString(",") { it.frostElementId }
 
     /**
-     * Builds a Frost v0 repeating-interval referenceTime string.
+     * Creates a Frost v0 ISO-8601 referenceTime string.
      *
      * Returns e.g. "R10/2017-03-23/2017-04-23/P1Y" which tells Frost:
      * "give me data for Mar 23–Apr 22 (inclusive), repeated yearly for 10 years."
@@ -126,7 +126,7 @@ private val elementsCsv: String =
      * @param yearsBack How many years back to include observations from.
      * @param referenceDate Used to determine which years to query. Pass explicitly in tests for deterministic results.
      */
-    internal fun buildRepeatingTimeRange(
+    internal fun createReferenceTimeString(
         periodStart: MonthDay,
         periodEnd: MonthDay,
         yearsBack: Int,
@@ -144,6 +144,9 @@ private val elementsCsv: String =
         else oldestStartYear
 
         val firstEnd = periodEnd.atYear(endYear).plusDays(1)
+
+        if (yearsBack == 0)
+            return "$firstStart/$firstEnd"
 
         return "R${yearsBack + 1}/$firstStart/$firstEnd/P1Y"
     }
