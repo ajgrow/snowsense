@@ -6,27 +6,17 @@ import in2000.prosjekt.in2000project.data.datasource.dto.FrostV0Observation
 import in2000.prosjekt.in2000project.data.datasource.dto.FrostV0Source
 import in2000.prosjekt.in2000project.data.model.Coordinate
 import in2000.prosjekt.in2000project.data.model.LocationClimateData
+import in2000.prosjekt.in2000project.data.model.LocationClimateDataPoint
 import in2000.prosjekt.in2000project.data.model.NoObservationsException
 import in2000.prosjekt.in2000project.data.model.NoStationFoundException
 import java.time.LocalDate
 import java.time.MonthDay
-import java.time.Year
+import in2000.prosjekt.in2000project.data.model.enums.ElementType
+import in2000.prosjekt.in2000project.data.model.enums.MeasurementUnit
 
 class FrostClimateRepository(
     private val frostV0DataSource: FrostV0DataSource
 ) : ClimateRepository {
-
-    companion object {
-        /** Daily observation elements relevant for avalanche risk assessment. */
-        private const val ELEMENT_TEMP = "mean(air_temperature P1D)"
-        private const val ELEMENT_PRECIP = "sum(precipitation_amount P1D)"
-        private const val ELEMENT_WIND = "mean(wind_speed P1D)"
-        private const val ELEMENT_SNOW = "max(surface_snow_thickness P1D)"
-
-        private val ELEMENTS_CSV = listOf(
-            ELEMENT_TEMP, ELEMENT_PRECIP, ELEMENT_WIND, ELEMENT_SNOW
-        ).joinToString(",")
-    }
 
     override suspend fun getClimateDataForLocation(
         coordinate: Coordinate,
@@ -38,28 +28,37 @@ class FrostClimateRepository(
 
         val station = getNearestStation(coordinate)
 
-        val referenceTime = buildRepeatingTimeRange(
+        // ISO-8601 repeating time range (R10/2014-03-01/2014-04-01/P1Y)
+        val referenceTime = createReferenceTimeString(
             periodStart,
             periodEnd,
             yearsBack,
         )
 
         val obsResponse = frostV0DataSource.getObservations(
-            sourceId = station.id,
-            elements = ELEMENTS_CSV,
-            referenceTime = referenceTime,
+            station.id,
+            elementsCsv,
+            referenceTime,
         )
 
         val allObservations = obsResponse.data.flatMap { it.observations }
 
-        if (allObservations.isEmpty())
+        if (allObservations.isEmpty()) {
             throw NoObservationsException(
                 stationName = station.name,
                 message = "Station ${station.name} has no observations for " +
                         "$periodStart–$periodEnd over the last $yearsBack years",
             )
+        }
 
-        val averages = averageByElement(allObservations)
+        // Group by year, calculate averages for each element, create data points
+        val yearlyAverages = obsResponse.data
+            .groupBy { it.referenceTime.take(4).toIntOrNull() ?: 0 }
+            .flatMap { (year, yearData) ->
+                val yearObservations = yearData.flatMap { it.observations }
+                val averages = averageByElement(yearObservations)
+                toYearlyDataPoints(year, averages)
+            }
 
         return LocationClimateData(
             coordinate = coordinate,
@@ -70,82 +69,92 @@ class FrostClimateRepository(
             periodEnd = periodEnd,
             yearsBack = yearsBack,
             dataPointCount = allObservations.size,
-            avgDailyMeanTemperatureC = averages[ELEMENT_TEMP],
-            avgDailyPrecipitationMm = averages[ELEMENT_PRECIP],
-            avgDailyMeanWindSpeedMs = averages[ELEMENT_WIND],
-            avgDailyMaxSnowDepthCm = averages[ELEMENT_SNOW],
+            yearlyAverages = yearlyAverages
         )
     }
 
-    /** Returns the nearest station to [coordinate], or throws [NoStationFoundException]. */
+    // Throws NoStationFoundException if no station found.
     private suspend fun getNearestStation(
         coordinate: Coordinate
-    ): FrostV0Source
-        = frostV0DataSource
+    ): FrostV0Source = frostV0DataSource
         .getNearestSource(coordinate)
         .data
         .firstOrNull()
         ?: throw NoStationFoundException(coordinate)
+
+    // Pair years and ElementType averages, skipping missing elements.
+    private fun toYearlyDataPoints(
+        year: Int,
+        averages: Map<String, Double>,
+    ): List<LocationClimateDataPoint>
+    = ElementType.entries.mapNotNull { type ->
+        averages[type.frostElementId]?.let { avgValue ->
+            LocationClimateDataPoint( year,  type,  type.defaultUnit,  avgValue)
+        }
+    }
 }
 
-// --- Helper functions (top-level for independent testability) ---
+private val ElementType.frostElementId: String
+    get() = when (this) {
+        ElementType.TEMPERATURE_MEAN_P1D -> "mean(air_temperature P1D)"
+        ElementType.PRECIPITATION_SUM_P1D -> "sum(precipitation_amount P1D)"
+        ElementType.WIND_SPEED_MEAN_P1D -> "mean(wind_speed P1D)"
+        ElementType.SNOW_DEPTH_MAX_P1D -> "max(surface_snow_thickness P1D)"
+    }
 
-/**
- * Builds a Frost v0 repeating-interval referenceTime string.
- *
- * Returns e.g. "R10/2017-03-23/2017-04-23/P1Y" which tells Frost:
- * "give me data for Mar 23–Apr 22 (inclusive), repeated yearly for 10 years."
- *
- * Handles year-boundary crossings (e.g. Dec 15 – Jan 15).
- *
- * @param periodStart First day of the window (inclusive).
- * @param periodEnd Last day of the window (inclusive). +1 day added internally for Frost's half-open interval.
- * @param yearsBack How many years back to include observations from.
- * @param referenceDate Used to determine which years to query. Pass explicitly in tests for deterministic results.
- */
-internal fun buildRepeatingTimeRange(
-    periodStart: MonthDay,
-    periodEnd: MonthDay,
-    yearsBack: Int,
-    referenceDate: LocalDate = LocalDate.now(),
-): String {
-    require(yearsBack >= 0)
+private val ElementType.defaultUnit: MeasurementUnit
+    get() = when (this) {
+        ElementType.TEMPERATURE_MEAN_P1D -> MeasurementUnit.CELSIUS
+        ElementType.PRECIPITATION_SUM_P1D -> MeasurementUnit.MILLIMETERS
+        ElementType.WIND_SPEED_MEAN_P1D -> MeasurementUnit.METERS_PER_SECOND
+        ElementType.SNOW_DEPTH_MAX_P1D -> MeasurementUnit.CENTIMETERS
+    }
 
-    val oldestStartYear = referenceDate.year - yearsBack
+private val elementsCsv: String =
+    ElementType.entries.joinToString(",") { it.frostElementId }
 
-    val firstStart = periodStart.atYearClamped(oldestStartYear)
+    /**
+     * Creates a Frost v0 ISO-8601 referenceTime string.
+     *
+     * Returns e.g. "R10/2017-03-23/2017-04-23/P1Y" which tells Frost:
+     * "give me data for Mar 23–Apr 22 (inclusive), repeated yearly for 10 years."
+     *
+     * Handles year-boundary crossings (e.g. Dec 15 – Jan 15).
+     *
+     * @param periodStart First day of the window (inclusive).
+     * @param periodEnd Last day of the window (inclusive). +1 day added internally for Frost's half-open interval.
+     * @param yearsBack How many years back to include observations from.
+     * @param referenceDate Used to determine which years to query. Pass explicitly in tests for deterministic results.
+     */
+    internal fun createReferenceTimeString(
+        periodStart: MonthDay,
+        periodEnd: MonthDay,
+        yearsBack: Int,
+        referenceDate: LocalDate = LocalDate.now(),
+    ): String {
+        require(yearsBack >= 0)
 
-    val crossesYearBoundary = periodStart.isAfter(periodEnd)
+        val oldestStartYear = referenceDate.year - yearsBack
 
-    val endYear = if (crossesYearBoundary) oldestStartYear + 1
-                  else oldestStartYear
+        val firstStart = periodStart.atYear(oldestStartYear)
 
-    val firstEnd = periodEnd.atYearClamped(endYear).plusDays(1)
+        val crossesYearBoundary = periodStart.isAfter(periodEnd)
 
-    return "R${yearsBack + 1}/$firstStart/$firstEnd/P1Y"
-}
+        val endYear = if (crossesYearBoundary) oldestStartYear + 1
+        else oldestStartYear
 
-/**
- * Like [MonthDay.atYear] but clamps to the last valid day of the month
- *  instead of throwing on e.g. Feb 29 in a non-leap year.
- */
-private fun MonthDay.atYearClamped(
-    year: Int
-): LocalDate
-    = LocalDate.of(
-        year,
-        month,
-        minOf(
-            dayOfMonth,
-            month.length(Year.isLeap(year.toLong()))))
+        val firstEnd = periodEnd.atYear(endYear).plusDays(1)
 
-/**
- * Groups daily observations by elementId and computes the flat mean for each
- * element. Elements with no observations are absent from the returned map.
- */
-internal fun averageByElement(
-    observations: List<FrostV0Observation>
-): Map<String, Double>
+        if (yearsBack == 0)
+            return "$firstStart/$firstEnd"
+
+        return "R${yearsBack + 1}/$firstStart/$firstEnd/P1Y"
+    }
+
+    /** Mean observation value per Frost elementId. */
+    internal fun averageByElement(
+        observations: List<FrostV0Observation>
+    ): Map<String, Double>
     = observations
         .groupBy { it.elementId }
         .mapValues { groupedObservations ->
