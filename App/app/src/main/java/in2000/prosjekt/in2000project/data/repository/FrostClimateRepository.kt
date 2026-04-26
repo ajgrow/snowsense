@@ -6,7 +6,6 @@ import in2000.prosjekt.in2000project.data.datasource.dto.FrostV0Observation
 import in2000.prosjekt.in2000project.data.datasource.dto.FrostV0Source
 import in2000.prosjekt.in2000project.data.model.Coordinate
 import in2000.prosjekt.in2000project.data.model.DangerLevel
-import in2000.prosjekt.in2000project.data.model.DangerLevelType
 import in2000.prosjekt.in2000project.data.model.LocationClimateData
 import in2000.prosjekt.in2000project.data.model.LocationSlabAvalancheRiskData
 import in2000.prosjekt.in2000project.data.model.NoObservationsException
@@ -116,6 +115,14 @@ class FrostClimateRepository(
             elements = ELEMENTS_CSV,
             referenceTime)
 
+        if (observationResponse.data.flatMap { it.observations }.isEmpty())
+            throw NoObservationsException(
+                station.name,
+                MonthDay.of(startDate.monthValue, startDate.dayOfMonth),
+                MonthDay.of(currentDate.monthValue, currentDate.dayOfMonth),
+                0
+            )
+
         //recent snowfall estimate from last 3 days
         val totalPrecip = observationResponse.data.take(3).sumOf { it.observations.firstOrNull{ it.elementId == ELEMENT_PRECIP }?.value ?: 0.0}
 
@@ -184,17 +191,13 @@ class FrostClimateRepository(
 
         val totalScore = newSnowLoad + weakLayerPresence + slabFormation + tempTrend
 
-        val dangerLevelType = when (totalScore) {
-            in 0..15 -> DangerLevelType.LOW
-            in 16..35 -> DangerLevelType.MODERATE
-            in 36..55 -> DangerLevelType.CONSIDERABLE
-            in 56..75 -> DangerLevelType.HIGH
-            else -> DangerLevelType.VERY_HIGH
+        val dangerLevel = when (totalScore) {
+            in 0..15 -> DangerLevel.LOW
+            in 16..35 -> DangerLevel.MODERATE
+            in 36..55 -> DangerLevel.CONSIDERABLE
+            in 56..75 -> DangerLevel.HIGH
+            else -> DangerLevel.VERY_HIGH
         }
-
-        val dangerLevel = DangerLevel(
-            type = dangerLevelType,
-        )
 
         return LocationSlabAvalancheRiskData(
             coordinate = coordinate,

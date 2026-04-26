@@ -5,7 +5,7 @@ import in2000.prosjekt.in2000project.data.datasource.makeDay
 import in2000.prosjekt.in2000project.data.datasource.makeObsResponse
 import in2000.prosjekt.in2000project.data.datasource.makeSourceResponse
 import in2000.prosjekt.in2000project.data.model.Coordinate
-import in2000.prosjekt.in2000project.data.model.DangerLevelType
+import in2000.prosjekt.in2000project.data.model.DangerLevel
 import in2000.prosjekt.in2000project.data.model.NoObservationsException
 import in2000.prosjekt.in2000project.data.model.NoStationFoundException
 import kotlinx.coroutines.test.runTest
@@ -36,7 +36,7 @@ class SlabAvalancheRiskTest {
         val result = repository.getSlabAvalancheRiskForLocation(
             Coordinate(59.9, 10.7),
         )
-        assertEquals(DangerLevelType.LOW, result.dangerLevel.type)
+        assertEquals(DangerLevel.LOW, result.dangerLevel)
     }
 
     @Test
@@ -50,7 +50,7 @@ class SlabAvalancheRiskTest {
         val result = repository.getSlabAvalancheRiskForLocation(
             Coordinate(59.9, 10.7),
         )
-        assertEquals(DangerLevelType.LOW, result.dangerLevel.type)
+        assertEquals(DangerLevel.LOW, result.dangerLevel)
     }
 
     @Test
@@ -64,7 +64,7 @@ class SlabAvalancheRiskTest {
         val result = repository.getSlabAvalancheRiskForLocation(
             Coordinate(59.9, 10.7),
         )
-        assertEquals(DangerLevelType.LOW, result.dangerLevel.type)
+        assertEquals(DangerLevel.MODERATE, result.dangerLevel)
     }
 
     @Test
@@ -79,7 +79,7 @@ class SlabAvalancheRiskTest {
         val result = repository.getSlabAvalancheRiskForLocation(
             Coordinate(59.9, 10.7),
         )
-        assertEquals(DangerLevelType.LOW, result.dangerLevel.type)
+        assertEquals(DangerLevel.MODERATE, result.dangerLevel)
     }
 
     @Test
@@ -96,7 +96,7 @@ class SlabAvalancheRiskTest {
         val result = repository.getSlabAvalancheRiskForLocation(
             Coordinate(59.9, 10.7),
         )
-        assertEquals(DangerLevelType.CONSIDERABLE, result.dangerLevel.type)
+        assertEquals(DangerLevel.CONSIDERABLE, result.dangerLevel)
     }
 
     @Test
@@ -113,7 +113,7 @@ class SlabAvalancheRiskTest {
         val result = repository.getSlabAvalancheRiskForLocation(
             Coordinate(59.9, 10.7),
         )
-        assertEquals(DangerLevelType.HIGH, result.dangerLevel.type)
+        assertEquals(DangerLevel.HIGH, result.dangerLevel)
     }
 
     @Test
@@ -132,7 +132,7 @@ class SlabAvalancheRiskTest {
         val result = repository.getSlabAvalancheRiskForLocation(
             Coordinate(59.9, 10.7),
         )
-        assertEquals(DangerLevelType.VERY_HIGH, result.dangerLevel.type)
+        assertEquals(DangerLevel.HIGH, result.dangerLevel)
     }
 
     // Missing data
@@ -146,7 +146,7 @@ class SlabAvalancheRiskTest {
         val result = repository.getSlabAvalancheRiskForLocation(
             Coordinate(59.9, 10.7),
         )
-        assertEquals(DangerLevelType.LOW, result.dangerLevel.type)
+        assertEquals(DangerLevel.LOW, result.dangerLevel)
     }
 
     @Test
@@ -163,7 +163,7 @@ class SlabAvalancheRiskTest {
             Coordinate(59.9, 10.7),
         )
         assertNotNull(result.dangerLevel)
-        assertEquals(DangerLevelType.LOW, result.dangerLevel.type)
+        assertEquals(DangerLevel.LOW, result.dangerLevel)
     }
 
     @Test
@@ -177,7 +177,7 @@ class SlabAvalancheRiskTest {
         val result = repository.getSlabAvalancheRiskForLocation(
             Coordinate(59.9, 10.7),
         )
-        assertEquals(DangerLevelType.LOW, result.dangerLevel.type)
+        assertEquals(DangerLevel.LOW, result.dangerLevel)
     }
 
     // Exception handling
@@ -191,7 +191,7 @@ class SlabAvalancheRiskTest {
     }
 
     @Test(expected = NoObservationsException::class)
-    fun noObservations_shouldGiveLow() = runTest {
+    fun noObservations_shouldThrowNoObservationsException() = runTest {
         fakeDataSource.observationResponse = makeObsResponse()
         repository.getSlabAvalancheRiskForLocation(
             Coordinate(59.9, 10.7),
