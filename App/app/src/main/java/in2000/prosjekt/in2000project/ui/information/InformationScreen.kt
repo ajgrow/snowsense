@@ -28,7 +28,33 @@ fun InfoScreen(
     navController: NavController,
     infoViewModel: InfoViewModel = viewModel()
 ) {
-    val uiState by infoViewModel.infoState.collectAsStateWithLifecycle()
+
+    val dangerLevels = listOf(
+        DangerLevel(
+            level = stringResource(R.string.danger_level_1_title),
+            description = stringResource(R.string.danger_level_1_description)
+        ),
+
+        DangerLevel(
+            level = stringResource(R.string.danger_level_2_title),
+            description = stringResource(R.string.danger_level_2_description)
+        ),
+
+        DangerLevel(
+            level = stringResource(R.string.danger_level_3_title),
+            description = stringResource(R.string.danger_level_3_description)
+        ),
+
+        DangerLevel(
+            level = stringResource(R.string.danger_level_4_title),
+            description = stringResource(R.string.danger_level_4_description)
+        ),
+
+        DangerLevel(
+            level = stringResource(R.string.danger_level_5_title),
+            description = stringResource(R.string.danger_level_5_description)
+        )
+    )
 
     Scaffold(
         modifier = modifier,
@@ -53,40 +79,40 @@ fun InfoScreen(
             item {
                 Column {
                     Text(
-                        text = uiState.title,
+                        text = stringResource(R.string.about_app_title),
                         style = MaterialTheme.typography.headlineMedium,
                         fontWeight = Bold,
                         modifier = Modifier.padding(bottom = 8.dp)
                     )
 
                     Text(
-                        text = uiState.teamTitle,
+                        text = stringResource(R.string.team_title),
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = Bold,
                         modifier = Modifier.padding(bottom = 16.dp)
                     )
 
                     Text(
-                        text = uiState.aboutTeam,
+                        text = stringResource(R.string.about_team_text),
                         style = MaterialTheme.typography.bodySmall,
                         modifier = Modifier.padding(bottom = 16.dp)
                     )
 
                     Text(
-                        text = uiState.avalancheTitle,
+                        text = stringResource(R.string.avalanche_info_title),
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = Bold,
                         modifier = Modifier.padding(bottom = 16.dp)
                     )
 
                     Text(
-                        text = uiState.avalancheGeneralInfo,
+                        text = stringResource(R.string.avalanche_general_info_text),
                         style = MaterialTheme.typography.bodySmall,
                         modifier = Modifier.padding(bottom = 16.dp)
                     )
 
                     Text(
-                        text = uiState.dangerTitle,
+                        text = stringResource(R.string.danger_levels_title),
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = Bold,
                         modifier = Modifier.padding(bottom = 8.dp)
@@ -95,7 +121,7 @@ fun InfoScreen(
             }
 
             //replaced the function "DangerLevelsColumn" with a "items" composable
-            items(uiState.dangerLevels) { dangerLevel ->
+            items(dangerLevels) { dangerLevel ->
                 DangerLevelItem(
                     level = dangerLevel.level,
                     description = dangerLevel.description,

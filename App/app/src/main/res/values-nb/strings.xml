@@ -1,0 +1,137 @@
+<resources>
+    <string name="app_name">in2000project</string>
+
+    <string name="home_title">Hjem</string>
+    <string name="app_logo_description">App-logo</string>
+    <string name="search_placeholder">Søk</string>
+    <string name="favorites_title">Favoritter</string>
+    <string name="recent_searches_title">Nylige søk</string>
+
+
+
+
+    <string name="information_title">Informasjon</string>
+    <string name="about_app_title">Om appen</string>
+    <string name="team_title">Teamet</string>
+    <string name="about_team_text">
+Vi er en gruppe engasjerte og kreative IN2000-studenter som jobber sammen for å lage en informativ og brukervennlig skredvarsling-app. Målet vårt har vært å lage et pålitelig verktøy som hjelper brukere å ta tryggere beslutninger når de ferdes i områder med potensiell skredfare. Denne siden gir generell informasjon om skredfaregrader og hva de betyr. Gå tilbake til hjemskjermen eller kartet for hovedfunksjonene.
+    </string>
+
+    <string name="avalanche_info_title">Skredinformasjon</string>
+    <string name="avalanche_general_info_text">
+Skred har blitt stadig mer vanlig etter hvert som klimaendringer påvirker fjellområder. Når du er ute og utforsker naturen, er det viktig å holde seg informert og prioritere sikkerhet. Derfor laget vi denne appen: for å hjelpe deg å ta tryggere valg og nyte tiden utendørs.
+    </string>
+
+    <string name="danger_levels_title">Skredfaregrader</string>
+
+    <string name="danger_level_1_title">1 - Lav</string>
+    <string name="danger_level_1_description">
+Generelt stabile forhold.\n\n
+
+Utløsning er vanligvis kun mulig ved stor tilleggsbelastning i isolerte områder med svært bratt terreng. Kun små og middels store naturlige skred er mulig.\n\n
+
+Typiske faresignaler:\n
+sjelden noen faresignaler.\n\n
+
+Varslet rundt 20% av vintersesongen. Rundt 5% av skredulykker.
+    </string>
+
+    <string name="danger_level_2_title">2 - Moderat</string>
+    <string name="danger_level_2_description">
+Økte skredforhold i enkelte terrengformasjoner.\n\n
+
+Utløsning er mulig, hovedsakelig ved stor tilleggsbelastning, spesielt i bratte heng som er angitt. Svært store naturlige skred er lite sannsynlig.\n\n
+
+Typiske faresignaler:\n
+ofte ingen faresignaler, men det betyr ikke nødvendigvis at det er trygt. Vær ekstra oppmerksom dersom vedvarende svakt lag er et av skredproblemene.\n\n
+
+Varslet rundt 50% av vintersesongen. Rundt 30% av skredulykker.
+    </string>
+
+    <string name="danger_level_3_title">3 - Betydelig</string>
+    <string name="danger_level_3_description">
+Farlige skredforhold.\n\n
+
+Utløsning er mulig, selv ved liten tilleggsbelastning, spesielt i bratte heng som er angitt. I enkelte situasjoner kan noen store, og i isolerte tilfeller svært store naturlige skred forekomme.\n\n
+
+Typiske faresignaler:\n
+fersk skredaktivitet, sprekker og \'drønn\' i snøen. Fjernutløsning er typisk, spesielt dersom vedvarende svakt lag er et av skredproblemene.\n\n
+
+Varslet rundt 30% av vintersesongen. Rundt 50% av skredulykker.
+    </string>
+
+    <string name="danger_level_4_title">4 - Høy</string>
+    <string name="danger_level_4_description">
+Svært farlige skredforhold.\n\n
+
+Utløsning er sannsynlig, selv ved liten tilleggsbelastning, i mange bratte heng. I noen tilfeller kan mange store og ofte svært store naturlige skred forventes.\n\n
+
+Typiske faresignaler:\n
+utbredt fersk skredaktivitet, sprekker og \'drønn\' i snøen.\n
+Fjernutløsning er typisk.\n\n
+
+Varsles kun noen få dager i løpet av vinteren. Rundt 10% av skredulykker.
+    </string>
+
+    <string name="danger_level_5_title">5 - Svært høy</string>
+    <string name="danger_level_5_description">
+Ekstreme skredforhold.\n\n
+
+Mange svært store og ofte ekstremt store naturlige skred kan forventes, selv i moderat bratt terreng.\n\n
+
+Svært sjelden varslet.
+    </string>
+
+
+
+    <string name="map_screen_title">Kartskjerm</string>
+
+    <string name="map_title">Kart</string>
+    <string name="map_instruction">Velg et område for å se historiske klimadata.</string>
+
+    <string name="overlay_loading">Laster skredkartlag...</string>
+    <string name="overlay_error">Kunne ikke laste skredkartlag.</string>
+
+    <string name="retry">Prøv igjen</string>
+
+    <string name="historical_climate_title">Historisk klimasammendrag</string>
+
+    <string name="label_avalanche_danger">Skredfare</string>
+    <string name="label_average_snowfall">Gjennomsnittlig snøfall</string>
+    <string name="label_average_precipitation">Gjennomsnittlig nedbør</string>
+    <string name="label_average_temperature">Gjennomsnittstemperatur</string>
+
+
+
+    <string name="nav_home_desc">Gå til hjemskjerm</string>
+    <string name="nav_map_desc">Gå til kartskjerm</string>
+    <string name="nav_info_desc">Gå til informasjonsskjerm</string>
+
+    <string name="settings_desc">Innstillinger</string>
+
+    <string name="loading">Laster...</string>
+
+    <string name="error_title">Feil</string>
+    <string name="no_internet">Ingen internettforbindelse</string>
+
+    <string name="topbar_settings">Innstillinger</string>
+
+
+
+
+    <string name="settings_title">Innstillinger</string>
+
+    <string name="back_button_desc">Tilbake</string>
+
+    <string name="appearance_title">Utseende</string>
+    <string name="text_size_title">Tekststørrelse</string>
+    <string name="language_title">Språk</string>
+
+    <string name="theme_system">Bruk enhetsinnstilling</string>
+    <string name="theme_light">Lys modus</string>
+    <string name="theme_dark">Mørk modus</string>
+
+    <string name="text_small">Liten</string>
+    <string name="text_medium">Middels</string>
+    <string name="text_large">Stor</string>
+</resources>
