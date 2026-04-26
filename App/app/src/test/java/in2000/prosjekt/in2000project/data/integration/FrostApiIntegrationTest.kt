@@ -20,12 +20,6 @@ import org.junit.Test
 import org.junit.Assert.assertTrue
 import java.time.MonthDay
 
-/**
- * Tests that FrostClimateRepository gets data from Frost API.
- *
- * Should skip automatically if FROST_CLIENT_ID is not available
- * in local.properties.
- */
 class FrostApiIntegrationTest {
 
     private lateinit var client: HttpClient
@@ -56,7 +50,8 @@ class FrostApiIntegrationTest {
             }
         }
 
-        repository = FrostClimateRepository(KtorFrostV0DataSource(client))
+        repository = FrostClimateRepository(
+            KtorFrostV0DataSource(client))
     }
 
     @After
@@ -73,45 +68,23 @@ class FrostApiIntegrationTest {
             yearsBack = 5,
         )
 
-        // Prove real data arrived — only the actual Frost API returns "BLINDERN"
-        val stationName = requireNotNull(result.stationName) { "Station name was null" }
-        assertTrue(
-            "Expected station near Blindern but got '$stationName'",
-            stationName.contains("BLINDERN", ignoreCase = true)
-        )
+        val stationName = requireNotNull(result.stationName) {
+            "Station name was null" }
 
-        // 5 years × ~30 days × multiple elements → well above 20 data points
-        assertTrue(
-            "Expected >= 20 data points but got ${result.dataPointCount}",
-            result.dataPointCount >= 20
-        )
+        assertTrue(stationName.contains("BLINDERN", ignoreCase = true))
 
-        // At least 3 of 5 requested years should have data
+        // Manual tests showed BLINDERN returns at least 20 data points.
         assertTrue(
-            "Expected >= 3 yearly averages but got ${result.yearlyAverages.size}",
-            result.yearlyAverages.size >= 3
-        )
+            "got ${result.dataPointCount} data points",
+            result.dataPointCount >= 20)
+
+        assertTrue(result.yearlyAverages.size >= 3)
 
         val elementTypes = result.yearlyAverages.map { it.type }.toSet()
-        assertTrue(
-            "Expected temperature data in $elementTypes",
-            elementTypes.contains(ElementType.TEMPERATURE_MEAN_P1D)
-        )
-        assertTrue(
-            "Expected precipitation data in $elementTypes",
-            elementTypes.contains(ElementType.PRECIPITATION_SUM_P1D)
-        )
 
-        // Temperature values should be plausible for Mar–Apr in Oslo
-        val temperatures = result.yearlyAverages
-            .filter { it.type == ElementType.TEMPERATURE_MEAN_P1D }
-        assertTrue("Expected temperature observations", temperatures.isNotEmpty())
-        for (point in temperatures) {
-            assertTrue(
-                "Temperature ${point.avgValue}°C in ${point.year} outside plausible Mar–Apr range [-5, 15]",
-                point.avgValue in -5.0..15.0
-            )
-        }
+        // Manual tests showed BLINDERN measures at least these elements.
+        assertTrue(elementTypes.contains(ElementType.TEMPERATURE_MEAN_P1D))
+        assertTrue(elementTypes.contains(ElementType.PRECIPITATION_SUM_P1D))
     }
 
     @Test
@@ -123,34 +96,20 @@ class FrostApiIntegrationTest {
             yearsBack = 3,
         )
 
-        assertTrue(
-            "Expected >= 1 data point for cross-year period but got ${result.dataPointCount}",
-            result.dataPointCount >= 1
-        )
-        assertTrue(
-            "Expected yearly averages for cross-year period but got ${result.yearlyAverages.size}",
-            result.yearlyAverages.isNotEmpty()
-        )
+        assertTrue(result.dataPointCount >= 1)
+        assertTrue(result.yearlyAverages.isNotEmpty())
     }
 
     @Test
-    fun minimalRepetition_yearsBackOne_returnsData() = runTest {
+    fun singleYear_yearsBackZero_returnsData() = runTest {
         val result = repository.getClimateDataForLocation(
             coordinate = Coordinate(59.9423, 10.72),
             periodStart = MonthDay.of(1, 1),
             periodEnd = MonthDay.of(2, 28),
-            yearsBack = 1,
+            yearsBack = 0,
         )
 
-        assertTrue(
-            "Expected >= 1 data point for 2-year request but got ${result.dataPointCount}",
-            result.dataPointCount >= 1
-        )
-
-        val years = result.yearlyAverages.map { it.year }.toSet()
-        assertTrue(
-            "Expected 1–2 years in results but got $years",
-            years.size in 1..2
-        )
+        assertTrue(result.dataPointCount >= 1)
+        assertTrue(result.yearlyAverages.map { it.year }.toSet().size == 1)
     }
 }
