@@ -19,18 +19,6 @@ class FrostClimateRepository(
     private val frostV0DataSource: FrostV0DataSource
 ) : ClimateRepository {
 
-    companion object {
-        /** Daily observation elements relevant for avalanche risk assessment. */
-        private const val ELEMENT_TEMP = "mean(air_temperature P1D)"
-        private const val ELEMENT_PRECIP = "sum(precipitation_amount P1D)"
-        private const val ELEMENT_WIND = "mean(wind_speed P1D)"
-        private const val ELEMENT_SNOW = "max(surface_snow_thickness P1D)"
-
-        private val ELEMENTS_CSV = listOf(
-            ELEMENT_TEMP, ELEMENT_PRECIP, ELEMENT_WIND, ELEMENT_SNOW
-        ).joinToString(",")
-    }
-
     override suspend fun getClimateDataForLocation(
         coordinate: Coordinate,
         periodStart: MonthDay,
@@ -51,9 +39,9 @@ class FrostClimateRepository(
 
         // 3. Fetch observations for the specified elements and time range.
         val obsResponse = frostV0DataSource.getObservations(
-            sourceId = station.id,
-            elementsCsv = ELEMENTS_CSV,
-            referenceTime = referenceTime,
+            station.id,
+            elementsCsv,
+            referenceTime,
         )
 
         // 4. Flatten all nested observations to check if any data was returned at all.
@@ -73,7 +61,7 @@ class FrostClimateRepository(
             .flatMap { (year, yearData) ->
                 val yearObservations = yearData.flatMap { it.observations }
                 val averages = averageByElement(yearObservations)
-                buildYearlyAverages(year, averages)
+                toYearlyDataPoints(year, averages)
             }
 
         // 6. Map the processed results into the final domain model.
@@ -101,37 +89,48 @@ class FrostClimateRepository(
 
 
     /**
-     * Builds a list of [LocationClimateDataPoint] for a specific year.
+     * Converts a year's averaged observations into [LocationClimateDataPoint]s.
      *
-     * Maps the element-id strings used by the Frost API to our internal [ElementType] enum.
-     * Values not present in the [averages] map will be null.
+     * Uses [frostElementId] to look up each element's average, and [defaultUnit]
+     * to assign the correct measurement unit. Elements not present in [averages]
+     * are omitted from the result.
      */
-    private fun buildYearlyAverages(
+    private fun toYearlyDataPoints(
         year: Int,
-        averages: Map<String, Double>
-    ): List<LocationClimateDataPoint>
-    = listOf(
-            ElementType.MEAN_TEMPERATURE to ELEMENT_TEMP,
-            ElementType.PRECIPITATION to ELEMENT_PRECIP,
-            ElementType.WIND_SPEED to ELEMENT_WIND,
-            ElementType.SNOW_DEPTH to ELEMENT_SNOW)
-        .map { (type, element) ->
+        averages: Map<String, Double>,
+    ): List<LocationClimateDataPoint> = ElementType.entries.mapNotNull { type ->
+        averages[type.frostElementId]?.let { avgValue ->
             LocationClimateDataPoint(
                 year,
                 type,
                 type.defaultUnit,
-                averages[element])
+                avgValue,
+            )
         }
-
-    /** The default measurement unit for each [ElementType]. */
-    private val ElementType.defaultUnit: MeasurementUnit
-        get() = when (this) {
-            ElementType.MEAN_TEMPERATURE -> MeasurementUnit.CELSIUS
-            ElementType.PRECIPITATION -> MeasurementUnit.MILLIMETERS
-            ElementType.WIND_SPEED -> MeasurementUnit.METERS_PER_SECOND
-            ElementType.SNOW_DEPTH -> MeasurementUnit.CENTIMETERS
-        }
+    }
 }
+
+/** The Frost v0 element-id string for each [ElementType]. */
+private val ElementType.frostElementId: String
+    get() = when (this) {
+        ElementType.TEMPERATURE_MEAN_P1D -> "mean(air_temperature P1D)"
+        ElementType.PRECIPITATION_SUM_P1D -> "sum(precipitation_amount P1D)"
+        ElementType.WIND_SPEED_MEAN_P1D -> "mean(wind_speed P1D)"
+        ElementType.SNOW_DEPTH_MAX_P1D -> "max(surface_snow_thickness P1D)"
+    }
+
+/** The default measurement unit for each [ElementType]. */
+private val ElementType.defaultUnit: MeasurementUnit
+    get() = when (this) {
+        ElementType.TEMPERATURE_MEAN_P1D -> MeasurementUnit.CELSIUS
+        ElementType.PRECIPITATION_SUM_P1D -> MeasurementUnit.MILLIMETERS
+        ElementType.WIND_SPEED_MEAN_P1D -> MeasurementUnit.METERS_PER_SECOND
+        ElementType.SNOW_DEPTH_MAX_P1D -> MeasurementUnit.CENTIMETERS
+    }
+
+/** Comma-separated Frost v0 element IDs for all supported element types. */
+private val elementsCsv: String =
+    ElementType.entries.joinToString(",") { it.frostElementId }
 
 // --- Helper functions (top-level for independent testability) ---
 

@@ -7,5 +7,5 @@ data class LocationClimateDataPoint(
     val year: Int,
     val type: ElementType,
     val unit: MeasurementUnit,
-    val avgValue: Double?
+    val avgValue: Double,
 )
