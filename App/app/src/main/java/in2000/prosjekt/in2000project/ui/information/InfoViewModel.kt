@@ -34,30 +34,30 @@ class InfoViewModel: ViewModel(){
                 currentState.copy(
                     title = "About the app",
                     teamTitle = "The Team",
-                    aboutTeam = "We are a group of incredibly talented, wonderfully creative, and pretty f***ing cool IN2000 students. We have been tasked with making the coooooooolest app you've ever seen and that's what we plan to do. This page is just FYI, but click back to Home or the Map for more :)",
+                    aboutTeam = "We are a group of dedicated and creative IN2000 students working together to create an informative and user-friendly avalanche safety app. Our goal going into this was to create a reliable tool that helps users make safer decisions when traveling to potential avalanche-prone areas. This page is provides general information about avalanche risk levels and their meaning. Please return to the Homescreen or the Map for the main features",
                     avalancheTitle = "Avalanche Info",
-                    avalancheGeneralInfo = "Avalanches have become increasingly more common as Global Climate Change keeps on keeping on. So when you're out shreddin', you gots ta be careful. That's why we created this app! We hope you enjoy it.",
+                    avalancheGeneralInfo = "Avalanches have become increasingly more common as Global Climate Change continues to impact mountainous environments. When you're out exploring the country, it's important to stay informed and prioritize your safety. That's why we created this app. To help you make safer decisions and enjoy your time outdoors.",
                     dangerTitle = "Avalanche Danger Levels",
                     dangerLevels = listOf(
                         DangerLevel(
                             level = "1 - Low",
-                            description = "NICE! This means generally safe avalanche conditions. Natural and human-triggered avalanches are unlikely. GO! GO! GO!"
+                            description = "Generally stable conditions.\n\nTriggering is generally possible only from high additional loads in isolated areas of very steep, extreme terrain. Only small and medium natural avalanches are possible.\n\nTypical danger signs: \nrarely any danger signs. \n\nForecast for around 20% of the winter season. Around 5% of avalanche fatalities."
                         ),
                         DangerLevel(
                             level = "2 - Moderate",
-                            description = "Hmmm... maybe think twice before taking this on? Heightened avalanche conditions on some terrain features. Human-triggered avalanches are definitely possible."
+                            description = "Heightened avalanche conditions on specific terrain features.\n\nTriggering is possible, primarily from high additional loads, particularly on the indicated steep slopes. Very large natural avalanches are unlikely. \n\nTypical danger signs: \noften there are no danger signs, but that does not necessarily mean it is safe. Pay extra attention if persistent weak layer is one of the avalanche problems. \n\nForecast for around 50% of the winter season. Around 30% of avalanche fatalities."
                         ),
                         DangerLevel(
                             level = "3 - Considerable",
-                            description = "YIKES, POSSIBLE DEATH - Dangerous avalanche conditions. PLEASE DON'T GO! Human-triggered avalanches are likely and natural avalanches are possible."
+                            description = "Dangerous avalanche conditions.\n\nTriggering is possible, even from low additional loads, particularly on the indicated steep slopes. In certain situations some large, and in isolated cases very large natural avalanches are possible. \n\nTypical danger signs: \nrecent avalanche activity, cracking, and 'whumpf' sounds. Remote triggering of avalanches is typical, especially if persistent weak layer is one of the avalanche problems. \n\nForecast for around 30% of the winter season. Around 50% of avalanche fatalities."
                         ),
                         DangerLevel(
                             level = "4 - High",
-                            description = "DEATH IS LIKELY - DO NOT GO!! Very dangerous avalanche conditions. Human-triggered avalanches are very likely and natural avalanches are likely."
+                            description = "Very dangerous avalanche conditions. \n\nTriggering is likely, even from low additional loads, on many steep slopes. In some cases, numerous large and often very large natural avalanches can be expected. \n\nTypical danger signs: \nwidespread recent avalanche activity, cracking, and 'whumpf' sounds. \nRemote triggering of avalanches is typical. \n\nForecasted only on a few days throughout the winter. Around 10% of avalanche fatalities."
                         ),
                         DangerLevel(
-                            level = "5 - Extreme",
-                            description = "CERTAIN DEATH!! At this point, it might be time to book a flight south. Avoid all avalanche terrain. Large natural avalanches are certain or nearly certain."
+                            level = "5 - Very High",
+                            description = "Extraordinary avalanche conditions. \n\nNumerous very large and often extremely large natural avalanches can be expected, even in moderately steep terrain. \n\nVery rarely forecast."
                         )
                     )
                 )
