@@ -10,5 +10,6 @@ sealed class Screen(
         fun createRoute(coordinates: String) = "map/$coordinates"
     }
     object Info : Screen("info")
+    object Settings : Screen("settings")
 
 }

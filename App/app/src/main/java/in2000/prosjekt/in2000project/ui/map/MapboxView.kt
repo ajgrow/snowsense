@@ -1,5 +1,6 @@
 package in2000.prosjekt.in2000project.ui.map
 
+import android.graphics.BitmapFactory
 import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -28,8 +29,15 @@ import com.mapbox.maps.extension.style.layers.generated.rasterLayer
 import com.mapbox.maps.extension.style.sources.addSource
 import com.mapbox.maps.extension.style.sources.generated.rasterSource
 import com.mapbox.maps.plugin.animation.MapAnimationOptions
+import com.mapbox.maps.plugin.annotation.annotations
+import com.mapbox.maps.plugin.annotation.generated.PointAnnotationManager
+import com.mapbox.maps.plugin.annotation.generated.PointAnnotationOptions
+import com.mapbox.maps.plugin.annotation.generated.createPointAnnotationManager
 import com.mapbox.maps.plugin.gestures.gestures
 import com.mapbox.maps.toCameraOptions
+import in2000.prosjekt.in2000project.ui.settings.SettingsViewModel
+import in2000.prosjekt.in2000project.ui.settings.ThemeMode
+import in2000.prosjekt.in2000project.R
 
 /*
 This global object is bad practice but it works and I
@@ -68,8 +76,21 @@ fun MapboxView(
     coordinates: String,
     onOverlayError: () -> Unit,
     onOverlayLoaded: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    settingsViewModel: SettingsViewModel
 ) {
+
+    val themeMode = settingsViewModel.themeMode
+    val mapStyle = when (themeMode){
+        ThemeMode.DARK -> Style.DARK
+        ThemeMode.LIGHT -> Style.OUTDOORS
+        ThemeMode.SYSTEM ->
+            if (androidx.compose.foundation.isSystemInDarkTheme())
+                Style.DARK
+            else
+                Style.OUTDOORS
+    }
+
     val (hasSearch, searchLat, searchLng) = remember(coordinates) {
         if (coordinates.isNotBlank() && coordinates != "0,0") {
             val parts = coordinates.split(",")
@@ -121,18 +142,13 @@ fun MapboxView(
                 mapViewportState = viewportState
             ) {
                 MapEffect(Unit) { mapView ->
-                    //this click listener just works generally on the map
-                    mapView.gestures.addOnMapClickListener { point ->
-                        onMapClick(point)
-                        true //return true to show that the click was handled
-                    }
 
                     mapView.mapboxMap.subscribeMapLoadingError { error ->
                         Log.e(TAG, "Map loading error: ${error.message}")
                         onOverlayError()
                     }
 
-                    mapView.mapboxMap.loadStyle(Style.OUTDOORS) { style ->
+                    mapView.mapboxMap.loadStyle(mapStyle) { style ->
                         onOverlayLoaded()
                         Log.d(TAG, "Style loaded, adding WMS sources")
 
@@ -193,6 +209,44 @@ fun MapboxView(
                             .maxZoom(18.0)
                             .build()
                     )
+
+
+                    val annotationApi = mapView.annotations
+                    val pointAnnotationManager: PointAnnotationManager = annotationApi.createPointAnnotationManager()
+
+                    fun addPin(point: Point){
+                        pointAnnotationManager.deleteAll()
+                        val bitmap = BitmapFactory.decodeResource(
+                            mapView.context.resources,
+                            R.drawable.red_marker
+                        )
+
+                        val pointAnnotationOptions = PointAnnotationOptions()
+                            .withPoint(point)
+                            .withIconImage(bitmap)
+                            .withIconSize(0.3)
+                        pointAnnotationManager.create(pointAnnotationOptions)
+
+                    }
+
+                    //this click listener just works generally on the map
+                    mapView.gestures.addOnMapClickListener { point ->
+                        addPin(point)
+                        onMapClick(point)
+                        true
+                    }
+
+                    if (hasSearch && searchLat != null && searchLng != null){
+                        val searchPoint = Point.fromLngLat(searchLng, searchLat)
+
+                        mapView.mapboxMap.setCamera(
+                            CameraOptions
+                                .Builder()
+                                .center(searchPoint)
+                                .zoom(12.0)
+                                .build())
+                        addPin(searchPoint)
+                    }
                 }
             }
             Column(

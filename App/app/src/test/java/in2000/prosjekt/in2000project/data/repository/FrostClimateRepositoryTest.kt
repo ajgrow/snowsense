@@ -5,6 +5,7 @@ import in2000.prosjekt.in2000project.data.datasource.dto.*
 import in2000.prosjekt.in2000project.data.model.Coordinate
 import in2000.prosjekt.in2000project.data.model.NoObservationsException
 import in2000.prosjekt.in2000project.data.model.NoStationFoundException
+import in2000.prosjekt.in2000project.data.model.enums.ElementType
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
@@ -114,7 +115,7 @@ class FrostClimateRepositoryTest {
     }
 
     @Test
-    fun dailyAverages_computedCorrectly() = runTest {
+    fun yearlyAverages_computedCorrectly() = runTest {
         // temp -2,-4 → avg -3; precip 4.5,6.5 → avg 5.5; wind 3,5 → avg 4.
         fakeDataSource.observationResponse = makeObsResponse(
             makeDay("2024-04-01T00:00:00.000Z", temp = -2.0, precip = 4.5, wind = 3.0),
@@ -127,14 +128,20 @@ class FrostClimateRepositoryTest {
             10,
         )
 
-        assertEquals(-3.0, result.avgDailyMeanTemperatureC!!, 0.001)
-        assertEquals(5.5, result.avgDailyPrecipitationMm!!, 0.001)
-        assertEquals(4.0, result.avgDailyMeanWindSpeedMs!!, 0.001)
+        val temp2024 = result.yearlyAverages.find { it.year == 2024 && it.type == ElementType.TEMPERATURE_MEAN_P1D }!!.avgValue
+        val temp2025 = result.yearlyAverages.find { it.year == 2025 && it.type == ElementType.TEMPERATURE_MEAN_P1D }!!.avgValue
+        val precip2024 = result.yearlyAverages.find { it.year == 2024 && it.type == ElementType.PRECIPITATION_SUM_P1D }!!.avgValue
+        val wind2025 = result.yearlyAverages.find { it.year == 2025 && it.type == ElementType.WIND_SPEED_MEAN_P1D }!!.avgValue
+
+        assertEquals(-2.0, temp2024, 0.001)
+        assertEquals(-4.0, temp2025, 0.001)
+        assertEquals(4.5, precip2024, 0.001)
+        assertEquals(5.0, wind2025, 0.001)
     }
 
     @Test
-    fun missingElement_returnsNullAverage() = runTest {
-        // No snow depth observations — should map to null, not 0 or NaN.
+    fun missingElement_omittedFromResults() = runTest {
+        // No snow depth observations — should be absent from results.
         fakeDataSource.observationResponse = makeObsResponse(
             makeDay("2024-04-01T00:00:00.000Z", temp = -2.0, precip = 4.5, wind = 3.0),
         )
@@ -145,7 +152,9 @@ class FrostClimateRepositoryTest {
             10,
         )
 
-        assertNull(result.avgDailyMaxSnowDepthCm)
+        val snow = result.yearlyAverages.find { it.year == 2024 && it.type == ElementType.SNOW_DEPTH_MAX_P1D }
+
+        assertNull(snow)
     }
 
     @Test

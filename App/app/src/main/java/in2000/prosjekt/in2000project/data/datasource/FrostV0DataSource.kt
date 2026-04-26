@@ -25,7 +25,7 @@ interface FrostV0DataSource {
      * Fetches weather observations from a station.
      *
      * @param sourceId Station identifier, e.g. `"SN18700"` (Blindern).
-     * @param elements Comma-separated element IDs, e.g. `"mean(air_temperature P1D)"`.
+     * @param elementsCsv Comma-separated element IDs, e.g. `"mean(air_temperature P1D)"`.
      *   See [element table](https://frost.met.no/elementtable) for valid IDs.
      * @param referenceTime ISO 8601 time range (half-open), e.g. `"2020-01-01/2025-01-01"`.
      *   Also supports `"latest"` for the most recent data.
@@ -34,7 +34,7 @@ interface FrostV0DataSource {
      */
     suspend fun getObservations(
         sourceId: String,
-        elements: String,
+        elementsCsv: String,
         referenceTime: String,
     ): FrostV0ObservationResponse
 }
