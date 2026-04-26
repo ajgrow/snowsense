@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">in2000project</string>
+
+    <string name="home_title">Home</string>
+    <string name="app_logo_description">App Logo</string>
+    <string name="search_placeholder">Search</string>
+    <string name="favorites_title">Favorites</string>
+    <string name="recent_searches_title">Recent searches</string>
 </resources>
