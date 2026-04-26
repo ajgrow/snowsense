@@ -47,12 +47,12 @@ class FakeFrostV0DataSource : FrostV0DataSource {
 
     override suspend fun getObservations(
         sourceId: String,
-        elements: String,
+        elementsCsv: String,
         referenceTime: String,
     ): FrostV0ObservationResponse {
         if (shouldThrow) throw java.io.IOException("Fake network error")
         lastSourceId = sourceId
-        lastElements = elements
+        lastElements = elementsCsv
         lastReferenceTime = referenceTime
         return observationResponse
     }

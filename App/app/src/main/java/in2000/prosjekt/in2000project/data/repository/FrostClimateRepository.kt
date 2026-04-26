@@ -51,7 +51,7 @@ class FrostClimateRepository(
         // 3. Fetch observations for the specified elements and time range.
         val obsResponse = frostV0DataSource.getObservations(
             sourceId = station.id,
-            elements = ELEMENTS_CSV,
+            elementsCsv = ELEMENTS_CSV,
             referenceTime = referenceTime,
         )
 

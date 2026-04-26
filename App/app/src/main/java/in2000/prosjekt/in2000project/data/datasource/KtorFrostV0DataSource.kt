@@ -24,12 +24,12 @@ class KtorFrostV0DataSource(
 
     override suspend fun getObservations(
         sourceId: String,
-        elements: String,
+        elementsCsv: String,
         referenceTime: String
     ): FrostV0ObservationResponse {
         return client.get("https://frost.met.no/observations/v0.jsonld") {
             parameter("sources", sourceId)
-            parameter("elements", elements)
+            parameter("elements", elementsCsv)
             parameter("referencetime", referenceTime)
             parameter("timeoffsets", "default")
         }.body()
