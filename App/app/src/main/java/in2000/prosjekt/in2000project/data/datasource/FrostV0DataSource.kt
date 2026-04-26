@@ -2,7 +2,6 @@ package in2000.prosjekt.in2000project.data.datasource
 
 import in2000.prosjekt.in2000project.data.datasource.dto.FrostV0ObservationResponse
 import in2000.prosjekt.in2000project.data.datasource.dto.FrostV0Source
-import in2000.prosjekt.in2000project.data.datasource.dto.FrostV0SourceResponse
 import in2000.prosjekt.in2000project.data.model.Coordinate
 
 /**
