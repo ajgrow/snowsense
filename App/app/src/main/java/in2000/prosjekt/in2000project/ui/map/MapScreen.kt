@@ -23,12 +23,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import in2000.prosjekt.in2000project.R
 import in2000.prosjekt.in2000project.data.model.SkiArea
 import in2000.prosjekt.in2000project.ui.reusables.BottomBar
 import in2000.prosjekt.in2000project.ui.reusables.TopBar
@@ -96,7 +98,10 @@ fun MapScreen(
     }
     Scaffold(
         topBar = {
-            TopBar(modifier = Modifier, title = "MapScreen", navController = navController)
+            TopBar(
+                modifier = Modifier,
+                title = stringResource(R.string.map_screen_title),
+                navController = navController)
         },
         bottomBar = {
             BottomBar(modifier, navController)
@@ -113,7 +118,7 @@ fun MapScreen(
         ) {
             // Title
             Text(
-                text = "Map",
+                text = stringResource(R.string.map_title),
                 style = MaterialTheme.typography.headlineMedium,
                 fontWeight = Bold,
                 modifier = Modifier.padding(bottom = 8.dp)
@@ -121,7 +126,7 @@ fun MapScreen(
 
             // Instructions
             Text(
-                text = "Select an area to view historical climate details.",
+                text = stringResource(R.string.map_instruction),
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.padding(bottom = 16.dp)
             )
@@ -152,13 +157,13 @@ fun MapScreen(
                 when (mapUIState) {
                     is MapUIState.Loading -> {
                         OverlayStatusCard(
-                            message = "Loading avalanche overlay..."
+                            message = stringResource(R.string.overlay_loading)
                         )
                     }
 
                     is MapUIState.Error -> {
                         OverlayRetryCard(
-                            message = "Could not load avalanche overlay.",
+                            message = stringResource(R.string.overlay_error),
                             onRetry = onRetry
                         )
                     }
@@ -215,17 +220,29 @@ fun SkiAreaBottomSheetContent(
 
             // Description of the content
             Text(
-                text = "Historical Climate Summary",
+                text = stringResource(R.string.historical_climate_title),
                 style = MaterialTheme.typography.titleMedium
             )
 
             HorizontalDivider()
 
             // Placeholder rows for climate information
-            ClimateRow(label = "Avalanche danger", value = avalancheStatus)
-            ClimateRow("Average snowfall", area.averageSnowfall)
-            ClimateRow("Average precipitation", area.averagePrecipitation)
-            ClimateRow("Average temperature", area.dailyMeanTemperature)
+            ClimateRow(
+                label = stringResource(R.string.label_avalanche_danger),
+                value = avalancheStatus
+            )
+            ClimateRow(
+                stringResource(R.string.label_average_snowfall),
+                area.averageSnowfall
+            )
+            ClimateRow(
+                stringResource(R.string.label_average_precipitation),
+                area.averagePrecipitation
+            )
+            ClimateRow(
+                stringResource(R.string.label_average_temperature),
+                area.dailyMeanTemperature
+            )
         }
     }
 }

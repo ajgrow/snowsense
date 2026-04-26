@@ -12,11 +12,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import in2000.prosjekt.in2000project.R
 import in2000.prosjekt.in2000project.ui.reusables.BottomBar
 import in2000.prosjekt.in2000project.ui.reusables.TopBar
 
@@ -31,7 +33,10 @@ fun InfoScreen(
     Scaffold(
         modifier = modifier,
         topBar = {
-            TopBar(modifier = Modifier, title = "Information", navController = navController)
+            TopBar(
+                modifier = Modifier,
+                title = stringResource(R.string.information_title),
+                navController = navController)
         },
         bottomBar = {
             BottomBar(modifier, navController)
