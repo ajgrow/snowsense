@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
@@ -37,6 +39,9 @@ android {
     buildFeatures {
         compose = true
         buildConfig = true
+    }
+    testOptions {
+        unitTests.isReturnDefaultValues = true
     }
 }
 
@@ -85,4 +90,16 @@ dependencies {
     //DataStore
     implementation("androidx.datastore:datastore-preferences:1.1.1")
 
+}
+
+// Read local.properties to pass secrets to JVM test processes as system properties.
+val localProps = Properties().apply {
+    rootProject.file("local.properties").takeIf { it.exists() }?.inputStream()?.use { load(it) }
+}
+
+tasks.withType<Test> {
+    systemProperty("FROST_CLIENT_ID", localProps.getProperty("FROST_CLIENT_ID") ?: "")
+    // Integration tests auto-skip via Assume.assumeTrue when FROST_CLIENT_ID is absent.
+    // Run them from CLI: ./gradlew test --tests "*.FrostApiIntegrationTest"
+    // Or click the green gutter arrow in Android Studio.
 }
