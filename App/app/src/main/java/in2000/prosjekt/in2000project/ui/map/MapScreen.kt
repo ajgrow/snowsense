@@ -31,8 +31,10 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import in2000.prosjekt.in2000project.data.model.SkiArea
 import in2000.prosjekt.in2000project.ui.reusables.BottomBar
+import in2000.prosjekt.in2000project.ui.reusables.DatePicker
 import in2000.prosjekt.in2000project.ui.reusables.TopBar
 import in2000.prosjekt.in2000project.ui.settings.SettingsViewModel
+import java.time.MonthDay
 
 private val previewSkiArea = SkiArea(
     id = "1",
@@ -94,7 +96,13 @@ fun MapScreen(
         dangerCheckUiState.isDanger == false -> "Low"
         else -> "Haven't checked"
     }
+
+    var startDate by rememberSaveable { mutableStateOf<MonthDay?>(null) }
+    var endDate by rememberSaveable { mutableStateOf<MonthDay?>(null) }
+    var selectedYear by rememberSaveable { mutableStateOf<Int?>(null) }
+
     Scaffold(
+        modifier = modifier,
         topBar = {
             TopBar(modifier = Modifier, title = "MapScreen", navController = navController)
         },
@@ -184,7 +192,13 @@ fun MapScreen(
                     .fillMaxWidth()
                     .heightIn(min = 320.dp)
                     .navigationBarsPadding()
-                    .padding(bottom = 24.dp)
+                    .padding(bottom = 24.dp),
+                startDate = startDate,
+                endDate = endDate,
+                selectedYear = selectedYear,
+                onStartDateChange = { startDate = it },
+                onEndDateChange = { endDate = it },
+                onYearChange = { selectedYear = it }
             )
         }
     }
@@ -194,7 +208,13 @@ fun MapScreen(
 fun SkiAreaBottomSheetContent(
     area: SkiArea,
     avalancheStatus: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    startDate: MonthDay?,
+    endDate: MonthDay?,
+    selectedYear: Int?,
+    onStartDateChange: (MonthDay?) -> Unit,
+    onEndDateChange: (MonthDay?) -> Unit,
+    onYearChange: (Int?) -> Unit,
 ) {
     // This is the content inside the bottom sheet.
     Surface(
@@ -207,10 +227,20 @@ fun SkiAreaBottomSheetContent(
                 .padding(horizontal = 20.dp, vertical = 16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
+
             // Area name
             Text(
                 text = area.name,
                 style = MaterialTheme.typography.headlineSmall
+            )
+
+            DatePicker(
+                startDate = startDate,
+                endDate = endDate,
+                selectedYear = selectedYear,
+                onStartDateChange = onStartDateChange,
+                onEndDateChange = onEndDateChange,
+                onYearChange =  onYearChange,
             )
 
             // Description of the content
@@ -269,6 +299,12 @@ fun MapScreenErrorPreview() {
 fun BottomSheetPreview() {
     SkiAreaBottomSheetContent(
         area = previewSkiArea,
-        avalancheStatus = "High"
+        avalancheStatus = "High",
+        startDate = null,
+        endDate = null,
+        selectedYear = null,
+        onStartDateChange = { },
+        onEndDateChange = { },
+        onYearChange = { },
     )
 }
