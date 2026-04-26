@@ -28,7 +28,8 @@ class FrostClimateRepository(
     ): LocationClimateData {
         require(yearsBack >= 0)
 
-        val station = getNearestStation(coordinate)
+        val station = frostV0DataSource.getNearestSource(coordinate)
+            ?: throw NoStationFoundException(coordinate)
 
         // ISO-8601 repeating time range (R10/2014-03-01/2014-04-01/P1Y)
         val referenceTime = FrostReferenceTime.fromMonthDayRange(
@@ -73,15 +74,6 @@ class FrostClimateRepository(
         )
     }
 
-    // Throws NoStationFoundException if no station found.
-    private suspend fun getNearestStation(
-        coordinate: Coordinate
-    ): FrostV0Source = frostV0DataSource
-        .getNearestSource(coordinate)
-        .data
-        .firstOrNull()
-        ?: throw NoStationFoundException(coordinate)
-
     /**
      * Incredibly naive and unreliable implementation of slab avalanche
      * risk assessment.
@@ -95,7 +87,8 @@ class FrostClimateRepository(
         val startDate = currentDate.minusDays(21)
 
         //find nearest station
-        val station = getNearestStation(coordinate)
+        val station = frostV0DataSource.getNearestSource(coordinate)
+            ?: throw NoStationFoundException(coordinate)
 
         //build time query
         val referenceTime = FrostReferenceTime.fromMonthDayRange(
