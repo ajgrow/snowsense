@@ -116,6 +116,15 @@ Svært sjelden varslet.
 
     <string name="topbar_settings">Innstillinger</string>
 
+    <string name="date_start">Startdato</string>
+    <string name="date_end">Sluttdato</string>
+    <string name="since_year">Siden år</string>
+
+    <string name="dialog_ok">OK</string>
+    <string name="dialog_cancel">Avbryt</string>
+
+    <string name="previous_month">Forrige måned</string>
+    <string name="next_month">Neste måned</string>
 
 
 

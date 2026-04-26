@@ -117,6 +117,16 @@
 
     <string name="topbar_settings">Settings</string>
 
+    <string name="date_start">Start</string>
+    <string name="date_end">End</string>
+    <string name="since_year">Since Year</string>
+
+    <string name="dialog_ok">OK</string>
+    <string name="dialog_cancel">Cancel</string>
+
+    <string name="previous_month">Previous month</string>
+    <string name="next_month">Next month</string>
+
 
 
 
