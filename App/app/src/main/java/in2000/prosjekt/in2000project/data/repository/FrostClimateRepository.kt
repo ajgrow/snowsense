@@ -212,23 +212,6 @@ class FrostClimateRepository(
         }
     }
 
-
-private val ElementType.frostElementId: String
-    get() = when (this) {
-        ElementType.TEMPERATURE_MEAN_P1D -> "mean(air_temperature P1D)"
-        ElementType.PRECIPITATION_SUM_P1D -> "sum(precipitation_amount P1D)"
-        ElementType.WIND_SPEED_MEAN_P1D -> "mean(wind_speed P1D)"
-        ElementType.SNOW_DEPTH_MAX_P1D -> "max(surface_snow_thickness P1D)"
-    }
-
-private val ElementType.defaultUnit: MeasurementUnit
-    get() = when (this) {
-        ElementType.TEMPERATURE_MEAN_P1D -> MeasurementUnit.CELSIUS
-        ElementType.PRECIPITATION_SUM_P1D -> MeasurementUnit.MILLIMETERS
-        ElementType.WIND_SPEED_MEAN_P1D -> MeasurementUnit.METERS_PER_SECOND
-        ElementType.SNOW_DEPTH_MAX_P1D -> MeasurementUnit.CENTIMETERS
-    }
-
 private val elementsCsv: String =
     ElementType.entries.joinToString(",") { it.frostElementId }
 
