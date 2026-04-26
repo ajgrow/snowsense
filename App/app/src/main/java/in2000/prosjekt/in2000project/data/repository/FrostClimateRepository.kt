@@ -56,7 +56,9 @@ class FrostClimateRepository(
 
         if (allObservations.isEmpty())
             throw NoObservationsException(
-                station.name, periodStart, periodEnd, yearsBack)
+                station.name,
+                ELEMENTS_CSV,
+                referenceTime)
 
 
         val averages = averageByElement(allObservations)
@@ -118,9 +120,8 @@ class FrostClimateRepository(
         if (observationResponse.data.flatMap { it.observations }.isEmpty())
             throw NoObservationsException(
                 station.name,
-                MonthDay.of(startDate.monthValue, startDate.dayOfMonth),
-                MonthDay.of(currentDate.monthValue, currentDate.dayOfMonth),
-                0
+                ELEMENTS_CSV,
+                referenceTime
             )
 
         //recent snowfall estimate from last 3 days
