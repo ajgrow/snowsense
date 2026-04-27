@@ -3,7 +3,7 @@ package in2000.prosjekt.in2000project.data.repository
 
 import in2000.prosjekt.in2000project.data.datasource.FrostV0DataSource
 import in2000.prosjekt.in2000project.data.datasource.dto.FrostV0Observation
-import in2000.prosjekt.in2000project.data.datasource.dto.FrostV0Source
+import in2000.prosjekt.in2000project.data.datasource.dto.FrostV0ObservationResponse
 import in2000.prosjekt.in2000project.data.model.Coordinate
 import in2000.prosjekt.in2000project.data.model.DangerLevel
 import in2000.prosjekt.in2000project.data.model.LocationClimateData
@@ -15,9 +15,10 @@ import java.time.LocalDate
 import java.time.MonthDay
 import in2000.prosjekt.in2000project.data.model.enums.ElementType
 import in2000.prosjekt.in2000project.data.model.enums.MeasurementUnit
+import kotlin.collections.groupBy
 
 class FrostClimateRepository(
-    private val frostV0DataSource: FrostV0DataSource
+    private val frostV0DataSource: FrostV0DataSource,
 ) : ClimateRepository {
 
     override suspend fun getClimateDataForLocation(
@@ -31,12 +32,16 @@ class FrostClimateRepository(
         val station = frostV0DataSource.getNearestSource(coordinate)
             ?: throw NoStationFoundException(coordinate)
 
-        // ISO-8601 repeating time range (R10/2014-03-01/2014-04-01/P1Y)
         val referenceTime = FrostReferenceTime.fromMonthDayRange(
             periodStart,
             periodEnd,
             yearsBack,
         ).value
+
+        val elementsCsv = ElementType.entries
+            .joinToString(",") {
+                it.frostElementId
+            }
 
         val obsResponse = frostV0DataSource.getObservations(
             station.id,
@@ -44,22 +49,19 @@ class FrostClimateRepository(
             referenceTime,
         )
 
-        val allObservations = obsResponse.data.flatMap { it.observations }
+        val observationCount = obsResponse.data
+            .fold(0) { acc, obs ->
+                acc + obs.observations.size
+            }
 
-        if (allObservations.isEmpty())
+        if (observationCount == 0)
             throw NoObservationsException(
                 station.name,
                 elementsCsv,
-                referenceTime)
+                referenceTime
+            )
 
-        // Group by year, calculate averages for each element, create data points
-        val yearlyAverages = obsResponse.data
-            .groupBy { it.referenceTime.take(4).toIntOrNull() ?: 0 }
-            .flatMap { (year, yearData) ->
-                val yearObservations = yearData.flatMap { it.observations }
-                val averages = averageByElement(yearObservations)
-                toYearlyDataPoints(year, averages)
-            }
+        val yearlyAverages = obsResponse.getYearlyDataPoints()
 
         return LocationClimateData(
             coordinate = coordinate,
@@ -69,7 +71,7 @@ class FrostClimateRepository(
             periodStart = periodStart,
             periodEnd = periodEnd,
             yearsBack = yearsBack,
-            dataPointCount = allObservations.size,
+            dataPointCount = observationCount,
             yearlyAverages = yearlyAverages
         )
     }
@@ -82,6 +84,10 @@ class FrostClimateRepository(
         coordinate: Coordinate,
         currentDate: LocalDate = LocalDate.now()
     ) : LocationSlabAvalancheRiskData {
+        val elementsCsv = listOf(
+            ElementType.TEMPERATURE_MEAN_P1D.frostElementId,
+            ElementType.PRECIPITATION_SUM_P1D.frostElementId)
+            .joinToString(",")
 
         //define time range
         val startDate = currentDate.minusDays(21)
@@ -194,28 +200,39 @@ class FrostClimateRepository(
 
 }
 
-    // Pair years and ElementType averages, skipping missing elements.
-    private fun toYearlyDataPoints(
-        year: Int,
-        averages: Map<String, Double>,
-    ): List<LocationClimateDataPoint>
-    = ElementType.entries.mapNotNull { type ->
-        averages[type.frostElementId]?.let { avgValue ->
-            LocationClimateDataPoint( year,  type,  type.defaultUnit,  avgValue)
-        }
+private fun FrostV0ObservationResponse.getYearlyDataPoints(
+): List<LocationClimateDataPoint> = this
+    .groupObservationsByYear()
+    .mapValues { it.value.averageByElement() }
+    .map { (year, elementAverages) ->
+        createDataPointForYear(year, elementAverages)
+    }
+    .flatten()
+
+private fun FrostV0ObservationResponse.groupObservationsByYear(
+): Map<Int, List<FrostV0Observation>> = this
+    .data
+    .groupBy(
+        { it.referenceTime.take(4).toIntOrNull() ?: 0 },
+        { it.observations })
+    .filter { it.key != 0 }
+    .mapValues { it.value.flatten() }
+
+/** Mean observation value per Frost elementId. */
+internal fun List<FrostV0Observation>.averageByElement(
+): Map<String, Double> = this.groupBy { it.elementId }
+    .mapValues { groupedObservations ->
+        groupedObservations.value
+            .map { observation -> observation.value }
+            .average()
     }
 
-private val elementsCsv: String =
-    ElementType.entries.joinToString(",") { it.frostElementId }
-
-    /** Mean observation value per Frost elementId. */
-    internal fun averageByElement(
-        observations: List<FrostV0Observation>
-    ): Map<String, Double>
-    = observations
-        .groupBy { it.elementId }
-        .mapValues { groupedObservations ->
-            groupedObservations.value
-                .map { observation -> observation.value }
-                .average()
-        }
+// Pair years and ElementType averages, skipping missing elements.
+private fun createDataPointForYear(
+    year: Int,
+    elementAverages: Map<String, Double>,
+): List<LocationClimateDataPoint> = ElementType.entries.mapNotNull { type ->
+    elementAverages[type.frostElementId]?.let { avgValue ->
+        LocationClimateDataPoint(year, type, type.defaultUnit, avgValue)
+    }
+}
