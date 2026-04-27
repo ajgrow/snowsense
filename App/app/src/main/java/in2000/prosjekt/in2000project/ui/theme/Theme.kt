@@ -14,6 +14,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import in2000.prosjekt.in2000project.ui.settings.TextSizeMode
 import in2000.prosjekt.in2000project.ui.settings.ThemeMode
+import androidx.compose.runtime.SideEffect
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalView
+import androidx.core.view.WindowCompat
 
 private val DarkColorScheme = darkColorScheme(
     primary = Purple80,
@@ -71,6 +75,22 @@ fun In2000projectTheme(
             bodyLarge = Typography.bodyLarge.copy(fontSize = Typography.bodyLarge.fontSize * 1.2f),
             titleLarge = Typography.titleLarge.copy(fontSize = Typography.titleLarge.fontSize * 1.2f)
         )
+    }
+
+    val view = LocalView.current
+
+    if(!view.isInEditMode){
+        SideEffect {
+            val window = (view.context as Activity).window
+
+            window.statusBarColor = colorScheme.background.toArgb()
+
+            val insetsController = WindowCompat.getInsetsController(window, view)
+
+            insetsController.isAppearanceLightStatusBars = !darkTheme
+
+            insetsController.isAppearanceLightNavigationBars = !darkTheme
+        }
     }
 
     MaterialTheme(
