@@ -51,8 +51,7 @@ fun AppNavigation(){
                 Log.d("fuckedupmap",coordinates)
                 MapRoute(
                     navController = navController,
-                    coordinates = coordinates,
-                    settingsViewModel = settingsViewModel)
+                    coordinates = coordinates)
             }
             composable(Screen.Info.route) {
                 InfoScreen(navController = navController)
