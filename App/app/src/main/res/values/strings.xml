@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">SnowSense</string>
-
+    
     <string name="app_logo_description">App Logo</string>
     <string name="search_placeholder">Search</string>
     <string name="favorites_title">Favorites</string>
