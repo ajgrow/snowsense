@@ -1,9 +1,11 @@
 package in2000.prosjekt.in2000project.ui.map
 
+import android.graphics.Paint
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -11,8 +13,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -46,18 +50,10 @@ import in2000.prosjekt.in2000project.ui.reusables.TopBar
 import org.koin.compose.viewmodel.koinViewModel
 import java.time.MonthDay
 import in2000.prosjekt.in2000project.ui.settings.SettingsViewModel
-import com.patrykandpatrick.vico.compose.chart.Chart
-import com.patrykandpatrick.vico.compose.chart.line.lineChart
-import com.patrykandpatrick.vico.core.entry.entryOf
-import com.patrykandpatrick.vico.core.entry.entryModelOf
-import com.patrykandpatrick.vico.compose.axis.horizontal.rememberBottomAxis
-import com.patrykandpatrick.vico.compose.axis.vertical.rememberStartAxis
-import com.patrykandpatrick.vico.compose.component.textComponent
 import in2000.prosjekt.in2000project.ui.reusables.ClimateGraph
 
 private val previewSkiArea = SkiArea(
-    id = "1",
-    name = "Galdhøpiggen Touring Zone",
+    name = "",
     temperatureData = emptyList(),
     precipitationData = emptyList(),
     windSpeedData = emptyList(),
@@ -89,6 +85,12 @@ fun MapRoute(
         onOverlayLoaded = { mapViewModel.onOverlayLoaded()},
         onOverlayError = { mapViewModel.onOverlayError()},
         onSheetDismiss = { mapViewModel.onSheetDismissed() },
+        onPeriodStart = { it ->
+            if (it != null) mapViewModel.onPeriodStart(it) },
+        onPeriodEnd = { it ->
+            if (it != null) mapViewModel.onPeriodEnd(it) },
+        onYearsBack = { it ->
+            if (it != null) mapViewModel.onYearsBack(it) },
         settingsViewModel = settingsViewModel
     )
 }
@@ -107,12 +109,19 @@ fun MapScreen(
     onOverlayLoaded: () -> Unit,
     onOverlayError: () -> Unit,
     onSheetDismiss: () -> Unit,
+    onPeriodStart: (MonthDay?) -> Unit,
+    onPeriodEnd: (MonthDay?) -> Unit,
+    onYearsBack: (Int?) -> Unit,
     settingsViewModel: SettingsViewModel
 ) {
-    val skiArea = when (val state = screenState.climateState) {
-        is ClimateState.Success -> state.data.toSkiArea()
-        else -> previewSkiArea
-    }
+    val skiArea = remember(screenState.climateState) {
+        val state = screenState.climateState
+        if (state is ClimateState.Success) {
+            state.data.toSkiArea()
+        } else {
+            null
+        }
+    } ?: previewSkiArea
 
     val dangerCheckUiState by nveViewModel.dangerCheckUiState.collectAsState()
     //Controls whether the bottom sheet is visible or not by keeping track of if the user has clicked the map
@@ -185,6 +194,7 @@ fun MapScreen(
                     onMapClick = { point ->
                         onMapClick(point.latitude(), point.longitude())
                         nveViewModel.avalancheChecker(point.latitude(), point.longitude())
+                        isSheetOpen = true
                     },
                     onOverlayError = onOverlayError,
                     onOverlayLoaded = onOverlayLoaded,
@@ -246,18 +256,31 @@ fun MapScreen(
         ) {
             BottomSheetContent(
                 area = skiArea,
+                climateState = screenState.climateState,
                 avalancheStatus = avalancheStatus,
                 modifier = Modifier
                     .fillMaxWidth()
                     .heightIn(min = 320.dp)
                     .navigationBarsPadding()
-                    .padding(bottom = 24.dp),
+                    .padding(bottom = 12.dp),
                 startDate = startDate,
                 endDate = endDate,
                 selectedYear = selectedYear,
-                onStartDateChange = { startDate = it },
-                onEndDateChange = { endDate = it },
-                onYearChange = { selectedYear = it }
+                onStartDateChange = {
+                    startDate = it
+                    onPeriodStart(it)
+                },
+                onEndDateChange = {
+                    endDate = it
+                    onPeriodEnd(it)
+                },
+                onYearChange = { year ->
+                    selectedYear = year
+                    year?.let {
+                        val calculatedYearsBack = java.time.Year.now().value - it
+                        onYearsBack(calculatedYearsBack)
+                    }
+                }
             )
         }
     }
@@ -266,6 +289,7 @@ fun MapScreen(
 @Composable
 fun BottomSheetContent(
     area: SkiArea,
+    climateState: ClimateState,
     avalancheStatus: String,
     modifier: Modifier = Modifier,
     startDate: MonthDay?,
@@ -288,22 +312,63 @@ fun BottomSheetContent(
         LazyColumn(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 20.dp, vertical = 16.dp),
+                .padding(horizontal = 20.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
 
             item {
-                // Area name
-                Text(
-                    text = area.name,
-                    style = MaterialTheme.typography.headlineSmall
-                )
+                val headerHeight = 40.dp
 
-                // Description of the content
-                Text(
-                    text = "Historical Climate Summary",
-                    style = MaterialTheme.typography.titleMedium
-                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(headerHeight),
+                    contentAlignment = Alignment.CenterStart
+                ) {
+                    when (climateState) {
+                        is ClimateState.Loading -> {
+                            Column(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Box(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    CircularProgressIndicator(modifier = Modifier.size(26.dp))
+                                }
+                            }
+                        }
+
+                        is ClimateState.Error -> {
+                            Column(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Text(
+                                    text = "Failed to load data. Please try again.",
+                                    color = MaterialTheme.colorScheme.error,
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                            }
+                        }
+
+                        else -> {
+                            Column(
+                                modifier = Modifier
+                            ) {
+                                Text(
+                                    "Weather station:",
+                                    style = MaterialTheme.typography.labelSmall
+                                )
+                                Text(
+                                    text = area.name,
+                                    style = MaterialTheme.typography.titleLarge,
+                                )
+                            }
+                        }
+                    }
+                }
             }
             item {
                 DatePicker(
@@ -359,7 +424,33 @@ fun BottomSheetContent(
                         Text("Please select a year range to view graph")
                     }
                 } else {
-                    ClimateGraph(yearRange, startDate, endDate)
+                    Column(verticalArrangement = Arrangement.spacedBy(24.dp)) {
+                        ClimateGraph(
+                            dataPoints = area.temperatureData,
+                            startDate = startDate,
+                            endDate = endDate,
+                            title = "Mean Temperature"
+                        )
+
+                        HorizontalDivider()
+
+                        ClimateGraph(
+                            dataPoints = area.precipitationData,
+                            startDate = startDate,
+                            endDate = endDate,
+                            title = "Precipitation"
+                        )
+
+                        HorizontalDivider()
+
+                        ClimateGraph(
+                            dataPoints = area.windSpeedData,
+                            startDate = startDate,
+                            endDate = endDate,
+                            title = "Wind speed"
+                        )
+
+                    }
                 }
             }
         }
@@ -404,7 +495,10 @@ fun MapScreenErrorPreview() {
         onOverlayLoaded = {},
         onOverlayError = {},
         onSheetDismiss = {},
-        settingsViewModel = viewModel()
+        settingsViewModel = viewModel(),
+        onPeriodStart = {},
+        onPeriodEnd = {},
+        onYearsBack = {},
     )
 }
 
@@ -414,6 +508,7 @@ fun MapScreenErrorPreview() {
 fun BottomSheetPreview() {
     BottomSheetContent(
         area = previewSkiArea,
+        climateState = ClimateState.Idle,
         avalancheStatus = "High",
         startDate = null,
         endDate = null,
