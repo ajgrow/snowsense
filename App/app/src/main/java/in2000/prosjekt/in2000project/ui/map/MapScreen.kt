@@ -49,6 +49,7 @@ import com.patrykandpatrick.vico.core.entry.entryModelOf
 import com.patrykandpatrick.vico.compose.axis.horizontal.rememberBottomAxis
 import com.patrykandpatrick.vico.compose.axis.vertical.rememberStartAxis
 import com.patrykandpatrick.vico.compose.component.textComponent
+import in2000.prosjekt.in2000project.ui.reusables.ClimateGraph
 
 private val previewSkiArea = SkiArea(
     id = "1",
@@ -304,14 +305,14 @@ fun BottomSheetContent(
             item {
                 val currentYear = java.time.Year.now().value
 
-                val yearRange = remember(selectedYear){
-                    selectedYear?.let {it..currentYear}
+                val yearRange = remember(selectedYear) {
+                    selectedYear?.let { it..currentYear }
                 }
 
                 if (yearRange == null ||
                     startDate == null ||
-                    endDate == null)
-                {
+                    endDate == null
+                ) {
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -321,38 +322,7 @@ fun BottomSheetContent(
                         Text("Please select a year range to view graph")
                     }
                 } else {
-                    val points = remember(yearRange, startDate, endDate){
-                        yearRange.map {year ->
-                            year.toFloat() to 50f
-                        }
-                    }
-
-                    val entries = points.map {
-                        entryOf(it.first, it.second)
-                    }
-
-                    Text(
-                        text = "From $startDate to $endDate",
-                        style = MaterialTheme.typography.titleMedium
-                    )
-
-                    Chart(
-                        chart = lineChart(),
-                        model = entryModelOf(entries),
-                        startAxis = rememberStartAxis(
-                            label = textComponent(
-                                color = MaterialTheme.colorScheme.onSurface,
-                            )
-                        ),
-                        bottomAxis = rememberBottomAxis(
-                            label = textComponent(
-                                color = MaterialTheme.colorScheme.onSurface
-                            )
-                        ),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(180.dp)
-                    )
+                    ClimateGraph(yearRange, startDate, endDate)
                 }
             }
         }
