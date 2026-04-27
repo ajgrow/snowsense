@@ -1,18 +1,17 @@
 package in2000.prosjekt.in2000project.ui.map
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class MapViewModel : ViewModel() {
     private val _uiState = MutableStateFlow<MapUIState>(MapUIState.Loading)
     val uiState: StateFlow<MapUIState> = _uiState.asStateFlow()
+
 
     init {
         getMapData()

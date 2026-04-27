@@ -1,3 +1,148 @@
 <resources>
     <string name="app_name">SnowSense</string>
+
+    <string name="home_title">Home</string>
+    <string name="app_logo_description">App Logo</string>
+    <string name="search_placeholder">Search</string>
+    <string name="favorites_title">Favorites</string>
+    <string name="recent_searches_title">Recent searches</string>
+
+
+
+
+    <string name="information_title">Information</string>
+
+    <string name="about_app_title">About the app</string>
+    <string name="team_title">The Team</string>
+    <string name="about_team_text">
+    We are a group of dedicated and creative IN2000 students working together to create an informative and user-friendly avalanche safety app. Our goal going into this was to create a reliable tool that helps users make safer decisions when traveling to potential avalanche-prone areas. This page provides general information about avalanche risk levels and their meaning. Please return to the Home screen or the Map for the main features.
+    </string>
+
+    <string name="avalanche_info_title">Avalanche Info</string>
+    <string name="avalanche_general_info_text">
+    Avalanches have become increasingly more common as Global Climate Change continues to impact mountainous environments. When you\'re out exploring the country, it\'s important to stay informed and prioritize your safety. That\'s why we created this app: to help you make safer decisions and enjoy your time outdoors.
+    </string>
+
+    <string name="danger_levels_title">Avalanche Danger Levels</string>
+
+    <string name="danger_level_1_title">1 - Low</string>
+    <string name="danger_level_1_description">
+    Generally stable conditions.\n\n
+
+    Triggering is generally possible only from high additional loads in isolated areas of very steep, extreme terrain. Only small and medium natural avalanches are possible.\n\n
+
+    Typical danger signs:\n
+    rarely any danger signs.\n\n
+
+    Forecast for around 20% of the winter season. Around 5% of avalanche fatalities.
+    </string>
+
+    <string name="danger_level_2_title">2 - Moderate</string>
+    <string name="danger_level_2_description">
+    Heightened avalanche conditions on specific terrain features.\n\n
+
+    Triggering is possible, primarily from high additional loads, particularly on the indicated steep slopes. Very large natural avalanches are unlikely.\n\n
+
+    Typical danger signs:\n
+    often there are no danger signs, but that does not necessarily mean it is safe. Pay extra attention if persistent weak layer is one of the avalanche problems.\n\n
+
+    Forecast for around 50% of the winter season. Around 30% of avalanche fatalities.
+    </string>
+
+    <string name="danger_level_3_title">3 - Considerable</string>
+    <string name="danger_level_3_description">
+    Dangerous avalanche conditions.\n\n
+
+    Triggering is possible, even from low additional loads, particularly on the indicated steep slopes. In certain situations some large, and in isolated cases very large natural avalanches are possible.\n\n
+
+    Typical danger signs:\n
+    recent avalanche activity, cracking, and \'whumpf\' sounds. Remote triggering of avalanches is typical, especially if persistent weak layer is one of the avalanche problems.\n\n
+
+    Forecast for around 30% of the winter season. Around 50% of avalanche fatalities.
+    </string>
+
+    <string name="danger_level_4_title">4 - High</string>
+    <string name="danger_level_4_description">
+    Very dangerous avalanche conditions.\n\n
+
+    Triggering is likely, even from low additional loads, on many steep slopes. In some cases, numerous large and often very large natural avalanches can be expected.\n\n
+
+    Typical danger signs:\n
+    widespread recent avalanche activity, cracking, and \'whumpf\' sounds.\n
+    Remote triggering of avalanches is typical.\n\n
+
+    Forecasted only on a few days throughout the winter. Around 10% of avalanche fatalities.
+    </string>
+
+    <string name="danger_level_5_title">5 - Very High</string>
+    <string name="danger_level_5_description">
+    Extraordinary avalanche conditions.\n\n
+
+    Numerous very large and often extremely large natural avalanches can be expected, even in moderately steep terrain.\n\n
+
+    Very rarely forecast.
+    </string>
+
+
+
+    <string name="map_screen_title">MapScreen</string>
+
+    <string name="map_title">Map</string>
+    <string name="map_instruction">Select an area to view historical climate details.</string>
+
+    <string name="overlay_loading">Loading avalanche overlay...</string>
+    <string name="overlay_error">Could not load avalanche overlay.</string>
+
+    <string name="retry">Retry</string>
+
+    <string name="historical_climate_title">Historical Climate Summary</string>
+
+    <string name="label_avalanche_danger">Avalanche danger</string>
+    <string name="label_average_snowfall">Average snowfall</string>
+    <string name="label_average_precipitation">Average precipitation</string>
+    <string name="label_average_temperature">Average temperature</string>
+
+
+
+    <string name="nav_home_desc">Go to home screen</string>
+    <string name="nav_map_desc">Go to map screen</string>
+    <string name="nav_info_desc">Go to information screen</string>
+
+    <string name="settings_desc">Settings</string>
+
+    <string name="loading">Loading...</string>
+
+    <string name="error_title">Error</string>
+    <string name="no_internet">No internet connection</string>
+
+    <string name="topbar_settings">Settings</string>
+
+    <string name="date_start">Start</string>
+    <string name="date_end">End</string>
+    <string name="since_year">Since year</string>
+
+    <string name="dialog_ok">OK</string>
+    <string name="dialog_cancel">Cancel</string>
+
+    <string name="previous_month">Previous month</string>
+    <string name="next_month">Next month</string>
+
+
+
+
+    <string name="settings_title">Settings</string>
+
+    <string name="back_button_desc">Back</string>
+
+    <string name="appearance_title">Appearance</string>
+    <string name="text_size_title">Text Size</string>
+    <string name="language_title">Language</string>
+
+    <string name="theme_system">Use device setting</string>
+    <string name="theme_light">Light Mode</string>
+    <string name="theme_dark">Dark Mode</string>
+
+    <string name="text_small">Small</string>
+    <string name="text_medium">Medium</string>
+    <string name="text_large">Large</string>
 </resources>
