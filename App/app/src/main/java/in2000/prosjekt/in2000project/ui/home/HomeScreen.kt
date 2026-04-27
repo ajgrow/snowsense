@@ -60,7 +60,7 @@ fun HomeScreen(
         modifier = modifier,
         topBar = {
             TopBar(
-                title = stringResource(R.string.home_title),
+                title = stringResource(R.string.app_name),
                 navController = navController)
                  },
         bottomBar = { BottomBar(modifier, navController) }
