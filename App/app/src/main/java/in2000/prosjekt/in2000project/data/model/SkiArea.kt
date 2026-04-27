@@ -1,26 +1,35 @@
 package in2000.prosjekt.in2000project.data.model
 
+import in2000.prosjekt.in2000project.data.model.enums.ElementType
+
 // This data class represents one ski touring area.
-// Each area has a name and some placeholder climate info that we will use when we have frost
+// It now includes historical climate data separated by element type for graphing.
 data class SkiArea(
     val id: String,
     val name: String,
-    val averageSnowfall: String,
-    val averagePrecipitation: String,
-    val dailyMeanTemperature: String
+    val temperatureData: List<LocationClimateDataPoint>,
+    val precipitationData: List<LocationClimateDataPoint>,
+    val windSpeedData: List<LocationClimateDataPoint>,
+    val snowDepthData: List<LocationClimateDataPoint>,
 )
-
 
 fun LocationClimateData.toSkiArea() = SkiArea(
     id = "${coordinate.latitude},${coordinate.longitude}",
     name = stationName ?: "Selected Area",
-    averageSnowfall = avgDailyMaxSnowDepthCm
-        ?.let { "%.1f cm daily average".format(it) }
-        ?: "No data",
-    averagePrecipitation = avgDailyPrecipitationMm
-        ?.let { "%.1f mm daily average".format(it) }
-        ?: "No data",
-    dailyMeanTemperature = avgDailyMeanTemperatureC
-        ?.let { "%.1f°C daily average".format(it) }
-        ?: "No data"
+
+    temperatureData = yearlyAverages
+        .filter { it.type == ElementType.TEMPERATURE_MEAN_P1D }
+        .sortedBy { it.year },
+
+    precipitationData = yearlyAverages
+        .filter { it.type == ElementType.PRECIPITATION_SUM_P1D }
+        .sortedBy { it.year },
+
+    windSpeedData = yearlyAverages
+        .filter { it.type == ElementType.WIND_SPEED_MEAN_P1D }
+        .sortedBy { it.year },
+
+    snowDepthData = yearlyAverages
+        .filter { it.type == ElementType.SNOW_DEPTH_MAX_P1D }
+        .sortedBy { it.year }
 )

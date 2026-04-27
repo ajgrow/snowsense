@@ -48,9 +48,10 @@ import in2000.prosjekt.in2000project.ui.settings.SettingsViewModel
 private val previewSkiArea = SkiArea(
     id = "1",
     name = "Galdhøpiggen Touring Zone",
-    averageSnowfall = "210 cm seasonal average",
-    averagePrecipitation = "95 mm monthly average",
-    dailyMeanTemperature = "-3.2°C winter average"
+    temperatureData = emptyList(),
+    precipitationData = emptyList(),
+    windSpeedData = emptyList(),
+    snowDepthData = emptyList()
 )
 
 
@@ -267,9 +268,6 @@ fun BottomSheetContent(
 
     val climateRows = listOf(
         "Avalanche status" to avalancheStatus,
-        "Average snowfall" to "TODO",
-        "Average rainfall" to "TODO",
-        "Average temperature" to "TODO"
     )
 
     // This is the content inside the bottom sheet.
@@ -332,7 +330,36 @@ fun BottomSheetContent(
 
             //THIS IS WHERE WE CAN PUT THE GRAPH COMPONENTS
             item {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Text(
+                        text = "--- DEBUG DATA ---",
+                        style = MaterialTheme.typography.titleSmall,
+                        color = MaterialTheme.colorScheme.primary
+                    )
 
+                    Text(
+                        text = "Temperature Data:\n${area.temperatureData.joinToString("\n")}",
+                        style = MaterialTheme.typography.bodySmall
+                    )
+
+                    Text(
+                        text = "Precipitation Data:\n${area.precipitationData.joinToString("\n")}",
+                        style = MaterialTheme.typography.bodySmall
+                    )
+
+                    Text(
+                        text = "Wind Speed Data:\n${area.windSpeedData.joinToString("\n")}",
+                        style = MaterialTheme.typography.bodySmall
+                    )
+
+                    Text(
+                        text = "Snow Depth Data:\n${area.snowDepthData.joinToString("\n")}",
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
             }
         }
     }
