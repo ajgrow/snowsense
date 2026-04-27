@@ -137,6 +137,14 @@ fun SettingScreen(
             )
 
             ThemeOption(
+                title = stringResource(R.string.theme_system),
+                selected = languageMode == AppLanguageMode.SYSTEM,
+                onClick = {
+                    settingsViewModel.setLanguage(AppLanguageMode.SYSTEM)
+                }
+            )
+
+            ThemeOption(
                 title = "English",
                 selected = languageMode == AppLanguageMode.ENGLISH,
                 onClick = {
@@ -150,7 +158,6 @@ fun SettingScreen(
                 onClick = {
                     settingsViewModel.setLanguage(AppLanguageMode.NORWEGIAN)
                 }
-
             )
 
         }

@@ -2,17 +2,12 @@ package in2000.prosjekt.in2000project.ui.settings
 
 import android.app.Application
 import android.content.Context
-import android.util.Log
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.os.LocaleListCompat
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.ViewModel
-import in2000.prosjekt.in2000project.data.datastore.dataStore
-import io.ktor.http.ContentType
-import java.util.Locale
 
 class SettingsViewModel(application: Application)
     : AndroidViewModel(application)
@@ -40,8 +35,9 @@ class SettingsViewModel(application: Application)
             .toLanguageTags()
             .split(",")
             .firstOrNull()
+            ?.takeIf { it.isNotEmpty() }
             ?.let { AppLanguageMode.fromTag(it) }
-            ?: AppLanguageMode.ENGLISH
+            ?: AppLanguageMode.SYSTEM
     )
 
     fun setTheme(mode: ThemeMode){
@@ -58,9 +54,12 @@ class SettingsViewModel(application: Application)
 
     fun setLanguage(mode: AppLanguageMode) {
         languageMode = mode
-        AppCompatDelegate.setApplicationLocales(
+        val locales = if (mode == AppLanguageMode.SYSTEM) {
+            LocaleListCompat.getEmptyLocaleList()
+        } else {
             LocaleListCompat.forLanguageTags(mode.tag)
-        )
+        }
+        AppCompatDelegate.setApplicationLocales(locales)
     }
 
 }
