@@ -241,6 +241,14 @@ fun BottomSheetContent(
         stringResource(R.string.label_average_temperature) to "TODO"
     )
 
+    val dangerLevels = listOf(
+        stringResource(R.string.danger_level_1_title),
+        stringResource(R.string.danger_level_2_title),
+        stringResource(R.string.danger_level_3_title),
+        stringResource(R.string.danger_level_4_title),
+        stringResource(R.string.danger_level_5_title)
+    )
+
     // This is the content inside the bottom sheet.
     Surface(
         modifier = modifier.fillMaxWidth(),
