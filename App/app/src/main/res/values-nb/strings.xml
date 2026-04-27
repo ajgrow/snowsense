@@ -82,6 +82,8 @@ Mange svært store og ofte ekstremt store naturlige skred kan forventes, selv i 
 Svært sjelden varslet.
     </string>
 
+    <string name="date_description">Velg en datoperiode og år siden for å se historiske klimadata for temperatur, vind og nedbør.</string>
+
 
 
     <string name="map_screen_title">Kartskjerm</string>
