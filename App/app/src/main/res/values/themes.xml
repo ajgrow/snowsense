@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.In2000project" parent="Theme.AppCompat.Light.NoActionBar" />
+    <style name="Theme.In2000project" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowBackground">@color/surface_light</item>
+    </style>
 </resources>
