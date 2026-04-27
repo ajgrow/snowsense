@@ -68,6 +68,7 @@ foundation = { group = "androidx.compose.foundation", name = "foundation", versi
 androidx-compose-runtime = { group = "androidx.compose.runtime", name = "runtime", version.ref = "runtime" }
 koin-compose-viewmodel = { module = "io.insert-koin:koin-compose-viewmodel", version = "4.2.1" }
 
+
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }

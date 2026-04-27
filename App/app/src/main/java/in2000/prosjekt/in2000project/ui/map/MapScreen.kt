@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
@@ -29,6 +30,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.tooling.preview.Preview
@@ -44,6 +46,14 @@ import in2000.prosjekt.in2000project.ui.reusables.TopBar
 import org.koin.compose.viewmodel.koinViewModel
 import java.time.MonthDay
 import in2000.prosjekt.in2000project.ui.settings.SettingsViewModel
+import com.patrykandpatrick.vico.compose.chart.Chart
+import com.patrykandpatrick.vico.compose.chart.line.lineChart
+import com.patrykandpatrick.vico.core.entry.entryOf
+import com.patrykandpatrick.vico.core.entry.entryModelOf
+import com.patrykandpatrick.vico.compose.axis.horizontal.rememberBottomAxis
+import com.patrykandpatrick.vico.compose.axis.vertical.rememberStartAxis
+import com.patrykandpatrick.vico.compose.component.textComponent
+import in2000.prosjekt.in2000project.ui.reusables.ClimateGraph
 
 private val previewSkiArea = SkiArea(
     id = "1",
@@ -330,35 +340,26 @@ fun BottomSheetContent(
 
             //THIS IS WHERE WE CAN PUT THE GRAPH COMPONENTS
             item {
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                val currentYear = java.time.Year.now().value
+
+                val yearRange = remember(selectedYear) {
+                    selectedYear?.let { it..currentYear }
+                }
+
+                if (yearRange == null ||
+                    startDate == null ||
+                    endDate == null
                 ) {
-                    Text(
-                        text = "--- DEBUG DATA ---",
-                        style = MaterialTheme.typography.titleSmall,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-
-                    Text(
-                        text = "Temperature Data:\n${area.temperatureData.joinToString("\n")}",
-                        style = MaterialTheme.typography.bodySmall
-                    )
-
-                    Text(
-                        text = "Precipitation Data:\n${area.precipitationData.joinToString("\n")}",
-                        style = MaterialTheme.typography.bodySmall
-                    )
-
-                    Text(
-                        text = "Wind Speed Data:\n${area.windSpeedData.joinToString("\n")}",
-                        style = MaterialTheme.typography.bodySmall
-                    )
-
-                    Text(
-                        text = "Snow Depth Data:\n${area.snowDepthData.joinToString("\n")}",
-                        style = MaterialTheme.typography.bodySmall
-                    )
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(180.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text("Please select a year range to view graph")
+                    }
+                } else {
+                    ClimateGraph(yearRange, startDate, endDate)
                 }
             }
         }
