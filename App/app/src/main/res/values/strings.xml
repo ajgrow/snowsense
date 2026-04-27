@@ -119,7 +119,7 @@
 
     <string name="date_start">Start</string>
     <string name="date_end">End</string>
-    <string name="since_year">Since Year</string>
+    <string name="since_year">Since year</string>
 
     <string name="dialog_ok">OK</string>
     <string name="dialog_cancel">Cancel</string>

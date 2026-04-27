@@ -276,7 +276,7 @@ fun BottomSheetContent(
 
             item {
                 Text(
-                    text = "Historical Climate Summary",
+                    text = stringResource(R.string.historical_climate_title),
                     style = MaterialTheme.typography.titleMedium
                 )
             }
