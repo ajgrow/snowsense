@@ -3,6 +3,7 @@ package in2000.prosjekt.in2000project.ui.settings
 import android.app.Application
 import android.content.Context
 import android.util.Log
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -13,9 +14,11 @@ import in2000.prosjekt.in2000project.data.datastore.dataStore
 import io.ktor.http.ContentType
 import java.util.Locale
 
-class SettingsViewModel(application: Application) : AndroidViewModel(application){
-
-    private val prefs = application.getSharedPreferences("settings", Context.MODE_PRIVATE)
+class SettingsViewModel(application: Application)
+    : AndroidViewModel(application)
+{
+    private val prefs = application
+        .getSharedPreferences("settings", Context.MODE_PRIVATE)
 
     var themeMode by mutableStateOf(
         ThemeMode.valueOf(
@@ -32,13 +35,14 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
     )
 
     var languageMode by mutableStateOf(
-        AppLanguageMode.valueOf(
-            prefs.getString(
-                "language_mode", AppLanguageMode.ENGLISH.name)!!
-        )
+        AppCompatDelegate
+            .getApplicationLocales()
+            .toLanguageTags()
+            .split(",")
+            .firstOrNull()
+            ?.let { AppLanguageMode.fromTag(it) }
+            ?: AppLanguageMode.ENGLISH
     )
-
-
 
     fun setTheme(mode: ThemeMode){
         themeMode = mode
