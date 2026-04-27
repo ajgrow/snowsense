@@ -1,5 +1,7 @@
 package in2000.prosjekt.in2000project.ui.settings
 
+import java.util.Locale.forLanguageTag
+
 enum class AppLanguageMode(val tag: String) {
     SYSTEM(""),
     ENGLISH("en"),
@@ -7,6 +9,7 @@ enum class AppLanguageMode(val tag: String) {
 
     companion object {
         fun fromTag(tag: String)
-            = entries.find { it.tag == tag } ?: SYSTEM
+        = entries.find { it.tag == forLanguageTag(tag).language }
+            ?: SYSTEM
     }
 }

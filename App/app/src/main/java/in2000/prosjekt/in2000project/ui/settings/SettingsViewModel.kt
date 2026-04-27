@@ -29,16 +29,8 @@ class SettingsViewModel(application: Application)
         )
     )
 
-    var languageMode by mutableStateOf(
-        AppCompatDelegate
-            .getApplicationLocales()
-            .toLanguageTags()
-            .split(",")
-            .firstOrNull()
-            ?.takeIf { it.isNotEmpty() }
-            ?.let { AppLanguageMode.fromTag(it) }
-            ?: AppLanguageMode.SYSTEM
-    )
+    var languageMode by mutableStateOf(currentLanguageMode())
+        private set
 
     fun setTheme(mode: ThemeMode){
         themeMode = mode
@@ -62,4 +54,18 @@ class SettingsViewModel(application: Application)
         AppCompatDelegate.setApplicationLocales(locales)
     }
 
+    private fun currentLanguageMode(
+    ): AppLanguageMode
+    = AppCompatDelegate
+        .getApplicationLocales()
+        .toLanguageTags()
+        .split(",")
+        .firstOrNull()
+        ?.takeIf { it.isNotEmpty() }
+        ?.let { AppLanguageMode.fromTag(it) }
+        ?: AppLanguageMode.SYSTEM
+
+    fun refreshLanguageMode() {
+        languageMode = currentLanguageMode()
+    }
 }

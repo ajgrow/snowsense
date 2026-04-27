@@ -29,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.activity.compose.LocalActivity
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -42,6 +43,10 @@ fun SettingScreen(
     navController: NavController,
     settingsViewModel: SettingsViewModel
 ) {
+    LaunchedEffect(Unit) {
+        settingsViewModel.refreshLanguageMode()
+    }
+
     Surface(
         modifier = Modifier
             .fillMaxSize(),
