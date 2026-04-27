@@ -68,6 +68,7 @@ dependencies {
     implementation(libs.androidx.compose.ui.text)
     implementation(libs.androidx.foundation)
     implementation(libs.foundation)
+    implementation(libs.androidx.appcompat)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -97,6 +98,10 @@ dependencies {
 
     //DataStore
     implementation("androidx.datastore:datastore-preferences:1.1.1")
+
+    //Graph
+    implementation("com.patrykandpatrick.vico:compose:1.13.1")
+    implementation("androidx.compose.foundation:foundation:1.6.0")
 
 }
 

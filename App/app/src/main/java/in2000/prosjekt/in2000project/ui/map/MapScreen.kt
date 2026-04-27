@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
@@ -27,19 +28,30 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import in2000.prosjekt.in2000project.R
 import in2000.prosjekt.in2000project.data.model.SkiArea
 import in2000.prosjekt.in2000project.ui.reusables.BottomBar
 import in2000.prosjekt.in2000project.ui.reusables.DatePicker
 import in2000.prosjekt.in2000project.ui.reusables.TopBar
 import in2000.prosjekt.in2000project.ui.settings.SettingsViewModel
 import java.time.MonthDay
+import com.patrykandpatrick.vico.compose.chart.Chart
+import com.patrykandpatrick.vico.compose.chart.line.lineChart
+import com.patrykandpatrick.vico.core.entry.entryOf
+import com.patrykandpatrick.vico.core.entry.entryModelOf
+import com.patrykandpatrick.vico.compose.axis.horizontal.rememberBottomAxis
+import com.patrykandpatrick.vico.compose.axis.vertical.rememberStartAxis
+import com.patrykandpatrick.vico.compose.component.textComponent
+import in2000.prosjekt.in2000project.ui.reusables.ClimateGraph
 
 private val previewSkiArea = SkiArea(
     id = "1",
@@ -115,7 +127,10 @@ fun MapScreen(
     Scaffold(
         modifier = modifier,
         topBar = {
-            TopBar(modifier = Modifier, title = "MapScreen", navController = navController)
+            TopBar(
+                modifier = Modifier,
+                title = stringResource(R.string.map_screen_title),
+                navController = navController)
         },
         bottomBar = {
             BottomBar(modifier, navController)
@@ -132,7 +147,7 @@ fun MapScreen(
         ) {
             // Title
             Text(
-                text = "Map",
+                text = stringResource(R.string.map_title),
                 style = MaterialTheme.typography.headlineMedium,
                 fontWeight = Bold,
                 modifier = Modifier.padding(bottom = 8.dp)
@@ -140,7 +155,7 @@ fun MapScreen(
 
             // Instructions
             Text(
-                text = "Select an area to view historical climate details.",
+                text = stringResource(R.string.map_instruction),
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.padding(bottom = 16.dp)
             )
@@ -168,13 +183,13 @@ fun MapScreen(
                 when (mapUIState) {
                     is MapUIState.Loading -> {
                         OverlayStatusCard(
-                            message = "Loading avalanche overlay..."
+                            message = stringResource(R.string.overlay_loading)
                         )
                     }
 
                     is MapUIState.Error -> {
                         OverlayRetryCard(
-                            message = "Could not load avalanche overlay.",
+                            message = stringResource(R.string.overlay_error),
                             onRetry = onRetry
                         )
                     }
@@ -227,10 +242,10 @@ fun BottomSheetContent(
 ) {
 
     val climateRows = listOf(
-        "Avalanche status" to avalancheStatus,
-        "Average snowfall" to "TODO",
-        "Average rainfall" to "TODO",
-        "Average temperature" to "TODO"
+        stringResource(R.string.label_avalanche_danger) to avalancheStatus,
+        stringResource(R.string.label_average_snowfall) to "TODO",
+        stringResource(R.string.label_average_precipitation) to "TODO",
+        stringResource(R.string.label_average_temperature) to "TODO"
     )
 
     // This is the content inside the bottom sheet.
@@ -254,7 +269,7 @@ fun BottomSheetContent(
 
                 // Description of the content
                 Text(
-                    text = "Historical Climate Summary",
+                    text = stringResource(R.string.historical_climate_title),
                     style = MaterialTheme.typography.titleMedium
                 )
             }
@@ -271,7 +286,7 @@ fun BottomSheetContent(
 
             item {
                 Text(
-                    text = "Historical Climate Summary",
+                    text = stringResource(R.string.historical_climate_title),
                     style = MaterialTheme.typography.titleMedium
                 )
             }
@@ -293,7 +308,27 @@ fun BottomSheetContent(
 
             //THIS IS WHERE WE CAN PUT THE GRAPH COMPONENTS
             item {
+                val currentYear = java.time.Year.now().value
 
+                val yearRange = remember(selectedYear) {
+                    selectedYear?.let { it..currentYear }
+                }
+
+                if (yearRange == null ||
+                    startDate == null ||
+                    endDate == null
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(180.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text("Please select a year range to view graph")
+                    }
+                } else {
+                    ClimateGraph(yearRange, startDate, endDate)
+                }
             }
         }
     }

@@ -11,11 +11,13 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import in2000.prosjekt.in2000project.R
 import in2000.prosjekt.in2000project.navigation.Screen
 
 @SuppressLint("RestrictedApi")
@@ -42,7 +44,7 @@ fun BottomBar(
             icon = {
                 Icon(
                     imageVector = Icons.Default.Home,
-                    contentDescription = "Go to home screen",
+                    contentDescription = stringResource(R.string.nav_home_desc),
                 )
             }
         )
@@ -61,7 +63,7 @@ fun BottomBar(
             icon = {
                 Icon(
                     imageVector = Icons.Default.Place,
-                    contentDescription = "Go to map screen",
+                    contentDescription = stringResource(R.string.nav_map_desc),
                 )
             }
         )
@@ -77,7 +79,7 @@ fun BottomBar(
             icon = {
                 Icon(
                     imageVector = Icons.Default.Info,
-                    contentDescription = "Go to information screen",
+                    contentDescription = stringResource(R.string.nav_info_desc),
                 )
             },
         )

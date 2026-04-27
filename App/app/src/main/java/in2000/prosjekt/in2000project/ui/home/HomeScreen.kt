@@ -43,6 +43,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import in2000.prosjekt.in2000project.data.model.NamedLocation
 import in2000.prosjekt.in2000project.navigation.Screen
@@ -57,7 +58,11 @@ fun HomeScreen(
 
     Scaffold(
         modifier = modifier,
-        topBar = { TopBar(title = "Home", navController = navController) },
+        topBar = {
+            TopBar(
+                title = stringResource(R.string.home_title),
+                navController = navController)
+                 },
         bottomBar = { BottomBar(modifier, navController) }
     ) { paddingValues ->
         Column(
@@ -166,7 +171,8 @@ fun SearchSection(
                     },
                     expanded = expanded,
                     onExpandedChange = { expanded = it },
-                    placeholder = { Text("Search") }
+                    placeholder = {
+                        Text(stringResource(R.string.search_placeholder)) }
                 )
             },
             expanded = expanded,
@@ -201,7 +207,7 @@ fun FavoriteSection(
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
         Text(
-            text = "Favorites",
+            text = stringResource(R.string.favorites_title),
             style = MaterialTheme.typography.titleMedium
         )
         LazyRow(
@@ -225,7 +231,7 @@ fun RecentSection(
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
         Text(
-            text = "Recent searches",
+            text = stringResource(R.string.recent_searches_title),
             style = MaterialTheme.typography.titleMedium
         )
 
