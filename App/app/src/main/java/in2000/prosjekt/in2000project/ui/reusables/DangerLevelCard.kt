@@ -1,5 +1,6 @@
 package in2000.prosjekt.in2000project.ui.reusables
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Surface
@@ -19,7 +20,7 @@ fun DangerLevelCard(dangerLevel: DangerLevel, backgroundColor: Color) {
     Surface(
         color = backgroundColor,
         modifier = Modifier.padding(8.dp),
-        shape = RoundedCornerShape(12.dp),
+        shape = RoundedCornerShape(12.dp)
 
     ) {
         when (dangerLevel) {
