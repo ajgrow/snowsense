@@ -43,6 +43,9 @@ android {
     testOptions {
         unitTests.isReturnDefaultValues = true
     }
+    androidResources {
+        generateLocaleConfig = true
+    }
 }
 
 dependencies {
