@@ -28,6 +28,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.activity.compose.LocalActivity
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -50,7 +51,6 @@ fun SettingScreen(
         val themeMode = settingsViewModel.themeMode
         val textSizeMode = settingsViewModel.textSizeMode
         val languageMode = settingsViewModel.languageMode
-        val activity = LocalActivity.current
 
         Column(
             modifier = Modifier
@@ -67,7 +67,7 @@ fun SettingScreen(
                     onClick = {navController.popBackStack()}
                 ) {
                     Icon(
-                        imageVector = Icons.Default.ArrowBack,
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = stringResource(R.string.back_button_desc)
                     )
                 }
@@ -141,16 +141,6 @@ fun SettingScreen(
                 selected = languageMode == AppLanguageMode.ENGLISH,
                 onClick = {
                     settingsViewModel.setLanguage(AppLanguageMode.ENGLISH)
-
-                    val locale = Locale.forLanguageTag("en")
-                    Locale.setDefault(locale)
-
-                    val config = activity?.resources?.configuration
-                    config?.setLocale(locale)
-
-                    activity?.resources?.updateConfiguration(config, activity?.resources?.displayMetrics)
-
-                    activity?.recreate()
                 }
             )
 
@@ -159,16 +149,6 @@ fun SettingScreen(
                 selected = languageMode == AppLanguageMode.NORWEGIAN,
                 onClick = {
                     settingsViewModel.setLanguage(AppLanguageMode.NORWEGIAN)
-
-                    val locale = Locale("nb")
-                    Locale.setDefault(locale)
-
-                    val config = activity?.resources?.configuration
-                    config?.setLocale(locale)
-
-                    activity?.resources?.updateConfiguration(config, activity?.resources?.displayMetrics)
-
-                    activity?.recreate()
                 }
 
             )

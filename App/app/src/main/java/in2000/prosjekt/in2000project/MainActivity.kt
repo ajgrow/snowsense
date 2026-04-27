@@ -18,24 +18,6 @@ class MainActivity : AppCompatActivity() {
         // Must be set before calling MapBox composable.
         MapboxOptions.accessToken = ApiKeys.mapboxAccessToken
 
-
-        val prefs = getSharedPreferences("settings", MODE_PRIVATE)
-
-        val savedLanguage = prefs.getString("language_mode", "ENGLISH")
-
-        val locale = when (savedLanguage) {
-            "NORWEGIAN" -> Locale.forLanguageTag("nb")
-            else -> Locale.forLanguageTag("en")
-        }
-
-        Locale.setDefault(locale)
-
-        val config = resources.configuration
-        config.setLocale(locale)
-
-        resources.updateConfiguration(config, resources.displayMetrics)
-
-
         setContent {
             In2000projectTheme {
                 AppNavigation()
