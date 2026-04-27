@@ -308,7 +308,10 @@ fun BottomSheetContent(
                     selectedYear?.let {it..currentYear}
                 }
 
-                if (yearRange == null){
+                if (yearRange == null ||
+                    startDate == null ||
+                    endDate == null)
+                {
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -318,7 +321,7 @@ fun BottomSheetContent(
                         Text("Please select a year range to view graph")
                     }
                 } else {
-                    val points = remember(yearRange){
+                    val points = remember(yearRange, startDate, endDate){
                         yearRange.map {year ->
                             year.toFloat() to 50f
                         }
@@ -327,6 +330,11 @@ fun BottomSheetContent(
                     val entries = points.map {
                         entryOf(it.first, it.second)
                     }
+
+                    Text(
+                        text = "From $startDate to $endDate",
+                        style = MaterialTheme.typography.titleMedium
+                    )
 
                     Chart(
                         chart = lineChart(),
