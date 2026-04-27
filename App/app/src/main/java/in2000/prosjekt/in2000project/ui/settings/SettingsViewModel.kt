@@ -44,15 +44,11 @@ class SettingsViewModel(application: Application)
             "text_size_mode", mode.name).apply()
     }
 
-    fun setLanguage(mode: AppLanguageMode) {
-        languageMode = mode
-        val locales = if (mode == AppLanguageMode.SYSTEM) {
-            LocaleListCompat.getEmptyLocaleList()
-        } else {
-            LocaleListCompat.forLanguageTags(mode.tag)
-        }
-        AppCompatDelegate.setApplicationLocales(locales)
-    }
+    fun setLanguage(mode: AppLanguageMode)
+    = AppCompatDelegate
+        .setApplicationLocales(
+            LocaleListCompat.forLanguageTags(mode.tag))
+
 
     private fun currentLanguageMode(
     ): AppLanguageMode
@@ -63,7 +59,9 @@ class SettingsViewModel(application: Application)
         .firstOrNull()
         ?.takeIf { it.isNotEmpty() }
         ?.let { AppLanguageMode.fromTag(it) }
-        ?: AppLanguageMode.SYSTEM
+        ?: AppLanguageMode
+            .fromTag(java.util.Locale
+                .getDefault().language)
 
     fun refreshLanguageMode() {
         languageMode = currentLanguageMode()
