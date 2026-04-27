@@ -260,7 +260,6 @@ fun LocationCard(
 @Preview
 @Composable
 fun HomeScreenPreview(
-    modifier: Modifier = Modifier
 ) {
     HomeScreen(navController = rememberNavController())
 }
