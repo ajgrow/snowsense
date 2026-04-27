@@ -1,5 +1,7 @@
 package in2000.prosjekt.in2000project.ui.settings
 
+import android.annotation.SuppressLint
+import android.app.Activity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -25,8 +27,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.activity.compose.LocalActivity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import in2000.prosjekt.in2000project.R
+import java.util.Locale
 
 @Composable
 fun SettingScreen(
@@ -43,6 +49,8 @@ fun SettingScreen(
 
         val themeMode = settingsViewModel.themeMode
         val textSizeMode = settingsViewModel.textSizeMode
+        val languageMode = settingsViewModel.languageMode
+        val activity = LocalActivity.current
 
         Column(
             modifier = Modifier
@@ -60,37 +68,37 @@ fun SettingScreen(
                 ) {
                     Icon(
                         imageVector = Icons.Default.ArrowBack,
-                        contentDescription = "Back Button"
+                        contentDescription = stringResource(R.string.back_button_desc)
                     )
                 }
                 Text(
-                    text = "Settings",
+                    text = stringResource(R.string.settings_title),
                     style = MaterialTheme.typography.titleLarge,
                     color = MaterialTheme.colorScheme.onSurface
                 )
             }
 
             Text(
-                text = "Appearance",
+                text = stringResource(R.string.appearance_title),
                 modifier = Modifier.padding(16.dp)
             )
 
             ThemeOption(
-                title = "Use device setting",
+                title = stringResource(R.string.theme_system),
                 selected = themeMode == ThemeMode.SYSTEM,
                 onClick = {settingsViewModel.setTheme(ThemeMode.SYSTEM)},
                 modifier = Modifier.padding(horizontal = 16.dp)
             )
 
             ThemeOption(
-                title = "Light Mode",
+                title = stringResource(R.string.theme_light),
                 selected = themeMode == ThemeMode.LIGHT,
                 onClick = {settingsViewModel.setTheme(ThemeMode.LIGHT)},
                 modifier = Modifier.padding(horizontal = 16.dp)
             )
 
             ThemeOption(
-                title = "Dark Mode",
+                title = stringResource(R.string.theme_dark),
                 selected = themeMode == ThemeMode.DARK,
                 onClick = {settingsViewModel.setTheme(ThemeMode.DARK)},
                 modifier = Modifier.padding(horizontal = 16.dp)
@@ -98,30 +106,73 @@ fun SettingScreen(
 
 
             Text(
-                text = "Text Size",
+                text = stringResource(R.string.text_size_title),
                 modifier = Modifier.padding(16.dp)
             )
 
             ThemeOption(
-                title = "Small",
+                title = stringResource(R.string.text_small),
                 selected = textSizeMode == TextSizeMode.SMALL,
                 onClick = {settingsViewModel.setTextSize(TextSizeMode.SMALL)},
                 modifier = Modifier.padding(horizontal = 16.dp)
             )
 
             ThemeOption(
-                title = "Medium",
+                title = stringResource(R.string.text_medium),
                 selected = textSizeMode == TextSizeMode.MEDIUM,
                 onClick = {settingsViewModel.setTextSize(TextSizeMode.MEDIUM)},
                 modifier = Modifier.padding(horizontal = 16.dp)
             )
 
             ThemeOption(
-                title = "Large",
+                title = stringResource(R.string.text_large),
                 selected = textSizeMode == TextSizeMode.LARGE,
                 onClick = {settingsViewModel.setTextSize(TextSizeMode.LARGE)},
                 modifier = Modifier.padding(horizontal = 16.dp)
             )
+
+            Text(
+                text = stringResource(R.string.language_title),
+                modifier = Modifier.padding(16.dp)
+            )
+
+            ThemeOption(
+                title = "English",
+                selected = languageMode == AppLanguageMode.ENGLISH,
+                onClick = {
+                    settingsViewModel.setLanguage(AppLanguageMode.ENGLISH)
+
+                    val locale = Locale.forLanguageTag("en")
+                    Locale.setDefault(locale)
+
+                    val config = activity?.resources?.configuration
+                    config?.setLocale(locale)
+
+                    activity?.resources?.updateConfiguration(config, activity?.resources?.displayMetrics)
+
+                    activity?.recreate()
+                }
+            )
+
+            ThemeOption(
+                title = "Norsk",
+                selected = languageMode == AppLanguageMode.NORWEGIAN,
+                onClick = {
+                    settingsViewModel.setLanguage(AppLanguageMode.NORWEGIAN)
+
+                    val locale = Locale("nb")
+                    Locale.setDefault(locale)
+
+                    val config = activity?.resources?.configuration
+                    config?.setLocale(locale)
+
+                    activity?.resources?.updateConfiguration(config, activity?.resources?.displayMetrics)
+
+                    activity?.recreate()
+                }
+
+            )
+
         }
     }
 }
@@ -134,7 +185,7 @@ fun ThemeOption(
     selected: Boolean,
     onClick: () -> Unit,
     enabled: Boolean = true,
-    modifier: Modifier
+    modifier: Modifier = Modifier
 ) {
     Row(
         modifier = Modifier

@@ -23,7 +23,8 @@ import java.time.format.TextStyle
 import java.util.Calendar
 import java.util.Locale
 import androidx.compose.ui.platform.LocalLocale
-
+import androidx.compose.ui.res.stringResource
+import in2000.prosjekt.in2000project.R
 @Composable
 fun DatePicker(
     startDate: MonthDay?,
@@ -42,18 +43,19 @@ fun DatePicker(
         verticalAlignment = Alignment.CenterVertically
     ) {
         DateField(
-            label = "Start",
+            label = stringResource(R.string.date_start),
             value = startDate,
             onClick = { showingPicker = "start" },
             modifier = Modifier.weight(1f)
         )
         DateField(
-            label = "End",
+            label = stringResource(R.string.date_end),
             value = endDate,
             onClick = { showingPicker = "end" },
             modifier = Modifier.weight(1f)
         )
         YearDropdown(
+            label = stringResource(R.string.since_year),
             currentYear = currentYear,
             selected = selectedYear,
             onSelected = { onYearChange(it) },
@@ -142,10 +144,10 @@ fun CalendarPickerDialog(
             TextButton(
                 onClick = { selectedDay?.let { onConfirm(MonthDay.of(displayedMonth, it)) } },
                 enabled = selectedDay != null
-            ) { Text("OK") }
+            ) { Text(stringResource(R.string.dialog_ok)) }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Cancel") }
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.dialog_cancel)) }
         },
         text = {
             Column {
@@ -181,14 +183,14 @@ private fun MonthNavHeader(month: Int, onPrevious: () -> Unit, onNext: () -> Uni
         verticalAlignment = Alignment.CenterVertically
     ) {
         IconButton(onClick = onPrevious) {
-            Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, contentDescription = "Previous month")
+            Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, contentDescription = stringResource(R.string.previous_month))
         }
         Text(
             text = Month.of(month).getDisplayName(TextStyle.FULL, LocalLocale.current.platformLocale),
             style = MaterialTheme.typography.titleMedium
         )
         IconButton(onClick = onNext) {
-            Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = "Next month")
+            Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = stringResource(R.string.next_month))
         }
     }
 }
@@ -234,7 +236,7 @@ private fun DayGrid(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun YearDropdown(
-    label: String = "Since Year",
+    label: String,
     currentYear: Int,
     selected: Int?,
     onSelected: (Int) -> Unit,

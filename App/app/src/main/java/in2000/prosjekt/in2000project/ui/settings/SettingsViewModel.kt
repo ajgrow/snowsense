@@ -2,13 +2,16 @@ package in2000.prosjekt.in2000project.ui.settings
 
 import android.app.Application
 import android.content.Context
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.core.os.LocaleListCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import in2000.prosjekt.in2000project.data.datastore.dataStore
 import io.ktor.http.ContentType
+import java.util.Locale
 
 class SettingsViewModel(application: Application) : AndroidViewModel(application){
 
@@ -28,6 +31,13 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
         )
     )
 
+    var languageMode by mutableStateOf(
+        AppLanguageMode.valueOf(
+            prefs.getString(
+                "language_mode", AppLanguageMode.ENGLISH.name)!!
+        )
+    )
+
 
 
     fun setTheme(mode: ThemeMode){
@@ -41,4 +51,11 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
         prefs.edit().putString(
             "text_size_mode", mode.name).apply()
     }
+
+    fun setLanguage(mode: AppLanguageMode) {
+        languageMode = mode
+        prefs.edit().putString("language_mode", mode.name).apply()
+
+    }
+
 }
