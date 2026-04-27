@@ -13,8 +13,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.unit.dp
+import in2000.prosjekt.in2000project.R
 
 @Composable
 fun OverlayStatusCard(message: String) {
@@ -62,7 +64,7 @@ fun OverlayRetryCard(message: String, onRetry: () -> Unit) {
                     color = MaterialTheme.colorScheme.onErrorContainer
                 )
                 Text(
-                    text = "Retry",
+                    text = stringResource(R.string.retry),
                     style = MaterialTheme.typography.labelLarge,
                     color = MaterialTheme.colorScheme.onErrorContainer,
                     fontWeight = Bold,
