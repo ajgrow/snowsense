@@ -77,19 +77,7 @@ fun MapboxView(
     onOverlayError: () -> Unit,
     onOverlayLoaded: () -> Unit,
     modifier: Modifier = Modifier,
-    settingsViewModel: SettingsViewModel
 ) {
-
-    val themeMode = settingsViewModel.themeMode
-    val mapStyle = when (themeMode){
-        ThemeMode.DARK -> Style.DARK
-        ThemeMode.LIGHT -> Style.OUTDOORS
-        ThemeMode.SYSTEM ->
-            if (androidx.compose.foundation.isSystemInDarkTheme())
-                Style.DARK
-            else
-                Style.OUTDOORS
-    }
 
     val (hasSearch, searchLat, searchLng) = remember(coordinates) {
         if (coordinates.isNotBlank() && coordinates != "0,0") {
@@ -148,7 +136,7 @@ fun MapboxView(
                         onOverlayError()
                     }
 
-                    mapView.mapboxMap.loadStyle(mapStyle) { style ->
+                    mapView.mapboxMap.loadStyle(Style.OUTDOORS) { style ->
                         onOverlayLoaded()
                         Log.d(TAG, "Style loaded, adding WMS sources")
 
