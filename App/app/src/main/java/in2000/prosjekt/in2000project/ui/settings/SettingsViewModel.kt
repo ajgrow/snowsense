@@ -58,8 +58,9 @@ class SettingsViewModel(application: Application)
 
     fun setLanguage(mode: AppLanguageMode) {
         languageMode = mode
-        prefs.edit().putString("language_mode", mode.name).apply()
-
+        AppCompatDelegate.setApplicationLocales(
+            LocaleListCompat.forLanguageTags(mode.tag)
+        )
     }
 
 }
