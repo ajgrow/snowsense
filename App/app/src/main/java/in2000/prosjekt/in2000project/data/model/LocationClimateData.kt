@@ -26,9 +26,7 @@ data class LocationClimateData(
     // Data quality
     val dataPointCount: Int,
 
-    // Daily averages
-    val avgDailyMeanTemperatureC: Double?,
-    val avgDailyPrecipitationMm: Double?,
-    val avgDailyMeanWindSpeedMs: Double?,
-    val avgDailyMaxSnowDepthCm: Double?,
+    // yearly averages
+    val yearlyAverages: List<LocationClimateDataPoint>
+
 )
