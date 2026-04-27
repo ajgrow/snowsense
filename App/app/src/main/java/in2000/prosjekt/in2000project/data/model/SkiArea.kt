@@ -5,7 +5,6 @@ import in2000.prosjekt.in2000project.data.model.enums.ElementType
 // This data class represents one ski touring area.
 // It now includes historical climate data separated by element type for graphing.
 data class SkiArea(
-    val id: String,
     val name: String,
     val temperatureData: List<LocationClimateDataPoint>,
     val precipitationData: List<LocationClimateDataPoint>,
@@ -14,7 +13,6 @@ data class SkiArea(
 )
 
 fun LocationClimateData.toSkiArea() = SkiArea(
-    id = "${coordinate.latitude},${coordinate.longitude}",
     name = stationName ?: "Selected Area",
 
     temperatureData = yearlyAverages
