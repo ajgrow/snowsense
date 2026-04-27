@@ -2,7 +2,9 @@ package in2000.prosjekt.in2000project.data.integration
 
 import in2000.prosjekt.in2000project.data.datasource.KtorFrostV0DataSource
 import in2000.prosjekt.in2000project.data.model.Coordinate
+import in2000.prosjekt.in2000project.data.model.DangerLevel
 import in2000.prosjekt.in2000project.data.model.enums.ElementType
+import in2000.prosjekt.in2000project.data.repository.FrostAvalancheRiskRepository
 import in2000.prosjekt.in2000project.data.repository.FrostClimateRepository
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
@@ -17,13 +19,22 @@ import org.junit.After
 import org.junit.Assume.assumeTrue
 import org.junit.Before
 import org.junit.Test
-import org.junit.Assert.assertTrue
 import java.time.MonthDay
+import kotlin.test.assertContains
+import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
+import kotlin.test.assertEquals
 
 class FrostApiIntegrationTest {
 
+    companion object {
+        val BLINDERN = Coordinate(59.9423, 10.72)
+        val BOVERDAL = Coordinate(61.62373, 8.27996)
+    }
+
     private lateinit var client: HttpClient
-    private lateinit var repository: FrostClimateRepository
+    private lateinit var climateRepository: FrostClimateRepository
+    private lateinit var avalancheRepository: FrostAvalancheRiskRepository
 
     @Before
     fun setUp() {
@@ -50,8 +61,9 @@ class FrostApiIntegrationTest {
             }
         }
 
-        repository = FrostClimateRepository(
-            KtorFrostV0DataSource(client))
+        val dataSource = KtorFrostV0DataSource(client)
+        climateRepository = FrostClimateRepository(dataSource)
+        avalancheRepository = FrostAvalancheRiskRepository(dataSource)
     }
 
     @After
@@ -60,37 +72,34 @@ class FrostApiIntegrationTest {
     }
 
     @Test
-    fun blindern_smokeTest() = runTest {
-        val result = repository.getClimateDataForLocation(
-            coordinate = Coordinate(59.9423, 10.72),
+    fun blindern_climateData_smokeTest() = runTest {
+        val result = climateRepository.getClimateDataForLocation(
+            coordinate = BLINDERN,
             periodStart = MonthDay.of(3, 23),
             periodEnd = MonthDay.of(4, 22),
             yearsBack = 5,
         )
 
-        val stationName = requireNotNull(result.stationName) {
-            "Station name was null" }
+        val stationName = assertNotNull(result.stationName, "Station name was null")
 
-        assertTrue(stationName.contains("BLINDERN", ignoreCase = true))
-
-        // Manual tests showed BLINDERN returns at least 20 data points.
         assertTrue(
-            "got ${result.dataPointCount} data points",
-            result.dataPointCount >= 20)
+            stationName.contains("BLINDERN", ignoreCase = true),
+            "Expected station name containing BLINDERN, got: $stationName",
+        )
 
+        assertTrue(result.dataPointCount >= 20, "got ${result.dataPointCount} data points")
         assertTrue(result.yearlyAverages.size >= 3)
 
         val elementTypes = result.yearlyAverages.map { it.type }.toSet()
 
-        // Manual tests showed BLINDERN measures at least these elements.
-        assertTrue(elementTypes.contains(ElementType.TEMPERATURE_MEAN_P1D))
-        assertTrue(elementTypes.contains(ElementType.PRECIPITATION_SUM_P1D))
+        assertContains(elementTypes, ElementType.TEMPERATURE_MEAN_P1D)
+        assertContains(elementTypes, ElementType.PRECIPITATION_SUM_P1D)
     }
 
     @Test
     fun crossYearBoundary_decToJan_returnsData() = runTest {
-        val result = repository.getClimateDataForLocation(
-            coordinate = Coordinate(59.9423, 10.72),
+        val result = climateRepository.getClimateDataForLocation(
+            coordinate = BLINDERN,
             periodStart = MonthDay.of(12, 1),
             periodEnd = MonthDay.of(1, 31),
             yearsBack = 3,
@@ -102,14 +111,22 @@ class FrostApiIntegrationTest {
 
     @Test
     fun singleYear_yearsBackZero_returnsData() = runTest {
-        val result = repository.getClimateDataForLocation(
-            coordinate = Coordinate(59.9423, 10.72),
+        val result = climateRepository.getClimateDataForLocation(
+            coordinate = BLINDERN,
             periodStart = MonthDay.of(1, 1),
             periodEnd = MonthDay.of(2, 28),
             yearsBack = 0,
         )
 
         assertTrue(result.dataPointCount >= 1)
-        assertTrue(result.yearlyAverages.map { it.year }.toSet().size == 1)
+        assertEquals(1, result.yearlyAverages.map { it.year }.toSet().size)
+    }
+
+    @Test
+    fun boverdal_avalancheRisk_smokeTest() = runTest {
+        val result = avalancheRepository.getSlabAvalancheRiskForLocation(BOVERDAL)
+
+        assertEquals(BOVERDAL, result.coordinate)
+        assertContains(DangerLevel.entries, result.dangerLevel)
     }
 }

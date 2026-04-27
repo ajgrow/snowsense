@@ -1,7 +1,7 @@
 package in2000.prosjekt.in2000project.data.datasource
 
 import in2000.prosjekt.in2000project.data.datasource.dto.FrostV0ObservationResponse
-import in2000.prosjekt.in2000project.data.datasource.dto.FrostV0SourceResponse
+import in2000.prosjekt.in2000project.data.datasource.dto.FrostV0Source
 import in2000.prosjekt.in2000project.data.model.Coordinate
 
 /**
@@ -14,12 +14,12 @@ interface FrostV0DataSource {
      * Finds the nearest weather station to the given coordinates.
      *
      * @param coordinate The point to search from (WGS-84).
-     * @return [FrostV0SourceResponse] containing the single nearest station with distance in km.
+     * @return [FrostV0Source] The nearest station with distance in km.
      * @throws java.io.IOException on network or I/O failures.
      */
     suspend fun getNearestSource(
         coordinate: Coordinate
-    ): FrostV0SourceResponse
+    ): FrostV0Source?
 
     /**
      * Fetches weather observations from a station.
