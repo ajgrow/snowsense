@@ -11,7 +11,6 @@ import in2000.prosjekt.in2000project.data.repository.FrostClimateRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.MonthDay
 
@@ -93,8 +92,9 @@ class MapViewModel(
         val end = setTimeBoundary(start, current.periodEnd)
 
         _screenState.value = _screenState.value.copy(
-            periodStart = start,
-            periodEnd = end
+            periodStart = start
+            //TIME BOUNDARY NOT IMPLEMENTED YET
+            //periodEnd = end
         )
 
         refetchIfLocationKnown()
@@ -105,7 +105,8 @@ class MapViewModel(
         val start = setTimeBoundary(current.periodStart, end)
 
         _screenState.value = _screenState.value.copy(
-            periodStart = start,
+            //TIME BOUNDARY NOT IMPLEMENTED YET
+            //periodStart = start,
             periodEnd = end
         )
 
