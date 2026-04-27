@@ -3,12 +3,14 @@ package in2000.prosjekt.in2000project.ui.home
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material3.MaterialTheme
@@ -40,8 +42,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.layout.ContentScale
 import androidx.navigation.NavGraph.Companion.findStartDestination
-import androidx.navigation.compose.currentBackStackEntryAsState
 import in2000.prosjekt.in2000project.data.model.NamedLocation
 import in2000.prosjekt.in2000project.navigation.Screen
 
@@ -117,11 +119,25 @@ fun HomeScreen(
 fun LogoSection(
     modifier: Modifier = Modifier
 ) {
-    Image(
-        painterResource(R.drawable.logo_placeholder),
-        contentDescription = "App Logo",
-        modifier = modifier.size(130.dp)
-    )
+    BoxWithConstraints(
+        modifier = modifier.fillMaxWidth(),
+        contentAlignment = Alignment.Center
+    ) {
+        //Take 45% of available width and caps the value at 240dp max (coerceAtMost)
+        //This enables the logo to adjust to different screensizes,
+        //without becoming ridiculously large on big screens
+        val logoWidth = (maxWidth * 0.45f).coerceAtMost(240.dp)
+
+        Image(
+            painter = painterResource(R.drawable.app_logo),
+            contentDescription = "App Logo",
+            modifier = Modifier
+                .width(logoWidth)
+                .wrapContentHeight()
+                .padding(10.dp),
+            contentScale = ContentScale.Fit
+        )
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
