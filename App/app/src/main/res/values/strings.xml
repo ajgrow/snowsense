@@ -79,6 +79,8 @@
     Extraordinary avalanche conditions.\n\nNumerous very large and often extremely large natural avalanches can be expected, even in moderately steep terrain.\n\nVery rarely forecast.
     </string>
 
+    <string name="date_description">Define a date range and the number of years back to visualize historical trends in temperature, wind, and precipitation.</string>
+
 
 
     <string name="map_screen_title">MapScreen</string>
