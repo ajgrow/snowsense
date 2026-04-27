@@ -273,6 +273,11 @@ fun BottomSheetContent(
                     DangerLevelCard(dangerLevel = DangerLevel.VERY_HIGH, backgroundColor = Color.Red)
                 }
             }
+
+            item {
+                DangerLevelDescriptionCard(dangerLevel = DangerLevel.VERY_HIGH)
+            }
+            
             item {
                 // Description of the content
                 Text(
