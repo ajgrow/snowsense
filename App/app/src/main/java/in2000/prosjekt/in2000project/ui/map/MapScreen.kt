@@ -25,7 +25,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -42,7 +41,6 @@ import in2000.prosjekt.in2000project.data.model.SkiArea
 import in2000.prosjekt.in2000project.ui.reusables.BottomBar
 import in2000.prosjekt.in2000project.ui.reusables.DatePicker
 import in2000.prosjekt.in2000project.ui.reusables.TopBar
-import in2000.prosjekt.in2000project.ui.settings.SettingsViewModel
 import java.time.MonthDay
 import com.patrykandpatrick.vico.compose.chart.Chart
 import com.patrykandpatrick.vico.compose.chart.line.lineChart
@@ -69,7 +67,6 @@ fun MapScreenState(
     viewModel: MapViewModel = viewModel(),
     nveViewModel: NveViewModel = viewModel(),
     coordinates: String = "65.0,10.0",
-    settingsViewModel: SettingsViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -81,7 +78,6 @@ fun MapScreenState(
         onRetry = { viewModel.getMapData() },
         onOverlayLoaded = {viewModel.onOverlayLoaded()},
         onOverlayError = {viewModel.onOverlayError()},
-        settingsViewModel = settingsViewModel
     )
 }
 
@@ -97,7 +93,6 @@ fun MapScreen(
     onRetry: () -> Unit,
     onOverlayLoaded: () -> Unit,
     onOverlayError: () -> Unit,
-    settingsViewModel: SettingsViewModel
 ) {
 
     // Hardcoded sample data for the MVP, however, when Frost API is ready this should move into the ViewModel
@@ -112,7 +107,6 @@ fun MapScreen(
 
     val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = skipPartiallyExpanded)
 
-    val scope = rememberCoroutineScope()
 
     val avalancheStatus = when {
         dangerCheckUiState.isDanger == true -> "High"
@@ -177,7 +171,6 @@ fun MapScreen(
                     modifier = Modifier
                         .fillMaxSize(),
                     coordinates = coordinates,
-                    settingsViewModel = settingsViewModel
                 )
 
                 when (mapUIState) {
@@ -363,7 +356,6 @@ fun MapScreenErrorPreview() {
         onRetry = {},
         onOverlayLoaded = {},
         onOverlayError = {},
-        settingsViewModel = viewModel()
     )
 }
 
