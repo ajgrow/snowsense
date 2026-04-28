@@ -78,6 +78,12 @@
 
     <string name="date_description">Define a date range and the number of years back to visualize historical trends in temperature, wind, and precipitation.</string>
 
+    <string name="police_service">Police</string>
+    <string name="police_number">112</string>
+    <string name="fire_service">Fire</string>
+    <string name="fire_number">110</string>
+    <string name="ambulance_service">Ambulance</string>
+    <string name="ambulance_number">113</string>
 
 
 
@@ -141,4 +147,5 @@
     <string name="text_large">Large</string>
     <string name="hide_info">Hide info ▲</string>
     <string name="show_info">Show info ▼</string>
+    <string name="emergency_title">Emergency Numbers</string>
 </resources>
