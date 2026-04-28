@@ -42,9 +42,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.rememberNavController
@@ -72,7 +70,7 @@ fun HomeScreen(
                  },
         bottomBar = { BottomBar(modifier, navController) }
     ) { paddingValues ->
-        Column(
+        LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
@@ -82,9 +80,11 @@ fun HomeScreen(
                 ) {
                    focusManager.clearFocus()
                 },
+            contentPadding = PaddingValues(16.dp),
+            verticalArrangement = Arrangement.spacedBy(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            LogoSection()
+            item {LogoSection()}
 
             val onNavigateToMap = { coordinate: String ->
                 navController.navigate(Screen.Map.createRoute(coordinate)) {
@@ -94,40 +94,34 @@ fun HomeScreen(
                 }
             }
 
-            SearchSection(
-                //get states from the viewmodel
-                modifier = Modifier,
-                textFieldState = uiState.searchTextFieldState,
-                onSearch = { homeViewModel.onSearch() },
-                searchResults = uiState.searchResults,
-                onNavigateToMap = onNavigateToMap,
-                onSelectResult = { result ->
-                    homeViewModel.addRecentSearch(result)
-                }
-            )
+            item {
+                SearchSection(
+                    //get states from the viewmodel
+                    modifier = Modifier,
+                    textFieldState = uiState.searchTextFieldState,
+                    onSearch = { homeViewModel.onSearch() },
+                    searchResults = uiState.searchResults,
+                    onNavigateToMap = onNavigateToMap,
+                    onSelectResult = { result ->
+                        homeViewModel.addRecentSearch(result)
+                    }
+                )
+            }
 
-            LazyColumn(
-                modifier = Modifier.fillMaxWidth(),
+            item {
+                FavoriteSection(
+                    items = uiState.favorites,
+                    modifier = Modifier,
+                    onNavigateToMap = onNavigateToMap
+                )
+            }
 
-                contentPadding = PaddingValues(16.dp),          //adds padding around content
-                verticalArrangement = Arrangement.spacedBy(24.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                item {
-                    FavoriteSection(
-                        items = uiState.favorites,
-                        modifier = Modifier,
-                        onNavigateToMap = onNavigateToMap
-                    )
-                }
-
-                item {
-                    RecentSection(
-                        items = uiState.recentSearches,
-                        modifier = Modifier,
-                        onNavigateToMap = onNavigateToMap
-                    )
-                }
+            item {
+                RecentSection(
+                    items = uiState.recentSearches,
+                    modifier = Modifier,
+                    onNavigateToMap = onNavigateToMap
+                )
             }
         }
     }
