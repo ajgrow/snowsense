@@ -272,7 +272,7 @@ fun BottomSheetContent(
                         style = MaterialTheme.typography.headlineSmall
                     )
                     Spacer(modifier = Modifier.weight(1f))
-                    DangerLevelCard(dangerLevel = DangerLevel.VERY_HIGH, backgroundColor = Color.Red)
+                    DangerLevelCard(dangerLevel = DangerLevel.VERY_HIGH)
                 }
             }
 

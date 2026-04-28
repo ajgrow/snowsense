@@ -17,11 +17,11 @@ import in2000.prosjekt.in2000project.data.model.enums.DangerLevel
 fun DangerLevelCard(
     modifier: Modifier = Modifier,
     dangerLevel: DangerLevel,
-    backgroundColor: Color)
+    )
 {
 
     Surface(
-        color = backgroundColor,
+        color = dangerLevel.color,
         modifier = modifier.padding(8.dp),
         shape = RoundedCornerShape(12.dp),
         border = BorderStroke(1.dp, Color.Black)
@@ -56,7 +56,7 @@ fun DangerLevelDescriptionCard(
 @Preview
 @Composable
 fun PreviewDangerLevelCard() {
-    DangerLevelCard(dangerLevel = DangerLevel.VERY_HIGH, backgroundColor = Color.Red)
+    DangerLevelCard(dangerLevel = DangerLevel.VERY_HIGH)
 }
 
 @Preview
