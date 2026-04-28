@@ -1,5 +1,6 @@
 package in2000.prosjekt.in2000project.ui.map
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,6 +15,7 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -55,6 +57,8 @@ import com.patrykandpatrick.vico.compose.component.textComponent
 import in2000.prosjekt.in2000project.data.model.DangerLevel
 import in2000.prosjekt.in2000project.ui.reusables.ClimateGraph
 import in2000.prosjekt.in2000project.ui.reusables.DangerLevelCard
+import in2000.prosjekt.in2000project.ui.reusables.DangerLevelDescriptionCard
+import androidx.compose.material3.Surface
 
 private val previewSkiArea = SkiArea(
     id = "1",
@@ -272,6 +276,11 @@ fun BottomSheetContent(
                     DangerLevelCard(dangerLevel = DangerLevel.VERY_HIGH, backgroundColor = Color.Red)
                 }
             }
+
+            item {
+                DangerLevelDescriptionCard(dangerLevel = DangerLevel.VERY_HIGH)
+            }
+
             item {
                 // Description of the content
                 Text(

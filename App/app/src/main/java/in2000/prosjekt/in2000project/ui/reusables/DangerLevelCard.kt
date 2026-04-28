@@ -20,7 +20,8 @@ fun DangerLevelCard(dangerLevel: DangerLevel, backgroundColor: Color) {
     Surface(
         color = backgroundColor,
         modifier = Modifier.padding(8.dp),
-        shape = RoundedCornerShape(12.dp)
+        shape = RoundedCornerShape(12.dp),
+        border = BorderStroke(1.dp, Color.Black)
 
     ) {
         when (dangerLevel) {
@@ -34,10 +35,33 @@ fun DangerLevelCard(dangerLevel: DangerLevel, backgroundColor: Color) {
     }
 }
 
+@Composable
+fun DangerLevelDescriptionCard(dangerLevel: DangerLevel) {
+
+    Surface(
+        modifier = Modifier.padding(8.dp),
+        border = BorderStroke(1.dp, Color.Black),
+        shape = RoundedCornerShape(12.dp)
+    ) {
+        when (dangerLevel) {
+            DangerLevel.LOW -> Text(stringResource(R.string.danger_level_1_description), modifier = Modifier.padding(8.dp))
+            DangerLevel.MODERATE -> Text(stringResource(R.string.danger_level_2_description), modifier = Modifier.padding(8.dp))
+            DangerLevel.CONSIDERABLE -> Text(stringResource(R.string.danger_level_3_description), modifier = Modifier.padding(8.dp))
+            DangerLevel.HIGH -> Text(stringResource(R.string.danger_level_4_description), modifier = Modifier.padding(8.dp))
+            DangerLevel.VERY_HIGH -> Text(stringResource(R.string.danger_level_5_description), modifier = Modifier.padding(8.dp))
+        }
+    }
+}
 
 
 @Preview
 @Composable
 fun PreviewDangerLevelCard() {
     DangerLevelCard(DangerLevel.VERY_HIGH, backgroundColor = Color.Red)
+}
+
+@Preview
+@Composable
+fun PreviewDangerLevelDescriptionCard() {
+    DangerLevelDescriptionCard(DangerLevel.VERY_HIGH)
 }
