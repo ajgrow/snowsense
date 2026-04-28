@@ -6,11 +6,12 @@ import in2000.prosjekt.in2000project.data.datasource.dto.FrostV0SourceResponse
 import in2000.prosjekt.in2000project.data.model.Coordinate
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
+import io.ktor.client.request.basicAuth
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter
 
 class KtorFrostV0DataSource(
-    private val client: HttpClient
+    private val client: HttpClient,
 ): FrostV0DataSource {
     override suspend fun getNearestSource(
         coordinate: Coordinate
