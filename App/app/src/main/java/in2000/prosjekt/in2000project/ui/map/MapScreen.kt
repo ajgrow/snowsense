@@ -1,6 +1,9 @@
 package in2000.prosjekt.in2000project.ui.map
 
+import android.graphics.Paint
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,8 +16,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -25,6 +30,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -43,10 +49,13 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import in2000.prosjekt.in2000project.R
 import in2000.prosjekt.in2000project.data.model.SkiArea
+import in2000.prosjekt.in2000project.data.model.toSkiArea
 import in2000.prosjekt.in2000project.ui.reusables.BottomBar
 import in2000.prosjekt.in2000project.ui.reusables.DatePicker
 import in2000.prosjekt.in2000project.ui.reusables.TopBar
+import org.koin.compose.viewmodel.koinViewModel
 import java.time.MonthDay
+import in2000.prosjekt.in2000project.ui.settings.SettingsViewModel
 import com.patrykandpatrick.vico.compose.chart.Chart
 import com.patrykandpatrick.vico.compose.chart.line.lineChart
 import com.patrykandpatrick.vico.core.entry.entryOf
@@ -61,32 +70,45 @@ import in2000.prosjekt.in2000project.ui.reusables.DangerLevelDescriptionCard
 import androidx.compose.material3.Surface
 
 private val previewSkiArea = SkiArea(
-    id = "1",
-    name = "Galdhøpiggen",
-    averageSnowfall = "210 cm seasonal average",
-    averagePrecipitation = "95 mm monthly average",
-    dailyMeanTemperature = "-3.2°C winter average"
+    name = "",
+    temperatureData = emptyList(),
+    precipitationData = emptyList(),
+    windSpeedData = emptyList(),
+    snowDepthData = emptyList()
 )
 
 
 //for use when the VM is ready
 @Composable
-fun MapScreenState(
+fun MapRoute(
     navController: NavController,
-    viewModel: MapViewModel = viewModel(),
+    coordinates: String,
+    mapViewModel: MapViewModel = koinViewModel(),
     nveViewModel: NveViewModel = viewModel(),
-    coordinates: String = "65.0,10.0",
+    settingsViewModel: SettingsViewModel = viewModel()
 ) {
-    val uiState by viewModel.uiState.collectAsState()
+    val screenState by mapViewModel.screenState.collectAsState()
 
     MapScreen(
         navController = navController,
-        mapUIState = uiState,
+        screenState = screenState,
         nveViewModel = nveViewModel,
+        onMapClick = { lat, lon ->
+            mapViewModel.onMapClick(lat, lon)
+            nveViewModel.avalancheChecker(lat, lon)
+        },
         coordinates = coordinates,
-        onRetry = { viewModel.getMapData() },
-        onOverlayLoaded = {viewModel.onOverlayLoaded()},
-        onOverlayError = {viewModel.onOverlayError()},
+        onOverlayRetry = { mapViewModel.onOverlayLoading() },
+        onOverlayLoaded = { mapViewModel.onOverlayLoaded()},
+        onOverlayError = { mapViewModel.onOverlayError()},
+        onSheetDismiss = { mapViewModel.onSheetDismissed() },
+        onPeriodStart = { it ->
+            if (it != null) mapViewModel.onPeriodStart(it) },
+        onPeriodEnd = { it ->
+            if (it != null) mapViewModel.onPeriodEnd(it) },
+        onYearsBack = { it ->
+            if (it != null) mapViewModel.onYearsBack(it) },
+        settingsViewModel = settingsViewModel
     )
 }
 
@@ -96,26 +118,42 @@ fun MapScreenState(
 fun MapScreen(
     modifier: Modifier = Modifier,
     navController: NavController,
-    mapUIState: MapUIState,
+    screenState: MapScreenState,
     nveViewModel: NveViewModel,
+    onMapClick: (Double, Double) -> Unit,
     coordinates: String,
-    onRetry: () -> Unit,
+    onOverlayRetry: () -> Unit,
     onOverlayLoaded: () -> Unit,
     onOverlayError: () -> Unit,
+    onSheetDismiss: () -> Unit,
+    onPeriodStart: (MonthDay?) -> Unit,
+    onPeriodEnd: (MonthDay?) -> Unit,
+    onYearsBack: (Int?) -> Unit,
+    settingsViewModel: SettingsViewModel
 ) {
-
-    // Hardcoded sample data for the MVP, however, when Frost API is ready this should move into the ViewModel
-    val skiArea = remember { previewSkiArea }
+    val skiArea = remember(screenState.climateState) {
+        val state = screenState.climateState
+        if (state is ClimateState.Success) {
+            state.data.toSkiArea()
+        } else {
+            null
+        }
+    } ?: previewSkiArea
 
     val dangerCheckUiState by nveViewModel.dangerCheckUiState.collectAsState()
     //Controls whether the bottom sheet is visible or not by keeping track of if the user has clicked the map
     //if this is set to null then the ModalBottomSheet is not open
     var isSheetOpen by rememberSaveable { mutableStateOf(false) }
 
+    LaunchedEffect(screenState.climateState) {
+        if (screenState.climateState is ClimateState.Success) {
+            isSheetOpen = true
+        }
+    }
+
     var skipPartiallyExpanded by rememberSaveable {mutableStateOf(false)}
 
     val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = skipPartiallyExpanded)
-
 
     val avalancheStatus = when {
         dangerCheckUiState.isDanger == true -> "High"
@@ -171,8 +209,9 @@ fun MapScreen(
                 //onMapClick is passed to the Map
                 MapboxView(
                     onMapClick = { point ->
-                        isSheetOpen = true
+                        onMapClick(point.latitude(), point.longitude())
                         nveViewModel.avalancheChecker(point.latitude(), point.longitude())
+                        isSheetOpen = true
                     },
                     onOverlayError = onOverlayError,
                     onOverlayLoaded = onOverlayLoaded,
@@ -181,21 +220,40 @@ fun MapScreen(
                     coordinates = coordinates,
                 )
 
-                when (mapUIState) {
-                    is MapUIState.Loading -> {
+
+                when (screenState.overlayState) {
+                    is OverlayState.Loading -> {
                         OverlayStatusCard(
                             message = stringResource(R.string.overlay_loading)
                         )
                     }
 
-                    is MapUIState.Error -> {
+                    is OverlayState.Error -> {
                         OverlayRetryCard(
                             message = stringResource(R.string.overlay_error),
-                            onRetry = onRetry
+                            onRetry = onOverlayRetry
                         )
                     }
 
-                    is MapUIState.Success -> Unit
+                    is OverlayState.Success -> Unit
+                }
+
+                when (screenState.climateState) {
+                    is ClimateState.Idle -> Unit
+
+                    is ClimateState.Loading -> {
+                        Log.d("ClimateData", "Loading...")
+                    }
+
+                    is ClimateState.Error -> {
+                        Log.d("ClimateData", "Error")
+                    }
+
+                    is ClimateState.Success -> {
+                        val success = screenState.climateState
+                        val climateData = success.data
+                        Log.d("ClimateData", climateData.toString())
+                    }
                 }
             }
         }
@@ -212,18 +270,31 @@ fun MapScreen(
         ) {
             BottomSheetContent(
                 area = skiArea,
+                climateState = screenState.climateState,
                 avalancheStatus = avalancheStatus,
                 modifier = Modifier
                     .fillMaxWidth()
                     .heightIn(min = 320.dp)
                     .navigationBarsPadding()
-                    .padding(bottom = 24.dp),
+                    .padding(bottom = 12.dp),
                 startDate = startDate,
                 endDate = endDate,
                 selectedYear = selectedYear,
-                onStartDateChange = { startDate = it },
-                onEndDateChange = { endDate = it },
-                onYearChange = { selectedYear = it }
+                onStartDateChange = {
+                    startDate = it
+                    onPeriodStart(it)
+                },
+                onEndDateChange = {
+                    endDate = it
+                    onPeriodEnd(it)
+                },
+                onYearChange = { year ->
+                    selectedYear = year
+                    year?.let {
+                        val calculatedYearsBack = java.time.Year.now().value - it
+                        onYearsBack(calculatedYearsBack)
+                    }
+                }
             )
         }
     }
@@ -232,6 +303,7 @@ fun MapScreen(
 @Composable
 fun BottomSheetContent(
     area: SkiArea,
+    climateState: ClimateState,
     avalancheStatus: String,
     modifier: Modifier = Modifier,
     startDate: MonthDay?,
@@ -242,12 +314,14 @@ fun BottomSheetContent(
     onYearChange: (Int?) -> Unit,
 ) {
 
+    /*
     val climateRows = listOf(
-        stringResource(R.string.label_avalanche_danger) to avalancheStatus,
-        stringResource(R.string.label_average_snowfall) to "TODO",
-        stringResource(R.string.label_average_precipitation) to "TODO",
-        stringResource(R.string.label_average_temperature) to "TODO"
+        "Avalanche status" to avalancheStatus,
     )
+    */
+
+    val climateRows = emptyList<Pair<String, String>>()
+
 
     // This is the content inside the bottom sheet.
     Surface(
@@ -257,35 +331,63 @@ fun BottomSheetContent(
         LazyColumn(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 20.dp, vertical = 16.dp),
+                .padding(horizontal = 20.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
 
             item {
+                val headerHeight = 40.dp
 
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(headerHeight),
+                    contentAlignment = Alignment.CenterStart
                 ) {
-                    // Area name
-                    Text(
-                        text = area.name,
-                        style = MaterialTheme.typography.headlineSmall
-                    )
-                    Spacer(modifier = Modifier.weight(1f))
-                    DangerLevelCard(dangerLevel = DangerLevel.VERY_HIGH)
+                    when (climateState) {
+                        is ClimateState.Loading -> {
+                            Column(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Box(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    CircularProgressIndicator(modifier = Modifier.size(26.dp))
+                                }
+                            }
+                        }
+
+                        is ClimateState.Error -> {
+                            Column(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Text(
+                                    text = stringResource(R.string.climate_error_desc),
+                                    color = MaterialTheme.colorScheme.error,
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                            }
+                        }
+
+                        else -> {
+                            Column(
+                                modifier = Modifier
+                            ) {
+                                Text(
+                                    text = stringResource(R.string.weather_station_desc),
+                                    style = MaterialTheme.typography.labelSmall
+                                )
+                                Text(
+                                    text = area.name,
+                                    style = MaterialTheme.typography.titleLarge,
+                                )
+                            }
+                        }
+                    }
                 }
-            }
-
-            item {
-                DangerLevelDescriptionCard(dangerLevel = DangerLevel.VERY_HIGH)
-            }
-
-            item {
-                // Description of the content
-                Text(
-                    text = stringResource(R.string.historical_climate_title),
-                    style = MaterialTheme.typography.titleMedium
-                )
             }
 
             item {
@@ -327,10 +429,6 @@ fun BottomSheetContent(
                     value = row.second)
             }
 
-            item {
-                HorizontalDivider()
-            }
-
             //THIS IS WHERE WE CAN PUT THE GRAPH COMPONENTS
             item {
                 val currentYear = java.time.Year.now().value
@@ -349,10 +447,36 @@ fun BottomSheetContent(
                             .height(180.dp),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text("Please select a year range to view graph")
+                        Text( text = stringResource(R.string.no_date_selected_msg))
                     }
                 } else {
-                    ClimateGraph(yearRange, startDate, endDate)
+                    Column(verticalArrangement = Arrangement.spacedBy(24.dp)) {
+                        ClimateGraph(
+                            dataPoints = area.temperatureData,
+                            startDate = startDate,
+                            endDate = endDate,
+                            title = stringResource(R.string.mean_temp_desc)
+                        )
+
+                        HorizontalDivider()
+
+                        ClimateGraph(
+                            dataPoints = area.precipitationData,
+                            startDate = startDate,
+                            endDate = endDate,
+                            title = stringResource(R.string.mean_precip_desc)
+                        )
+
+                        HorizontalDivider()
+
+                        ClimateGraph(
+                            dataPoints = area.windSpeedData,
+                            startDate = startDate,
+                            endDate = endDate,
+                            title = stringResource(R.string.mean_wind_desc)
+                        )
+
+                    }
                 }
             }
         }
@@ -382,12 +506,25 @@ fun ClimateRow(
 fun MapScreenErrorPreview() {
     MapScreen(
         navController = rememberNavController(),
-        mapUIState = MapUIState.Error,
+        screenState = MapScreenState(
+            overlayState = OverlayState.Error,
+            climateState = ClimateState.Idle,
+            climateCoordinate = null,
+            periodStart = MonthDay.now(),
+            periodEnd = MonthDay.now(),
+            yearsBack = 1
+        ),
         nveViewModel = viewModel(),
-        coordinates = "65.0,10.0",
-        onRetry = {},
+        onMapClick = { _, _ -> },
+        coordinates = "",
+        onOverlayRetry = {},
         onOverlayLoaded = {},
         onOverlayError = {},
+        onSheetDismiss = {},
+        settingsViewModel = viewModel(),
+        onPeriodStart = {},
+        onPeriodEnd = {},
+        onYearsBack = {},
     )
 }
 
@@ -397,6 +534,7 @@ fun MapScreenErrorPreview() {
 fun BottomSheetPreview() {
     BottomSheetContent(
         area = previewSkiArea,
+        climateState = ClimateState.Idle,
         avalancheStatus = "High",
         startDate = null,
         endDate = null,

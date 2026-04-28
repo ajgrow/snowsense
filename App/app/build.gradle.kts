@@ -68,6 +68,7 @@ dependencies {
     implementation(libs.androidx.compose.ui.text)
     implementation(libs.androidx.foundation)
     implementation(libs.foundation)
+    implementation(libs.androidx.compose.runtime)
     implementation(libs.androidx.appcompat)
     testImplementation(libs.junit)
     testImplementation(libs.kotlin.test)
@@ -77,6 +78,9 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
+    implementation(libs.koin.core)
+    implementation(libs.koin.android)
+    implementation(libs.koin.compose.viewmodel)
     implementation(libs.androidx.compose.material.icons.core)
 
     // Mapbox
