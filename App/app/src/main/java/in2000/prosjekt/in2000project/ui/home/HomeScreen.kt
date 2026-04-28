@@ -4,12 +4,14 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -40,6 +42,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.rememberNavController
@@ -62,7 +67,7 @@ fun HomeScreen(
         modifier = modifier,
         topBar = {
             TopBar(
-                title = stringResource(R.string.home_title),
+                title = stringResource(R.string.app_name),
                 navController = navController)
                  },
         bottomBar = { BottomBar(modifier, navController) }
@@ -132,11 +137,25 @@ fun HomeScreen(
 fun LogoSection(
     modifier: Modifier = Modifier
 ) {
-    Image(
-        painterResource(R.drawable.logo_placeholder),
-        contentDescription = stringResource(R.string.app_logo_description),
-        modifier = modifier.size(130.dp)
-    )
+    BoxWithConstraints(
+        modifier = modifier.fillMaxWidth(),
+        contentAlignment = Alignment.Center
+    ) {
+        //Take 45% of available width and caps the value at 240dp max (coerceAtMost)
+        //This enables the logo to adjust to different screensizes,
+        //without becoming ridiculously large on big screens
+        val logoWidth = (maxWidth * 0.45f).coerceAtMost(240.dp)
+
+        Image(
+            painter = painterResource(R.drawable.app_logo),
+            contentDescription = "App Logo",
+            modifier = Modifier
+                .width(logoWidth)
+                .wrapContentHeight()
+                .padding(10.dp),
+            contentScale = ContentScale.Fit
+        )
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -271,7 +290,6 @@ fun LocationCard(
 @Preview
 @Composable
 fun HomeScreenPreview(
-    modifier: Modifier = Modifier
 ) {
     HomeScreen(navController = rememberNavController())
 }
