@@ -1,7 +1,6 @@
 <resources>
     <string name="app_name">SnowSense</string>
-
-    <string name="home_title">Home</string>
+    
     <string name="app_logo_description">App Logo</string>
     <string name="search_placeholder">Search</string>
     <string name="favorites_title">Favorites</string>
@@ -9,8 +8,6 @@
 
 
 
-
-    <string name="information_title">Information</string>
 
     <string name="about_app_title">About the app</string>
     <string name="team_title">The Team</string>
@@ -76,16 +73,13 @@
 
     <string name="danger_level_5_title">5 - Very High</string>
     <string name="danger_level_5_description">
-    Extraordinary avalanche conditions.\n\n
-
-    Numerous very large and often extremely large natural avalanches can be expected, even in moderately steep terrain.\n\n
-
-    Very rarely forecast.
+    Extraordinary avalanche conditions.\n\nNumerous very large and often extremely large natural avalanches can be expected, even in moderately steep terrain.\n\nVery rarely forecast.
     </string>
 
+    <string name="date_description">Define a date range and the number of years back to visualize historical trends in temperature, wind, and precipitation.</string>
 
 
-    <string name="map_screen_title">MapScreen</string>
+
 
     <string name="map_title">Map</string>
     <string name="map_instruction">Select an area to view historical climate details.</string>
