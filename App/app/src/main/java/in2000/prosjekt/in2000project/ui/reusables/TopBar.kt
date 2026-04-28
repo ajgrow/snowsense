@@ -22,19 +22,21 @@ import in2000.prosjekt.in2000project.navigation.Screen
 @Composable
 fun TopBar(
     modifier: Modifier = Modifier,
-    title: String,
+    title: String? = null,
     navController: NavController
 ){
     CenterAlignedTopAppBar(
         modifier =  modifier,
         title = {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-                },
+            title?.let {
+                Text(
+                    text = it,
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            } //if title is not null
+        },
         actions = {
             IconButton(
                 onClick = {navController.navigate(Screen.Settings.route)}
