@@ -61,7 +61,6 @@ fun InfoScreen(
         topBar = {
             TopBar(
                 modifier = Modifier,
-                title = stringResource(R.string.information_title),
                 navController = navController)
         },
         bottomBar = {

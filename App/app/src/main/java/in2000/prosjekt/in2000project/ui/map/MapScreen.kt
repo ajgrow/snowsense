@@ -132,7 +132,6 @@ fun MapScreen(
         topBar = {
             TopBar(
                 modifier = Modifier,
-                title = stringResource(R.string.map_screen_title),
                 navController = navController)
         },
         bottomBar = {

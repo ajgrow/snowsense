@@ -9,8 +9,6 @@
 
 
 
-    <string name="information_title">Information</string>
-
     <string name="about_app_title">About the app</string>
     <string name="team_title">The Team</string>
     <string name="about_team_text">
@@ -82,7 +80,6 @@
 
 
 
-    <string name="map_screen_title">MapScreen</string>
 
     <string name="map_title">Map</string>
     <string name="map_instruction">Select an area to view historical climate details.</string>
