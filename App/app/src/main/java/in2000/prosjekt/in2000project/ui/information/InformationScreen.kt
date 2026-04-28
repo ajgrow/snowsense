@@ -140,7 +140,7 @@ fun DangerLevelItem(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Surface(
-                    color = dangerLevel.color,
+                    color = dangerLevel.getColor(),
                     shape = RoundedCornerShape(8.dp)
                 ) {
                     Text(
