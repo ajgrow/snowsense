@@ -19,7 +19,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import in2000.prosjekt.in2000project.R
-import in2000.prosjekt.in2000project.data.model.DangerLevel
+import in2000.prosjekt.in2000project.data.model.enums.DangerLevel
 import in2000.prosjekt.in2000project.ui.reusables.BottomBar
 import in2000.prosjekt.in2000project.ui.reusables.TopBar
 

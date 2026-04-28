@@ -11,7 +11,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import in2000.prosjekt.in2000project.data.model.DangerLevel
+import in2000.prosjekt.in2000project.data.model.enums.DangerLevel
 
 @Composable
 fun DangerLevelCard(

@@ -54,7 +54,7 @@ import com.patrykandpatrick.vico.core.entry.entryModelOf
 import com.patrykandpatrick.vico.compose.axis.horizontal.rememberBottomAxis
 import com.patrykandpatrick.vico.compose.axis.vertical.rememberStartAxis
 import com.patrykandpatrick.vico.compose.component.textComponent
-import in2000.prosjekt.in2000project.data.model.DangerLevel
+import in2000.prosjekt.in2000project.data.model.enums.DangerLevel
 import in2000.prosjekt.in2000project.ui.reusables.ClimateGraph
 import in2000.prosjekt.in2000project.ui.reusables.DangerLevelCard
 import in2000.prosjekt.in2000project.ui.reusables.DangerLevelDescriptionCard
