@@ -148,21 +148,6 @@ fun MapScreen(
                 .padding(paddingValues)
                 .padding(16.dp)
         ) {
-            // Title
-            Text(
-                text = stringResource(R.string.map_title),
-                style = MaterialTheme.typography.headlineMedium,
-                fontWeight = Bold,
-                modifier = Modifier.padding(bottom = 8.dp)
-            )
-
-            // Instructions
-            Text(
-                text = stringResource(R.string.map_instruction),
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(bottom = 16.dp)
-            )
-
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
