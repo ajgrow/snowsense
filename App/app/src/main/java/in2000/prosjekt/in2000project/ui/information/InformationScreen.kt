@@ -124,7 +124,6 @@ fun DangerLevelItem(
     var expanded by rememberSaveable { mutableStateOf(false) }
 
     Surface(
-        color = dangerLevel.color,
         modifier = modifier
             .padding(bottom = 8.dp)
             .fillMaxWidth()
@@ -140,11 +139,17 @@ fun DangerLevelItem(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = stringResource(dangerLevel.titleRes),
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = Bold
-                )
+                Surface(
+                    color = dangerLevel.color,
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    Text(
+                        text = stringResource(dangerLevel.titleRes),
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = Bold,
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)
+                    )
+                }
                 Text(
                     text =
                         if (expanded)
