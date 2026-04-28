@@ -1,5 +1,6 @@
 package in2000.prosjekt.in2000project.data.repository
 
+import in2000.prosjekt.in2000project.data.datasource.dto.FrostV0Observation
 import in2000.prosjekt.in2000project.data.datasource.makeObservation
 import org.junit.Assert.*
 import org.junit.Test
@@ -13,7 +14,7 @@ class AverageByElementTest {
             makeObservation(value = -4.0),
             makeObservation(value = -2.0),
         )
-        val result = averageByElement(obs)
+        val result = obs.averageByElement()
         assertEquals(-4.0, result["mean(air_temperature P1D)"]!!, 0.001)
     }
 
@@ -25,7 +26,7 @@ class AverageByElementTest {
             makeObservation(value = -4.0),
             makeObservation(elementId = "sum(precipitation_amount P1D)", value = 3.0, unit = "mm"),
         )
-        val result = averageByElement(obs)
+        val result = obs.averageByElement()
         assertEquals(-3.0, result["mean(air_temperature P1D)"]!!, 0.001)
         assertEquals(4.0, result["sum(precipitation_amount P1D)"]!!, 0.001)
     }
@@ -35,13 +36,14 @@ class AverageByElementTest {
         val obs = listOf(
             makeObservation(value = -3.5),
         )
-        val result = averageByElement(obs)
+        val result = obs.averageByElement()
         assertEquals(-3.5, result["mean(air_temperature P1D)"]!!, 0.001)
     }
 
     @Test
     fun emptyInput_returnsEmptyMap() {
-        val result = averageByElement(emptyList())
+        val obs = emptyList<FrostV0Observation>()
+        val result = obs.averageByElement()
         assertTrue(result.isEmpty())
     }
 
@@ -54,7 +56,7 @@ class AverageByElementTest {
             makeObservation(elementId = "mean(wind_speed P1D)", value = 3.0, unit = "m/s"),
             makeObservation(elementId = "max(surface_snow_thickness P1D)", value = 50.0, unit = "cm"),
         )
-        val result = averageByElement(obs)
+        val result = obs.averageByElement()
         assertEquals(4, result.size)
         assertEquals(-2.0, result["mean(air_temperature P1D)"]!!, 0.001)
         assertEquals(50.0, result["max(surface_snow_thickness P1D)"]!!, 0.001)

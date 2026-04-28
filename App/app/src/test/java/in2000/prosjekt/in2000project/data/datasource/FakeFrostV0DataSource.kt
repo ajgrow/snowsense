@@ -39,10 +39,10 @@ class FakeFrostV0DataSource : FrostV0DataSource {
 
     override suspend fun getNearestSource(
         coordinate: Coordinate,
-    ): FrostV0SourceResponse {
+    ): FrostV0Source? {
         if (shouldThrow) throw java.io.IOException("Fake network error")
         lastCoordinate = coordinate
-        return sourceResponse
+        return sourceResponse.data.firstOrNull()
     }
 
     override suspend fun getObservations(

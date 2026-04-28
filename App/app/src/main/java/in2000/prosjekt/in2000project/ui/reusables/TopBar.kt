@@ -31,7 +31,8 @@ fun TopBar(
             Text(
                 text = title,
                 style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurface
             )
                 },
         actions = {

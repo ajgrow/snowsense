@@ -1,7 +1,10 @@
 package in2000.prosjekt.in2000project.ui.theme
 
-import android.app.Activity
 import android.os.Build
+import androidx.activity.ComponentActivity
+import androidx.activity.SystemBarStyle
+import androidx.activity.compose.LocalActivity
+import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
@@ -9,8 +12,7 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.platform.LocalContext
 import in2000.prosjekt.in2000project.ui.settings.TextSizeMode
 import in2000.prosjekt.in2000project.ui.settings.ThemeMode
@@ -44,18 +46,36 @@ fun In2000projectTheme(
     dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
-    val darkTheme = when (themeMode){
+    val isDarkTheme = when (themeMode){
         ThemeMode.SYSTEM -> isSystemInDarkTheme()
         ThemeMode.DARK -> true
         ThemeMode.LIGHT -> false
     }
+
+    // Refresh edge-to-edge when the theme changes so status bar icons update
+    (LocalActivity.current as? ComponentActivity)?.let { activity ->
+        DisposableEffect(isDarkTheme) {
+            activity.enableEdgeToEdge(
+                statusBarStyle = SystemBarStyle.auto(
+                    android.graphics.Color.TRANSPARENT,
+                    android.graphics.Color.TRANSPARENT
+                    ) { isDarkTheme },
+                navigationBarStyle = SystemBarStyle.auto(
+                    android.graphics.Color.TRANSPARENT,
+                    android.graphics.Color.TRANSPARENT
+                    ) { isDarkTheme },
+            )
+            onDispose { }
+        }
+    }
+
     val colorScheme = when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+            if (isDarkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
 
-        darkTheme -> DarkColorScheme
+        isDarkTheme -> DarkColorScheme
         else -> LightColorScheme
     }
 
