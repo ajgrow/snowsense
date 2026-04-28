@@ -21,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.activity.compose.LocalActivity
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -172,7 +173,7 @@ fun SettingScreen(
                 ThemeOption(
                     title = "Norsk",
                     selected = languageMode == AppLanguageMode.NORWEGIAN,
-                    oonClick = {
+                    onClick = {
                         settingsViewModel.setLanguage(AppLanguageMode.NORWEGIAN)
                     },
                     modifier = Modifier.padding(horizontal = 16.dp)
