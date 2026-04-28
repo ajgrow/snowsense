@@ -2,20 +2,18 @@ package in2000.prosjekt.in2000project.ui.settings
 
 import android.app.Application
 import android.content.Context
-import android.util.Log
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.os.LocaleListCompat
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.ViewModel
-import in2000.prosjekt.in2000project.data.datastore.dataStore
-import io.ktor.http.ContentType
-import java.util.Locale
 
-class SettingsViewModel(application: Application) : AndroidViewModel(application){
-
-    private val prefs = application.getSharedPreferences("settings", Context.MODE_PRIVATE)
+class SettingsViewModel(application: Application)
+    : AndroidViewModel(application)
+{
+    private val prefs = application
+        .getSharedPreferences("settings", Context.MODE_PRIVATE)
 
     var themeMode by mutableStateOf(
         ThemeMode.valueOf(
@@ -31,14 +29,8 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
         )
     )
 
-    var languageMode by mutableStateOf(
-        AppLanguageMode.valueOf(
-            prefs.getString(
-                "language_mode", AppLanguageMode.ENGLISH.name)!!
-        )
-    )
-
-
+    var languageMode by mutableStateOf(currentLanguageMode())
+        private set
 
     fun setTheme(mode: ThemeMode){
         themeMode = mode
@@ -54,8 +46,26 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
 
     fun setLanguage(mode: AppLanguageMode) {
         languageMode = mode
-        prefs.edit().putString("language_mode", mode.name).apply()
-
+        AppCompatDelegate
+            .setApplicationLocales(
+                LocaleListCompat.forLanguageTags(mode.tag))
     }
 
+
+    private fun currentLanguageMode(
+    ): AppLanguageMode
+    = AppCompatDelegate
+        .getApplicationLocales()
+        .toLanguageTags()
+        .split(",")
+        .firstOrNull()
+        ?.takeIf { it.isNotEmpty() }
+        ?.let { AppLanguageMode.fromTag(it) }
+        ?: AppLanguageMode
+            .fromTag(java.util.Locale
+                .getDefault().language)
+
+    fun refreshLanguageMode() {
+        languageMode = currentLanguageMode()
+    }
 }
