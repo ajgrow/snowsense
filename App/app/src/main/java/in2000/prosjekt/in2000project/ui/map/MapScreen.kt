@@ -302,6 +302,20 @@ fun BottomSheetContent(
                     onEndDateChange = onEndDateChange,
                     onYearChange = onYearChange,
                 )
+
+                Surface(
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
+                    color = MaterialTheme.colorScheme.surfaceVariant
+                ) {
+                    Text(
+                        text = stringResource(R.string.date_description),
+                        modifier = Modifier.padding(12.dp)
+                    )
+                }
             }
 
             item {
