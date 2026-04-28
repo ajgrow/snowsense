@@ -11,7 +11,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import in2000.prosjekt.in2000project.R
 import com.patrykandpatrick.vico.compose.axis.horizontal.rememberBottomAxis
 import com.patrykandpatrick.vico.compose.axis.vertical.rememberStartAxis
 import com.patrykandpatrick.vico.compose.chart.Chart
@@ -59,7 +61,7 @@ fun ClimateGraph(
                 modifier = Modifier.fillMaxWidth().height(180.dp),
                 contentAlignment = Alignment.Center
             ) {
-                Text("No data for this period", style = MaterialTheme.typography.bodySmall)
+                Text(stringResource(R.string.no_graph_data), style = MaterialTheme.typography.bodySmall)
             }
         }
     }

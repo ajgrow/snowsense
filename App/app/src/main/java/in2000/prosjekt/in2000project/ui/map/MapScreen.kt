@@ -203,7 +203,6 @@ fun MapScreen(
                     modifier = Modifier
                         .fillMaxSize(),
                     coordinates = coordinates,
-                    settingsViewModel = settingsViewModel
                 )
 
 
@@ -228,12 +227,10 @@ fun MapScreen(
                     is ClimateState.Idle -> Unit
 
                     is ClimateState.Loading -> {
-                        /*TO DO*/
                         Log.d("ClimateData", "Loading...")
                     }
 
                     is ClimateState.Error -> {
-                        /*TO DO*/
                         Log.d("ClimateData", "Error")
                     }
 
@@ -302,9 +299,14 @@ fun BottomSheetContent(
     onYearChange: (Int?) -> Unit,
 ) {
 
+    /*
     val climateRows = listOf(
         "Avalanche status" to avalancheStatus,
     )
+    */
+
+    val climateRows = emptyList<Pair<String, String>>()
+
 
     // This is the content inside the bottom sheet.
     Surface(
@@ -348,7 +350,7 @@ fun BottomSheetContent(
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
                                 Text(
-                                    text = "Failed to load data. Please try again.",
+                                    text = stringResource(R.string.climate_error_desc),
                                     color = MaterialTheme.colorScheme.error,
                                     style = MaterialTheme.typography.bodyMedium
                                 )
@@ -360,7 +362,7 @@ fun BottomSheetContent(
                                 modifier = Modifier
                             ) {
                                 Text(
-                                    "Weather station:",
+                                    text = stringResource(R.string.weather_station_desc),
                                     style = MaterialTheme.typography.labelSmall
                                 )
                                 Text(
@@ -401,10 +403,6 @@ fun BottomSheetContent(
 
             }
 
-            item {
-                HorizontalDivider()
-            }
-
             //THIS IS WHERE WE CAN PUT THE GRAPH COMPONENTS
             item {
                 val currentYear = java.time.Year.now().value
@@ -423,7 +421,7 @@ fun BottomSheetContent(
                             .height(180.dp),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text("Please select a year range to view graph")
+                        Text( text = stringResource(R.string.no_date_selected_msg))
                     }
                 } else {
                     Column(verticalArrangement = Arrangement.spacedBy(24.dp)) {
@@ -431,7 +429,7 @@ fun BottomSheetContent(
                             dataPoints = area.temperatureData,
                             startDate = startDate,
                             endDate = endDate,
-                            title = "Mean Temperature"
+                            title = stringResource(R.string.mean_temp_desc)
                         )
 
                         HorizontalDivider()
@@ -440,7 +438,7 @@ fun BottomSheetContent(
                             dataPoints = area.precipitationData,
                             startDate = startDate,
                             endDate = endDate,
-                            title = "Precipitation"
+                            title = stringResource(R.string.mean_precip_desc)
                         )
 
                         HorizontalDivider()
@@ -449,7 +447,7 @@ fun BottomSheetContent(
                             dataPoints = area.windSpeedData,
                             startDate = startDate,
                             endDate = endDate,
-                            title = "Wind speed"
+                            title = stringResource(R.string.mean_wind_desc)
                         )
 
                     }
