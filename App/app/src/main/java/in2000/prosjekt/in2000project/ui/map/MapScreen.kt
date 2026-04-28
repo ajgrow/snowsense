@@ -55,7 +55,6 @@ import com.patrykandpatrick.vico.compose.component.textComponent
 import in2000.prosjekt.in2000project.data.model.DangerLevel
 import in2000.prosjekt.in2000project.ui.reusables.ClimateGraph
 import in2000.prosjekt.in2000project.ui.reusables.DangerLevelCard
-import in2000.prosjekt.in2000project.ui.reusables.DangerLevelDescriptionCard
 
 private val previewSkiArea = SkiArea(
     id = "1",
