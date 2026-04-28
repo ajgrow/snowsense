@@ -1,4 +1,4 @@
-package in2000.prosjekt.in2000project.ui.reusables
+package in2000.prosjekt.in2000project.data.model.enums
 
 import androidx.annotation.StringRes
 import in2000.prosjekt.in2000project.R

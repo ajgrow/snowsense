@@ -35,7 +35,7 @@ import androidx.navigation.NavController
 import in2000.prosjekt.in2000project.R
 import in2000.prosjekt.in2000project.data.model.enums.DangerLevel
 import in2000.prosjekt.in2000project.ui.reusables.BottomBar
-import in2000.prosjekt.in2000project.ui.reusables.EmergencyServices
+import in2000.prosjekt.in2000project.data.model.enums.EmergencyServices
 import in2000.prosjekt.in2000project.ui.reusables.TopBar
 
 @Composable
