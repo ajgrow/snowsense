@@ -44,10 +44,12 @@ class SettingsViewModel(application: Application)
             "text_size_mode", mode.name).apply()
     }
 
-    fun setLanguage(mode: AppLanguageMode)
-    = AppCompatDelegate
-        .setApplicationLocales(
-            LocaleListCompat.forLanguageTags(mode.tag))
+    fun setLanguage(mode: AppLanguageMode) {
+        languageMode = mode
+        AppCompatDelegate
+            .setApplicationLocales(
+                LocaleListCompat.forLanguageTags(mode.tag))
+    }
 
 
     private fun currentLanguageMode(
