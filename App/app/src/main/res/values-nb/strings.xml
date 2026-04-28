@@ -1,7 +1,6 @@
 <resources>
     <string name="app_name">SnowSense</string>
 
-    <string name="home_title">Hjem</string>
     <string name="app_logo_description">App-logo</string>
     <string name="search_placeholder">Søk</string>
     <string name="favorites_title">Favoritter</string>
@@ -10,7 +9,6 @@
 
 
 
-    <string name="information_title">Informasjon</string>
     <string name="about_app_title">Om appen</string>
     <string name="team_title">Teamet</string>
     <string name="about_team_text">
@@ -82,9 +80,9 @@ Mange svært store og ofte ekstremt store naturlige skred kan forventes, selv i 
 Svært sjelden varslet.
     </string>
 
+    <string name="date_description">Velg en datoperiode og år siden for å se historiske klimadata for temperatur, vind og nedbør.</string>
 
 
-    <string name="map_screen_title">Kartskjerm</string>
 
     <string name="map_title">Kart</string>
     <string name="map_instruction">Velg et område for å se historiske klimadata.</string>
