@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -21,26 +20,21 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import in2000.prosjekt.in2000project.R
 import in2000.prosjekt.in2000project.data.model.enums.DangerLevel
 import in2000.prosjekt.in2000project.ui.reusables.BottomBar
 import in2000.prosjekt.in2000project.ui.reusables.TopBar
-import in2000.prosjekt.in2000project.ui.theme.DangerColorLevel3
 
 @Composable
 fun InfoScreen(
@@ -55,6 +49,7 @@ fun InfoScreen(
         modifier = modifier,
         topBar = {
             TopBar(
+                title = stringResource(R.string.about_app_title),
                 modifier = Modifier,
                 navController = navController)
         },
@@ -72,13 +67,6 @@ fun InfoScreen(
         ) {
             item {
                 Column {
-                    Text(
-                        text = stringResource(R.string.about_app_title),
-                        style = MaterialTheme.typography.headlineMedium,
-                        fontWeight = Bold,
-                        modifier = Modifier.padding(bottom = 8.dp)
-                    )
-
                     Text(
                         text = stringResource(R.string.team_title),
                         style = MaterialTheme.typography.bodyMedium,
@@ -152,7 +140,7 @@ fun DangerLevelItem(
                 Text(
                     text = stringResource(dangerLevel.titleRes),
                     style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = Bold
                 )
                 Text(
                     text =
