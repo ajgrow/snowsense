@@ -141,4 +141,6 @@ Svært sjelden varslet.
     <string name="text_small">Liten</string>
     <string name="text_medium">Middels</string>
     <string name="text_large">Stor</string>
+    <string name="hide_info">Skjul info ▲</string>
+    <string name="show_info">Vis info ▼</string>
 </resources>
