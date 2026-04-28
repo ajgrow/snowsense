@@ -139,4 +139,15 @@
     <string name="text_small">Small</string>
     <string name="text_medium">Medium</string>
     <string name="text_large">Large</string>
+
+    <string name="weather_station_desc">Weather station</string>
+
+    <string name="mean_temp_desc">Mean temperature</string>
+    <string name="mean_precip_desc">Mean precipitation</string>
+    <string name="mean_snow_desc">Mean snow depth</string>
+    <string name="mean_wind_desc">Mean wind speed</string>
+
+    <string name="climate_error_desc">Failed to load climate data, please try again.</string>
+    <string name="no_date_selected_msg">Select a date interval to see historical trend graphs for the period.</string>
+    <string name="no_graph_data">No data to show.</string>
 </resources>

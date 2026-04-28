@@ -9,9 +9,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -21,15 +19,17 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.activity.compose.LocalActivity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import in2000.prosjekt.in2000project.R
-import java.util.Locale
 
 @Composable
 fun SettingScreen(
@@ -38,6 +38,10 @@ fun SettingScreen(
     navController: NavController,
     settingsViewModel: SettingsViewModel
 ) {
+    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
+        settingsViewModel.refreshLanguageMode()
+    }
+
     Surface(
         modifier = Modifier
             .fillMaxSize(),
@@ -47,7 +51,6 @@ fun SettingScreen(
         val themeMode = settingsViewModel.themeMode
         val textSizeMode = settingsViewModel.textSizeMode
         val languageMode = settingsViewModel.languageMode
-        val activity = LocalActivity.current
 
         LazyColumn(
             modifier = Modifier
@@ -66,7 +69,7 @@ fun SettingScreen(
                         onClick = { navController.popBackStack() }
                     ) {
                         Icon(
-                            imageVector = Icons.Default.ArrowBack,
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = stringResource(R.string.back_button_desc)
                         )
                     }
@@ -160,19 +163,6 @@ fun SettingScreen(
                     selected = languageMode == AppLanguageMode.ENGLISH,
                     onClick = {
                         settingsViewModel.setLanguage(AppLanguageMode.ENGLISH)
-
-                        val locale = Locale.forLanguageTag("en")
-                        Locale.setDefault(locale)
-
-                        val config = activity?.resources?.configuration
-                        config?.setLocale(locale)
-
-                        activity?.resources?.updateConfiguration(
-                            config,
-                            activity?.resources?.displayMetrics
-                        )
-
-                        activity?.recreate()
                     },
                     modifier = Modifier.padding(horizontal = 16.dp)
                 )
@@ -182,21 +172,8 @@ fun SettingScreen(
                 ThemeOption(
                     title = "Norsk",
                     selected = languageMode == AppLanguageMode.NORWEGIAN,
-                    onClick = {
+                    oonClick = {
                         settingsViewModel.setLanguage(AppLanguageMode.NORWEGIAN)
-
-                        val locale = Locale("nb")
-                        Locale.setDefault(locale)
-
-                        val config = activity?.resources?.configuration
-                        config?.setLocale(locale)
-
-                        activity?.resources?.updateConfiguration(
-                            config,
-                            activity?.resources?.displayMetrics
-                        )
-
-                        activity?.recreate()
                     },
                     modifier = Modifier.padding(horizontal = 16.dp)
                 )

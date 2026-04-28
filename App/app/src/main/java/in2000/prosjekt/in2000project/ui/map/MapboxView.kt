@@ -130,6 +130,30 @@ fun MapboxView(
                 mapViewportState = viewportState
             ) {
                 MapEffect(Unit) { mapView ->
+                    val annotationApi = mapView.annotations
+                    val pointAnnotationManager: PointAnnotationManager = annotationApi.createPointAnnotationManager()
+
+                    fun addPin(point: Point){
+                        pointAnnotationManager.deleteAll()
+                        val bitmap = BitmapFactory.decodeResource(
+                            mapView.context.resources,
+                            R.drawable.red_marker
+                        )
+
+                        val pointAnnotationOptions = PointAnnotationOptions()
+                            .withPoint(point)
+                            .withIconImage(bitmap)
+                            .withIconSize(0.3)
+                        pointAnnotationManager.create(pointAnnotationOptions)
+
+                    }
+
+                    //this click listener just works generally on the map
+                    mapView.gestures.addOnMapClickListener { point ->
+                        addPin(point)
+                        onMapClick(point)
+                        true
+                    }
 
                     mapView.mapboxMap.subscribeMapLoadingError { error ->
                         Log.e(TAG, "Map loading error: ${error.message}")
@@ -199,30 +223,7 @@ fun MapboxView(
                     )
 
 
-                    val annotationApi = mapView.annotations
-                    val pointAnnotationManager: PointAnnotationManager = annotationApi.createPointAnnotationManager()
 
-                    fun addPin(point: Point){
-                        pointAnnotationManager.deleteAll()
-                        val bitmap = BitmapFactory.decodeResource(
-                            mapView.context.resources,
-                            R.drawable.red_marker
-                        )
-
-                        val pointAnnotationOptions = PointAnnotationOptions()
-                            .withPoint(point)
-                            .withIconImage(bitmap)
-                            .withIconSize(0.3)
-                        pointAnnotationManager.create(pointAnnotationOptions)
-
-                    }
-
-                    //this click listener just works generally on the map
-                    mapView.gestures.addOnMapClickListener { point ->
-                        addPin(point)
-                        onMapClick(point)
-                        true
-                    }
 
                     if (hasSearch && searchLat != null && searchLng != null){
                         val searchPoint = Point.fromLngLat(searchLng, searchLat)

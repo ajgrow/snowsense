@@ -10,6 +10,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import in2000.prosjekt.in2000project.ui.home.HomeScreen
 import in2000.prosjekt.in2000project.ui.information.InfoScreen
+import in2000.prosjekt.in2000project.ui.map.MapRoute
 import in2000.prosjekt.in2000project.ui.map.MapScreenState
 import in2000.prosjekt.in2000project.ui.settings.SettingScreen
 import in2000.prosjekt.in2000project.ui.settings.SettingsViewModel
@@ -17,7 +18,6 @@ import in2000.prosjekt.in2000project.ui.theme.In2000projectTheme
 
 @Composable
 fun AppNavigation(){
-
     val navController = rememberNavController()
 
     val settingsViewModel: SettingsViewModel = viewModel()
@@ -49,7 +49,7 @@ fun AppNavigation(){
             ) { backStackEntry ->
                 val coordinates = backStackEntry.arguments?.getString("coordinates")!!
                 Log.d("fuckedupmap",coordinates)
-                MapScreenState(
+                MapRoute(
                     navController = navController,
                     coordinates = coordinates)
             }

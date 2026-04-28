@@ -1,39 +1,140 @@
 package in2000.prosjekt.in2000project.ui.map
 
+import android.util.Log
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import in2000.prosjekt.in2000project.data.model.Coordinate
+import in2000.prosjekt.in2000project.data.repository.FrostClimateRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.time.MonthDay
 
-class MapViewModel : ViewModel() {
-    private val _uiState = MutableStateFlow<MapUIState>(MapUIState.Loading)
-    val uiState: StateFlow<MapUIState> = _uiState.asStateFlow()
+class MapViewModel(
+    private val frostClimateRepository: FrostClimateRepository
+) : ViewModel() {
 
+    //Using MapScreenState() instead of <MapScreenState>(MapScreenState.Loading) because
+    //it's a data class rather than just one sealed interface. This is because two things can fail instead
+    //of just one. Both the WMS overlay can fail as well as the climate data. This means that
+    //we base this off the MapScreenState() data class rather than just one sealed interface.
+    private val _screenState = MutableStateFlow(MapScreenState())
+    val screenState: StateFlow<MapScreenState> = _screenState.asStateFlow()
 
-    init {
-        getMapData()
+    //.copy() creates a new instance of the data class with a few of the properties changed while
+    //everything else stays the same. StateFlow needs to identify the change but can't if you
+    //just mutate the existing object in place and the UI won't update. However, if you create a copy(),
+    //the old value is replaced with a new one which triggers recomposition
+
+    fun onOverlayLoading() {
+        _screenState.value = _screenState.value.copy(
+            overlayState = OverlayState.Loading
+        )
     }
-    fun getMapData() {
-        viewModelScope.launch {
-            _uiState.value = MapUIState.Loading
 
-            _uiState.value = try {
-                MapUIState.Success
+    fun onOverlayLoaded() {
+        _screenState.value = _screenState.value.copy(
+            overlayState = OverlayState.Success
+        )
+    }
+
+    fun onOverlayError() {
+        _screenState.value = _screenState.value.copy(
+            overlayState = OverlayState.Error
+        )
+    }
+
+    //set climateState to Loading until success.
+    //use coordinates from UI to call getClimateDataForLocation() using coordinates and time period
+    fun fetchClimateData(lat: Double, lon: Double) {
+        viewModelScope.launch {
+            _screenState.value = _screenState.value.copy(
+                climateState = ClimateState.Loading
+            )
+
+            try {
+                val current = _screenState.value
+                val climateData = frostClimateRepository.getClimateDataForLocation(
+                    coordinate = Coordinate(lat, lon),
+                    periodStart = current.periodStart,
+                    periodEnd = current.periodEnd,
+                    yearsBack = current.yearsBack
+                )
+
+                _screenState.value = _screenState.value.copy(
+                    climateState = ClimateState.Success(climateData)
+                )
             } catch (e: Exception) {
+                Log.d("ClimateData", "Something went wrong: " + Log.getStackTraceString(e))
                 e.printStackTrace()
-                MapUIState.Error
+
+                _screenState.value = _screenState.value.copy(
+                    climateState = ClimateState.Error
+                )
             }
         }
     }
 
-    fun onOverlayLoaded() {
-        _uiState.value = MapUIState.Success
+    //when user taps map, fetches the info with the default date range
+    fun onMapClick(lat: Double, lon: Double) {
+        _screenState.value = _screenState.value.copy(
+            climateCoordinate = Coordinate(lat, lon)
+        )
+        fetchClimateData(lat, lon)
     }
 
-    fun onOverlayError() {
-        _uiState.value = MapUIState.Error
+    fun onPeriodStart(start: MonthDay) {
+        val current = _screenState.value
+        val end = setTimeBoundary(start, current.periodEnd)
+
+        _screenState.value = _screenState.value.copy(
+            periodStart = start
+            //TIME BOUNDARY NOT IMPLEMENTED YET
+            //periodEnd = end
+        )
+
+        refetchIfLocationKnown()
     }
+
+    fun onPeriodEnd(end: MonthDay) {
+        val current = _screenState.value
+        val start = setTimeBoundary(current.periodStart, end)
+
+        _screenState.value = _screenState.value.copy(
+            //TIME BOUNDARY NOT IMPLEMENTED YET
+            //periodStart = start,
+            periodEnd = end
+        )
+
+        refetchIfLocationKnown()
+    }
+
+    fun onYearsBack(yearsBack: Int) {
+        _screenState.value = _screenState.value.copy(
+            yearsBack = yearsBack
+        )
+
+        refetchIfLocationKnown()
+    }
+
+    private fun refetchIfLocationKnown() {
+        val coordinate = _screenState.value.climateCoordinate ?: return
+        fetchClimateData(coordinate.latitude, coordinate.longitude)
+    }
+
+    private fun setTimeBoundary(start: MonthDay, end: MonthDay): MonthDay {
+        // TO DO - enforce max 1 month range
+        return end
+    }
+
+    fun onSheetDismissed() {
+        _screenState.value = _screenState.value.copy(
+            climateState = ClimateState.Idle
+        )
+    }
+
 }
