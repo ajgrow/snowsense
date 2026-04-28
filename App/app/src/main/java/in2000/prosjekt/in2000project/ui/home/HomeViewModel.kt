@@ -66,7 +66,10 @@ class HomeViewModel: ViewModel(){
 
     fun addRecentSearch(location: NamedLocation) {
         _homeState.update {
-            it.copy(recentSearches = (it.recentSearches + location).distinct())
+            val updated = (listOf(location) + it.recentSearches)
+                .distinct()
+                .take(5)
+            it.copy(recentSearches = updated)
         }
     }
 
