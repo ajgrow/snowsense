@@ -10,8 +10,8 @@ import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
 val appModule = module {
-    single { KtorClient.client }
-    single<FrostV0DataSource> { KtorFrostV0DataSource(client = get(), clientId = ApiKeys.frostClientId) }
+    single { KtorClient.frostClient }
+    single<FrostV0DataSource> { KtorFrostV0DataSource(client = get()) }
     single { FrostClimateRepository(get()) }
     viewModel { MapViewModel(get()) }
 }

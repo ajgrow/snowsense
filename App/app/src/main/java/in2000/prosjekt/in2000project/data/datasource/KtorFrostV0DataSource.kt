@@ -12,13 +12,11 @@ import io.ktor.client.request.parameter
 
 class KtorFrostV0DataSource(
     private val client: HttpClient,
-    private val clientId: String
 ): FrostV0DataSource {
     override suspend fun getNearestSource(
         coordinate: Coordinate
     ): FrostV0Source?
     = client.get("https://frost.met.no/sources/v0.jsonld") {
-            basicAuth(clientId, "")
             parameter("geometry",
                 "nearest(POINT(${coordinate.longitude} ${coordinate.latitude}))")
             parameter("nearestmaxcount",
@@ -33,7 +31,6 @@ class KtorFrostV0DataSource(
         referenceTime: String
     ): FrostV0ObservationResponse
     = client.get("https://frost.met.no/observations/v0.jsonld") {
-            basicAuth(clientId, "")
             parameter("sources", sourceId)
             parameter("elements", elementsCsv)
             parameter("referencetime", referenceTime)
