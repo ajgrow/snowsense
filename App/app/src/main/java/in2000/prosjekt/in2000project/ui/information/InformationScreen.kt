@@ -19,6 +19,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import in2000.prosjekt.in2000project.R
+import in2000.prosjekt.in2000project.data.model.DangerLevel
 import in2000.prosjekt.in2000project.ui.reusables.BottomBar
 import in2000.prosjekt.in2000project.ui.reusables.TopBar
 
@@ -29,32 +30,7 @@ fun InfoScreen(
     infoViewModel: InfoViewModel = viewModel()
 ) {
 
-    val dangerLevels = listOf(
-        DangerLevel(
-            level = stringResource(R.string.danger_level_1_title),
-            description = stringResource(R.string.danger_level_1_description)
-        ),
-
-        DangerLevel(
-            level = stringResource(R.string.danger_level_2_title),
-            description = stringResource(R.string.danger_level_2_description)
-        ),
-
-        DangerLevel(
-            level = stringResource(R.string.danger_level_3_title),
-            description = stringResource(R.string.danger_level_3_description)
-        ),
-
-        DangerLevel(
-            level = stringResource(R.string.danger_level_4_title),
-            description = stringResource(R.string.danger_level_4_description)
-        ),
-
-        DangerLevel(
-            level = stringResource(R.string.danger_level_5_title),
-            description = stringResource(R.string.danger_level_5_description)
-        )
-    )
+    val dangerLevels = DangerLevel.entries
 
     Scaffold(
         modifier = modifier,
@@ -122,8 +98,8 @@ fun InfoScreen(
             //replaced the function "DangerLevelsColumn" with an "items" composable
             items(dangerLevels) { dangerLevel ->
                 DangerLevelItem(
-                    level = dangerLevel.level,
-                    description = dangerLevel.description,
+                    level = stringResource(dangerLevel.titleRes),
+                    description = stringResource(dangerLevel.descriptionRes),
                     modifier = Modifier.padding(vertical = 6.dp)
                 )
             }
