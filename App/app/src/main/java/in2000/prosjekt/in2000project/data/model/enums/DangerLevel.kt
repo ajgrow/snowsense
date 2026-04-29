@@ -13,11 +13,36 @@ enum class DangerLevel(
     val lightColor: Color,
     val darkColor: Color
 ) {
-    LOW(R.string.danger_level_1_title, R.string.danger_level_1_description, DangerColorLevel1, DangerColorLevel1Dark),
-    MODERATE(R.string.danger_level_2_title, R.string.danger_level_2_description, DangerColorLevel2, DangerColorLevel2Dark),
-    CONSIDERABLE(R.string.danger_level_3_title, R.string.danger_level_3_description, DangerColorLevel3, DangerColorLevel3Dark),
-    HIGH(R.string.danger_level_4_title, R.string.danger_level_4_description, DangerColorLevel4, DangerColorLevel4Dark),
-    VERY_HIGH(R.string.danger_level_5_title, R.string.danger_level_5_description, DangerColorLevel5, DangerColorLevel5Dark);
+    LOW(
+        R.string.danger_level_1_title,
+        R.string.danger_level_1_description,
+        DangerColorLevel1,
+        DangerColorLevel1Dark
+    ),
+    MODERATE(
+        R.string.danger_level_2_title,
+        R.string.danger_level_2_description,
+        DangerColorLevel2,
+        DangerColorLevel2Dark
+    ),
+    CONSIDERABLE(
+        R.string.danger_level_3_title,
+        R.string.danger_level_3_description,
+        DangerColorLevel3,
+        DangerColorLevel3Dark
+    ),
+    HIGH(
+        R.string.danger_level_4_title,
+        R.string.danger_level_4_description,
+        DangerColorLevel4,
+        DangerColorLevel4Dark
+    ),
+    VERY_HIGH(
+        R.string.danger_level_5_title,
+        R.string.danger_level_5_description,
+        DangerColorLevel5,
+        DangerColorLevel5Dark
+    );
 
     @Composable
     fun getColor(): Color {
