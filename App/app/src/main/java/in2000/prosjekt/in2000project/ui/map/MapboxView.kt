@@ -62,9 +62,15 @@ have not found any other practical working alternatives.
 object MapCameraRepository {
     var lastCameraOptions: CameraOptions? = null
         private set
+    var lastPinnedPoint: Point? = null
+        private set
 
     fun updateCameraOptions(options: CameraOptions) {
         lastCameraOptions = options
+    }
+
+    fun updatePinnedPoint(point: Point) {
+        lastPinnedPoint = point
     }
 }
 private const val TAG = "SnoskredWMS"
@@ -187,11 +193,16 @@ fun MapboxView(
 
                     }
 
+                    MapCameraRepository.lastPinnedPoint?.let {
+                        localAddPin(it)
+                    }
+
                     addPin = ::localAddPin
 
                     //this click listener just works generally on the map
                     mapView.gestures.addOnMapClickListener { point ->
                         if (!isSearchActive) {
+                            MapCameraRepository.updatePinnedPoint(point)
                             addPin?.invoke(point)
                             onMapClick(point)
                         }
@@ -281,6 +292,7 @@ fun MapboxView(
                                 .center(searchPoint)
                                 .zoom(12.0)
                                 .build())
+                        MapCameraRepository.updatePinnedPoint(searchPoint)
                         addPin?.invoke(searchPoint)
                     }
                 }
@@ -360,6 +372,7 @@ fun MapboxView(
                         zoom(12.0)
                     }
                 )
+                MapCameraRepository.updatePinnedPoint(point)
                 addPin?.invoke(point)
             }
 
