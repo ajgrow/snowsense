@@ -45,7 +45,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import in2000.prosjekt.in2000project.R
-import in2000.prosjekt.in2000project.data.model.DangerLevel
 import in2000.prosjekt.in2000project.data.model.SkiArea
 import in2000.prosjekt.in2000project.data.model.toSkiArea
 import in2000.prosjekt.in2000project.ui.reusables.BottomBar
@@ -56,19 +55,9 @@ import in2000.prosjekt.in2000project.ui.reusables.TopBar
 import in2000.prosjekt.in2000project.ui.settings.SettingsViewModel
 import org.koin.compose.viewmodel.koinViewModel
 import java.time.MonthDay
-import in2000.prosjekt.in2000project.ui.settings.SettingsViewModel
-import com.patrykandpatrick.vico.compose.chart.Chart
-import com.patrykandpatrick.vico.compose.chart.line.lineChart
-import com.patrykandpatrick.vico.core.entry.entryOf
-import com.patrykandpatrick.vico.core.entry.entryModelOf
-import com.patrykandpatrick.vico.compose.axis.horizontal.rememberBottomAxis
-import com.patrykandpatrick.vico.compose.axis.vertical.rememberStartAxis
-import com.patrykandpatrick.vico.compose.component.textComponent
+
 import in2000.prosjekt.in2000project.data.model.enums.DangerLevel
-import in2000.prosjekt.in2000project.ui.reusables.ClimateGraph
-import in2000.prosjekt.in2000project.ui.reusables.DangerLevelCard
-import in2000.prosjekt.in2000project.ui.reusables.DangerLevelDescriptionCard
-import androidx.compose.material3.Surface
+
 
 private val previewSkiArea = SkiArea(
     name = "",
@@ -356,7 +345,7 @@ fun BottomSheetContent(
                         }
                     }
 
-                    DangerLevelCard(dangerLevel = DangerLevel.VERY_HIGH, backgroundColor = Color.Red)
+                    DangerLevelCard(dangerLevel = DangerLevel.VERY_HIGH)
                 }
             }
 
