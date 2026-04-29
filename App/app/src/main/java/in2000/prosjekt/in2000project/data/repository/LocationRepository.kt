@@ -8,13 +8,13 @@ class LocationRepository {
 
     private val dataSource = LocationDataSource()
 
-    suspend fun getNames(query:String) : List<NamedLocation> {
+    suspend fun getNamedLocations(query:String) : List<NamedLocation> {
         return dataSource.getNamesResponse(query)?.map {
             NamedLocation(
                 name = it.skrivemåte,
                 coordinate = Coordinate(
-                    it.representasjonspunkt.øst,
-                    it.representasjonspunkt.nord
+                    it.representasjonspunkt.nord,
+                    it.representasjonspunkt.øst
                 ))
         } ?: emptyList()
     }

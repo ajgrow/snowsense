@@ -52,12 +52,13 @@ import in2000.prosjekt.in2000project.ui.reusables.ClimateGraph
 import in2000.prosjekt.in2000project.ui.reusables.DangerLevelCard
 import in2000.prosjekt.in2000project.ui.reusables.DatePicker
 import in2000.prosjekt.in2000project.ui.reusables.TopBar
-import in2000.prosjekt.in2000project.ui.settings.SettingsViewModel
 import org.koin.compose.viewmodel.koinViewModel
 import java.time.MonthDay
-
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import in2000.prosjekt.in2000project.ui.search.SearchViewModel
+import in2000.prosjekt.in2000project.ui.settings.SettingsViewModel
 import in2000.prosjekt.in2000project.data.model.enums.DangerLevel
-
 
 private val previewSkiArea = SkiArea(
     name = "",
@@ -73,6 +74,7 @@ private val previewSkiArea = SkiArea(
 fun MapRoute(
     navController: NavController,
     coordinates: String,
+    searchViewModel: SearchViewModel,
     mapViewModel: MapViewModel = koinViewModel(),
     nveViewModel: NveViewModel = viewModel(),
     settingsViewModel: SettingsViewModel = viewModel()
@@ -98,7 +100,8 @@ fun MapRoute(
             if (it != null) mapViewModel.onPeriodEnd(it) },
         onYearsBack = { it ->
             if (it != null) mapViewModel.onYearsBack(it) },
-        settingsViewModel = settingsViewModel
+        settingsViewModel = settingsViewModel,
+        searchViewModel = searchViewModel
     )
 }
 
@@ -119,7 +122,8 @@ fun MapScreen(
     onPeriodStart: (MonthDay?) -> Unit,
     onPeriodEnd: (MonthDay?) -> Unit,
     onYearsBack: (Int?) -> Unit,
-    settingsViewModel: SettingsViewModel
+    settingsViewModel: SettingsViewModel,
+    searchViewModel: SearchViewModel
 ) {
     val skiArea = remember(screenState.climateState) {
         val state = screenState.climateState
@@ -129,6 +133,8 @@ fun MapScreen(
             null
         }
     } ?: previewSkiArea
+
+    val searchState by searchViewModel.searchState.collectAsStateWithLifecycle()
 
     val dangerCheckUiState by nveViewModel.dangerCheckUiState.collectAsState()
     //Controls whether the bottom sheet is visible or not by keeping track of if the user has clicked the map
@@ -193,6 +199,9 @@ fun MapScreen(
                     modifier = Modifier
                         .fillMaxSize(),
                     coordinates = coordinates,
+                    searchState = searchState,
+                    onSearch = { searchViewModel.onSearch() },
+                    onSelectResult = searchViewModel::addRecentSearch
                 )
 
 
@@ -484,6 +493,7 @@ fun MapScreenErrorPreview() {
         onPeriodStart = {},
         onPeriodEnd = {},
         onYearsBack = {},
+        searchViewModel = koinViewModel()
     )
 }
 
