@@ -2,7 +2,7 @@ package in2000.prosjekt.in2000project.data.integration
 
 import in2000.prosjekt.in2000project.data.datasource.KtorFrostV0DataSource
 import in2000.prosjekt.in2000project.data.model.Coordinate
-import in2000.prosjekt.in2000project.data.model.DangerLevel
+import in2000.prosjekt.in2000project.data.model.enums.DangerLevel
 import in2000.prosjekt.in2000project.data.model.enums.ElementType
 import in2000.prosjekt.in2000project.data.repository.FrostAvalancheRiskRepository
 import in2000.prosjekt.in2000project.data.repository.FrostClimateRepository

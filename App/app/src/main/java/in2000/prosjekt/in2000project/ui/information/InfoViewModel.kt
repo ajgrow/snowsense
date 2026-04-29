@@ -10,11 +10,6 @@ import in2000.prosjekt.in2000project.R
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-data class DangerLevel(
-    val level: String,
-    val description: String
-)
-
 class InfoViewModel(application: Application): AndroidViewModel(application){
 
 }

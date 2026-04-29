@@ -1,9 +1,7 @@
 package in2000.prosjekt.in2000project.ui.map
 
-import android.graphics.Paint
 import android.util.Log
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,8 +17,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -41,7 +39,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -51,26 +48,17 @@ import in2000.prosjekt.in2000project.R
 import in2000.prosjekt.in2000project.data.model.SkiArea
 import in2000.prosjekt.in2000project.data.model.toSkiArea
 import in2000.prosjekt.in2000project.ui.reusables.BottomBar
+import in2000.prosjekt.in2000project.ui.reusables.ClimateGraph
+import in2000.prosjekt.in2000project.ui.reusables.DangerLevelCard
 import in2000.prosjekt.in2000project.ui.reusables.DatePicker
 import in2000.prosjekt.in2000project.ui.reusables.TopBar
 import org.koin.compose.viewmodel.koinViewModel
 import java.time.MonthDay
-import in2000.prosjekt.in2000project.ui.settings.SettingsViewModel
-import com.patrykandpatrick.vico.compose.chart.Chart
-import com.patrykandpatrick.vico.compose.chart.line.lineChart
-import com.patrykandpatrick.vico.core.entry.entryOf
-import com.patrykandpatrick.vico.core.entry.entryModelOf
-import com.patrykandpatrick.vico.compose.axis.horizontal.rememberBottomAxis
-import com.patrykandpatrick.vico.compose.axis.vertical.rememberStartAxis
-import com.patrykandpatrick.vico.compose.component.textComponent
-import in2000.prosjekt.in2000project.data.model.DangerLevel
-import in2000.prosjekt.in2000project.ui.reusables.ClimateGraph
-import in2000.prosjekt.in2000project.ui.reusables.DangerLevelCard
-import in2000.prosjekt.in2000project.ui.reusables.DangerLevelDescriptionCard
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import in2000.prosjekt.in2000project.ui.search.SearchViewModel
+import in2000.prosjekt.in2000project.ui.settings.SettingsViewModel
+import in2000.prosjekt.in2000project.data.model.enums.DangerLevel
 
 private val previewSkiArea = SkiArea(
     name = "",
@@ -332,46 +320,28 @@ fun BottomSheetContent(
         ) {
 
             item {
-                val headerHeight = 40.dp
-
-                Box(
+                Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(headerHeight),
-                    contentAlignment = Alignment.CenterStart
+                        .height(60.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     when (climateState) {
                         is ClimateState.Loading -> {
-                            Column(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                Box(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    CircularProgressIndicator(modifier = Modifier.size(26.dp))
-                                }
-                            }
+                            CircularProgressIndicator(modifier = Modifier.size(26.dp))
                         }
 
                         is ClimateState.Error -> {
-                            Column(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                Text(
-                                    text = stringResource(R.string.climate_error_desc),
-                                    color = MaterialTheme.colorScheme.error,
-                                    style = MaterialTheme.typography.bodyMedium
-                                )
-                            }
+                            Text(
+                                text = stringResource(R.string.climate_error_desc),
+                                color = MaterialTheme.colorScheme.error,
+                                style = MaterialTheme.typography.bodyMedium
+                            )
                         }
 
                         else -> {
-                            Column(
-                                modifier = Modifier
-                            ) {
+                            Column {
                                 Text(
                                     text = stringResource(R.string.weather_station_desc),
                                     style = MaterialTheme.typography.labelSmall
@@ -383,6 +353,8 @@ fun BottomSheetContent(
                             }
                         }
                     }
+
+                    DangerLevelCard(dangerLevel = DangerLevel.VERY_HIGH)
                 }
             }
 
