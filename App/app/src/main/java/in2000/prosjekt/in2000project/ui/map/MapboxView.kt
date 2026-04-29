@@ -2,17 +2,27 @@ package in2000.prosjekt.in2000project.ui.map
 
 import android.graphics.BitmapFactory
 import android.util.Log
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.unit.dp
 import com.mapbox.common.Cancelable
 import com.mapbox.geojson.Point
@@ -38,6 +48,12 @@ import com.mapbox.maps.toCameraOptions
 import in2000.prosjekt.in2000project.ui.settings.SettingsViewModel
 import in2000.prosjekt.in2000project.ui.settings.ThemeMode
 import in2000.prosjekt.in2000project.R
+import in2000.prosjekt.in2000project.data.model.Coordinate
+import in2000.prosjekt.in2000project.data.model.NamedLocation
+import in2000.prosjekt.in2000project.ui.reusables.SearchSection
+import in2000.prosjekt.in2000project.ui.search.SearchUiState
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.style.TextAlign
 
 /*
 This global object is bad practice but it works and I
@@ -77,9 +93,12 @@ fun MapboxView(
     onOverlayError: () -> Unit,
     onOverlayLoaded: () -> Unit,
     modifier: Modifier = Modifier,
+    searchState: SearchUiState,
+    onSearch: (String) -> Unit,
+    onSelectResult: (NamedLocation) -> Unit
 ) {
 
-    val (hasSearch, searchLat, searchLng) = remember(coordinates) {
+    val (hasSearch, searchLng, searchLat) = remember(coordinates) {
         if (coordinates.isNotBlank() && coordinates != "0,0") {
             val parts = coordinates.split(",")
             if (parts.size == 2) {
@@ -112,6 +131,17 @@ fun MapboxView(
         if (hasSearch) System.currentTimeMillis() else "default"
     }
 
+    val focusManager = LocalFocusManager.current
+    val focusRequester = remember { FocusRequester() }
+
+    var isSearchActive by remember { mutableStateOf(false) }
+
+    LaunchedEffect(isSearchActive) {
+        if (isSearchActive) {
+            focusRequester.requestFocus()
+        }
+    }
+
     DisposableEffect(Unit) {
         onDispose {
             viewportState.cameraState?.toCameraOptions()?.let {
@@ -119,6 +149,8 @@ fun MapboxView(
             }
         }
     }
+
+    var addPin by remember { mutableStateOf<((Point) -> Unit)?>(null) }
 
     key(mapRecreateKey) {
         Box(
@@ -133,7 +165,7 @@ fun MapboxView(
                     val annotationApi = mapView.annotations
                     val pointAnnotationManager: PointAnnotationManager = annotationApi.createPointAnnotationManager()
 
-                    fun addPin(point: Point){
+                    fun localAddPin(point: Point){
                         pointAnnotationManager.deleteAll()
                         val bitmap = BitmapFactory.decodeResource(
                             mapView.context.resources,
@@ -148,10 +180,18 @@ fun MapboxView(
 
                     }
 
+                    addPin = ::localAddPin
+
                     //this click listener just works generally on the map
                     mapView.gestures.addOnMapClickListener { point ->
-                        addPin(point)
-                        onMapClick(point)
+                        if (!isSearchActive) {
+                            addPin?.invoke(point)
+                            onMapClick(point)
+                        }
+
+                        isSearchActive = false
+                        focusManager.clearFocus()
+
                         true
                     }
 
@@ -234,16 +274,33 @@ fun MapboxView(
                                 .center(searchPoint)
                                 .zoom(12.0)
                                 .build())
-                        addPin(searchPoint)
+                        addPin?.invoke(searchPoint)
                     }
                 }
             }
+
+            val mapButtonModifier = Modifier.size(50.dp)
+
             Column(
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
-                    .padding(16.dp)
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
+
                 Button(
+                    onClick = { isSearchActive = true },
+                    modifier = mapButtonModifier,
+                    contentPadding = PaddingValues(0.dp),
+                    enabled = !isSearchActive
+                ) {
+                    Icon(imageVector = Icons.Default.Search, contentDescription = "Open Search")
+                }
+
+                Spacer(Modifier.height(8.dp))
+
+                Button(
+                    modifier = mapButtonModifier,
                     onClick = {
                         val currentZoom = viewportState
                             .cameraState?.zoom ?: 10.0
@@ -258,13 +315,15 @@ fun MapboxView(
                     }
                 ) {
                     Text(
-                        text = "+"
+                        text = "+",
+                        textAlign = TextAlign.Center
                     )
                 }
 
                 Spacer(Modifier.height(8.dp))
 
                 Button(
+                    modifier = mapButtonModifier,
                     onClick = {
                         val currentZoom = viewportState
                             .cameraState?.zoom ?: 10.0
@@ -279,9 +338,40 @@ fun MapboxView(
                     }
                 ) {
                     Text(
-                        text = "-"
+                        text = "-",
+                        textAlign = TextAlign.Center
                     )
                 }
+
+            }
+
+            val onNavigateToMap: (Coordinate) -> Unit = { coordinate ->
+                val point = Point.fromLngLat(coordinate.longitude, coordinate.latitude)
+                viewportState.easeTo(
+                    cameraOptions {
+                        center(point)
+                        zoom(12.0)
+                    }
+                )
+                addPin?.invoke(point)
+            }
+
+            if (isSearchActive) {
+                SearchSection(
+                    modifier = Modifier
+                        .focusRequester(focusRequester)
+                        .padding(top = 24.dp),
+                    textFieldState = searchState.searchTextFieldState,
+                    onSearch = onSearch,
+                    searchResults = searchState.searchResults,
+                    onNavigateToMap = { coordinate ->
+                        onNavigateToMap(coordinate)
+                        isSearchActive = false
+                        focusManager.clearFocus()
+                    },
+                    onSelectResult = onSelectResult,
+                    recentSearches = searchState.recentSearches
+                )
             }
         }
     }
