@@ -12,10 +12,16 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.platform.LocalContext
 import in2000.prosjekt.in2000project.ui.settings.TextSizeMode
 import in2000.prosjekt.in2000project.ui.settings.ThemeMode
+
+/*Global provider for the Dark Mode state, so components can access it without
+passing it as a parameter everywhere.*/
+val LocalIsDarkTheme = staticCompositionLocalOf { false }
 
 private val DarkColorScheme = darkColorScheme(
     primary = Purple80,
@@ -38,6 +44,7 @@ private val LightColorScheme = lightColorScheme(
     onSurface = Color(0xFF1C1B1F),
     */
 )
+
 @Composable
 fun In2000projectTheme(
     themeMode: ThemeMode = ThemeMode.SYSTEM,
@@ -46,6 +53,7 @@ fun In2000projectTheme(
     dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
+    // Calculate if the theme should be dark based on in-app settings or system default
     val isDarkTheme = when (themeMode){
         ThemeMode.SYSTEM -> isSystemInDarkTheme()
         ThemeMode.DARK -> true
@@ -74,7 +82,6 @@ fun In2000projectTheme(
             val context = LocalContext.current
             if (isDarkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
-
         isDarkTheme -> DarkColorScheme
         else -> LightColorScheme
     }
@@ -84,18 +91,19 @@ fun In2000projectTheme(
             bodyLarge = Typography.bodyLarge.copy(fontSize = Typography.bodyLarge.fontSize * 0.85f),
             titleLarge = Typography.titleLarge.copy(fontSize = Typography.titleLarge.fontSize * 0.85f)
         )
-
         TextSizeMode.MEDIUM -> Typography
-
         TextSizeMode.LARGE -> Typography.copy(
             bodyLarge = Typography.bodyLarge.copy(fontSize = Typography.bodyLarge.fontSize * 1.2f),
             titleLarge = Typography.titleLarge.copy(fontSize = Typography.titleLarge.fontSize * 1.2f)
         )
     }
 
-    MaterialTheme(
-        colorScheme = colorScheme,
-        typography = chosenTypography,
-        content = content
-    )
+    // Wrap the app content in a Provider to broadcast the 'isDarkTheme' value to the entire UI tree.
+    CompositionLocalProvider(LocalIsDarkTheme provides isDarkTheme) {
+        MaterialTheme(
+            colorScheme = colorScheme,
+            typography = chosenTypography,
+            content = content
+        )
+    }
 }

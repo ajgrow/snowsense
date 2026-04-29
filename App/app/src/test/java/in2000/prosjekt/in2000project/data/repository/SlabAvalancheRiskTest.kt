@@ -5,7 +5,7 @@ import in2000.prosjekt.in2000project.data.datasource.makeDay
 import in2000.prosjekt.in2000project.data.datasource.makeObsResponse
 import in2000.prosjekt.in2000project.data.datasource.makeSourceResponse
 import in2000.prosjekt.in2000project.data.model.Coordinate
-import in2000.prosjekt.in2000project.data.model.DangerLevel
+import in2000.prosjekt.in2000project.data.model.enums.DangerLevel
 import in2000.prosjekt.in2000project.data.model.NoObservationsException
 import in2000.prosjekt.in2000project.data.model.NoStationFoundException
 import kotlinx.coroutines.test.runTest

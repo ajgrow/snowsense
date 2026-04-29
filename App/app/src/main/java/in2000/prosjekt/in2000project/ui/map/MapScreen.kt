@@ -45,7 +45,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import in2000.prosjekt.in2000project.R
-import in2000.prosjekt.in2000project.data.model.DangerLevel
 import in2000.prosjekt.in2000project.data.model.SkiArea
 import in2000.prosjekt.in2000project.data.model.toSkiArea
 import in2000.prosjekt.in2000project.ui.reusables.BottomBar
@@ -56,6 +55,9 @@ import in2000.prosjekt.in2000project.ui.reusables.TopBar
 import in2000.prosjekt.in2000project.ui.settings.SettingsViewModel
 import org.koin.compose.viewmodel.koinViewModel
 import java.time.MonthDay
+
+import in2000.prosjekt.in2000project.data.model.enums.DangerLevel
+
 
 private val previewSkiArea = SkiArea(
     name = "",
@@ -343,7 +345,7 @@ fun BottomSheetContent(
                         }
                     }
 
-                    DangerLevelCard(dangerLevel = DangerLevel.VERY_HIGH, backgroundColor = Color.Red)
+                    DangerLevelCard(dangerLevel = DangerLevel.VERY_HIGH)
                 }
             }
 
