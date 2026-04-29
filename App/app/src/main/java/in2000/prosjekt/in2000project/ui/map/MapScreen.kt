@@ -28,6 +28,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -80,6 +81,12 @@ fun MapRoute(
     settingsViewModel: SettingsViewModel = viewModel()
 ) {
     val screenState by mapViewModel.screenState.collectAsState()
+    DisposableEffect(Unit) {
+        onDispose {
+            mapViewModel.onSheetDismissed()
+        }
+    }
+
 
     MapScreen(
         navController = navController,
@@ -139,7 +146,7 @@ fun MapScreen(
     val dangerCheckUiState by nveViewModel.dangerCheckUiState.collectAsState()
     //Controls whether the bottom sheet is visible or not by keeping track of if the user has clicked the map
     //if this is set to null then the ModalBottomSheet is not open
-    var isSheetOpen by rememberSaveable { mutableStateOf(false) }
+    var isSheetOpen by remember { mutableStateOf(false) }
 
     LaunchedEffect(screenState.climateState) {
         if (screenState.climateState is ClimateState.Success) {
