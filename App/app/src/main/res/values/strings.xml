@@ -146,6 +146,8 @@
     <string name="text_medium">Medium</string>
     <string name="text_large">Large</string>
 
+    <string name="language_system">Use device setting</string>
+
     <string name="hide_info">Hide info ▲</string>
     <string name="show_info">Show info ▼</string>
     <string name="emergency_title">Emergency Numbers</string>
