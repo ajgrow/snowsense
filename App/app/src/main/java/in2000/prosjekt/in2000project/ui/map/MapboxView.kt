@@ -113,7 +113,6 @@ fun MapboxView(
                 .center(Point.fromLngLat(searchLng, searchLat))
                 .zoom(12.0)
                 .build()
-                .also { MapCameraRepository.updateCameraOptions(it) }
         } else {
             MapCameraRepository.lastCameraOptions ?: CameraOptions.Builder()
                 .center(Point.fromLngLat(10.75, 59.91))
@@ -142,11 +141,14 @@ fun MapboxView(
         }
     }
 
+    var idleSubscription by remember { mutableStateOf<Cancelable?>(null) }
+
     DisposableEffect(Unit) {
         onDispose {
             viewportState.cameraState?.toCameraOptions()?.let {
                 MapCameraRepository.updateCameraOptions(it)
             }
+            idleSubscription?.cancel()
         }
     }
 
@@ -162,6 +164,11 @@ fun MapboxView(
                 mapViewportState = viewportState
             ) {
                 MapEffect(Unit) { mapView ->
+                    MapCameraRepository.lastCameraOptions?.let {
+                        mapView.mapboxMap.setCamera(it)
+                    }
+
+
                     val annotationApi = mapView.annotations
                     val pointAnnotationManager: PointAnnotationManager = annotationApi.createPointAnnotationManager()
 
@@ -240,7 +247,7 @@ fun MapboxView(
                         )
                     }
 
-                    var idleSubscription: Cancelable? = null
+
                     idleSubscription = mapView.mapboxMap.subscribeMapIdle {
                         viewportState.cameraState?.toCameraOptions()?.let {
                             MapCameraRepository.updateCameraOptions(it)
