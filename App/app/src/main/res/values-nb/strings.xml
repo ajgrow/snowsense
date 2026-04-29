@@ -147,6 +147,8 @@ Svært sjelden varslet.
     <string name="text_medium">Middels</string>
     <string name="text_large">Stor</string>
 
+    <string name="language_system">Bruk enhetsinnstilling</string>
+    
     <string name="hide_info">Skjul info ▲</string>
     <string name="show_info">Vis info ▼</string>
     <string name="emergency_title">Nødnummer</string>
