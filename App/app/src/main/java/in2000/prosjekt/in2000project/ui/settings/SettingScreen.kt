@@ -4,9 +4,12 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -21,6 +24,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Button
 import androidx.compose.material3.Slider
 import androidx.compose.ui.res.stringResource
@@ -110,22 +114,41 @@ fun SettingScreen(
                         .padding(24.dp)
                 ) {
                     Text(
-                        text = "Text size: ${(textScale * 100).toInt()}%",
+                        text = stringResource(
+                            R.string.text_size_label,
+                            (textScale * 100).toInt()
+                        ),
                         style = MaterialTheme.typography.bodyMedium
                     )
 
-                    Slider(
-                        value = textScale,
-                        onValueChange = { settingsViewModel.updateTextScale(it) },
-                        valueRange = 0.5f..2.0f
-                    )
+                    Spacer(modifier = Modifier.height(8.dp))
 
-                    Button(
-                        onClick = { settingsViewModel.resetTextScale() },
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween,
                         modifier = Modifier
-                            .padding(8.dp)
+                            .fillMaxWidth()
                     ) {
-                        Text("Reset to default")
+
+                        Slider(
+                            value = textScale,
+                            onValueChange = { settingsViewModel.updateTextScale(it) },
+                            valueRange = 0.5f..2.0f,
+                            modifier = Modifier
+                                .weight(1f)
+                        )
+
+                        IconButton(
+                            onClick = { settingsViewModel.resetTextScale() },
+                            modifier = Modifier
+                                .padding(8.dp)
+                                .size(24.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Refresh,
+                                contentDescription = stringResource(R.string.reset_default),
+                            )
+                        }
                     }
                 }
             }
