@@ -23,7 +23,7 @@ class SettingsViewModel(application: Application)
     )
 
     var textScale by mutableStateOf(
-        prefs.getFloat("text_scale", 1.0f)
+        prefs.getFloat("text_scale", 1.5f)
     )
         private set
 
