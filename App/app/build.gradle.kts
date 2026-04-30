@@ -73,6 +73,7 @@ dependencies {
     implementation(libs.foundation)
     implementation(libs.androidx.compose.runtime)
     implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.compose.material.core)
     testImplementation(libs.junit)
     testImplementation(libs.kotlin.test)
     androidTestImplementation(libs.androidx.junit)

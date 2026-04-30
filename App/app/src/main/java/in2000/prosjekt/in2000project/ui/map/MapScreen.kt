@@ -6,57 +6,71 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.util.lerp
+import androidx.compose.ui.zIndex
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import in2000.prosjekt.in2000project.R
 import in2000.prosjekt.in2000project.data.model.SkiArea
+import in2000.prosjekt.in2000project.data.model.enums.DangerLevel
 import in2000.prosjekt.in2000project.data.model.toSkiArea
 import in2000.prosjekt.in2000project.ui.reusables.BottomBar
 import in2000.prosjekt.in2000project.ui.reusables.ClimateGraph
 import in2000.prosjekt.in2000project.ui.reusables.DangerLevelCard
 import in2000.prosjekt.in2000project.ui.reusables.DatePicker
-import in2000.prosjekt.in2000project.ui.reusables.TopBar
 import in2000.prosjekt.in2000project.ui.settings.SettingsViewModel
+import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinViewModel
 import java.time.MonthDay
-
-import in2000.prosjekt.in2000project.data.model.enums.DangerLevel
+import kotlin.toString
 
 
 private val previewSkiArea = SkiArea(
@@ -91,7 +105,6 @@ fun MapRoute(
         onOverlayRetry = { mapViewModel.onOverlayLoading() },
         onOverlayLoaded = { mapViewModel.onOverlayLoaded()},
         onOverlayError = { mapViewModel.onOverlayError()},
-        onSheetDismiss = { mapViewModel.onSheetDismissed() },
         onPeriodStart = { it ->
             if (it != null) mapViewModel.onPeriodStart(it) },
         onPeriodEnd = { it ->
@@ -115,7 +128,6 @@ fun MapScreen(
     onOverlayRetry: () -> Unit,
     onOverlayLoaded: () -> Unit,
     onOverlayError: () -> Unit,
-    onSheetDismiss: () -> Unit,
     onPeriodStart: (MonthDay?) -> Unit,
     onPeriodEnd: (MonthDay?) -> Unit,
     onYearsBack: (Int?) -> Unit,
@@ -131,19 +143,17 @@ fun MapScreen(
     } ?: previewSkiArea
 
     val dangerCheckUiState by nveViewModel.dangerCheckUiState.collectAsState()
-    //Controls whether the bottom sheet is visible or not by keeping track of if the user has clicked the map
-    //if this is set to null then the ModalBottomSheet is not open
+
     var isSheetOpen by rememberSaveable { mutableStateOf(false) }
+    val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
+
+    val scope = rememberCoroutineScope()
 
     LaunchedEffect(screenState.climateState) {
         if (screenState.climateState is ClimateState.Success) {
             isSheetOpen = true
         }
     }
-
-    var skipPartiallyExpanded by rememberSaveable {mutableStateOf(false)}
-
-    val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = skipPartiallyExpanded)
 
     val avalancheStatus = when {
         dangerCheckUiState.isDanger == true -> "High"
@@ -155,38 +165,164 @@ fun MapScreen(
     var endDate by rememberSaveable { mutableStateOf<MonthDay?>(null) }
     var selectedYear by rememberSaveable { mutableStateOf<Int?>(null) }
 
+    // Animate map height fraction when sheet opens/closes
+    val mapHeightFraction by animateFloatAsState(
+        targetValue = if (isSheetOpen) 0.4f else 1f,
+        animationSpec = tween(durationMillis = 300),
+        label = "mapHeight"
+    )
+
     Scaffold(
         modifier = modifier,
-        topBar = {
-            TopBar(
-                modifier = Modifier,
-                navController = navController)
-        },
-        bottomBar = {
-            BottomBar(modifier, navController)
-        }
+        bottomBar = { BottomBar(modifier, navController) }
     ) { paddingValues ->
-
-        //Main screen content
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                // Makes sure the content is not hidden behind the top app bar or bottom app bar.
                 .padding(paddingValues)
-                .padding(16.dp)
         ) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(1f)
+                    .fillMaxHeight(mapHeightFraction)
             ) {
+                MapboxView(
+                    onMapClick = { point ->
+                        onMapClick(point.latitude(), point.longitude())
+                        nveViewModel.avalancheChecker(point.latitude(), point.longitude())
+                        isSheetOpen = true
+                    },
+                    onOverlayError = onOverlayError,
+                    onOverlayLoaded = onOverlayLoaded,
+                    modifier = Modifier.fillMaxSize(),
+                    coordinates = coordinates,
+                )
+
+                when (screenState.overlayState) {
+                    is OverlayState.Loading -> {
+                        OverlayStatusCard(message = stringResource(R.string.overlay_loading))
+                    }
+                    is OverlayState.Error -> {
+                        OverlayRetryCard(
+                            message = stringResource(R.string.overlay_error),
+                            onRetry = onOverlayRetry
+                        )
+                    }
+                    is OverlayState.Success -> Unit
+                }
+
+                when (screenState.climateState) {
+                    is ClimateState.Idle -> Unit
+
+                    is ClimateState.Loading -> {
+                        Log.d("ClimateData", "Loading...")
+                    }
+
+                    is ClimateState.Error -> {
+                        Log.d("ClimateData", "Error")
+                    }
+
+                    is ClimateState.Success -> {
+                        val success = screenState.climateState
+                        val climateData = success.data
+                        Log.d("ClimateData", climateData.toString())
+                    }
+                }
+            }
+        }
+        // Modal bottom sheet — rendered outside Scaffold so it overlays everything
+        if (isSheetOpen) {
+            ModalBottomSheet(
+                onDismissRequest = {
+                    isSheetOpen = false
+                },
+                sheetState = bottomSheetState,
+                containerColor = MaterialTheme.colorScheme.surface,
+                tonalElevation = 0.dp,
+                modifier = Modifier.fillMaxHeight()
+            ) {
+                BottomSheetContent(
+                    area = skiArea,
+                    climateState = screenState.climateState,
+                    avalancheStatus = avalancheStatus,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .navigationBarsPadding()
+                        .padding(bottom = 12.dp),
+                    startDate = startDate,
+                    endDate = endDate,
+                    selectedYear = selectedYear,
+                    onStartDateChange = {
+                        startDate = it
+                        onPeriodStart(it)
+                    },
+                    onEndDateChange = {
+                        endDate = it
+                        onPeriodEnd(it)
+                    },
+                    onYearChange = { year ->
+                        selectedYear = year
+                        year?.let {
+                            val calculatedYearsBack = java.time.Year.now().value - it
+                            onYearsBack(calculatedYearsBack)
+                        }
+                    }
+                )
+            }
+        }
+    }
+
+    BottomSheetScaffold(
+        modifier = Modifier.zIndex(1f),
+        scaffoldState = scaffoldState,
+        sheetPeekHeight = 0.dp, //the sheet is originally hidden by default
+        sheetSwipeEnabled = true,
+        sheetContent = {
+            BottomSheetContent(
+                area = skiArea,
+                climateState = screenState.climateState,
+                avalancheStatus = avalancheStatus,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .navigationBarsPadding()
+                    .padding(bottom = 12.dp),
+                startDate = startDate,
+                endDate = endDate,
+                selectedYear = selectedYear,
+                onStartDateChange = {
+                    startDate = it
+                    onPeriodStart(it)
+                },
+                onEndDateChange = {
+                    endDate = it
+                    onPeriodEnd(it)
+                },
+                onYearChange = { year ->
+                    selectedYear = year
+                    year?.let {
+                        val calculatedYearsBack = java.time.Year.now().value - it
+                        onYearsBack(calculatedYearsBack)
+                    }
+                }
+            )
+        },
+
+        content = { innerPadding ->
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    //this is the reel animation - the map shrinks from full height to 40% when sheet opens
+                    .fillMaxHeight(1f - (0.6f * sheetProgress)) // shrinks touch area
+                    .zIndex(0f)
+            )
+             {
                 //Map added here
                 //onMapClick is passed to the Map
                 MapboxView(
                     onMapClick = { point ->
                         onMapClick(point.latitude(), point.longitude())
                         nveViewModel.avalancheChecker(point.latitude(), point.longitude())
-                        isSheetOpen = true
+                        scope.launch { scaffoldState.bottomSheetState.expand() }
                     },
                     onOverlayError = onOverlayError,
                     onOverlayLoaded = onOverlayLoaded,
@@ -230,50 +366,15 @@ fun MapScreen(
                         Log.d("ClimateData", climateData.toString())
                     }
                 }
+                 BottomBar(
+                     modifier = Modifier.align(Alignment.BottomCenter),
+                     navController = navController
+                 )
             }
         }
-    }
-
-    //This is for the bottom sheet - if isSheetOpen is set to true, then it will open otherwise, it stays closed
-    if (isSheetOpen){
-        ModalBottomSheet(
-            onDismissRequest = { isSheetOpen = false },
-            sheetState = bottomSheetState,
-            containerColor = MaterialTheme.colorScheme.surface,
-            tonalElevation = 0.dp,
-            modifier = Modifier.fillMaxHeight()
-        ) {
-            BottomSheetContent(
-                area = skiArea,
-                climateState = screenState.climateState,
-                avalancheStatus = avalancheStatus,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .heightIn(min = 320.dp)
-                    .navigationBarsPadding()
-                    .padding(bottom = 12.dp),
-                startDate = startDate,
-                endDate = endDate,
-                selectedYear = selectedYear,
-                onStartDateChange = {
-                    startDate = it
-                    onPeriodStart(it)
-                },
-                onEndDateChange = {
-                    endDate = it
-                    onPeriodEnd(it)
-                },
-                onYearChange = { year ->
-                    selectedYear = year
-                    year?.let {
-                        val calculatedYearsBack = java.time.Year.now().value - it
-                        onYearsBack(calculatedYearsBack)
-                    }
-                }
-            )
-        }
-    }
+    )
 }
+
 
 @Composable
 fun BottomSheetContent(
@@ -306,6 +407,7 @@ fun BottomSheetContent(
         LazyColumn(
             modifier = Modifier
                 .fillMaxWidth()
+                .nestedScroll(rememberNestedScrollInteropConnection())
                 .padding(horizontal = 20.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
@@ -479,7 +581,6 @@ fun MapScreenErrorPreview() {
         onOverlayRetry = {},
         onOverlayLoaded = {},
         onOverlayError = {},
-        onSheetDismiss = {},
         settingsViewModel = viewModel(),
         onPeriodStart = {},
         onPeriodEnd = {},
