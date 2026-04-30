@@ -167,5 +167,6 @@ Svært sjelden varslet.
     <string name="no_date_selected_msg">Velg et datointervall for å vise historiske trender for perioden.</string>
 
     <string name="no_graph_data">Ingen data å vise.</string>
+    <string name="not_checked">Ikke sjekket</string>
 
 </resources>
