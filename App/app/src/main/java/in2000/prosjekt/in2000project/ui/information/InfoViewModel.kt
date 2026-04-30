@@ -15,13 +15,13 @@ data class InfoUiState(
 
 class InfoViewModel(application: Application): AndroidViewModel(application){
 
-    private val _uiState = MutableStateFlow(InfoUiState())
-    val uiState: StateFlow<InfoUiState> = _uiState.asStateFlow()
+    private val _infoUiState = MutableStateFlow(InfoUiState())
+    val infoUiState: StateFlow<InfoUiState> = _infoUiState.asStateFlow()
 
     init {
         // We perform the mapping from Domain to UI model here in the ViewModel.
         // This keeps the Composable "dumb" and ensures presentation logic is centralized.
-        _uiState.value = InfoUiState(
+        _infoUiState.value = InfoUiState(
             dangerLevels = DangerLevel.entries.map { it.toUiModel() }
         )
     }

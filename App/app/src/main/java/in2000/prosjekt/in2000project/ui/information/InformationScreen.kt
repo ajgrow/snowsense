@@ -47,7 +47,7 @@ fun InfoScreen(
     navController: NavController,
     infoViewModel: InfoViewModel = viewModel()
 ) {
-    val uiState by infoViewModel.uiState.collectAsState()
+    val uiState by infoViewModel.infoUiState.collectAsState()
 
     Scaffold(
         modifier = modifier,
