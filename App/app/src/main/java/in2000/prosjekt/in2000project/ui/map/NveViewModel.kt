@@ -29,8 +29,11 @@ class NveViewModel : ViewModel() {
             val geoJson = nveRepository.getGeoJson(lat, lon, 10)
             val isDanger = geoJson.features?.isNotEmpty() == true
 
-            /* The ViewModel transforms the domain value into a UI-ready model.
-            * At this point it only shows LOW or VERY_HIGH depending on isDanger*/
+            /*
+            * WE DO NOT HAVE ALL LOGIC IN PLACE YET
+            * At this point we only have the ability to show levels very high
+            * or low
+            * */
             val dangerLevel = if (isDanger) DangerLevel.VERY_HIGH.toUiModel() else DangerLevel.LOW.toUiModel()
 
             _dangerCheckUiState.update { currentState ->
