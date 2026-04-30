@@ -145,6 +145,9 @@
     <string name="text_small">Small</string>
     <string name="text_medium">Medium</string>
     <string name="text_large">Large</string>
+    
+    <string name="reset_default">Reset to Default</string>
+    <string name="text_size_label">Text size: %1$d%%</string>
 
     <string name="language_system">Use device setting</string>
 

@@ -4,9 +4,12 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -21,6 +24,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material3.Button
+import androidx.compose.material3.Slider
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
@@ -39,7 +45,7 @@ fun SettingScreen(
     }
 
     val themeMode = settingsViewModel.themeMode
-    val textSizeMode = settingsViewModel.textSizeMode
+    val textScale = settingsViewModel.textScale
     val languageMode = settingsViewModel.languageMode
 
     Scaffold(
@@ -57,14 +63,10 @@ fun SettingScreen(
                     onClick = { navController.popBackStack() }
 
                 ) {
-                    IconButton(
-                        onClick = { navController.popBackStack() }
-                    ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.back_button_desc)
-                        )
-                    }
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = stringResource(R.string.back_button_desc)
+                    )
                 }
                 Text(
                     text = stringResource(R.string.settings_title),
@@ -107,23 +109,48 @@ fun SettingScreen(
             SettingsSection(
                 title = stringResource(R.string.text_size_title),
             ) {
-                SettingsRadioOption(
-                    title = stringResource(R.string.text_small),
-                    selected = textSizeMode == TextSizeMode.SMALL,
-                    onClick = { settingsViewModel.setTextSize(TextSizeMode.SMALL) },
-                )
+                Column(
+                    modifier = Modifier
+                        .padding(24.dp)
+                ) {
+                    Text(
+                        text = stringResource(
+                            R.string.text_size_label,
+                            (textScale * 100).toInt()
+                        ),
+                        style = MaterialTheme.typography.bodyMedium
+                    )
 
-                SettingsRadioOption(
-                    title = stringResource(R.string.text_medium),
-                    selected = textSizeMode == TextSizeMode.MEDIUM,
-                    onClick = { settingsViewModel.setTextSize(TextSizeMode.MEDIUM) },
-                )
+                    Spacer(modifier = Modifier.height(8.dp))
 
-                SettingsRadioOption(
-                    title = stringResource(R.string.text_large),
-                    selected = textSizeMode == TextSizeMode.LARGE,
-                    onClick = { settingsViewModel.setTextSize(TextSizeMode.LARGE) },
-                )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                    ) {
+
+                        Slider(
+                            value = textScale,
+                            onValueChange = { settingsViewModel.updateTextScale(it) },
+                            valueRange = 0.5f..2.0f,
+                            modifier = Modifier
+                                .weight(1f)
+                        )
+
+                        IconButton(
+                            onClick = { settingsViewModel.resetTextScale() },
+                            modifier = Modifier
+                                .padding(8.dp)
+                                .size(24.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Refresh,
+                                contentDescription = stringResource(R.string.reset_default),
+                            )
+                        }
+                    }
+                }
             }
 
             SettingsSection(

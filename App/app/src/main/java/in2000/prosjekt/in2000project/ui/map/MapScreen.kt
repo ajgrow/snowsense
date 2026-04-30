@@ -327,12 +327,11 @@ fun BottomSheetContent(
         ) {
 
             item {
-                Row(
+                Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(60.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
+                        .heightIn(min = 60.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     when (climateState) {
                         is ClimateState.Loading -> {

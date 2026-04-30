@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.LocalActivity
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
@@ -16,7 +17,6 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.platform.LocalContext
-import in2000.prosjekt.in2000project.ui.settings.TextSizeMode
 import in2000.prosjekt.in2000project.ui.settings.ThemeMode
 
 /*Global provider for the Dark Mode state, so components can access it without
@@ -48,7 +48,7 @@ private val LightColorScheme = lightColorScheme(
 @Composable
 fun In2000projectTheme(
     themeMode: ThemeMode = ThemeMode.SYSTEM,
-    textSizeMode: TextSizeMode = TextSizeMode.MEDIUM,
+    textScale: Float = 1.0f,
     // Dynamic color is available on Android 12+
     dynamicColor: Boolean = true,
     content: @Composable () -> Unit
@@ -86,17 +86,8 @@ fun In2000projectTheme(
         else -> LightColorScheme
     }
 
-    val chosenTypography = when (textSizeMode){
-        TextSizeMode.SMALL -> Typography.copy(
-            bodyLarge = Typography.bodyLarge.copy(fontSize = Typography.bodyLarge.fontSize * 0.85f),
-            titleLarge = Typography.titleLarge.copy(fontSize = Typography.titleLarge.fontSize * 0.85f)
-        )
-        TextSizeMode.MEDIUM -> Typography
-        TextSizeMode.LARGE -> Typography.copy(
-            bodyLarge = Typography.bodyLarge.copy(fontSize = Typography.bodyLarge.fontSize * 1.2f),
-            titleLarge = Typography.titleLarge.copy(fontSize = Typography.titleLarge.fontSize * 1.2f)
-        )
-    }
+    val adjustedScale = 1f + (textScale - 1f) * 0.7f
+    val chosenTypography = Typography.scaleAll(adjustedScale)
 
     // Wrap the app content in a Provider to broadcast the 'isDarkTheme' value to the entire UI tree.
     CompositionLocalProvider(LocalIsDarkTheme provides isDarkTheme) {
