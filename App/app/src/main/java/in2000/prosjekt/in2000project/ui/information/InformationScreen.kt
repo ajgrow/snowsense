@@ -41,17 +41,6 @@ import in2000.prosjekt.in2000project.ui.model.DangerLevelUiModel
 import in2000.prosjekt.in2000project.ui.model.toUiModel
 import in2000.prosjekt.in2000project.ui.reusables.TopBar
 
-/**
- * REFACTORING NOTE:
- * This screen has been updated to follow Clean Architecture principles.
- * Instead of consuming the domain 'DangerLevel' enum directly and performing
- * UI mapping in the composable, it now observes a 'uiState' from [InfoViewModel].
- *
- * This 'uiState' contains [DangerLevelUiModel] objects which already hold the
- * necessary presentation data (colors, string resources), keeping this composable
- * focused purely on rendering.
- */
-
 @Composable
 fun InfoScreen(
     modifier: Modifier = Modifier,
