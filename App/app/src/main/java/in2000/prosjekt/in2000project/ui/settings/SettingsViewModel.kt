@@ -22,12 +22,10 @@ class SettingsViewModel(application: Application)
         )
     )
 
-    var textSizeMode by mutableStateOf(
-        TextSizeMode.valueOf(
-            prefs.getString(
-                "text_size_mode", TextSizeMode.MEDIUM.name)!!
-        )
+    var textScale by mutableStateOf(
+        prefs.getFloat("text_scale", 1.5f)
     )
+        private set
 
     var languageMode by mutableStateOf(currentLanguageMode())
         private set
@@ -38,10 +36,14 @@ class SettingsViewModel(application: Application)
             "theme_mode", mode.name).apply()
     }
 
-    fun setTextSize(mode: TextSizeMode){
-        textSizeMode = mode
-        prefs.edit().putString(
-            "text_size_mode", mode.name).apply()
+    fun updateTextScale(scale: Float){
+        textScale = scale
+        prefs.edit().putFloat(
+            "text_scale", scale).apply()
+    }
+
+    fun resetTextScale(){
+        updateTextScale(1.0f)
     }
 
     fun setLanguage(mode: AppLanguageMode) {

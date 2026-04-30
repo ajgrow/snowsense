@@ -147,6 +147,9 @@ Svært sjelden varslet.
     <string name="text_medium">Middels</string>
     <string name="text_large">Stor</string>
 
+    <string name="reset_default">tilbakestille til standard</string>
+    <string name="text_size_label">Tekst størrelse: %1$d%%</string>
+
     <string name="language_system">Bruk enhetsinnstilling</string>
     
     <string name="hide_info">Skjul info ▲</string>
@@ -164,5 +167,6 @@ Svært sjelden varslet.
     <string name="no_date_selected_msg">Velg et datointervall for å vise historiske trender for perioden.</string>
 
     <string name="no_graph_data">Ingen data å vise.</string>
+    <string name="not_checked">Ikke sjekket</string>
 
 </resources>

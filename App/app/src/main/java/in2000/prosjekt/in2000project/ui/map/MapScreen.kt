@@ -60,6 +60,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import in2000.prosjekt.in2000project.ui.search.SearchViewModel
 import in2000.prosjekt.in2000project.ui.settings.SettingsViewModel
 import in2000.prosjekt.in2000project.data.model.enums.DangerLevel
+import in2000.prosjekt.in2000project.ui.model.DangerLevelUiModel
+import in2000.prosjekt.in2000project.ui.model.toUiModel
 
 private val previewSkiArea = SkiArea(
     name = "",
@@ -263,6 +265,7 @@ fun MapScreen(
                 area = skiArea,
                 climateState = screenState.climateState,
                 avalancheStatus = avalancheStatus,
+                dangerLevel = dangerCheckUiState.dangerLevel,
                 modifier = Modifier
                     .fillMaxWidth()
                     .heightIn(min = 320.dp)
@@ -296,6 +299,7 @@ fun BottomSheetContent(
     area: SkiArea,
     climateState: ClimateState,
     avalancheStatus: String,
+    dangerLevel: DangerLevelUiModel?,
     modifier: Modifier = Modifier,
     startDate: MonthDay?,
     endDate: MonthDay?,
@@ -327,12 +331,11 @@ fun BottomSheetContent(
         ) {
 
             item {
-                Row(
+                Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(60.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
+                        .heightIn(min = 60.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     when (climateState) {
                         is ClimateState.Loading -> {
@@ -361,7 +364,8 @@ fun BottomSheetContent(
                         }
                     }
 
-                    DangerLevelCard(dangerLevel = DangerLevel.VERY_HIGH)
+                    DangerLevelCard(uiModel =  dangerLevel)
+
                 }
             }
 
@@ -512,6 +516,7 @@ fun BottomSheetPreview() {
         area = previewSkiArea,
         climateState = ClimateState.Idle,
         avalancheStatus = "High",
+        dangerLevel = DangerLevel.HIGH.toUiModel(),
         startDate = null,
         endDate = null,
         selectedYear = null,

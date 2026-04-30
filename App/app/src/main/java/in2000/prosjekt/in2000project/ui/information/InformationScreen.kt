@@ -19,6 +19,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -36,16 +37,17 @@ import in2000.prosjekt.in2000project.R
 import in2000.prosjekt.in2000project.data.model.enums.DangerLevel
 import in2000.prosjekt.in2000project.ui.reusables.BottomBar
 import in2000.prosjekt.in2000project.data.model.enums.EmergencyServices
+import in2000.prosjekt.in2000project.ui.model.DangerLevelUiModel
+import in2000.prosjekt.in2000project.ui.model.toUiModel
 import in2000.prosjekt.in2000project.ui.reusables.TopBar
 
 @Composable
 fun InfoScreen(
     modifier: Modifier = Modifier,
     navController: NavController,
-    infoViewModel: InfoViewModel = viewModel() //Is this even needed?
+    infoViewModel: InfoViewModel = viewModel()
 ) {
-
-    val dangerLevels = DangerLevel.entries
+    val uiState by infoViewModel.infoUiState.collectAsState()
 
     Scaffold(
         modifier = modifier,
@@ -105,10 +107,9 @@ fun InfoScreen(
                 }
             }
 
-            //replaced the function "DangerLevelsColumn" with an "items" composable
-            items(dangerLevels) { dangerLevel ->
+            items(uiState.dangerLevels) { uiModel ->
                 DangerLevelItem(
-                    dangerLevel = dangerLevel,
+                    uiModel = uiModel,
                     modifier = Modifier.padding(vertical = 6.dp)
                 )
             }
@@ -119,7 +120,7 @@ fun InfoScreen(
 @Composable
 fun DangerLevelItem(
     modifier: Modifier = Modifier,
-    dangerLevel: DangerLevel
+    uiModel: DangerLevelUiModel
 ) {
     var expanded by rememberSaveable { mutableStateOf(false) }
 
@@ -140,11 +141,11 @@ fun DangerLevelItem(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Surface(
-                    color = dangerLevel.getColor(),
+                    color = uiModel.getColor(),
                     shape = RoundedCornerShape(8.dp)
                 ) {
                     Text(
-                        text = stringResource(dangerLevel.titleRes),
+                        text = stringResource(uiModel.titleRes),
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = Bold,
                         modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)
@@ -161,7 +162,7 @@ fun DangerLevelItem(
             }
             AnimatedVisibility(visible = expanded) {
                 Text(
-                    text = stringResource(dangerLevel.descriptionRes),
+                    text = stringResource(uiModel.descriptionRes),
                     style = MaterialTheme.typography.bodySmall,
                     modifier = Modifier.padding(top = 4.dp)
                 )
@@ -174,8 +175,6 @@ fun DangerLevelItem(
 fun EmergencyNumbersSection(
     modifier: Modifier = Modifier,
 ) {
-    val emergencyServices = EmergencyServices.entries
-
     Surface(
         modifier = modifier
             .padding(bottom = 8.dp)
@@ -206,7 +205,7 @@ fun EmergencyNumbersSection(
 @Preview
 @Composable
 fun PrevDangerLevelItem(){
-    DangerLevelItem(dangerLevel = DangerLevel.HIGH)
+    DangerLevelItem(uiModel = DangerLevel.HIGH.toUiModel())
 }
 
 @Preview
