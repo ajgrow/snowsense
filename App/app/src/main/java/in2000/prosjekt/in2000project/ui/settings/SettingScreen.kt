@@ -21,6 +21,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.Button
+import androidx.compose.material3.Slider
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
@@ -39,7 +41,7 @@ fun SettingScreen(
     }
 
     val themeMode = settingsViewModel.themeMode
-    val textSizeMode = settingsViewModel.textSizeMode
+    val textScale = settingsViewModel.textScale
     val languageMode = settingsViewModel.languageMode
 
     Scaffold(
@@ -57,14 +59,10 @@ fun SettingScreen(
                     onClick = { navController.popBackStack() }
 
                 ) {
-                    IconButton(
-                        onClick = { navController.popBackStack() }
-                    ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.back_button_desc)
-                        )
-                    }
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = stringResource(R.string.back_button_desc)
+                    )
                 }
                 Text(
                     text = stringResource(R.string.settings_title),
@@ -107,23 +105,29 @@ fun SettingScreen(
             SettingsSection(
                 title = stringResource(R.string.text_size_title),
             ) {
-                SettingsRadioOption(
-                    title = stringResource(R.string.text_small),
-                    selected = textSizeMode == TextSizeMode.SMALL,
-                    onClick = { settingsViewModel.setTextSize(TextSizeMode.SMALL) },
-                )
+                Column(
+                    modifier = Modifier
+                        .padding(24.dp)
+                ) {
+                    Text(
+                        text = "Text size: ${(textScale * 100).toInt()}%",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
 
-                SettingsRadioOption(
-                    title = stringResource(R.string.text_medium),
-                    selected = textSizeMode == TextSizeMode.MEDIUM,
-                    onClick = { settingsViewModel.setTextSize(TextSizeMode.MEDIUM) },
-                )
+                    Slider(
+                        value = textScale,
+                        onValueChange = { settingsViewModel.updateTextScale(it) },
+                        valueRange = 0.5f..2.0f
+                    )
 
-                SettingsRadioOption(
-                    title = stringResource(R.string.text_large),
-                    selected = textSizeMode == TextSizeMode.LARGE,
-                    onClick = { settingsViewModel.setTextSize(TextSizeMode.LARGE) },
-                )
+                    Button(
+                        onClick = { settingsViewModel.resetTextScale() },
+                        modifier = Modifier
+                            .padding(8.dp)
+                    ) {
+                        Text("Reset to default")
+                    }
+                }
             }
 
             SettingsSection(
