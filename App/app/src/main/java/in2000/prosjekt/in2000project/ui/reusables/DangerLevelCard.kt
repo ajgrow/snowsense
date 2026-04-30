@@ -12,23 +12,32 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import in2000.prosjekt.in2000project.data.model.enums.DangerLevel
+import in2000.prosjekt.in2000project.ui.model.DangerLevelUiModel
+import in2000.prosjekt.in2000project.ui.model.toUiModel
+
+/**
+ * REFACTORING NOTE:
+ * These components now accept [DangerLevelUiModel] instead of the domain [DangerLevel] enum.
+ * This follows Clean Architecture by ensuring that the UI layer only deals with
+ * presentation-ready data. The logic for choosing colors and strings is moved
+ * out of the Composable and into the ViewModel/Mapper.
+ */
 
 @Composable
 fun DangerLevelCard(
     modifier: Modifier = Modifier,
-    dangerLevel: DangerLevel,
+    uiModel: DangerLevelUiModel,
     )
 {
-
     Surface(
-        color = dangerLevel.getColor(),
+        color = uiModel.getColor(),
         modifier = modifier.padding(8.dp),
         shape = RoundedCornerShape(12.dp),
         border = BorderStroke(1.dp, Color.Black)
 
     ) {
         Text(
-            stringResource(dangerLevel.titleRes),
+            stringResource(uiModel.titleRes),
             modifier = Modifier.padding(8.dp)
         )
     }
@@ -37,7 +46,7 @@ fun DangerLevelCard(
 @Composable
 fun DangerLevelDescriptionCard(
     modifier: Modifier = Modifier,
-    dangerLevel: DangerLevel) {
+    uiModel: DangerLevelUiModel) {
 
     Surface(
         modifier = modifier.padding(8.dp),
@@ -46,7 +55,7 @@ fun DangerLevelDescriptionCard(
     ) {
 
         Text(
-            stringResource(dangerLevel.descriptionRes),
+            stringResource(uiModel.descriptionRes),
             modifier = Modifier.padding(8.dp)
         )
     }
@@ -56,11 +65,11 @@ fun DangerLevelDescriptionCard(
 @Preview
 @Composable
 fun PreviewDangerLevelCard() {
-    DangerLevelCard(dangerLevel = DangerLevel.VERY_HIGH)
+    DangerLevelCard(uiModel = DangerLevel.VERY_HIGH.toUiModel())
 }
 
 @Preview
 @Composable
 fun PreviewDangerLevelDescriptionCard() {
-    DangerLevelDescriptionCard(dangerLevel = DangerLevel.VERY_HIGH)
+    DangerLevelDescriptionCard(uiModel = DangerLevel.VERY_HIGH.toUiModel())
 }
