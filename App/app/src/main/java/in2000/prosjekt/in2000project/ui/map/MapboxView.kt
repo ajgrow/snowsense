@@ -62,9 +62,15 @@ have not found any other practical working alternatives.
 object MapCameraRepository {
     var lastCameraOptions: CameraOptions? = null
         private set
+    var lastPinnedPoint: Point? = null
+        private set
 
     fun updateCameraOptions(options: CameraOptions) {
         lastCameraOptions = options
+    }
+
+    fun updatePinnedPoint(point: Point) {
+        lastPinnedPoint = point
     }
 }
 private const val TAG = "SnoskredWMS"
@@ -113,7 +119,6 @@ fun MapboxView(
                 .center(Point.fromLngLat(searchLng, searchLat))
                 .zoom(12.0)
                 .build()
-                .also { MapCameraRepository.updateCameraOptions(it) }
         } else {
             MapCameraRepository.lastCameraOptions ?: CameraOptions.Builder()
                 .center(Point.fromLngLat(10.75, 59.91))
@@ -142,11 +147,14 @@ fun MapboxView(
         }
     }
 
+    var idleSubscription by remember { mutableStateOf<Cancelable?>(null) }
+
     DisposableEffect(Unit) {
         onDispose {
             viewportState.cameraState?.toCameraOptions()?.let {
                 MapCameraRepository.updateCameraOptions(it)
             }
+            idleSubscription?.cancel()
         }
     }
 
@@ -162,6 +170,11 @@ fun MapboxView(
                 mapViewportState = viewportState
             ) {
                 MapEffect(Unit) { mapView ->
+                    MapCameraRepository.lastCameraOptions?.let {
+                        mapView.mapboxMap.setCamera(it)
+                    }
+
+
                     val annotationApi = mapView.annotations
                     val pointAnnotationManager: PointAnnotationManager = annotationApi.createPointAnnotationManager()
 
@@ -180,11 +193,16 @@ fun MapboxView(
 
                     }
 
+                    MapCameraRepository.lastPinnedPoint?.let {
+                        localAddPin(it)
+                    }
+
                     addPin = ::localAddPin
 
                     //this click listener just works generally on the map
                     mapView.gestures.addOnMapClickListener { point ->
                         if (!isSearchActive) {
+                            MapCameraRepository.updatePinnedPoint(point)
                             addPin?.invoke(point)
                             onMapClick(point)
                         }
@@ -240,7 +258,7 @@ fun MapboxView(
                         )
                     }
 
-                    var idleSubscription: Cancelable? = null
+
                     idleSubscription = mapView.mapboxMap.subscribeMapIdle {
                         viewportState.cameraState?.toCameraOptions()?.let {
                             MapCameraRepository.updateCameraOptions(it)
@@ -274,6 +292,7 @@ fun MapboxView(
                                 .center(searchPoint)
                                 .zoom(12.0)
                                 .build())
+                        MapCameraRepository.updatePinnedPoint(searchPoint)
                         addPin?.invoke(searchPoint)
                     }
                 }
@@ -353,6 +372,7 @@ fun MapboxView(
                         zoom(12.0)
                     }
                 )
+                MapCameraRepository.updatePinnedPoint(point)
                 addPin?.invoke(point)
             }
 
