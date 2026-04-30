@@ -10,6 +10,11 @@ fun Typography.scaleAll(factor: Float): Typography{
         lineHeight = lineHeight * factor
     )
 
+    fun TextStyle.scaledLess() = copy(
+        fontSize = fontSize * (1f + (factor - 1f) * 0.5f),
+        lineHeight = lineHeight * (1f + (factor - 1f) * 0.5f),
+    )
+
     return Typography(
         displayLarge = displayLarge.scaled(),
         displayMedium = displayMedium.scaled(),
@@ -27,8 +32,8 @@ fun Typography.scaleAll(factor: Float): Typography{
         bodyMedium = bodyMedium.scaled(),
         bodySmall = bodySmall.scaled(),
 
-        labelLarge = labelLarge.scaled(),
-        labelMedium = labelMedium.scaled(),
-        labelSmall = labelSmall.scaled()
+        labelLarge = labelLarge.scaledLess(),
+        labelMedium = labelMedium.scaledLess(),
+        labelSmall = labelSmall.scaledLess()
     )
 }

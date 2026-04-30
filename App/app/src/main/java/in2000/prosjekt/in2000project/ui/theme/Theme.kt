@@ -86,8 +86,8 @@ fun In2000projectTheme(
         else -> LightColorScheme
     }
 
-    val animatedScale = animateFloatAsState(textScale).value
-    val chosenTypography = Typography.scaleAll(animatedScale)
+    val adjustedScale = 1f + (textScale - 1f) * 0.7f
+    val chosenTypography = Typography.scaleAll(adjustedScale)
 
     // Wrap the app content in a Provider to broadcast the 'isDarkTheme' value to the entire UI tree.
     CompositionLocalProvider(LocalIsDarkTheme provides isDarkTheme) {
