@@ -1,15 +1,20 @@
 package in2000.prosjekt.in2000project.ui.reusables
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import in2000.prosjekt.in2000project.R
@@ -22,6 +27,50 @@ These components now accept DangerLevelUiModel instead of the DangerLevel enum.
 The [uiModel] is nullable. If null, a neutral "Not checked" card is displayed.
  */
 
+/*
+  * highlightNumberOnly:  Show number as colored chip (DangerLevelItem)
+  * or plain text (used in DangerLevelCard)
+*/
+@Composable
+fun DangerLevelHeader(
+    modifier: Modifier = Modifier,
+    uiModel: DangerLevelUiModel,
+    highlightNumberOnly: Boolean = true
+) {
+    Row(
+        modifier = modifier,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        if (highlightNumberOnly) {
+            Surface(
+                color = uiModel.getColor(),
+                shape = RoundedCornerShape(8.dp)
+            ) {
+                Text(
+                    text = stringResource(uiModel.numberRes),
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = Bold,
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
+                )
+            }
+        } else {
+            Text(
+                text = stringResource(uiModel.numberRes),
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = Bold
+            )
+        }
+
+        Spacer(modifier = Modifier.width(8.dp))
+
+        Text(
+            text = stringResource(uiModel.titleRes),
+            style = MaterialTheme.typography.bodyMedium,
+            fontWeight = Bold
+        )
+    }
+}
+
 @Composable
 fun DangerLevelCard(
     modifier: Modifier = Modifier,
@@ -30,20 +79,24 @@ fun DangerLevelCard(
     val color = uiModel?.getColor()
         ?: MaterialTheme.colorScheme.surfaceVariant
 
-    val text = uiModel?.let {
-        "${stringResource(it.numberRes)} ${stringResource(it.titleRes)}"
-    } ?: stringResource(R.string.not_checked)
-
     Surface(
         color = color,
         modifier = modifier.padding(8.dp),
         shape = RoundedCornerShape(12.dp),
         border = BorderStroke(1.dp, Color.Black)
     ) {
-        Text(
-            text = text,
-            modifier = Modifier.padding(8.dp),
-        )
+        if (uiModel == null) {
+            Text(
+                text = stringResource(R.string.not_checked),
+                modifier = Modifier.padding(8.dp)
+            )
+        } else {
+            DangerLevelHeader(
+                uiModel = uiModel,
+                highlightNumberOnly = false,
+                modifier = Modifier.padding(8.dp)
+            )
+        }
     }
 }
 
@@ -58,12 +111,17 @@ fun DangerLevelDescriptionCard(
         shape = RoundedCornerShape(12.dp)
     ) {
         Text(
-            stringResource(uiModel.descriptionRes),
+            text = stringResource(uiModel.descriptionRes),
             modifier = Modifier.padding(8.dp)
         )
     }
 }
 
+@Preview
+@Composable
+fun PreviewDangerLevelHeader() {
+    DangerLevelHeader(uiModel = DangerLevel.VERY_HIGH.toUiModel())
+}
 
 @Preview
 @Composable
