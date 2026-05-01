@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -30,17 +29,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight.Companion.Bold
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import in2000.prosjekt.in2000project.R
 import in2000.prosjekt.in2000project.data.model.enums.DangerLevel
-import in2000.prosjekt.in2000project.ui.reusables.BottomBar
 import in2000.prosjekt.in2000project.data.model.enums.EmergencyServices
 import in2000.prosjekt.in2000project.ui.model.DangerLevelUiModel
 import in2000.prosjekt.in2000project.ui.model.toUiModel
+import in2000.prosjekt.in2000project.ui.reusables.BottomBar
+import in2000.prosjekt.in2000project.ui.reusables.DangerLevelHeader
 import in2000.prosjekt.in2000project.ui.reusables.TopBar
 
 @Composable
@@ -57,7 +56,8 @@ fun InfoScreen(
             TopBar(
                 title = stringResource(R.string.about_app_title),
                 modifier = Modifier,
-                navController = navController)
+                navController = navController
+            )
         },
         bottomBar = {
             BottomBar(modifier, navController)
@@ -71,7 +71,8 @@ fun InfoScreen(
                 .padding(horizontal = 16.dp),
             contentPadding = PaddingValues(vertical = 16.dp)
         ) {
-            item { EmergencyNumbersSection () }
+            item { EmergencyNumbersSection() }
+
             item {
                 Column {
                     Text(
@@ -120,12 +121,12 @@ fun InfoScreen(
 }
 
 @Composable
-
 fun DangerLevelItem(
     modifier: Modifier = Modifier,
     uiModel: DangerLevelUiModel
 ) {
     var expanded by rememberSaveable { mutableStateOf(false) }
+
     Surface(
         modifier = modifier
             .padding(bottom = 8.dp)
@@ -137,47 +138,22 @@ fun DangerLevelItem(
         Column(
             modifier = Modifier.padding(8.dp)
         ) {
-            Row (
+            Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    // Colored number box
-                    Surface(
-                        color = uiModel.getColor(),
-                        shape = RoundedCornerShape(8.dp)
-                    ) {
-                        Text(
-                            text = stringResource(uiModel.numberRes),
-                            style = MaterialTheme.typography.bodyMedium,
-                            fontWeight = Bold,
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier
-                                .padding(horizontal = 12.dp, vertical = 4.dp)
-                        )
+                DangerLevelHeader(uiModel = uiModel)
 
-                    }
-
-                    // Label next to number
-                    Text(
-                        text = stringResource(uiModel.titleRes),
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = Bold,
-                        modifier = Modifier.padding(start = 8.dp)
-                    )
-                }
                 Text(
-                    text =
-                        if (expanded)
-                            stringResource(R.string.hide_info)
-                        else
-                            stringResource(R.string.show_info),
+                    text = if (expanded)
+                        stringResource(R.string.hide_info)
+                    else
+                        stringResource(R.string.show_info),
                     style = MaterialTheme.typography.bodySmall
                 )
             }
+
             AnimatedVisibility(visible = expanded) {
                 Text(
                     text = stringResource(uiModel.descriptionRes),
@@ -209,6 +185,7 @@ fun EmergencyNumbersSection(
                 fontWeight = Bold,
                 modifier = Modifier.padding(bottom = 8.dp)
             )
+
             EmergencyServices.entries.forEach {
                 Row {
                     Text(text = stringResource(it.service))
@@ -222,7 +199,7 @@ fun EmergencyNumbersSection(
 
 @Preview
 @Composable
-fun PrevDangerLevelItem(){
+fun PrevDangerLevelItem() {
     DangerLevelItem(uiModel = DangerLevel.HIGH.toUiModel())
 }
 
