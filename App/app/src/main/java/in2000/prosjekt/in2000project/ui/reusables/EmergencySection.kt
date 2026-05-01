@@ -47,11 +47,6 @@ fun EmergencySection(
             modifier = Modifier.padding(8.dp)
         ) {
             Text(
-                text = stringResource(R.string.emergency_title),
-                style = MaterialTheme.typography.bodyMedium,
-                fontWeight = Bold,
-            )
-            Text(
                 text = stringResource(R.string.emergency_desc),
                 style = MaterialTheme.typography.bodySmall,
             )
