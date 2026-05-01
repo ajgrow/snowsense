@@ -48,6 +48,10 @@
     <string name="medical_service">Medical</string>
     <string name="medical_number">113</string>
 
+    <string name="call_dialog_title">Call %1$s?</string>
+    <string name="dialog_yes">Yes</string>
+    <string name="dialog_no">No</string>
+
 
 
     <string name="map_title">Map</string>

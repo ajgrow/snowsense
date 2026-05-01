@@ -48,6 +48,10 @@
     <string name="medical_service">Medisinsk</string>
     <string name="medical_number">113</string>
 
+    <string name="call_dialog_title">Ring %1$s?</string>
+    <string name="dialog_yes">Ja</string>
+    <string name="dialog_no">Nei</string>
+
     <string name="map_title">Kart</string>
     <string name="map_instruction">Velg et område for å se historiske klimadata.</string>
 
