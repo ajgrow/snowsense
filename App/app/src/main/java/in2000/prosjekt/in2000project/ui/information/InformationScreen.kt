@@ -27,9 +27,9 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import in2000.prosjekt.in2000project.R
-import in2000.prosjekt.in2000project.data.model.enums.EmergencyServices
 import in2000.prosjekt.in2000project.ui.reusables.BottomBar
 import in2000.prosjekt.in2000project.ui.reusables.DangerLevelItem
+import in2000.prosjekt.in2000project.ui.reusables.EmergencySection
 import in2000.prosjekt.in2000project.ui.reusables.TopBar
 
 @Composable
@@ -61,7 +61,7 @@ fun InfoScreen(
                 .padding(horizontal = 16.dp),
             contentPadding = PaddingValues(vertical = 16.dp)
         ) {
-            item { EmergencyNumbersSection() }
+            item { EmergencySection() }
 
             item {
                 Column {
@@ -108,42 +108,4 @@ fun InfoScreen(
             }
         }
     }
-}
-
-@Composable
-fun EmergencyNumbersSection(
-    modifier: Modifier = Modifier,
-) {
-    Surface(
-        modifier = modifier
-            .padding(bottom = 8.dp)
-            .fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
-        border = BorderStroke(1.dp, Color.Red)
-    ) {
-        Column(
-            modifier = Modifier.padding(12.dp)
-        ) {
-            Text(
-                text = stringResource(R.string.emergency_title),
-                style = MaterialTheme.typography.bodyMedium,
-                fontWeight = Bold,
-                modifier = Modifier.padding(bottom = 8.dp)
-            )
-
-            EmergencyServices.entries.forEach {
-                Row {
-                    Text(text = stringResource(it.service))
-                    Spacer(modifier = Modifier.weight(1f))
-                    Text(text = stringResource(it.number))
-                }
-            }
-        }
-    }
-}
-
-@Preview
-@Composable
-fun PrevEmergencySection() {
-    EmergencyNumbersSection()
 }
