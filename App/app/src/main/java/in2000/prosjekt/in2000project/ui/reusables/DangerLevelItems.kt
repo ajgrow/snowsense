@@ -93,7 +93,7 @@ fun DangerLevelItem(
             .fillMaxWidth()
             .clickable { expanded = !expanded },
         shape = RoundedCornerShape(12.dp),
-        border = BorderStroke(1.dp, Color.Black)
+        border = BorderStroke(2.dp, uiModel.getColor())
     ) {
         Column(
             modifier = Modifier.padding(8.dp)
