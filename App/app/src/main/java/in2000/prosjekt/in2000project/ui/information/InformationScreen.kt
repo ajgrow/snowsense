@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -29,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight.Companion.Bold
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -118,12 +120,12 @@ fun InfoScreen(
 }
 
 @Composable
+
 fun DangerLevelItem(
     modifier: Modifier = Modifier,
     uiModel: DangerLevelUiModel
 ) {
     var expanded by rememberSaveable { mutableStateOf(false) }
-
     Surface(
         modifier = modifier
             .padding(bottom = 8.dp)
@@ -140,15 +142,31 @@ fun DangerLevelItem(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Surface(
-                    color = uiModel.getColor(),
-                    shape = RoundedCornerShape(8.dp)
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
+                    // Colored number box
+                    Surface(
+                        color = uiModel.getColor(),
+                        shape = RoundedCornerShape(8.dp)
+                    ) {
+                        Text(
+                            text = stringResource(uiModel.numberRes),
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = Bold,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier
+                                .padding(horizontal = 12.dp, vertical = 4.dp)
+                        )
+
+                    }
+
+                    // Label next to number
                     Text(
                         text = stringResource(uiModel.titleRes),
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = Bold,
-                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)
+                        modifier = Modifier.padding(start = 8.dp)
                     )
                 }
                 Text(
@@ -175,7 +193,6 @@ fun DangerLevelItem(
 fun EmergencyNumbersSection(
     modifier: Modifier = Modifier,
 ) {
-
     Surface(
         modifier = modifier
             .padding(bottom = 8.dp)
