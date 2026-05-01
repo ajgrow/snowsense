@@ -30,8 +30,9 @@ fun DangerLevelCard(
     val color = uiModel?.getColor()
         ?: MaterialTheme.colorScheme.surfaceVariant
 
-    val text = uiModel?.let { stringResource(it.titleRes) }
-        ?: stringResource(R.string.not_checked)
+    val text = uiModel?.let {
+        "${stringResource(it.numberRes)} ${stringResource(it.titleRes)}"
+    } ?: stringResource(R.string.not_checked)
 
     Surface(
         color = color,
