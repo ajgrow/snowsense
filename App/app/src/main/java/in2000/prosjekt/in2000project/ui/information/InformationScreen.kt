@@ -174,7 +174,6 @@ fun DangerLevelItem(
 fun EmergencyNumbersSection(
     modifier: Modifier = Modifier,
 ) {
-    val emergencyServices = EmergencyServices.entries
 
     Surface(
         modifier = modifier
@@ -193,7 +192,7 @@ fun EmergencyNumbersSection(
                 modifier = Modifier.padding(bottom = 8.dp)
             )
             EmergencyServices.entries.forEach {
-                Row() {
+                Row {
                     Text(text = stringResource(it.service))
                     Spacer(modifier = Modifier.weight(1f))
                     Text(text = stringResource(it.number))
@@ -211,6 +210,6 @@ fun PrevDangerLevelItem(){
 
 @Preview
 @Composable
-fun prevEmergencySection() {
+fun PrevEmergencySection() {
     EmergencyNumbersSection()
 }
