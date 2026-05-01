@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -18,9 +17,13 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
@@ -38,7 +41,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -55,13 +57,14 @@ import in2000.prosjekt.in2000project.ui.reusables.DatePicker
 import in2000.prosjekt.in2000project.ui.reusables.TopBar
 import org.koin.compose.viewmodel.koinViewModel
 import java.time.MonthDay
-import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import in2000.prosjekt.in2000project.ui.search.SearchViewModel
 import in2000.prosjekt.in2000project.ui.settings.SettingsViewModel
 import in2000.prosjekt.in2000project.data.model.enums.DangerLevel
 import in2000.prosjekt.in2000project.ui.model.DangerLevelUiModel
 import in2000.prosjekt.in2000project.ui.model.toUiModel
+import in2000.prosjekt.in2000project.ui.reusables.TextInputDialog
+import java.time.Year
 
 private val previewSkiArea = SkiArea(
     name = "",
@@ -169,6 +172,23 @@ fun MapScreen(
     var startDate by rememberSaveable { mutableStateOf<MonthDay?>(null) }
     var endDate by rememberSaveable { mutableStateOf<MonthDay?>(null) }
     var selectedYear by rememberSaveable { mutableStateOf<Int?>(null) }
+
+
+    var showFavoriteDialog by remember { mutableStateOf(false) }
+
+    if (showFavoriteDialog) {
+        TextInputDialog(
+            title = stringResource(R.string.name_favorite_prompt),
+            defaultValue = "",
+            onConfirm = { name ->
+                if (name.isNotBlank()) {
+                    searchViewModel.nameFavorite(name)
+                    showFavoriteDialog = false
+                }
+            },
+            onDismiss = { showFavoriteDialog = false }
+        )
+    }
 
     Scaffold(
         modifier = modifier,
@@ -285,8 +305,14 @@ fun MapScreen(
                 onYearChange = { year ->
                     selectedYear = year
                     year?.let {
-                        val calculatedYearsBack = java.time.Year.now().value - it
+                        val calculatedYearsBack = Year.now().value - it
                         onYearsBack(calculatedYearsBack)
+                    }
+                },
+                onAddFavorite = {
+                    if (screenState.climateCoordinate != null) {
+                        showFavoriteDialog = true
+                        searchViewModel.addPendingFavorite(screenState.climateCoordinate)
                     }
                 }
             )
@@ -307,6 +333,7 @@ fun BottomSheetContent(
     onStartDateChange: (MonthDay?) -> Unit,
     onEndDateChange: (MonthDay?) -> Unit,
     onYearChange: (Int?) -> Unit,
+    onAddFavorite: () -> Unit
 ) {
 
     /*
@@ -316,6 +343,7 @@ fun BottomSheetContent(
     */
 
     val climateRows = emptyList<Pair<String, String>>()
+
 
 
     // This is the content inside the bottom sheet.
@@ -351,15 +379,33 @@ fun BottomSheetContent(
                         }
 
                         else -> {
-                            Column {
-                                Text(
-                                    text = stringResource(R.string.weather_station_desc),
-                                    style = MaterialTheme.typography.labelSmall
-                                )
-                                Text(
-                                    text = area.name,
-                                    style = MaterialTheme.typography.titleLarge,
-                                )
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Column {
+                                    Text(
+                                        text = stringResource(R.string.weather_station_desc),
+                                        style = MaterialTheme.typography.labelSmall
+                                    )
+                                    Text(
+                                        text = area.name,
+                                        style = MaterialTheme.typography.titleLarge,
+                                    )
+                                }
+                                IconButton(
+                                    modifier = Modifier,
+                                    onClick = {
+                                        onAddFavorite()
+                                    }
+
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Star,
+                                        contentDescription = ""
+                                    )
+                                }
                             }
                         }
                     }
@@ -410,7 +456,7 @@ fun BottomSheetContent(
 
             //THIS IS WHERE WE CAN PUT THE GRAPH COMPONENTS
             item {
-                val currentYear = java.time.Year.now().value
+                val currentYear = Year.now().value
 
                 val yearRange = remember(selectedYear) {
                     selectedYear?.let { it..currentYear }
@@ -523,5 +569,6 @@ fun BottomSheetPreview() {
         onStartDateChange = { },
         onEndDateChange = { },
         onYearChange = { },
+        onAddFavorite = { }
     )
 }

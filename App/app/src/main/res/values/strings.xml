@@ -79,12 +79,13 @@
     <string name="since_year">Since year</string>
 
     <string name="dialog_ok">OK</string>
+    <string name="dialog_save">Save</string>
     <string name="dialog_cancel">Cancel</string>
 
     <string name="previous_month">Previous month</string>
     <string name="next_month">Next month</string>
 
-
+    <string name="name_favorite_prompt">Name this favorite</string>
 
 
     <string name="settings_title">Settings</string>
