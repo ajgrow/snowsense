@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
@@ -79,8 +80,11 @@ fun DatePicker(
     }
 }
 
-fun MonthDay.display(): String =
-    "${month.getDisplayName(TextStyle.FULL, Locale.getDefault())} $dayOfMonth"
+fun MonthDay.display(): String {
+    val day = dayOfMonth.toString().padStart(2, '0')
+    val month = monthValue.toString().padStart(2, '0')
+    return "$day.$month"
+}
 
 @Composable
 fun DateField(
@@ -91,7 +95,7 @@ fun DateField(
 ) {
     Box(
         modifier = modifier
-            .height(56.dp)
+            .heightIn(min = 56.dp)
             .clip(MaterialTheme.shapes.extraSmall)
             .clickable(onClick = onClick)
             .border(1.dp, MaterialTheme.colorScheme.outline, MaterialTheme.shapes.extraSmall)
@@ -253,7 +257,7 @@ fun YearDropdown(
         Box(
             modifier = Modifier
                 .menuAnchor()
-                .height(56.dp)
+                .heightIn(min = 56.dp)
                 .fillMaxWidth()
                 .clip(MaterialTheme.shapes.extraSmall)
                 .border(1.dp, MaterialTheme.colorScheme.outline, MaterialTheme.shapes.extraSmall)
@@ -263,7 +267,7 @@ fun YearDropdown(
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.Start
             ) {
                 if (selected != null) {
                     Column {

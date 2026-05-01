@@ -28,12 +28,12 @@ fun AppNavigation(){
 
     val themeMode = settingsViewModel.themeMode
 
-    val textSizeMode = settingsViewModel.textSizeMode
+    val textScale = settingsViewModel.textScale
 
 
     In2000projectTheme(
         themeMode = themeMode,
-        textSizeMode = textSizeMode
+        textScale = textScale
     ) {
         NavHost(
             startDestination = Screen.Home.route,
