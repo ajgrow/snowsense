@@ -173,6 +173,23 @@ fun MapScreen(
     var endDate by rememberSaveable { mutableStateOf<MonthDay?>(null) }
     var selectedYear by rememberSaveable { mutableStateOf<Int?>(null) }
 
+
+    var showFavoriteDialog by remember { mutableStateOf(false) }
+
+    if (showFavoriteDialog) {
+        TextInputDialog(
+            title = stringResource(R.string.name_favorite_prompt),
+            defaultValue = "",
+            onConfirm = { name ->
+                if (name.isNotBlank()) {
+                    searchViewModel.nameFavorite(name)
+                    showFavoriteDialog = false
+                }
+            },
+            onDismiss = { showFavoriteDialog = false }
+        )
+    }
+
     Scaffold(
         modifier = modifier,
         topBar = {
@@ -288,8 +305,14 @@ fun MapScreen(
                 onYearChange = { year ->
                     selectedYear = year
                     year?.let {
-                        val calculatedYearsBack = java.time.Year.now().value - it
+                        val calculatedYearsBack = Year.now().value - it
                         onYearsBack(calculatedYearsBack)
+                    }
+                },
+                onAddFavorite = {
+                    if (screenState.climateCoordinate != null) {
+                        showFavoriteDialog = true
+                        searchViewModel.addPendingFavorite(screenState.climateCoordinate)
                     }
                 }
             )
@@ -310,6 +333,7 @@ fun BottomSheetContent(
     onStartDateChange: (MonthDay?) -> Unit,
     onEndDateChange: (MonthDay?) -> Unit,
     onYearChange: (Int?) -> Unit,
+    onAddFavorite: () -> Unit
 ) {
 
     /*
@@ -319,6 +343,7 @@ fun BottomSheetContent(
     */
 
     val climateRows = emptyList<Pair<String, String>>()
+
 
 
     // This is the content inside the bottom sheet.
@@ -354,15 +379,33 @@ fun BottomSheetContent(
                         }
 
                         else -> {
-                            Column {
-                                Text(
-                                    text = stringResource(R.string.weather_station_desc),
-                                    style = MaterialTheme.typography.labelSmall
-                                )
-                                Text(
-                                    text = area.name,
-                                    style = MaterialTheme.typography.titleLarge,
-                                )
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Column {
+                                    Text(
+                                        text = stringResource(R.string.weather_station_desc),
+                                        style = MaterialTheme.typography.labelSmall
+                                    )
+                                    Text(
+                                        text = area.name,
+                                        style = MaterialTheme.typography.titleLarge,
+                                    )
+                                }
+                                IconButton(
+                                    modifier = Modifier,
+                                    onClick = {
+                                        onAddFavorite()
+                                    }
+
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Star,
+                                        contentDescription = ""
+                                    )
+                                }
                             }
                         }
                     }
@@ -413,7 +456,7 @@ fun BottomSheetContent(
 
             //THIS IS WHERE WE CAN PUT THE GRAPH COMPONENTS
             item {
-                val currentYear = java.time.Year.now().value
+                val currentYear = Year.now().value
 
                 val yearRange = remember(selectedYear) {
                     selectedYear?.let { it..currentYear }
@@ -526,5 +569,6 @@ fun BottomSheetPreview() {
         onStartDateChange = { },
         onEndDateChange = { },
         onYearChange = { },
+        onAddFavorite = { }
     )
 }
