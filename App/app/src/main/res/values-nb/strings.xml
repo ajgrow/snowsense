@@ -40,12 +40,13 @@
 
     <string name="date_description">Velg en datoperiode og år siden for å se historiske klimadata for temperatur, vind og nedbør.</string>
 
-    <string name="police_service">Politi</string>
-    <string name="police_number">112</string>
-    <string name="fire_service">Brann</string>
-    <string name="fire_number">110</string>
-    <string name="ambulance_service">Ambulanse</string>
-    <string name="ambulance_number">113</string>
+    <string name="emergency_title">Nødnummer</string>
+    <string name="emergency_desc">Ved nødsituasjon, ring et av disse numrene</string>
+    <string name="emergency_call_desc">Ring</string>
+    <string name="police_rescue_service">Politi / redning</string>
+    <string name="police_rescue_number">112</string>
+    <string name="medical_service">Medisinsk</string>
+    <string name="medical_number">113</string>
 
     <string name="map_title">Kart</string>
     <string name="map_instruction">Velg et område for å se historiske klimadata.</string>
@@ -112,7 +113,6 @@
     
     <string name="hide_info">Skjul info ▲</string>
     <string name="show_info">Vis info ▼</string>
-    <string name="emergency_title">Nødnummer</string>
 
     <string name="weather_station_desc">Målestasjon</string>
 
