@@ -26,7 +26,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -45,16 +44,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import in2000.prosjekt.in2000project.R
 import in2000.prosjekt.in2000project.data.model.SkiArea
 import in2000.prosjekt.in2000project.data.model.toSkiArea
-import in2000.prosjekt.in2000project.ui.reusables.BottomBar
 import in2000.prosjekt.in2000project.ui.reusables.ClimateGraph
 import in2000.prosjekt.in2000project.ui.reusables.DangerLevelCard
 import in2000.prosjekt.in2000project.ui.reusables.DatePicker
-import in2000.prosjekt.in2000project.ui.reusables.TopBar
 import org.koin.compose.viewmodel.koinViewModel
 import java.time.MonthDay
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -326,19 +321,12 @@ fun BottomSheetContent(
     val climateRows = emptyList<Pair<String, String>>()
 
 
-
-    // This is the content inside the bottom sheet.
-    Surface(
-        modifier = modifier.fillMaxWidth(),
-        color = MaterialTheme.colorScheme.surface
-    ) {
         LazyColumn(
-            modifier = Modifier
+        modifier = modifier
                 .fillMaxWidth()
                 .padding(horizontal = 20.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-
             item {
                 Column(
                     modifier = Modifier
@@ -482,7 +470,6 @@ fun BottomSheetContent(
                             title = stringResource(R.string.mean_wind_desc)
                         )
 
-                    }
                 }
             }
         }
