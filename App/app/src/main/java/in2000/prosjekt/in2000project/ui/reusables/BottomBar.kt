@@ -1,6 +1,5 @@
 package in2000.prosjekt.in2000project.ui.reusables
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.height
 import androidx.compose.material.icons.Icons
@@ -17,13 +16,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import in2000.prosjekt.in2000project.R
 import in2000.prosjekt.in2000project.navigation.Screen
 
-@SuppressLint("RestrictedApi")
 @Composable
 fun BottomBar(
     modifier: Modifier = Modifier,
@@ -38,13 +35,7 @@ fun BottomBar(
 
         NavigationBarItem(
             selected = currentRoute == Screen.Home.route,
-            onClick = {navController.navigate(Screen.Home.route){
-                popUpTo(navController.graph.findStartDestination().id) {
-                    saveState = true
-                }
-                launchSingleTop = true
-                restoreState = true
-            }},
+            onClick = { navController.navigateSingleTopTo(Screen.Home.route) },
             icon = {
                 Icon(
                     imageVector = Icons.Default.Home,
@@ -54,16 +45,7 @@ fun BottomBar(
         )
         NavigationBarItem(
             selected = currentRoute == Screen.Map.route,
-            onClick = {
-                navController.navigate(Screen.Map.route)
-                {
-                    popUpTo(navController.graph.findStartDestination().id) {
-                        saveState = true
-                    }
-                    launchSingleTop = true
-                    restoreState = true
-                }
-            },
+            onClick = { navController.navigateSingleTopTo(Screen.Map.route) },
             icon = {
                 Icon(
                     imageVector = Icons.Default.Place,
@@ -73,22 +55,23 @@ fun BottomBar(
         )
         NavigationBarItem(
             selected = currentRoute == Screen.Info.route,
-            onClick = {navController.navigate(Screen.Info.route){
-                popUpTo(navController.graph.findStartDestination().id) {
-                    saveState = true
-                }
-                launchSingleTop = true
-                restoreState = true
-            }},
+            onClick = { navController.navigateSingleTopTo(Screen.Info.route) },
             icon = {
                 Icon(
                     imageVector = Icons.Default.Info,
                     contentDescription = stringResource(R.string.nav_info_desc),
                 )
-            },
+            }
         )
     }
 }
+
+private fun NavController.navigateSingleTopTo(route: String) =
+    this.navigate(route) {
+        popUpTo(Screen.Home.route) { saveState = true }
+        launchSingleTop = true
+        restoreState = true
+    }
 
 @Preview
 @Composable
