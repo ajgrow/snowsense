@@ -1,20 +1,20 @@
 package in2000.prosjekt.in2000project.navigation
 
-import android.util.Log
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import in2000.prosjekt.in2000project.ui.home.HomeScreen
 import in2000.prosjekt.in2000project.ui.information.InfoScreen
 import in2000.prosjekt.in2000project.ui.map.MapRoute
-import in2000.prosjekt.in2000project.ui.map.MapScreenState
 import in2000.prosjekt.in2000project.ui.reusables.BottomBar
 import in2000.prosjekt.in2000project.ui.search.SearchViewModel
 import in2000.prosjekt.in2000project.ui.settings.SettingScreen
@@ -26,21 +26,32 @@ import org.koin.compose.viewmodel.koinViewModel
 fun AppNavigation(){
     val navController = rememberNavController()
 
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
+
+    val navigationActions = NavigationActions(navController)
+
     val settingsViewModel: SettingsViewModel = viewModel()
 
     val searchViewModel: SearchViewModel = koinViewModel()
 
-    val themeMode = settingsViewModel.themeMode
-
-    val textScale = settingsViewModel.textScale
-
-
     In2000projectTheme(
-        themeMode = themeMode,
-        textScale = textScale
+        themeMode = settingsViewModel.themeMode,
+        textScale = settingsViewModel.textScale,
     ) {
         Scaffold(
-            bottomBar = { BottomBar(navController = navController) }
+            bottomBar = { BottomBar(
+                currentRoute = currentRoute,
+                onHomeClick = {navigationActions
+                    .navigateToTab(Screen
+                        .Home.route)},
+                onMapClick = {navigationActions
+                    .navigateToTab(Screen
+                        .Map.route)},
+                onInfoClick = {navigationActions
+                    .navigateToTab(Screen
+                        .Info.route)}
+            ) }
         ) { innerPadding ->
             NavHost(
                 modifier = Modifier.padding(innerPadding),
@@ -49,7 +60,9 @@ fun AppNavigation(){
             ) {
                 composable(Screen.Home.route) {
                     HomeScreen(
-                        onSettingsClick = { navController.navigate(Screen.Settings.route) },
+                        onSettingsClick = { navController
+                            .navigate(Screen
+                                .Settings.route) },
                         navController = navController,
                         searchViewModel = searchViewModel
                     )
@@ -63,8 +76,9 @@ fun AppNavigation(){
                         }
                     )
                 ) { backStackEntry ->
-                    val coordinates = backStackEntry.arguments?.getString("coordinates")!!
-                    Log.d("fuckedupmap", coordinates)
+                    val coordinates = backStackEntry.arguments
+                        ?.getString("coordinates")!!
+
                     MapRoute(
                         coordinates = coordinates,
                         searchViewModel = searchViewModel
@@ -72,7 +86,10 @@ fun AppNavigation(){
                 }
 
                 composable(Screen.Info.route) {
-                    InfoScreen(onSettingsClick = { navController.navigate(Screen.Settings.route) })
+                    InfoScreen(
+                        onSettingsClick = { navController
+                            .navigate(Screen
+                                .Settings.route) })
                 }
 
                 composable(Screen.Settings.route) {
