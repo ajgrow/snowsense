@@ -42,7 +42,8 @@ fun AppNavigation(){
         Scaffold(
             bottomBar = { BottomBar(
                 currentRoute = currentRoute,
-                onClick = navigationActions::navigateToTab
+                onClick = navigationActions
+                    ::navigateToTab
             ) }
         ) { innerPadding ->
             NavHost(
@@ -55,7 +56,8 @@ fun AppNavigation(){
                         onSettingsClick = { navController
                             .navigate(Screen
                                 .Settings.route) },
-                        navController = navController,
+                        onNavigateToMap = navigationActions
+                            ::navigateToMapCoordinates,
                         searchViewModel = searchViewModel
                     )
                 }

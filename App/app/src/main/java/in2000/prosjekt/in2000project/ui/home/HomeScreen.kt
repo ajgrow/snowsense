@@ -15,44 +15,25 @@
     import androidx.compose.foundation.lazy.LazyColumn
     import androidx.compose.foundation.lazy.LazyRow
     import androidx.compose.foundation.lazy.items
-    import androidx.compose.foundation.rememberScrollState
-    import androidx.compose.foundation.text.input.TextFieldState
-    import androidx.compose.foundation.verticalScroll
     import androidx.compose.material3.Card
-    import androidx.compose.material3.DockedSearchBar
-    import androidx.compose.material3.ExperimentalMaterial3Api
-    import androidx.compose.material3.ListItem
     import androidx.compose.material3.MaterialTheme
     import androidx.compose.material3.Scaffold
-    import androidx.compose.material3.SearchBarDefaults
     import androidx.compose.material3.Text
     import androidx.compose.runtime.Composable
     import androidx.compose.runtime.getValue
-    import androidx.compose.runtime.mutableStateOf
     import androidx.compose.runtime.remember
-    import androidx.compose.runtime.saveable.rememberSaveable
-    import androidx.compose.runtime.setValue
     import androidx.compose.ui.Alignment
     import androidx.compose.ui.Modifier
-    import androidx.compose.ui.focus.onFocusChanged
     import androidx.compose.ui.platform.LocalFocusManager
     import androidx.compose.ui.res.painterResource
     import androidx.compose.ui.res.stringResource
     import androidx.compose.ui.tooling.preview.Preview
     import androidx.compose.ui.unit.dp
     import androidx.lifecycle.compose.collectAsStateWithLifecycle
-    import androidx.lifecycle.viewmodel.compose.viewModel
-    import androidx.compose.runtime.setValue
     import androidx.compose.ui.layout.ContentScale
-    import androidx.compose.ui.res.stringResource
-    import androidx.navigation.NavController
-    import androidx.navigation.NavGraph.Companion.findStartDestination
-    import androidx.navigation.compose.rememberNavController
     import in2000.prosjekt.in2000project.R
     import in2000.prosjekt.in2000project.data.model.Coordinate
     import in2000.prosjekt.in2000project.data.model.NamedLocation
-    import in2000.prosjekt.in2000project.navigation.Screen
-    import in2000.prosjekt.in2000project.ui.reusables.BottomBar
     import in2000.prosjekt.in2000project.ui.reusables.SearchSection
     import in2000.prosjekt.in2000project.ui.reusables.TopBar
     import in2000.prosjekt.in2000project.ui.search.SearchViewModel
@@ -62,7 +43,7 @@
     fun HomeScreen(
         modifier: Modifier = Modifier,
         onSettingsClick: () -> Unit,
-        navController: NavController,
+        onNavigateToMap: (coordinate: Coordinate) -> Unit,
         searchViewModel: SearchViewModel = koinViewModel()
     ) {
         val focusManager = LocalFocusManager.current
@@ -88,15 +69,6 @@
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 LogoSection()
-
-                val onNavigateToMap = { coordinate: Coordinate ->
-                    val coordinateString = "${coordinate.longitude},${coordinate.latitude}"
-                    navController.navigate(Screen.Map.createRoute(coordinateString)) {
-                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
-                        launchSingleTop = false
-                        restoreState = false
-                    }
-                }
 
                 SearchSection(
                     //get states from the viewmodel
@@ -160,8 +132,6 @@
             )
         }
     }
-
-
 
     @Composable
     fun FavoriteSection(
@@ -235,7 +205,7 @@
     fun HomeScreenPreview(
     ) {
         HomeScreen(
-            navController = rememberNavController(),
-            onSettingsClick = {}
+            onSettingsClick = {},
+            onNavigateToMap = {},
         )
     }
