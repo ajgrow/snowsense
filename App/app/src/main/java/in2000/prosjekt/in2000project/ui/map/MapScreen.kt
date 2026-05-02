@@ -187,75 +187,67 @@ fun MapScreen(
         )
     }
 
-    Scaffold(
-        modifier = modifier,
-    ) { paddingValues ->
-
-        //Main screen content
-        Column(
+    //Main screen content
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+    ) {
+        Box(
             modifier = Modifier
-                .fillMaxSize()
-                // Makes sure the content is not hidden behind the top app bar or bottom app bar.
-                .padding(paddingValues)
-                .padding(16.dp)
+                .fillMaxWidth()
+                .weight(1f)
         ) {
-            Box(
+            //Map added here
+            //onMapClick is passed to the Map
+            MapboxView(
+                onMapClick = { point ->
+                    onMapClick(point.latitude(), point.longitude())
+                    nveViewModel.avalancheChecker(point.latitude(), point.longitude())
+                    isSheetOpen = true
+                },
+                onOverlayError = onOverlayError,
+                onOverlayLoaded = onOverlayLoaded,
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-            ) {
-                //Map added here
-                //onMapClick is passed to the Map
-                MapboxView(
-                    onMapClick = { point ->
-                        onMapClick(point.latitude(), point.longitude())
-                        nveViewModel.avalancheChecker(point.latitude(), point.longitude())
-                        isSheetOpen = true
-                    },
-                    onOverlayError = onOverlayError,
-                    onOverlayLoaded = onOverlayLoaded,
-                    modifier = Modifier
-                        .fillMaxSize(),
-                    coordinates = coordinates,
-                    searchState = searchState,
-                    onSearch = { searchViewModel.onSearch() },
-                    onSelectResult = searchViewModel::addRecentSearch
-                )
+                    .fillMaxSize(),
+                coordinates = coordinates,
+                searchState = searchState,
+                onSearch = { searchViewModel.onSearch() },
+                onSelectResult = searchViewModel::addRecentSearch
+            )
 
 
-                when (screenState.overlayState) {
-                    is OverlayState.Loading -> {
-                        OverlayStatusCard(
-                            message = stringResource(R.string.overlay_loading)
-                        )
-                    }
-
-                    is OverlayState.Error -> {
-                        OverlayRetryCard(
-                            message = stringResource(R.string.overlay_error),
-                            onRetry = onOverlayRetry
-                        )
-                    }
-
-                    is OverlayState.Success -> Unit
+            when (screenState.overlayState) {
+                is OverlayState.Loading -> {
+                    OverlayStatusCard(
+                        message = stringResource(R.string.overlay_loading)
+                    )
                 }
 
-                when (screenState.climateState) {
-                    is ClimateState.Idle -> Unit
+                is OverlayState.Error -> {
+                    OverlayRetryCard(
+                        message = stringResource(R.string.overlay_error),
+                        onRetry = onOverlayRetry
+                    )
+                }
 
-                    is ClimateState.Loading -> {
-                        Log.d("ClimateData", "Loading...")
-                    }
+                is OverlayState.Success -> Unit
+            }
 
-                    is ClimateState.Error -> {
-                        Log.d("ClimateData", "Error")
-                    }
+            when (screenState.climateState) {
+                is ClimateState.Idle -> Unit
 
-                    is ClimateState.Success -> {
-                        val success = screenState.climateState
-                        val climateData = success.data
-                        Log.d("ClimateData", climateData.toString())
-                    }
+                is ClimateState.Loading -> {
+                    Log.d("ClimateData", "Loading...")
+                }
+
+                is ClimateState.Error -> {
+                    Log.d("ClimateData", "Error")
+                }
+
+                is ClimateState.Success -> {
+                    val success = screenState.climateState
+                    val climateData = success.data
+                    Log.d("ClimateData", climateData.toString())
                 }
             }
         }
