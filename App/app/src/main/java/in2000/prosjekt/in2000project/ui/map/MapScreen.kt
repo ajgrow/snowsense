@@ -156,20 +156,18 @@ fun MapScreen(
         }
     } ?: previewSkiArea
 
+    val scope = rememberCoroutineScope()
+
     val searchState by searchViewModel.searchState.collectAsStateWithLifecycle()
 
     val dangerCheckUiState by nveViewModel.dangerCheckUiState.collectAsState()
 
-    var isSheetOpen by rememberSaveable { mutableStateOf(false) }
-    val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
-
-    val scope = rememberCoroutineScope()
     //Controls whether the bottom sheet is visible or not by keeping track of if the user has clicked the map
     //if this is set to null then the ModalBottomSheet is not open
     var isSheetOpen by remember { mutableStateOf(false) }
 
     LaunchedEffect(screenState.climateState) {
-        if (screenState.climateState is ClimateState.Success) {
+        if (screenState.climateState is ClimateState.Success && !isSheetOpen) {
             isSheetOpen = true
         }
     }
@@ -183,13 +181,6 @@ fun MapScreen(
     var startDate by rememberSaveable { mutableStateOf<MonthDay?>(null) }
     var endDate by rememberSaveable { mutableStateOf<MonthDay?>(null) }
     var selectedYear by rememberSaveable { mutableStateOf<Int?>(null) }
-
-    // Animate map height fraction when sheet opens/closes
-    val mapHeightFraction by animateFloatAsState(
-        targetValue = if (isSheetOpen) 0.4f else 1f,
-        animationSpec = tween(durationMillis = 300),
-        label = "mapHeight"
-    )
 
 
     var showFavoriteDialog by remember { mutableStateOf(false) }
@@ -208,25 +199,94 @@ fun MapScreen(
         )
     }
 
-    Scaffold(
-        modifier = modifier,
-        bottomBar = { BottomBar(modifier, navController) }
-    ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight(mapHeightFraction)
-            ) {
+    val listState = rememberLazyListState()
+    val showScrollButton by remember {
+        derivedStateOf {
+            val layoutInfo = listState.layoutInfo
+            val lastItem = layoutInfo.visibleItemsInfo.lastOrNull()
+            if (lastItem == null || lastItem.index < layoutInfo.totalItemsCount - 1) {
+                true
+            } else {
+                lastItem.offset + lastItem.size > layoutInfo.viewportEndOffset
+            }
+        }
+    }
+
+    // required variables for the custom scroll system
+    val density = LocalDensity.current
+    val screenHeightDp = LocalConfiguration.current.screenHeightDp.dp
+    val halfScreenPx = with(density) { screenHeightDp.toPx() * 0.5f }
+
+    var mapHeightPx by remember { mutableFloatStateOf(with(density) { screenHeightDp.toPx() }) }
+    val mapHeightDp by remember { derivedStateOf { with(density) { mapHeightPx.toDp() } } }
+
+    // this is needed for the integrated "bottom sheet" to work so that it shrinks the map when scrolled up
+    val nestedScrollConnection = remember {
+        object : NestedScrollConnection {
+
+            // consume scroll to shrink the map (if it is not already at 0px)
+            override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+                if (!isSheetOpen) return Offset.Zero
+                if (available.y < 0 && mapHeightPx > 0f && mapHeightPx <= halfScreenPx) {
+                    val newHeight = (mapHeightPx + available.y).coerceAtLeast(0f)
+                    val consumed = newHeight - mapHeightPx
+                    mapHeightPx = newHeight
+                    return Offset(0f, consumed)
+                }
+                return Offset.Zero
+            }
+
+            // use remaining scroll
+            override fun onPostScroll(consumed: Offset, available: Offset, source: NestedScrollSource): Offset {
+                if (!isSheetOpen) return Offset.Zero
+                if (available.y > 0) {
+                    if (mapHeightPx < halfScreenPx) {
+                        val newHeight = (mapHeightPx + available.y).coerceAtMost(halfScreenPx)
+                        val consumedDelta = newHeight - mapHeightPx
+                        mapHeightPx = newHeight
+                        return Offset(0f, consumedDelta)
+                    } else if (mapHeightPx >= halfScreenPx) {
+                        val resistance = 0.3f
+                        val newHeight = (mapHeightPx + available.y * resistance)
+                            .coerceAtMost(with(density) { screenHeightDp.toPx() })
+                        val consumedDelta = newHeight - mapHeightPx
+                        mapHeightPx = newHeight
+                        return Offset(0f, consumedDelta)
+                    }
+                }
+                return Offset.Zero
+            }
+
+            // used for closing the sheet (with resistance)
+            override suspend fun onPostFling(consumed: Velocity, available: Velocity): Velocity {
+                if (!isSheetOpen) return Velocity.Zero
+                if (mapHeightPx > halfScreenPx) {
+                    // snap: close if dragged past threshold, otherwise snap back
+                    val threshold = halfScreenPx * 1.3f
+                    if (mapHeightPx > threshold || available.y > 500f) {
+                        isSheetOpen = false
+                        mapHeightPx = with(density) { screenHeightDp.toPx() }
+                    } else {
+                        mapHeightPx = halfScreenPx
+                    }
+                }
+                return Velocity.Zero
+            }
+        }
+    }
+
+    // simple box and column for bottom sheet
+    Box(modifier = Modifier.fillMaxSize().nestedScroll(nestedScrollConnection)) {
+        Column(modifier = Modifier.fillMaxSize()) {
+            Box(modifier = Modifier.fillMaxWidth().height(mapHeightDp)) {
                 MapboxView(
                     onMapClick = { point ->
                         onMapClick(point.latitude(), point.longitude())
                         nveViewModel.avalancheChecker(point.latitude(), point.longitude())
-                        isSheetOpen = true
+                        if (!isSheetOpen) {
+                            mapHeightPx = halfScreenPx
+                            isSheetOpen = true
+                        }
                     },
                     onOverlayError = onOverlayError,
                     onOverlayLoaded = onOverlayLoaded,
@@ -236,189 +296,71 @@ fun MapScreen(
                     onSearch = { searchViewModel.onSearch() },
                     onSelectResult = searchViewModel::addRecentSearch
                 )
-
                 when (screenState.overlayState) {
-                    is OverlayState.Loading -> {
-                        OverlayStatusCard(message = stringResource(R.string.overlay_loading))
-                    }
-                    is OverlayState.Error -> {
-                        OverlayRetryCard(
-                            message = stringResource(R.string.overlay_error),
-                            onRetry = onOverlayRetry
-                        )
-                    }
+                    is OverlayState.Loading -> OverlayStatusCard(message = stringResource(R.string.overlay_loading))
+                    is OverlayState.Error -> OverlayRetryCard(message = stringResource(R.string.overlay_error), onRetry = onOverlayRetry)
                     is OverlayState.Success -> Unit
                 }
-
-                when (screenState.climateState) {
-                    is ClimateState.Idle -> Unit
-
-                    is ClimateState.Loading -> {
-                        Log.d("ClimateData", "Loading...")
-                    }
-
-                    is ClimateState.Error -> {
-                        Log.d("ClimateData", "Error")
-                    }
-
-                    is ClimateState.Success -> {
-                        val success = screenState.climateState
-                        val climateData = success.data
-                        Log.d("ClimateData", climateData.toString())
-                    }
-                }
             }
-        }
-        // Modal bottom sheet — rendered outside Scaffold so it overlays everything
-        if (isSheetOpen) {
-            ModalBottomSheet(
-                onDismissRequest = {
-                    isSheetOpen = false
-                },
-                sheetState = bottomSheetState,
-                containerColor = MaterialTheme.colorScheme.surface,
-                tonalElevation = 0.dp,
-                modifier = Modifier.fillMaxHeight()
-            ) {
-                BottomSheetContent(
-                    area = skiArea,
-                    climateState = screenState.climateState,
-                    avalancheStatus = avalancheStatus,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .navigationBarsPadding()
-                        .padding(bottom = 12.dp),
-                    startDate = startDate,
-                    endDate = endDate,
-                    selectedYear = selectedYear,
-                    onStartDateChange = {
-                        startDate = it
-                        onPeriodStart(it)
-                    },
-                    onEndDateChange = {
-                        endDate = it
-                        onPeriodEnd(it)
-                    },
-                    onYearChange = { year ->
-                        selectedYear = year
-                        year?.let {
-                            val calculatedYearsBack = java.time.Year.now().value - it
-                            onYearsBack(calculatedYearsBack)
+
+            if (isSheetOpen) {
+                Box(
+                    modifier = Modifier.fillMaxWidth().weight(1f).navigationBarsPadding()
+                ) {
+                    BottomSheetContent(
+                        area = skiArea,
+                        climateState = screenState.climateState,
+                        dangerLevel = dangerCheckUiState.dangerLevel,
+                        modifier = Modifier.fillMaxSize(),
+                        startDate = startDate,
+                        endDate = endDate,
+                        selectedYear = selectedYear,
+                        onStartDateChange = { startDate = it; onPeriodStart(it) },
+                        onEndDateChange = { endDate = it; onPeriodEnd(it) },
+                        onYearChange = { year ->
+                            selectedYear = year; year?.let { onYearsBack(Year.now().value - it) }
+                        },
+                        onAddFavorite = {
+                            if (screenState.climateCoordinate != null) {
+                                showFavoriteDialog = true
+                                searchViewModel.addPendingFavorite(screenState.climateCoordinate)
+                            }
+                        },
+
+                        canAddFavorite = {
+                            val coordinate = screenState.climateCoordinate
+                            if (coordinate != null) {
+                                !searchState.favorites.any { it.coordinate == coordinate }
+                            } else {
+                                false
+                            }
+                        },
+                        listState = listState
+                    )
+                    if (showScrollButton) {
+                        Button(
+                            onClick = {
+                                scope.launch {
+                                    // hide map
+                                    mapHeightPx = 0f
+                                    val lastIndex = listState.layoutInfo.totalItemsCount - 1
+                                    val lastItemSize = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.size ?: 0
+                                    listState.animateScrollToItem(lastIndex, scrollOffset = lastItemSize)
+                                }
+                            },
+                            modifier = Modifier.align(Alignment.BottomCenter).padding(64.dp)
+                        ) {
+                            Icon(
+                                Icons.Default.KeyboardArrowDown,
+                                contentDescription = "Scroll down"
+                            )
                         }
                     }
-                )
+                }
             }
         }
+        BottomBar(modifier = Modifier.align(Alignment.BottomCenter), navController = navController)
     }
-
-    BottomSheetScaffold(
-        modifier = Modifier.zIndex(1f),
-        scaffoldState = scaffoldState,
-        sheetPeekHeight = 0.dp, //the sheet is originally hidden by default
-        sheetSwipeEnabled = true,
-        sheetContent = {
-            BottomSheetContent(
-                area = skiArea,
-                climateState = screenState.climateState,
-                avalancheStatus = avalancheStatus,
-                dangerLevel = dangerCheckUiState.dangerLevel,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .navigationBarsPadding()
-                    .padding(bottom = 12.dp),
-                startDate = startDate,
-                endDate = endDate,
-                selectedYear = selectedYear,
-                onStartDateChange = {
-                    startDate = it
-                    onPeriodStart(it)
-                },
-                onEndDateChange = {
-                    endDate = it
-                    onPeriodEnd(it)
-                },
-                onYearChange = { year ->
-                    selectedYear = year
-                    year?.let {
-                        val calculatedYearsBack = Year.now().value - it
-                        onYearsBack(calculatedYearsBack)
-                    }
-                },
-                onAddFavorite = {
-                    if (screenState.climateCoordinate != null) {
-                        showFavoriteDialog = true
-                        searchViewModel.addPendingFavorite(screenState.climateCoordinate)
-                    }
-                }
-            )
-        },
-
-        content = { innerPadding ->
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    //this is the reel animation - the map shrinks from full height to 40% when sheet opens
-                    .fillMaxHeight(1f - (0.6f * sheetProgress)) // shrinks touch area
-                    .zIndex(0f)
-            )
-             {
-                //Map added here
-                //onMapClick is passed to the Map
-                MapboxView(
-                    onMapClick = { point ->
-                        onMapClick(point.latitude(), point.longitude())
-                        nveViewModel.avalancheChecker(point.latitude(), point.longitude())
-                        scope.launch { scaffoldState.bottomSheetState.expand() }
-                    },
-                    onOverlayError = onOverlayError,
-                    onOverlayLoaded = onOverlayLoaded,
-                    modifier = Modifier
-                        .fillMaxSize(),
-                    coordinates = coordinates,
-                )
-
-
-                when (screenState.overlayState) {
-                    is OverlayState.Loading -> {
-                        OverlayStatusCard(
-                            message = stringResource(R.string.overlay_loading)
-                        )
-                    }
-
-                    is OverlayState.Error -> {
-                        OverlayRetryCard(
-                            message = stringResource(R.string.overlay_error),
-                            onRetry = onOverlayRetry
-                        )
-                    }
-
-                    is OverlayState.Success -> Unit
-                }
-
-                when (screenState.climateState) {
-                    is ClimateState.Idle -> Unit
-
-                    is ClimateState.Loading -> {
-                        Log.d("ClimateData", "Loading...")
-                    }
-
-                    is ClimateState.Error -> {
-                        Log.d("ClimateData", "Error")
-                    }
-
-                    is ClimateState.Success -> {
-                        val success = screenState.climateState
-                        val climateData = success.data
-                        Log.d("ClimateData", climateData.toString())
-                    }
-                }
-                 BottomBar(
-                     modifier = Modifier.align(Alignment.BottomCenter),
-                     navController = navController
-                 )
-            }
-        }
-    )
 }
 
 
@@ -426,7 +368,6 @@ fun MapScreen(
 fun BottomSheetContent(
     area: SkiArea,
     climateState: ClimateState,
-    avalancheStatus: String,
     dangerLevel: DangerLevelUiModel?,
     modifier: Modifier = Modifier,
     startDate: MonthDay?,
@@ -435,19 +376,10 @@ fun BottomSheetContent(
     onStartDateChange: (MonthDay?) -> Unit,
     onEndDateChange: (MonthDay?) -> Unit,
     onYearChange: (Int?) -> Unit,
-    onAddFavorite: () -> Unit
+    canAddFavorite: () -> Boolean,
+    onAddFavorite: () -> Unit,
+    listState: LazyListState
 ) {
-
-    /*
-    val climateRows = listOf(
-        "Avalanche status" to avalancheStatus,
-    )
-    */
-
-    val climateRows = emptyList<Pair<String, String>>()
-
-
-
     // This is the content inside the bottom sheet.
     Surface(
         modifier = modifier.fillMaxWidth(),
@@ -458,7 +390,8 @@ fun BottomSheetContent(
                 .fillMaxWidth()
                 .nestedScroll(rememberNestedScrollInteropConnection())
                 .padding(horizontal = 20.dp, vertical = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+            state = listState
         ) {
 
             item {
@@ -501,7 +434,8 @@ fun BottomSheetContent(
                                     modifier = Modifier,
                                     onClick = {
                                         onAddFavorite()
-                                    }
+                                    },
+                                    enabled = canAddFavorite()
 
                                 ) {
                                     Icon(
@@ -551,13 +485,6 @@ fun BottomSheetContent(
                 HorizontalDivider()
             }
 
-            items(climateRows) { row ->
-                ClimateRow(
-                    label = row.first,
-                    value = row.second)
-            }
-
-            //THIS IS WHERE WE CAN PUT THE GRAPH COMPONENTS
             item {
                 val currentYear = Year.now().value
 
@@ -663,7 +590,6 @@ fun BottomSheetPreview() {
     BottomSheetContent(
         area = previewSkiArea,
         climateState = ClimateState.Idle,
-        avalancheStatus = "High",
         dangerLevel = DangerLevel.HIGH.toUiModel(),
         startDate = null,
         endDate = null,
@@ -671,6 +597,8 @@ fun BottomSheetPreview() {
         onStartDateChange = { },
         onEndDateChange = { },
         onYearChange = { },
-        onAddFavorite = { }
+        onAddFavorite = { },
+        listState = rememberLazyListState(),
+        canAddFavorite = { false }
     )
 }
