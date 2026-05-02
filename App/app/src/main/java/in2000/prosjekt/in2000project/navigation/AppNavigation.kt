@@ -48,7 +48,11 @@ fun AppNavigation(){
                 navController = navController
             ) {
                 composable(Screen.Home.route) {
-                    HomeScreen(navController = navController, searchViewModel = searchViewModel)
+                    HomeScreen(
+                        onSettingsClick = { navController.navigate(Screen.Settings.route) },
+                        navController = navController,
+                        searchViewModel = searchViewModel
+                    )
                 }
 
                 composable(
@@ -68,7 +72,7 @@ fun AppNavigation(){
                 }
 
                 composable(Screen.Info.route) {
-                    InfoScreen(navController = navController)
+                    InfoScreen(onSettingsClick = { navController.navigate(Screen.Settings.route) })
                 }
 
                 composable(Screen.Settings.route) {

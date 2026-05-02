@@ -61,6 +61,7 @@
     @Composable
     fun HomeScreen(
         modifier: Modifier = Modifier,
+        onSettingsClick: () -> Unit,
         navController: NavController,
         searchViewModel: SearchViewModel = koinViewModel()
     ) {
@@ -71,7 +72,8 @@
             modifier = modifier,
             topBar = { TopBar(
                 title = stringResource(R.string.app_name),
-                navController = navController) },
+                onSettingsClick = onSettingsClick
+            ) },
         ) { paddingValues ->
             Column(
                 modifier = Modifier
@@ -232,5 +234,8 @@
     @Composable
     fun HomeScreenPreview(
     ) {
-        HomeScreen(navController = rememberNavController())
+        HomeScreen(
+            navController = rememberNavController(),
+            onSettingsClick = {}
+        )
     }
