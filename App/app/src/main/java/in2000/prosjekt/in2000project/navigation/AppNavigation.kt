@@ -1,7 +1,10 @@
 package in2000.prosjekt.in2000project.navigation
 
 import android.util.Log
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -12,6 +15,7 @@ import in2000.prosjekt.in2000project.ui.home.HomeScreen
 import in2000.prosjekt.in2000project.ui.information.InfoScreen
 import in2000.prosjekt.in2000project.ui.map.MapRoute
 import in2000.prosjekt.in2000project.ui.map.MapScreenState
+import in2000.prosjekt.in2000project.ui.reusables.BottomBar
 import in2000.prosjekt.in2000project.ui.search.SearchViewModel
 import in2000.prosjekt.in2000project.ui.settings.SettingScreen
 import in2000.prosjekt.in2000project.ui.settings.SettingsViewModel
@@ -35,37 +39,45 @@ fun AppNavigation(){
         themeMode = themeMode,
         textScale = textScale
     ) {
-        NavHost(
-            startDestination = Screen.Home.route,
-            navController = navController,
-
+        Scaffold(
+            bottomBar = { BottomBar(navController = navController) }
+        ) { innerPadding ->
+            NavHost(
+                modifier = Modifier.padding(innerPadding),
+                startDestination = Screen.Home.route,
+                navController = navController
             ) {
-            composable(Screen.Home.route) {
-                HomeScreen(navController = navController, searchViewModel = searchViewModel)
-            }
-            composable(
-                route = Screen.Map.route,
-                arguments = listOf(
-                    navArgument("coordinates") {
-                        type = NavType.StringType
-                    }
-                )
-            ) { backStackEntry ->
-                val coordinates = backStackEntry.arguments?.getString("coordinates")!!
-                Log.d("fuckedupmap",coordinates)
-                MapRoute(
-                    navController = navController,
-                    coordinates = coordinates,
-                    searchViewModel = searchViewModel)
-            }
-            composable(Screen.Info.route) {
-                InfoScreen(navController = navController)
-            }
-            composable(Screen.Settings.route){
-                SettingScreen(
-                    navController = navController,
-                    settingsViewModel = settingsViewModel
-                )
+                composable(Screen.Home.route) {
+                    HomeScreen(navController = navController, searchViewModel = searchViewModel)
+                }
+
+                composable(
+                    route = Screen.Map.route,
+                    arguments = listOf(
+                        navArgument("coordinates") {
+                            type = NavType.StringType
+                        }
+                    )
+                ) { backStackEntry ->
+                    val coordinates = backStackEntry.arguments?.getString("coordinates")!!
+                    Log.d("fuckedupmap", coordinates)
+                    MapRoute(
+                        navController = navController,
+                        coordinates = coordinates,
+                        searchViewModel = searchViewModel
+                    )
+                }
+
+                composable(Screen.Info.route) {
+                    InfoScreen(navController = navController)
+                }
+
+                composable(Screen.Settings.route) {
+                    SettingScreen(
+                        navController = navController,
+                        settingsViewModel = settingsViewModel
+                    )
+                }
             }
         }
     }
