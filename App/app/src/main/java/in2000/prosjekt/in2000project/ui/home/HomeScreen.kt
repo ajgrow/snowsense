@@ -69,12 +69,9 @@
 
         Scaffold(
             modifier = modifier,
-            topBar = {
-                TopBar(
-                    title = stringResource(R.string.app_name),
-                    navController = navController)
-                     },
-            bottomBar = { BottomBar(modifier, navController) }
+            topBar = { TopBar(
+                title = stringResource(R.string.app_name),
+                navController = navController) },
         ) { paddingValues ->
             Column(
                 modifier = Modifier
