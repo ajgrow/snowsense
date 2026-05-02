@@ -30,7 +30,7 @@ class SearchBarTest {
         val repository = LocationRepository()
 
         runBlocking {
-            val result = repository.getNames("https://api.kartverket.no/stedsnavn/v1/navn?sok=blindern&fuzzy=false&utkoordsys=4258&treffPerSide=10&side=1&filtrer=navn.representasjonspunkt%2Cnavn.skrivem%C3%A5te")
+            val result = repository.getNamedLocations("https://api.kartverket.no/stedsnavn/v1/navn?sok=blindern&fuzzy=false&utkoordsys=4258&treffPerSide=10&side=1&filtrer=navn.representasjonspunkt%2Cnavn.skrivem%C3%A5te")
             assertTrue(result.isNotEmpty())
         }
     }

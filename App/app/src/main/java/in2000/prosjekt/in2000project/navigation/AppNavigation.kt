@@ -12,9 +12,11 @@ import in2000.prosjekt.in2000project.ui.home.HomeScreen
 import in2000.prosjekt.in2000project.ui.information.InfoScreen
 import in2000.prosjekt.in2000project.ui.map.MapRoute
 import in2000.prosjekt.in2000project.ui.map.MapScreenState
+import in2000.prosjekt.in2000project.ui.search.SearchViewModel
 import in2000.prosjekt.in2000project.ui.settings.SettingScreen
 import in2000.prosjekt.in2000project.ui.settings.SettingsViewModel
 import in2000.prosjekt.in2000project.ui.theme.In2000projectTheme
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun AppNavigation(){
@@ -22,14 +24,16 @@ fun AppNavigation(){
 
     val settingsViewModel: SettingsViewModel = viewModel()
 
+    val searchViewModel: SearchViewModel = koinViewModel()
+
     val themeMode = settingsViewModel.themeMode
 
-    val textSizeMode = settingsViewModel.textSizeMode
+    val textScale = settingsViewModel.textScale
 
 
     In2000projectTheme(
         themeMode = themeMode,
-        textSizeMode = textSizeMode
+        textScale = textScale
     ) {
         NavHost(
             startDestination = Screen.Home.route,
@@ -37,7 +41,7 @@ fun AppNavigation(){
 
             ) {
             composable(Screen.Home.route) {
-                HomeScreen(navController = navController)
+                HomeScreen(navController = navController, searchViewModel = searchViewModel)
             }
             composable(
                 route = Screen.Map.route,
@@ -51,7 +55,8 @@ fun AppNavigation(){
                 Log.d("fuckedupmap",coordinates)
                 MapRoute(
                     navController = navController,
-                    coordinates = coordinates)
+                    coordinates = coordinates,
+                    searchViewModel = searchViewModel)
             }
             composable(Screen.Info.route) {
                 InfoScreen(navController = navController)

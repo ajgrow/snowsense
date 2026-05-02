@@ -11,74 +11,27 @@
 
     <string name="about_app_title">Om appen</string>
     <string name="team_title">Teamet</string>
-    <string name="about_team_text">
-Vi er en gruppe engasjerte og kreative IN2000-studenter som jobber sammen for å lage en informativ og brukervennlig skredvarsling-app. Målet vårt har vært å lage et pålitelig verktøy som hjelper brukere å ta tryggere beslutninger når de ferdes i områder med potensiell skredfare. Denne siden gir generell informasjon om skredfaregrader og hva de betyr. Gå tilbake til hjemskjermen eller kartet for hovedfunksjonene.
-    </string>
+    <string name="about_team_text">Vi er en gruppe engasjerte og kreative IN2000-studenter som jobber sammen for å lage en informativ og brukervennlig skredvarsling-app. Målet vårt har vært å lage et pålitelig verktøy som hjelper brukere å ta tryggere beslutninger når de ferdes i områder med potensiell skredfare. Denne siden gir generell informasjon om skredfaregrader og hva de betyr. Gå tilbake til hjemskjermen eller kartet for hovedfunksjonene.</string>
 
     <string name="avalanche_info_title">Skredinformasjon</string>
-    <string name="avalanche_general_info_text">
-Skred har blitt stadig mer vanlig etter hvert som klimaendringer påvirker fjellområder. Når du er ute og utforsker naturen, er det viktig å holde seg informert og prioritere sikkerhet. Derfor laget vi denne appen: for å hjelpe deg å ta tryggere valg og nyte tiden utendørs.
-    </string>
+    <string name="avalanche_general_info_text">Skred har blitt stadig mer vanlig etter hvert som klimaendringer påvirker fjellområder. Når du er ute og utforsker naturen, er det viktig å holde seg informert og prioritere sikkerhet. Derfor laget vi denne appen: for å hjelpe deg å ta tryggere valg og nyte tiden utendørs.</string>
 
     <string name="danger_levels_title">Skredfaregrader</string>
 
     <string name="danger_level_1_title">1 - Lav</string>
-    <string name="danger_level_1_description">
-Generelt stabile forhold.\n\n
-
-Utløsning er vanligvis kun mulig ved stor tilleggsbelastning i isolerte områder med svært bratt terreng. Kun små og middels store naturlige skred er mulig.\n\n
-
-Typiske faresignaler:\n
-sjelden noen faresignaler.\n\n
-
-Varslet rundt 20% av vintersesongen. Rundt 5% av skredulykker.
-    </string>
+    <string name="danger_level_1_description">Generelt stabile forhold.\n\nUtløsning er vanligvis kun mulig ved stor tilleggsbelastning i isolerte områder med svært bratt terreng. Kun små og middels store naturlige skred er mulig.\n\nTypiske faresignaler:\nSjelden noen faresignaler.\n\nVarslet rundt 20% av vintersesongen. Rundt 5% av skredulykker.</string>
 
     <string name="danger_level_2_title">2 - Moderat</string>
-    <string name="danger_level_2_description">
-Økte skredforhold i enkelte terrengformasjoner.\n\n
-
-Utløsning er mulig, hovedsakelig ved stor tilleggsbelastning, spesielt i bratte heng som er angitt. Svært store naturlige skred er lite sannsynlig.\n\n
-
-Typiske faresignaler:\n
-ofte ingen faresignaler, men det betyr ikke nødvendigvis at det er trygt. Vær ekstra oppmerksom dersom vedvarende svakt lag er et av skredproblemene.\n\n
-
-Varslet rundt 50% av vintersesongen. Rundt 30% av skredulykker.
-    </string>
+    <string name="danger_level_2_description">Økte skredforhold i enkelte terrengformasjoner.\n\nUtløsning er mulig, hovedsakelig ved stor tilleggsbelastning, spesielt i bratte heng som er angitt. Svært store naturlige skred er lite sannsynlig.\n\nTypiske faresignaler:\nOfte ingen faresignaler, men det betyr ikke nødvendigvis at det er trygt. Vær ekstra oppmerksom dersom vedvarende svakt lag er et av skredproblemene.\n\nVarslet rundt 50% av vintersesongen. Rundt 30% av skredulykker.</string>
 
     <string name="danger_level_3_title">3 - Betydelig</string>
-    <string name="danger_level_3_description">
-Farlige skredforhold.\n\n
-
-Utløsning er mulig, selv ved liten tilleggsbelastning, spesielt i bratte heng som er angitt. I enkelte situasjoner kan noen store, og i isolerte tilfeller svært store naturlige skred forekomme.\n\n
-
-Typiske faresignaler:\n
-fersk skredaktivitet, sprekker og \'drønn\' i snøen. Fjernutløsning er typisk, spesielt dersom vedvarende svakt lag er et av skredproblemene.\n\n
-
-Varslet rundt 30% av vintersesongen. Rundt 50% av skredulykker.
-    </string>
+    <string name="danger_level_3_description">Farlige skredforhold.\n\nUtløsning er mulig, selv ved liten tilleggsbelastning, spesielt i bratte heng som er angitt. I enkelte situasjoner kan noen store, og i isolerte tilfeller svært store naturlige skred forekomme.\n\nTypiske faresignaler:\nFersk skredaktivitet, sprekker og \'drønn\' i snøen. Fjernutløsning er typisk, spesielt dersom vedvarende svakt lag er et av skredproblemene.\n\nVarslet rundt 30% av vintersesongen. Rundt 50% av skredulykker.</string>
 
     <string name="danger_level_4_title">4 - Høy</string>
-    <string name="danger_level_4_description">
-Svært farlige skredforhold.\n\n
-
-Utløsning er sannsynlig, selv ved liten tilleggsbelastning, i mange bratte heng. I noen tilfeller kan mange store og ofte svært store naturlige skred forventes.\n\n
-
-Typiske faresignaler:\n
-utbredt fersk skredaktivitet, sprekker og \'drønn\' i snøen.\n
-Fjernutløsning er typisk.\n\n
-
-Varsles kun noen få dager i løpet av vinteren. Rundt 10% av skredulykker.
-    </string>
+    <string name="danger_level_4_description">Svært farlige skredforhold.\n\nUtløsning er sannsynlig, selv ved liten tilleggsbelastning, i mange bratte heng. I noen tilfeller kan mange store og ofte svært store naturlige skred forventes.\n\nTypiske faresignaler:\nUtbredt fersk skredaktivitet, sprekker og \'drønn\' i snøen. Fjernutløsning er typisk.\n\nVarsles kun noen få dager i løpet av vinteren. Rundt 10% av skredulykker.</string>
 
     <string name="danger_level_5_title">5 - Svært høy</string>
-    <string name="danger_level_5_description">
-Ekstreme skredforhold.\n\n
-
-Mange svært store og ofte ekstremt store naturlige skred kan forventes, selv i moderat bratt terreng.\n\n
-
-Svært sjelden varslet.
-    </string>
+    <string name="danger_level_5_description">Ekstreme skredforhold.\n\nMange svært store og ofte ekstremt store naturlige skred kan forventes, selv i moderat bratt terreng.\n\nSvært sjelden varslet.</string>
 
     <string name="date_description">Velg en datoperiode og år siden for å se historiske klimadata for temperatur, vind og nedbør.</string>
 
@@ -124,12 +77,13 @@ Svært sjelden varslet.
     <string name="since_year">Siden år</string>
 
     <string name="dialog_ok">OK</string>
+    <string name="dialog_save">Lagre</string>
     <string name="dialog_cancel">Avbryt</string>
 
     <string name="previous_month">Forrige måned</string>
     <string name="next_month">Neste måned</string>
 
-
+    <string name="name_favorite_prompt">Navngi denne favoritten</string>
 
     <string name="settings_title">Innstillinger</string>
 
@@ -147,6 +101,11 @@ Svært sjelden varslet.
     <string name="text_medium">Middels</string>
     <string name="text_large">Stor</string>
 
+    <string name="reset_default">tilbakestille til standard</string>
+    <string name="text_size_label">Tekst størrelse: %1$d%%</string>
+
+    <string name="language_system">Bruk enhetsinnstilling</string>
+    
     <string name="hide_info">Skjul info ▲</string>
     <string name="show_info">Vis info ▼</string>
     <string name="emergency_title">Nødnummer</string>
@@ -162,5 +121,6 @@ Svært sjelden varslet.
     <string name="no_date_selected_msg">Velg et datointervall for å vise historiske trender for perioden.</string>
 
     <string name="no_graph_data">Ingen data å vise.</string>
+    <string name="not_checked">Ikke sjekket</string>
 
 </resources>
