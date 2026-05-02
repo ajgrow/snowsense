@@ -57,9 +57,6 @@ fun InfoScreen(
                 modifier = Modifier,
                 navController = navController)
         },
-        bottomBar = {
-            BottomBar(modifier, navController)
-        }
     ) { paddingValues ->
 
         LazyColumn(
