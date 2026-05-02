@@ -78,7 +78,6 @@ private val previewSkiArea = SkiArea(
 //for use when the VM is ready
 @Composable
 fun MapRoute(
-    navController: NavController,
     coordinates: String,
     searchViewModel: SearchViewModel,
     mapViewModel: MapViewModel = koinViewModel(),
@@ -94,7 +93,6 @@ fun MapRoute(
 
 
     MapScreen(
-        navController = navController,
         screenState = screenState,
         nveViewModel = nveViewModel,
         onMapClick = { lat, lon ->
@@ -122,7 +120,6 @@ fun MapRoute(
 @Composable
 fun MapScreen(
     modifier: Modifier = Modifier,
-    navController: NavController,
     screenState: MapScreenState,
     nveViewModel: NveViewModel,
     onMapClick: (Double, Double) -> Unit,
@@ -192,14 +189,6 @@ fun MapScreen(
 
     Scaffold(
         modifier = modifier,
-        topBar = {
-            TopBar(
-                modifier = Modifier,
-                navController = navController)
-        },
-        bottomBar = {
-            BottomBar(modifier, navController)
-        }
     ) { paddingValues ->
 
         //Main screen content
@@ -530,7 +519,6 @@ fun ClimateRow(
 @Composable
 fun MapScreenErrorPreview() {
     MapScreen(
-        navController = rememberNavController(),
         screenState = MapScreenState(
             overlayState = OverlayState.Error,
             climateState = ClimateState.Idle,

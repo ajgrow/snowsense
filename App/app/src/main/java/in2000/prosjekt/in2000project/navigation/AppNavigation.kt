@@ -62,7 +62,6 @@ fun AppNavigation(){
                     val coordinates = backStackEntry.arguments?.getString("coordinates")!!
                     Log.d("fuckedupmap", coordinates)
                     MapRoute(
-                        navController = navController,
                         coordinates = coordinates,
                         searchViewModel = searchViewModel
                     )
