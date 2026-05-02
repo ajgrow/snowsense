@@ -28,7 +28,7 @@ class MapViewModel(
         val now = MonthDay.now()
         val currentYear = Year.now().value
         _screenState.value = _screenState.value.copy(
-            startDate = now.with(now.month.plus(1)),
+            startDate = now.with(now.month.minus(1)),
             endDate = now,
             currentYear = currentYear,
             selectedYear = currentYear - 3
