@@ -21,9 +21,7 @@ import in2000.prosjekt.in2000project.navigation.Screen
 fun BottomBar(
     modifier: Modifier = Modifier,
     currentRoute: String?,
-    onHomeClick: () -> Unit,
-    onMapClick: () -> Unit,
-    onInfoClick: () -> Unit
+    onClick: (String) -> Unit,
 ) {
     NavigationBar(
         modifier = modifier.height(64.dp),
@@ -31,7 +29,7 @@ fun BottomBar(
     ) {
         NavigationBarItem(
             selected = currentRoute == Screen.Home.route,
-            onClick = onHomeClick,
+            onClick = { onClick(Screen.Home.route) } ,
             icon = { Icon(
                 imageVector = Icons.Default.Home,
                 contentDescription = stringResource(R.string.nav_home_desc),
@@ -39,7 +37,7 @@ fun BottomBar(
         )
         NavigationBarItem(
             selected = currentRoute == Screen.Map.route,
-            onClick = onMapClick,
+            onClick = { onClick(Screen.Map.route) },
             icon = { Icon(
                 imageVector = Icons.Default.Place,
                 contentDescription = stringResource(R.string.nav_map_desc),
@@ -47,7 +45,7 @@ fun BottomBar(
         )
         NavigationBarItem(
             selected = currentRoute == Screen.Info.route,
-            onClick = onInfoClick,
+            onClick = { onClick(Screen.Info.route) },
             icon = { Icon(
                 imageVector = Icons.Default.Info,
                 contentDescription = stringResource(R.string.nav_info_desc),
@@ -64,8 +62,6 @@ fun BottomBarPreview(
     BottomBar(
         modifier,
         currentRoute = Screen.Home.route,
-        onHomeClick = {},
-        onMapClick = {},
-        onInfoClick = {}
+        onClick = {}
     )
 }

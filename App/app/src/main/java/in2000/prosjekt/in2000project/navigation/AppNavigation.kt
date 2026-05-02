@@ -42,15 +42,7 @@ fun AppNavigation(){
         Scaffold(
             bottomBar = { BottomBar(
                 currentRoute = currentRoute,
-                onHomeClick = {navigationActions
-                    .navigateToTab(Screen
-                        .Home.route)},
-                onMapClick = {navigationActions
-                    .navigateToTab(Screen
-                        .Map.route)},
-                onInfoClick = {navigationActions
-                    .navigateToTab(Screen
-                        .Info.route)}
+                onClick = navigationActions::navigateToTab
             ) }
         ) { innerPadding ->
             NavHost(
