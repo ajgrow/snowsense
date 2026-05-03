@@ -54,6 +54,7 @@ import in2000.prosjekt.in2000project.ui.reusables.SearchSection
 import in2000.prosjekt.in2000project.ui.search.SearchUiState
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.style.TextAlign
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mapbox.maps.MapboxMap
 import in2000.prosjekt.in2000project.ui.search.SearchViewModel
 
@@ -116,23 +117,82 @@ fun MapboxView(
     ) {
         MapEffect(Unit) { mapView ->
 
-            val mapBoxMap = mapView.mapboxMap
+            mapView.mapboxMap.setBounds()
 
-            val bounds = CoordinateBounds(
-                Point.fromLngLat(3.0, 54.0),
-                Point.fromLngLat(33.0, 73.0)
-            )
-
-            mapBoxMap.setBounds(
-                CameraBoundsOptions.Builder()
-                    .bounds(bounds)
-                    .minZoom(3.5)
-                    .maxZoom(18.0)
-                    .build()
-            )
+            mapView.mapboxMap.loadStyle(
+                Style.OUTDOORS,
+                Style::addNveAvalancheRiskLayers)
         }
     }
 }
+
+private fun Style.addNveAvalancheRiskLayers() {
+    Log.d(TAG, "Style loaded, adding WMS sources")
+
+    // Low zoom data
+    addSource(
+        rasterSource(
+            "snoskred-overview-source"
+        ) {
+            tiles(listOf(WMS_OVERVIEW))
+            tileSize(256)
+            minzoom(6)
+            maxzoom(12)
+            attribution("© NVE")
+        }
+    )
+    addLayer(
+        rasterLayer(
+            "snoskred-overview-layer",
+            "snoskred-overview-source"
+        ) {
+            rasterOpacity(0.5)
+            minZoom(8.0)
+            maxZoom(12.0)
+            rasterFadeDuration(400.0)
+        }
+    )
+
+    // High zoom data
+    addSource(
+        rasterSource(
+            "snoskred-detail-source"
+        ) {
+            tiles(listOf(WMS_DETAIL))
+            tileSize(256)
+            minzoom(11)
+            maxzoom(24)
+            attribution("© NVE")
+        }
+    )
+    addLayer(
+        rasterLayer(
+            "snoskred-detail-layer",
+            "snoskred-detail-source"
+        ) {
+            rasterOpacity(0.7)
+            minZoom(12.0)
+            rasterHueRotate(160.0)
+            rasterFadeDuration(200.0)
+        }
+    )
+}
+
+private fun MapboxMap.setBounds() {
+    val bounds = CoordinateBounds(
+        Point.fromLngLat(3.0, 54.0),
+        Point.fromLngLat(33.0, 73.0)
+    )
+
+    setBounds(
+        CameraBoundsOptions.Builder()
+            .bounds(bounds)
+            .minZoom(3.5)
+            .maxZoom(18.0)
+            .build()
+    )
+}
+
 
 @Composable
 fun MapboxView2(
@@ -260,70 +320,12 @@ fun MapboxView2(
                         onOverlayError()
                     }
 
-                    mapView.mapboxMap.loadStyle(Style.OUTDOORS) { style ->
-                        onOverlayLoaded()
-                        Log.d(TAG, "Style loaded, adding WMS sources")
-
-                        // Low zoom data
-                        style.addSource(
-                            rasterSource("snoskred-overview-source") {
-                                tiles(listOf(WMS_OVERVIEW))
-                                tileSize(256)
-                                minzoom(4)
-                                maxzoom(12)
-                                attribution("© NVE")
-                            }
-                        )
-                        style.addLayer(
-                            rasterLayer("snoskred-overview-layer", "snoskred-overview-source") {
-                                rasterOpacity(0.5)
-                                maxZoom(11.5)
-                            }
-                        )
-
-                        // High zoom data
-                        style.addSource(
-                            rasterSource("snoskred-detail-source") {
-                                tiles(listOf(WMS_DETAIL))
-                                tileSize(256)
-                                minzoom(8)
-                                maxzoom(18)
-                                attribution("© NVE")
-                            }
-                        )
-                        style.addLayer(
-                            rasterLayer("snoskred-detail-layer", "snoskred-detail-source") {
-                                rasterOpacity(0.9)
-                                minZoom(8.0)
-                                rasterHueRotate(160.0)
-                            }
-                        )
-                    }
-
 
                     idleSubscription = mapView.mapboxMap.subscribeMapIdle {
                         viewportState.cameraState?.toCameraOptions()?.let {
                             MapCameraRepository.updateCameraOptions(it)
                         }
                     }
-
-                    val mapBoxMap = mapView.mapboxMap
-
-                    val bounds = CoordinateBounds(
-                        Point.fromLngLat(2.5, 55.9),
-                        Point.fromLngLat(31.5, 71.5)
-                    )
-
-                    mapBoxMap.setBounds(
-                        CameraBoundsOptions.Builder()
-                            .bounds(bounds)
-                            .minZoom(3.5)
-                            .maxZoom(18.0)
-                            .build()
-                    )
-
-
-
 
                     if (hasSearch && searchLat != null && searchLng != null){
                         val searchPoint = Point.fromLngLat(searchLng, searchLat)
