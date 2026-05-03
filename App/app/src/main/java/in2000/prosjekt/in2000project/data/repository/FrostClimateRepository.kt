@@ -41,10 +41,18 @@ class FrostClimateRepository(
             }
 
         val obsResponse = frostV0DataSource.getObservations(
-            station.id,
+            station.id ?: "",
             elementsCsv,
             referenceTime,
         )
+
+        if (obsResponse == null) {
+            throw NoObservationsException(
+                station.name ?: "",
+                elementsCsv,
+                referenceTime
+            )
+        }
 
         val observationCount = obsResponse.data
             .fold(0) { acc, obs ->
@@ -53,7 +61,7 @@ class FrostClimateRepository(
 
         if (observationCount == 0)
             throw NoObservationsException(
-                station.name,
+                station.name ?: "",
                 elementsCsv,
                 referenceTime
             )
