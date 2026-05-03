@@ -9,31 +9,35 @@ import io.ktor.client.call.body
 import io.ktor.client.request.basicAuth
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter
+import io.ktor.http.isSuccess
 
 class KtorFrostV0DataSource(
     private val client: HttpClient,
 ): FrostV0DataSource {
     override suspend fun getNearestSource(
         coordinate: Coordinate
-    ): FrostV0Source?
-    = client.get("https://frost.met.no/sources/v0.jsonld") {
-            parameter("geometry",
-                "nearest(POINT(${coordinate.longitude} ${coordinate.latitude}))")
-            parameter("nearestmaxcount",
-                "1")
-        }.body<FrostV0SourceResponse>()
-        .data
-        .firstOrNull()
+    ): FrostV0Source? {
+        val response = client.get("https://frost.met.no/sources/v0.jsonld") {
+            parameter("geometry", "nearest(POINT(${coordinate.longitude} ${coordinate.latitude}))")
+            parameter("nearestmaxcount", "1")
+        }
+        // handle error responses which were crashing the app
+        if (!response.status.isSuccess()) return null
+        return response.body<FrostV0SourceResponse>().data.firstOrNull()
+    }
 
     override suspend fun getObservations(
         sourceId: String,
         elementsCsv: String,
         referenceTime: String
-    ): FrostV0ObservationResponse
-    = client.get("https://frost.met.no/observations/v0.jsonld") {
+    ): FrostV0ObservationResponse? {
+        val response = client.get("https://frost.met.no/observations/v0.jsonld") {
             parameter("sources", sourceId)
             parameter("elements", elementsCsv)
             parameter("referencetime", referenceTime)
             parameter("timeoffsets", "default")
-        }.body()
+        }
+        if (!response.status.isSuccess()) return null
+        return response.body()
+    }
 }

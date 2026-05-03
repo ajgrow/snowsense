@@ -11,6 +11,8 @@ val PurpleGrey40 = Color(0xFF625b71)
 val Pink40 = Color(0xFF7D5260)
 
 // Light Mode Danger Colors
+
+val DangerColorLevel0 = Color(0xFF969696)
 val DangerColorLevel1 = Color(0xFF7ECC5C)
 val DangerColorLevel2 = Color(0xFFC8D43A)
 val DangerColorLevel3 = Color(0xFFF5BC3A)
@@ -18,6 +20,7 @@ val DangerColorLevel4 = Color(0xFFF07830)
 val DangerColorLevel5 = Color(0xFFE03535)
 
 // Dark Mode Danger Colors
+val DangerColorLevel0Dark = Color(0xFF6B6B6B)
 val DangerColorLevel1Dark = Color(0xFF2E6B1A)
 val DangerColorLevel2Dark = Color(0xFF6B7010)
 val DangerColorLevel3Dark = Color(0xFF8B5800)

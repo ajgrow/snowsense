@@ -18,6 +18,10 @@
 
     <string name="danger_levels_title">Skredfaregrader</string>
 
+    <string name="danger_level_0_number"></string>
+    <string name="danger_level_0_title">Ukjent</string>
+    <string name="danger_level_0_description">Vi har ikke tilstrekkelige målinger for det valgte området.</string>
+
     <string name="danger_level_1_number">1</string>
     <string name="danger_level_1_title">- Lav</string>
     <string name="danger_level_1_description">Generelt stabile forhold.\n\nUtløsning er vanligvis kun mulig ved stor tilleggsbelastning i isolerte områder med svært bratt terreng. Kun små og middels store naturlige skred er mulig.\n\nTypiske faresignaler:\nSjelden noen faresignaler.\n\nVarslet rundt 20% av vintersesongen. Rundt 5% av skredulykker.</string>
@@ -38,6 +42,7 @@
     <string name="danger_level_5_title">- Svært høy</string>
     <string name="danger_level_5_description">Ekstreme skredforhold.\n\nMange svært store og ofte ekstremt store naturlige skred kan forventes, selv i moderat bratt terreng.\n\nSvært sjelden varslet.</string>
 
+    <string name="danger_level_0_badge">UKJENT</string>
     <string name="danger_level_1_badge">LEVEL 1</string>
     <string name="danger_level_2_badge">LEVEL 2</string>
     <string name="danger_level_3_badge">LEVEL 3</string>
