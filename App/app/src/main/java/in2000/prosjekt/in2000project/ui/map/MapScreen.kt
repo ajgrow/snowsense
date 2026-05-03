@@ -306,16 +306,7 @@ fun BottomSheetContent(
     onAddFavorite: () -> Unit
 ) {
 
-    /*
-    val climateRows = listOf(
-        "Avalanche status" to avalancheStatus,
-    )
-    */
-
-    val climateRows = emptyList<Pair<String, String>>()
-
-
-        LazyColumn(
+    LazyColumn(
         modifier = modifier
                 .fillMaxWidth()
                 .padding(horizontal = 20.dp, vertical = 8.dp),
@@ -370,11 +361,9 @@ fun BottomSheetContent(
                                 )
                             }
                         }
+                        DangerLevelCard(uiModel = dangerLevel)
                     }
                 }
-
-                DangerLevelCard(uiModel =  dangerLevel)
-
             }
         }
 
