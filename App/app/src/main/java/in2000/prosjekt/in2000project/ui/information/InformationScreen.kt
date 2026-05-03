@@ -41,12 +41,13 @@ import in2000.prosjekt.in2000project.navigation.Screen
 import in2000.prosjekt.in2000project.ui.model.DangerLevelUiModel
 import in2000.prosjekt.in2000project.ui.model.toUiModel
 import in2000.prosjekt.in2000project.ui.reusables.TopBar
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun InfoScreen(
     modifier: Modifier = Modifier,
     onSettingsClick: () -> Unit = {},
-    infoViewModel: InfoViewModel = viewModel()
+    infoViewModel: InfoViewModel = koinViewModel()
 ) {
     val uiState by infoViewModel.infoUiState.collectAsState()
 

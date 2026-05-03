@@ -5,10 +5,15 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.DockedSearchBar
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
@@ -48,6 +53,7 @@ fun SearchSection(
 
     //We should add some rules to the searchSection, like restrictions on type of input and input length
     DockedSearchBar(
+        shape = RoundedCornerShape(20.dp),
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp)
@@ -58,6 +64,18 @@ fun SearchSection(
             },
         inputField = {
             SearchBarDefaults.InputField(
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.Menu,
+                        contentDescription = null
+                    )
+                },
+                trailingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.Search,
+                        contentDescription = null
+                    )
+                },
                 query = textFieldState.text.toString(),
                 onQueryChange = {
                     textFieldState.edit { replace(0, length, it) }

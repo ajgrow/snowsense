@@ -38,7 +38,7 @@ fun AppNavigation(){
 
     val navigationActions = NavigationActions(navController)
 
-    val settingsViewModel: SettingsViewModel = viewModel()
+    val settingsViewModel: SettingsViewModel = koinViewModel()
 
     val searchViewModel: SearchViewModel = koinViewModel()
 
