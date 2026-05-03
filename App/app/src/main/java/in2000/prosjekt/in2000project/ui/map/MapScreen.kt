@@ -140,7 +140,6 @@ fun MapRoute(
 @Composable
 fun MapScreen(
     modifier: Modifier = Modifier,
-    navController: NavController,
     screenState: MapScreenState,
     dangerCheckUiState: DangerCheckUiState,
     searchState: SearchUiState,
@@ -300,151 +299,149 @@ fun BottomSheetContent(
     val climateRows = emptyList<Pair<String, String>>()
 
 
-        LazyColumn(
+    LazyColumn(
         modifier = modifier
                 .fillMaxWidth()
                 .padding(horizontal = 20.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            item {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .heightIn(min = 60.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    when (climateState) {
-                        is ClimateState.Loading -> {
-                            CircularProgressIndicator(modifier = Modifier.size(26.dp))
-                        }
+    ) {
+        item {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = 60.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                when (climateState) {
+                    is ClimateState.Loading -> {
+                        CircularProgressIndicator(modifier = Modifier.size(26.dp))
+                    }
 
-                        is ClimateState.Error -> {
-                            Text(
-                                text = stringResource(R.string.climate_error_desc),
-                                color = MaterialTheme.colorScheme.error,
-                                style = MaterialTheme.typography.bodyMedium
-                            )
-                        }
+                    is ClimateState.Error -> {
+                        Text(
+                            text = stringResource(R.string.climate_error_desc),
+                            color = MaterialTheme.colorScheme.error,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
 
-                        else -> {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
+                    else -> {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column {
+                                Text(
+                                    text = stringResource(R.string.weather_station_desc),
+                                    style = MaterialTheme.typography.labelSmall
+                                )
+                                Text(
+                                    text = area.name,
+                                    style = MaterialTheme.typography.titleLarge,
+                                )
+                            }
+                            IconButton(
+                                modifier = Modifier,
+                                onClick = {
+                                    onAddFavorite()
+                                }
+
                             ) {
-                                Column {
-                                    Text(
-                                        text = stringResource(R.string.weather_station_desc),
-                                        style = MaterialTheme.typography.labelSmall
-                                    )
-                                    Text(
-                                        text = area.name,
-                                        style = MaterialTheme.typography.titleLarge,
-                                    )
-                                }
-                                IconButton(
-                                    modifier = Modifier,
-                                    onClick = {
-                                        onAddFavorite()
-                                    }
-
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Default.Star,
-                                        contentDescription = ""
-                                    )
-                                }
+                                Icon(
+                                    imageVector = Icons.Default.Star,
+                                    contentDescription = ""
+                                )
                             }
                         }
                     }
-
-                    DangerLevelCard(uiModel =  dangerLevel)
-
                 }
-            }
 
-            item {
-                HorizontalDivider()
-            }
+                DangerLevelCard(uiModel =  dangerLevel)
 
-            item {
-                DatePicker(
-                    startDate = startDate,
-                    endDate = endDate,
-                    selectedYear = selectedYear,
-                    onStartDateChange = onStartDateChange,
-                    onEndDateChange = onEndDateChange,
-                    onYearChange = onYearChange,
+            }
+        }
+
+        item {
+            HorizontalDivider()
+        }
+
+        item {
+            DatePicker(
+                startDate = startDate,
+                endDate = endDate,
+                selectedYear = selectedYear,
+                onStartDateChange = onStartDateChange,
+                onEndDateChange = onEndDateChange,
+                onYearChange = onYearChange,
+            )
+
+            Surface(
+                modifier = Modifier
+                    .padding(8.dp)
+                    .fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
+                color = MaterialTheme.colorScheme.surfaceVariant
+            ) {
+                Text(
+                    text = stringResource(R.string.date_description),
+                    modifier = Modifier.padding(12.dp)
                 )
+            }
+        }
 
-                Surface(
+        item {
+            HorizontalDivider()
+        }
+
+
+        //THIS IS WHERE WE CAN PUT THE GRAPH COMPONENTS
+        item {
+            val currentYear = Year.now().value
+
+            val yearRange = remember(selectedYear) {
+                selectedYear?.let { it..currentYear }
+            }
+
+            if (yearRange == null ||
+                startDate == null ||
+                endDate == null
+            ) {
+                Box(
                     modifier = Modifier
-                        .padding(8.dp)
-                        .fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp),
-                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
-                    color = MaterialTheme.colorScheme.surfaceVariant
+                        .fillMaxWidth()
+                        .height(180.dp),
+                    contentAlignment = Alignment.Center
                 ) {
-                    Text(
-                        text = stringResource(R.string.date_description),
-                        modifier = Modifier.padding(12.dp)
+                    Text( text = stringResource(R.string.no_date_selected_msg))
+                }
+            } else {
+                Column(verticalArrangement = Arrangement.spacedBy(24.dp)) {
+                    ClimateGraph(
+                        dataPoints = area.temperatureData,
+                        startDate = startDate,
+                        endDate = endDate,
+                        title = stringResource(R.string.mean_temp_desc)
                     )
-                }
-            }
 
-            item {
-                HorizontalDivider()
-            }
+                    HorizontalDivider()
 
+                    ClimateGraph(
+                        dataPoints = area.precipitationData,
+                        startDate = startDate,
+                        endDate = endDate,
+                        title = stringResource(R.string.mean_precip_desc)
+                    )
 
-            //THIS IS WHERE WE CAN PUT THE GRAPH COMPONENTS
-            item {
-                val currentYear = Year.now().value
+                    HorizontalDivider()
 
-                val yearRange = remember(selectedYear) {
-                    selectedYear?.let { it..currentYear }
-                }
-
-                if (yearRange == null ||
-                    startDate == null ||
-                    endDate == null
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(180.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text( text = stringResource(R.string.no_date_selected_msg))
-                    }
-                } else {
-                    Column(verticalArrangement = Arrangement.spacedBy(24.dp)) {
-                        ClimateGraph(
-                            dataPoints = area.temperatureData,
-                            startDate = startDate,
-                            endDate = endDate,
-                            title = stringResource(R.string.mean_temp_desc)
-                        )
-
-                        HorizontalDivider()
-
-                        ClimateGraph(
-                            dataPoints = area.precipitationData,
-                            startDate = startDate,
-                            endDate = endDate,
-                            title = stringResource(R.string.mean_precip_desc)
-                        )
-
-                        HorizontalDivider()
-
-                        ClimateGraph(
-                            dataPoints = area.windSpeedData,
-                            startDate = startDate,
-                            endDate = endDate,
-                            title = stringResource(R.string.mean_wind_desc)
-                        )
-
-                    }
+                    ClimateGraph(
+                        dataPoints = area.windSpeedData,
+                        startDate = startDate,
+                        endDate = endDate,
+                        title = stringResource(R.string.mean_wind_desc)
+                    )
                 }
             }
         }
