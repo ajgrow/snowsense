@@ -105,6 +105,7 @@ fun MapRoute(
     LifecycleResumeEffect(Unit) {
         onPauseOrDispose {
             mapViewModel.onSheetDismissed()
+            MapCameraRepository.clearPinnedPoint()
         }
     }
 

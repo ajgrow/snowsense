@@ -12,7 +12,7 @@ class NavigationActions(
             popUpTo(navController.graph.findStartDestination().id) {
                 saveState = true }
             launchSingleTop = true
-            restoreState = true
+            restoreState = false
         }
 
     fun navigateToMapCoordinates(coordinate: Coordinate)
