@@ -1,6 +1,7 @@
 package in2000.prosjekt.in2000project.ui.reusables
 
-import android.annotation.SuppressLint
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.height
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Info
@@ -9,79 +10,48 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.navigation.NavController
-import androidx.navigation.NavGraph.Companion.findStartDestination
-import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.rememberNavController
+import androidx.compose.ui.unit.dp
+import androidx.navigation.NavDestination
 import in2000.prosjekt.in2000project.R
 import in2000.prosjekt.in2000project.navigation.Screen
+import kotlin.collections.contains
 
-@SuppressLint("RestrictedApi")
 @Composable
 fun BottomBar(
     modifier: Modifier = Modifier,
-    navController: NavController
+    currentRoute: String?,
+    onClick: (String) -> Unit,
 ) {
     NavigationBar(
-        modifier = modifier
+        modifier = modifier.height(64.dp),
+        windowInsets = WindowInsets()
     ) {
-        val navBackStackEntry by navController.currentBackStackEntryAsState()
-        val currentRoute = navBackStackEntry?.destination?.route
-
         NavigationBarItem(
             selected = currentRoute == Screen.Home.route,
-            onClick = {navController.navigate(Screen.Home.route){
-                popUpTo(navController.graph.findStartDestination().id) {
-                    saveState = true
-                }
-                launchSingleTop = true
-                restoreState = true
-            }},
-            icon = {
-                Icon(
-                    imageVector = Icons.Default.Home,
-                    contentDescription = stringResource(R.string.nav_home_desc),
-                )
-            }
+            onClick = { onClick(Screen.Home.route) } ,
+            icon = { Icon(
+                imageVector = Icons.Default.Home,
+                contentDescription = stringResource(R.string.nav_home_desc),
+                ) }
         )
         NavigationBarItem(
             selected = currentRoute == Screen.Map.route,
-            onClick = {
-                navController.navigate(Screen.Map.route)
-                {
-                    popUpTo(navController.graph.findStartDestination().id) {
-                        saveState = true
-                    }
-                    launchSingleTop = true
-                    restoreState = true
-                }
-            },
-            icon = {
-                Icon(
-                    imageVector = Icons.Default.Place,
-                    contentDescription = stringResource(R.string.nav_map_desc),
-                )
-            }
+            onClick = { onClick(Screen.Map.route) },
+            icon = { Icon(
+                imageVector = Icons.Default.Place,
+                contentDescription = stringResource(R.string.nav_map_desc),
+                ) }
         )
         NavigationBarItem(
             selected = currentRoute == Screen.Info.route,
-            onClick = {navController.navigate(Screen.Info.route){
-                popUpTo(navController.graph.findStartDestination().id) {
-                    saveState = true
-                }
-                launchSingleTop = true
-                restoreState = true
-            }},
-            icon = {
-                Icon(
-                    imageVector = Icons.Default.Info,
-                    contentDescription = stringResource(R.string.nav_info_desc),
-                )
-            },
+            onClick = { onClick(Screen.Info.route) },
+            icon = { Icon(
+                imageVector = Icons.Default.Info,
+                contentDescription = stringResource(R.string.nav_info_desc),
+                ) }
         )
     }
 }
@@ -91,5 +61,16 @@ fun BottomBar(
 fun BottomBarPreview(
     modifier: Modifier = Modifier,
 ){
-    BottomBar(modifier, navController = rememberNavController())
+    BottomBar(
+        modifier,
+        currentRoute = Screen.Home.route,
+        onClick = {}
+    )
 }
+
+internal fun NavDestination?.isBottomBarScreen()
+    = this?.route in setOf(
+    Screen.Home.route,
+    Screen.Map.route,
+    Screen.Info.route,
+)
