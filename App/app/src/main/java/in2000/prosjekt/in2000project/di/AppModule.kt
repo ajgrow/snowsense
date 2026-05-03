@@ -4,6 +4,7 @@ import in2000.prosjekt.in2000project.data.datasource.FrostV0DataSource
 import in2000.prosjekt.in2000project.data.datasource.KtorFrostV0DataSource
 import in2000.prosjekt.in2000project.data.repository.FrostClimateRepository
 import in2000.prosjekt.in2000project.network.KtorClient
+import in2000.prosjekt.in2000project.ui.information.InfoViewModel
 import in2000.prosjekt.in2000project.ui.map.MapViewModel
 import in2000.prosjekt.in2000project.ui.map.NveViewModel
 import in2000.prosjekt.in2000project.ui.search.SearchViewModel
@@ -20,4 +21,6 @@ val appModule = module {
     viewModel { SearchViewModel() }
     viewModel { SettingsViewModel(get()) }
     viewModel { NveViewModel() }
+    viewModel { InfoViewModel(get()) }
+
 }
