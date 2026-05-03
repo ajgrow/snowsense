@@ -1,7 +1,13 @@
 package in2000.prosjekt.in2000project.navigation
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -16,6 +22,7 @@ import in2000.prosjekt.in2000project.ui.home.HomeScreen
 import in2000.prosjekt.in2000project.ui.information.InfoScreen
 import in2000.prosjekt.in2000project.ui.map.MapRoute
 import in2000.prosjekt.in2000project.ui.reusables.BottomBar
+import in2000.prosjekt.in2000project.ui.reusables.isBottomBarScreen
 import in2000.prosjekt.in2000project.ui.search.SearchViewModel
 import in2000.prosjekt.in2000project.ui.settings.SettingScreen
 import in2000.prosjekt.in2000project.ui.settings.SettingsViewModel
@@ -27,7 +34,7 @@ fun AppNavigation(){
     val navController = rememberNavController()
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = navBackStackEntry?.destination?.route
+    val currentDestination = navBackStackEntry?.destination
 
     val navigationActions = NavigationActions(navController)
 
@@ -40,11 +47,27 @@ fun AppNavigation(){
         textScale = settingsViewModel.textScale,
     ) {
         Scaffold(
-            bottomBar = { BottomBar(
-                currentRoute = currentRoute,
-                onClick = navigationActions
-                    ::navigateToTab
-            ) }
+            bottomBar = {
+                AnimatedVisibility(
+                    visible = currentDestination.isBottomBarScreen(),
+                    enter = slideInVertically { it },
+                    exit = slideOutVertically { it },
+                ) {
+                    BottomBar(
+                        currentRoute = currentDestination?.route,
+                        onClick = navigationActions
+                            ::navigateToTab
+                    )
+                }
+            },
+            contentWindowInsets = ScaffoldDefaults
+                .contentWindowInsets
+                .run {
+                    if (currentDestination.isBottomBarScreen())
+                        this
+                    else
+                        only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal)
+                }
         ) { innerPadding ->
             NavHost(
                 modifier = Modifier.padding(innerPadding),
@@ -72,7 +95,6 @@ fun AppNavigation(){
                 ) { backStackEntry ->
                     val coordinates = backStackEntry.arguments
                         ?.getString("coordinates")!!
-
                     MapRoute(
                         coordinates = coordinates,
                         searchViewModel = searchViewModel
