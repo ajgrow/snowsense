@@ -5,7 +5,9 @@ import in2000.prosjekt.in2000project.data.datasource.KtorFrostV0DataSource
 import in2000.prosjekt.in2000project.data.repository.FrostClimateRepository
 import in2000.prosjekt.in2000project.network.KtorClient
 import in2000.prosjekt.in2000project.ui.map.MapViewModel
+import in2000.prosjekt.in2000project.ui.map.NveViewModel
 import in2000.prosjekt.in2000project.ui.search.SearchViewModel
+import in2000.prosjekt.in2000project.ui.settings.SettingsViewModel
 import in2000.prosjekt.in2000project.util.ApiKeys
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
@@ -16,4 +18,6 @@ val appModule = module {
     single { FrostClimateRepository(get()) }
     viewModel { MapViewModel(get()) }
     viewModel { SearchViewModel() }
+    viewModel { SettingsViewModel(get()) }
+    viewModel { NveViewModel() }
 }

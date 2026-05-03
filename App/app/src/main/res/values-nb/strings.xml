@@ -38,6 +38,12 @@
     <string name="danger_level_5_title">- Svært høy</string>
     <string name="danger_level_5_description">Ekstreme skredforhold.\n\nMange svært store og ofte ekstremt store naturlige skred kan forventes, selv i moderat bratt terreng.\n\nSvært sjelden varslet.</string>
 
+    <string name="danger_level_1_badge">LEVEL 1</string>
+    <string name="danger_level_2_badge">LEVEL 2</string>
+    <string name="danger_level_3_badge">LEVEL 3</string>
+    <string name="danger_level_4_badge">LEVEL 4</string>
+    <string name="danger_level_5_badge">LEVEL 5</string>
+
     <string name="date_description">Velg en datoperiode og år siden for å se historiske klimadata for temperatur, vind og nedbør.</string>
 
     <string name="emergency_title">Nødnummer</string>
@@ -87,12 +93,13 @@
     <string name="since_year">Siden år</string>
 
     <string name="dialog_ok">OK</string>
+    <string name="dialog_save">Lagre</string>
     <string name="dialog_cancel">Avbryt</string>
 
     <string name="previous_month">Forrige måned</string>
     <string name="next_month">Neste måned</string>
 
-
+    <string name="name_favorite_prompt">Navngi denne favoritten</string>
 
     <string name="settings_title">Innstillinger</string>
 

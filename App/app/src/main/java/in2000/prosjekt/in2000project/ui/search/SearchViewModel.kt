@@ -5,6 +5,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import in2000.prosjekt.in2000project.data.datasource.LocationQueryBuilder
+import in2000.prosjekt.in2000project.data.model.Coordinate
 import in2000.prosjekt.in2000project.data.model.NamedLocation
 import in2000.prosjekt.in2000project.data.repository.LocationRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,7 +19,8 @@ data class SearchUiState (
     val searchTextFieldState: TextFieldState = TextFieldState(),
     val searchResults: List<NamedLocation> = emptyList(),
     val favorites: List<NamedLocation> = emptyList(),
-    val recentSearches: List<NamedLocation> = emptyList()
+    val recentSearches: List<NamedLocation> = emptyList(),
+    val awaitingFavoriteName: Coordinate? = null
 )
 class SearchViewModel: ViewModel(){
 
@@ -75,6 +77,45 @@ class SearchViewModel: ViewModel(){
     fun removeRecentSearch(location: NamedLocation) {
         _searchState.update {
             it.copy(recentSearches = it.recentSearches - location)
+        }
+    }
+
+    fun addPendingFavorite(coordinate: Coordinate) {
+        _searchState.update {
+            it.copy(awaitingFavoriteName = coordinate)
+        }
+    }
+
+    fun cancelPendingFavorite() {
+        _searchState.update {
+            it.copy(awaitingFavoriteName = null)
+        }
+    }
+
+    fun nameFavorite(name: String) {
+        _searchState.value.awaitingFavoriteName?.let { favoriteCoordinate ->
+            addFavoriteLocation(
+                NamedLocation(
+                    name,
+                    favoriteCoordinate
+                )
+            )
+            cancelPendingFavorite()
+        }
+    }
+
+    private fun addFavoriteLocation(location: NamedLocation) {
+        _searchState.update {
+            val updated = (listOf(location) + it.favorites)
+                .distinct()
+                .take(5)
+            it.copy(favorites = updated)
+        }
+    }
+
+    fun removeFavoriteLocation(location: NamedLocation) {
+        _searchState.update {
+            it.copy(favorites = it.favorites - location)
         }
     }
 
