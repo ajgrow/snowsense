@@ -175,6 +175,10 @@ fun MapScreen(
     //if this is set to null then the ModalBottomSheet is not open
     var isSheetOpen by remember { mutableStateOf(false) }
 
+    LaunchedEffect(coordinates) {
+        isSheetOpen = false
+    }
+
     LaunchedEffect(screenState.climateState) {
         if (screenState.climateState is ClimateState.Success) {
             isSheetOpen = true

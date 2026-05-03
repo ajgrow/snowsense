@@ -294,6 +294,7 @@ fun MapboxView(
                                 .build())
                         MapCameraRepository.updatePinnedPoint(searchPoint)
                         addPin?.invoke(searchPoint)
+                        onMapClick(searchPoint)
                     }
                 }
             }
