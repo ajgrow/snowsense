@@ -148,7 +148,14 @@ fun MapRoute(
                 showFavoriteDialog = true
             }
         },
-        canAddFavorite = searchViewModel::canAddFavorite
+        canAddFavorite = {
+            val coordinate = screenState.climateCoordinate
+            if (coordinate != null) {
+                !searchState.favorites.any { it.coordinate == coordinate }
+            } else {
+                false
+            }
+        }
     )
 }
 
