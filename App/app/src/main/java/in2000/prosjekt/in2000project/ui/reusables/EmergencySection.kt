@@ -1,6 +1,5 @@
 package in2000.prosjekt.in2000project.ui.reusables
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -26,6 +25,8 @@ import androidx.compose.ui.unit.dp
 import in2000.prosjekt.in2000project.R
 import androidx.compose.ui.Alignment
 import android.content.Intent
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.material.icons.filled.Phone
 import androidx.compose.runtime.*
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.TextButton
@@ -36,28 +37,46 @@ import androidx.core.net.toUri
 fun EmergencySection(
     modifier: Modifier = Modifier,
 ) {
-    Surface(
-        modifier = modifier
-            .padding(bottom = 8.dp)
-            .fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
-        border = BorderStroke(2.dp, Color.Red)
-    ) {
-        Column(
-            modifier = Modifier.padding(8.dp)
+
+    Column {
+        Row(
+            modifier = Modifier.padding(bottom = 8.dp)
         ) {
+            Icon(
+                imageVector = Icons.Default.Phone,
+                contentDescription = stringResource(R.string.call_icon) ,
+                tint = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.padding(end = 4.dp)
+            )
             Text(
-                text = stringResource(R.string.emergency_desc),
-                style = MaterialTheme.typography.bodySmall,
+                text = stringResource(R.string.emergency_title),
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = Bold,
             )
-            EmergencyRow(
-                serviceResource = R.string.police_rescue_service,
-                serviceNumberResource = R.string.police_rescue_number
-            )
-            EmergencyRow(
-                serviceResource = R.string.medical_service,
-                serviceNumberResource = R.string.medical_number
-            )
+        }
+        Surface(
+            modifier = modifier
+                .padding(bottom = 8.dp)
+                .fillMaxWidth(),
+            shape = RoundedCornerShape(12.dp),
+            border = BorderStroke(2.dp, Color.Red)
+        ) {
+            Column(
+                modifier = Modifier.padding(8.dp)
+            ) {
+                Text(
+                    text = stringResource(R.string.emergency_desc),
+                    style = MaterialTheme.typography.bodySmall,
+                )
+                EmergencyRow(
+                    serviceResource = R.string.police_rescue_service,
+                    serviceNumberResource = R.string.police_rescue_number
+                )
+                EmergencyRow(
+                    serviceResource = R.string.medical_service,
+                    serviceNumberResource = R.string.medical_number
+                )
+            }
         }
     }
 }
@@ -101,7 +120,7 @@ fun EmergencyRow(
             ) {
                 Icon(
                     imageVector = Icons.Default.Call,
-                    contentDescription = null,
+                    contentDescription = stringResource(R.string.call_icon),
                     modifier = Modifier.size(16.dp),
                 )
                 Text(
