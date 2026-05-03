@@ -44,23 +44,35 @@ class FrostAvalancheRiskRepository(
     private suspend fun FrostV0Source.getDailyWeatherRecords(
         repeatingTimeRange: FrostReferenceTime
     ): List<DailyWeatherRecord> {
-        val elementsCsv = listOf(
+        val requiredElements = listOf(
             ElementType.TEMPERATURE_MEAN_P1D.frostElementId,
-            ElementType.PRECIPITATION_SUM_P1D.frostElementId)
-            .joinToString(",")
+            ElementType.PRECIPITATION_SUM_P1D.frostElementId
+        )
+
+        val elementsCsv = requiredElements.joinToString(",")
 
         val observationResponse = frostV0DataSource.getObservations(
-            this.id,
+            this.id ?: "",
             elementsCsv,
             repeatingTimeRange.value)
 
-        if (observationResponse.data.isEmpty())
-            throw NoObservationsException(
-                this.name,
-                elementsCsv,
-                repeatingTimeRange.value)
+        if (observationResponse == null) {
+            return emptyList()
+        }
 
-        return observationResponse.data.map { it.toDailyWeatherRecord() }
+        val observations = observationResponse.data
+
+        if (observations.isEmpty()) return emptyList()
+
+        val hasAllElements = observations.all { atRefTime ->
+            requiredElements.all { elementId ->
+                atRefTime.observations.any { it.elementId == elementId }
+            }
+        }
+
+        if (!hasAllElements) return emptyList()
+
+        return observations.map { it.toDailyWeatherRecord() }
     }
 
     private fun FrostV0ObservationsAtRefTime.toDailyWeatherRecord(
