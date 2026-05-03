@@ -28,10 +28,18 @@ data class DangerLevelUiModel(
 /*Mapper extension function to convert a DangerLevel into a UI model.*/
 fun DangerLevel.toUiModel(): DangerLevelUiModel {
     return when (this) {
+        DangerLevel.UNKNOWN -> DangerLevelUiModel(
+            level = this,
+            titleRes = R.string.danger_level_0_title,
+            badgeLabelRes = R.string.danger_level_0_badge,
+            descriptionRes = R.string.danger_level_0_description,
+            lightColor = DangerColorLevel0,
+            darkColor = DangerColorLevel0Dark
+        )
         DangerLevel.LOW -> DangerLevelUiModel(
             level = this,
             titleRes = R.string.danger_level_1_title,
-            badgeLabelRes = R.string.danger_level_2_badge,
+            badgeLabelRes = R.string.danger_level_1_badge,
             descriptionRes = R.string.danger_level_1_description,
             lightColor = DangerColorLevel1,
             darkColor = DangerColorLevel1Dark
