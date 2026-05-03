@@ -71,10 +71,10 @@ class MapViewModel(
                 val current = _screenState.value
                 val climateData = frostClimateRepository.getClimateDataForLocation(
                     coordinate = Coordinate(lat, lon),
-                    periodStart = current.periodStart,
-                    periodEnd = current.periodEnd,
-                    yearsBack = current.yearsBack
-                ) ?: throw NoObservationsException("", "", "")
+                    periodStart = current.startDate,
+                    periodEnd = current.endDate,
+                    yearsBack = current.selectedYear
+                ) ?: throw NoObservationsException("","","")
 
                 _screenState.value = _screenState.value.copy(
                     climateState = ClimateState.Success(climateData)
@@ -100,10 +100,10 @@ class MapViewModel(
 
     fun onPeriodStart(start: MonthDay) {
         val current = _screenState.value
-        val end = setTimeBoundary(start, current.periodEnd)
+        val end = setTimeBoundary(start, current.endDate)
 
         _screenState.value = _screenState.value.copy(
-            periodStart = start
+            startDate = start
             //TIME BOUNDARY NOT IMPLEMENTED YET
             //periodEnd = end
         )
@@ -113,12 +113,12 @@ class MapViewModel(
 
     fun onPeriodEnd(end: MonthDay) {
         val current = _screenState.value
-        val start = setTimeBoundary(current.periodStart, end)
+        val start = setTimeBoundary(current.startDate, end)
 
         _screenState.value = _screenState.value.copy(
             //TIME BOUNDARY NOT IMPLEMENTED YET
             //periodStart = start,
-            periodEnd = end
+            endDate = end
         )
 
         refetchIfLocationKnown()
@@ -126,7 +126,7 @@ class MapViewModel(
 
     fun onYearsBack(yearsBack: Int) {
         _screenState.value = _screenState.value.copy(
-            yearsBack = yearsBack
+            selectedYear = yearsBack
         )
 
         refetchIfLocationKnown()
