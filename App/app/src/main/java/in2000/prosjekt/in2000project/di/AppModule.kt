@@ -27,7 +27,7 @@ val appModule = module {
     single { SearchRepository(get()) }
     viewModel { MapViewModel(get()) }
     viewModel { RiskViewModel(get(), get()) }
-    viewModel { SearchViewModel(get(), get()) }
+    viewModel { SearchViewModel(get()) }
     viewModel { SettingsViewModel(get()) }
     viewModel { InfoViewModel(get()) }
 

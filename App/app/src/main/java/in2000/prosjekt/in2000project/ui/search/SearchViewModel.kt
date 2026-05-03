@@ -28,9 +28,8 @@ data class SearchUiState (
     val awaitingFavoriteName: Coordinate? = null
 )
 class SearchViewModel(
-    application: Application,
     private val searchRepository: SearchRepository
-): AndroidViewModel(application){
+): ViewModel(){
     private val _searchState = MutableStateFlow(SearchUiState(
         favorites = searchRepository.loadFavorites(),
         recentSearches = searchRepository.loadRecentSearches()
