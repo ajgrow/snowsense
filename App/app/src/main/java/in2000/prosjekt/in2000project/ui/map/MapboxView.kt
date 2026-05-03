@@ -78,7 +78,13 @@ object MapCameraRepository {
     fun updatePinnedPoint(point: Point) {
         lastPinnedPoint = point
     }
+
+    fun clearPinnedPoint() {
+        lastPinnedPoint = null
+    }
 }
+
+
 private const val TAG = "SnoskredWMS"
 
 private const val WMS_BASE =
@@ -448,8 +454,17 @@ fun MapboxView2(
                                 .center(searchPoint)
                                 .zoom(12.0)
                                 .build())
+
+                        val isNewSearch = MapCameraRepository.lastPinnedPoint?.let {
+                            it.latitude() != searchLat || it.longitude() != searchLng
+                        } ?: true
+
                         MapCameraRepository.updatePinnedPoint(searchPoint)
                         addPin?.invoke(searchPoint)
+
+                        if (isNewSearch) {
+                            onMapClick(searchPoint)
+                        }
                     }
                 }
             }

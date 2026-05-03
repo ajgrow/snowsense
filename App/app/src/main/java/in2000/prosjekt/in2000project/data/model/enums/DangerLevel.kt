@@ -2,6 +2,7 @@ package in2000.prosjekt.in2000project.data.model.enums
 
 /** European Avalanche Danger Scale levels. */
 enum class DangerLevel {
+    UNKNOWN,
     LOW,
     MODERATE,
     CONSIDERABLE,

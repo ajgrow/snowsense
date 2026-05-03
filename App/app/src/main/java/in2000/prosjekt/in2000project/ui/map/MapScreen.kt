@@ -55,6 +55,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleResumeEffect
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import in2000.prosjekt.in2000project.R
 import in2000.prosjekt.in2000project.data.model.SkiArea
 import in2000.prosjekt.in2000project.data.model.toSkiArea
@@ -91,9 +95,10 @@ fun MapRoute(
     searchViewModel: SearchViewModel,
     mapViewModel: MapViewModel = koinViewModel(),
     nveViewModel: NveViewModel = koinViewModel(),
+    riskViewModel: RiskViewModel = koinViewModel(),
 ) {
     val screenState by mapViewModel.screenState.collectAsState()
-    val dangerCheckUiState by nveViewModel.dangerCheckUiState.collectAsState()
+    val riskState by riskViewModel.riskState.collectAsState()
     val searchState by searchViewModel.searchState.collectAsStateWithLifecycle()
 
     val mapStateHolder: MapStateHolder = koinInject()
@@ -110,10 +115,26 @@ fun MapRoute(
 
     var showFavoriteDialog by remember { mutableStateOf(false) }
 
+    val skiArea = remember(screenState.climateState) {
+        val state = screenState.climateState
+        if (state is ClimateState.Success) {
+            state.data.toSkiArea()
+        } else {
+            null
+        }
+    } ?: previewSkiArea
+
     if (showFavoriteDialog) {
         TextInputDialog(
             title = stringResource(R.string.name_favorite_prompt),
-            defaultValue = "",
+            defaultValue = when(screenState.climateState) {
+                is ClimateState.Success -> {
+                    skiArea.name
+                }
+                else -> {
+                    ""
+                }
+            },
             onConfirm = { name ->
                 if (name.isNotBlank()) {
                     searchViewModel.nameFavorite(name)
@@ -124,22 +145,21 @@ fun MapRoute(
         )
     }
 
-    DisposableEffect(Unit) {
-        onDispose {
-            mapViewModel.onSheetDismissed()
-        }
+    LaunchedEffect (Unit) {
+        mapViewModel.onSheetDismissed()
+        MapCameraRepository.clearPinnedPoint()
     }
 
     MapScreen(
         screenState = screenState,
+        riskState = riskState,
         overlayState = overlayState,
-        dangerCheckUiState = dangerCheckUiState,
         searchState = searchState,
         coordinates = coordinates,
         pinnedPoint = pin,
         onMapClick = { lat, lon ->
             mapViewModel.onMapClick(lat, lon)
-            nveViewModel.avalancheChecker(lat, lon)
+            riskViewModel.avalancheChecker(lat, lon)
         },
         onSearchLocationRequested = mapStateHolder::onSearchLocationRequested,
         onZoomIn = mapStateHolder::onZoomIn,
@@ -167,8 +187,8 @@ fun MapRoute(
 fun MapScreen(
     modifier: Modifier = Modifier,
     screenState: MapScreenState,
+    riskState: RiskState,
     overlayState: OverlayState,
-    dangerCheckUiState: DangerCheckUiState,
     searchState: SearchUiState,
     coordinates: String,
     pinnedPoint: Point?,
@@ -210,26 +230,6 @@ fun MapScreen(
             null
         }
     } ?: previewSkiArea
-
-    //Controls whether the bottom sheet is visible or not by keeping track of if the user has clicked the map
-    //if this is set to null then the ModalBottomSheet is not open
-    var isSheetOpen by remember { mutableStateOf(false) }
-
-    LaunchedEffect(screenState.climateState) {
-        if (screenState.climateState is ClimateState.Success) {
-            isSheetOpen = true
-        }
-    }
-
-    var skipPartiallyExpanded by rememberSaveable {mutableStateOf(false)}
-
-    val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = skipPartiallyExpanded)
-
-    val avalancheStatus = when {
-        dangerCheckUiState.isDanger == true -> "High"
-        dangerCheckUiState.isDanger == false -> "Low"
-        else -> "Haven't checked"
-    }
 
     var startDate by rememberSaveable { mutableStateOf<MonthDay?>(null) }
     var endDate by rememberSaveable { mutableStateOf<MonthDay?>(null) }
@@ -349,8 +349,7 @@ fun MapScreen(
                 BottomSheetContent(
                     area = skiArea,
                     climateState = screenState.climateState,
-                    avalancheStatus = avalancheStatus,
-                    dangerLevel = dangerCheckUiState.dangerLevel,
+                    dangerLevel = riskState.dangerLevel,
                     modifier = Modifier
                         .fillMaxWidth()
                         .heightIn(min = 320.dp)
@@ -397,7 +396,6 @@ fun MapScreen(
 fun BottomSheetContent(
     area: SkiArea,
     climateState: ClimateState,
-    avalancheStatus: String,
     dangerLevel: DangerLevelUiModel?,
     modifier: Modifier = Modifier,
     startDate: MonthDay?,
@@ -417,9 +415,8 @@ fun BottomSheetContent(
 
     val climateRows = emptyList<Pair<String, String>>()
 
-
     LazyColumn(
-    modifier = modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 20.dp, vertical = 8.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -514,8 +511,6 @@ fun BottomSheetContent(
             HorizontalDivider()
         }
 
-
-        //THIS IS WHERE WE CAN PUT THE GRAPH COMPONENTS
         item {
             val currentYear = Year.now().value
 
@@ -533,7 +528,7 @@ fun BottomSheetContent(
                         .height(180.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text( text = stringResource(R.string.no_date_selected_msg))
+                    Text(text = stringResource(R.string.no_date_selected_msg))
                 }
             } else {
                 Column(verticalArrangement = Arrangement.spacedBy(24.dp)) {
@@ -609,7 +604,6 @@ fun BottomSheetPreview() {
     BottomSheetContent(
         area = previewSkiArea,
         climateState = ClimateState.Idle,
-        avalancheStatus = "High",
         dangerLevel = DangerLevel.HIGH.toUiModel(),
         startDate = null,
         endDate = null,

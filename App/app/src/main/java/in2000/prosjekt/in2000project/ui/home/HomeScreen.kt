@@ -1,6 +1,5 @@
-    package in2000.prosjekt.in2000project.ui.home
+package in2000.prosjekt.in2000project.ui.home
 
-    import androidx.compose.foundation.BorderStroke
     import androidx.compose.foundation.Image
     import androidx.compose.foundation.background
     import androidx.compose.foundation.clickable
@@ -10,12 +9,11 @@
     import androidx.compose.foundation.layout.BoxWithConstraints
     import androidx.compose.foundation.layout.Column
     import androidx.compose.foundation.layout.PaddingValues
-    import androidx.compose.foundation.layout.Row
-    import androidx.compose.foundation.layout.Spacer
     import androidx.compose.foundation.layout.fillMaxSize
     import androidx.compose.foundation.layout.fillMaxWidth
-    import androidx.compose.foundation.layout.height
+    import androidx.compose.foundation.layout.offset
     import androidx.compose.foundation.layout.padding
+    import androidx.compose.foundation.layout.size
     import androidx.compose.foundation.layout.width
     import androidx.compose.foundation.layout.wrapContentHeight
     import androidx.compose.foundation.lazy.LazyColumn
@@ -25,13 +23,12 @@
     import androidx.compose.material3.Scaffold
     import androidx.compose.foundation.shape.RoundedCornerShape
     import androidx.compose.material.icons.Icons
-    import androidx.compose.material.icons.filled.Phone
     import androidx.compose.material.icons.filled.Settings
     import androidx.compose.material3.CardDefaults
+    import androidx.compose.material.icons.filled.Close
     import androidx.compose.material3.Icon
     import androidx.compose.material3.IconButton
     import androidx.compose.material3.MaterialTheme
-    import androidx.compose.material3.Surface
     import androidx.compose.material3.Text
     import androidx.compose.runtime.Composable
     import androidx.compose.runtime.LaunchedEffect
@@ -57,206 +54,219 @@
     import in2000.prosjekt.in2000project.R
     import in2000.prosjekt.in2000project.data.model.Coordinate
     import in2000.prosjekt.in2000project.data.model.NamedLocation
-    import in2000.prosjekt.in2000project.data.model.enums.EmergencyServices
-    import in2000.prosjekt.in2000project.ui.map.NveViewModel
+    import in2000.prosjekt.in2000project.ui.map.RiskViewModel
+    import in2000.prosjekt.in2000project.ui.reusables.EmergencySection
     import in2000.prosjekt.in2000project.ui.model.DangerLevelUiModel
     import in2000.prosjekt.in2000project.ui.reusables.SearchSection
     import in2000.prosjekt.in2000project.ui.search.SearchViewModel
     import org.koin.compose.viewmodel.koinViewModel
 
-    @Composable
-    fun HomeScreen(
-        modifier: Modifier = Modifier,
-        onSettingsClick: () -> Unit,
-        onNavigateToMap: (coordinate: Coordinate) -> Unit,
-        searchViewModel: SearchViewModel = koinViewModel()
-    ) {
-        val focusManager = LocalFocusManager.current
-        val searchState by searchViewModel.searchState.collectAsStateWithLifecycle()
+@Composable
+fun HomeScreen(
+    modifier: Modifier = Modifier,
+    onSettingsClick: () -> Unit,
+    onNavigateToMap: (coordinate: Coordinate) -> Unit,
+    searchViewModel: SearchViewModel = koinViewModel()
+) {
+    val focusManager = LocalFocusManager.current
+    val searchState by searchViewModel.searchState.collectAsStateWithLifecycle()
 
-        Scaffold(
-            modifier = modifier,
-        ) { paddingValues ->
-            Column(
+    Scaffold(
+        modifier = modifier,
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .clickable(
+                    indication = null,
+                    interactionSource = remember { MutableInteractionSource() }
+                ) {
+                   focusManager.clearFocus()
+                },
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            HomeTopBar(onSettingsClick)
+            LogoSection()
+
+            Box(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues)
-                    .clickable(
-                        indication = null,
-                        interactionSource = remember { MutableInteractionSource() }
-                    ) {
-                       focusManager.clearFocus()
-                    },
+                    .fillMaxWidth()
+                    .padding(
+                        horizontal = 16.dp,
+                        vertical = 8.dp
+                    ),
+            ){
+                SearchSection(
+                    //get states from the viewmodel
+                    modifier = Modifier,
+                    textFieldState = searchState.searchTextFieldState,
+                    onSearch = { searchViewModel.onSearch() },
+                    searchResults = searchState.searchResults,
+                    onNavigateToMap = onNavigateToMap,
+                    onSelectResult = searchViewModel::addRecentSearch,
+                    recentSearches = searchState.recentSearches
+                )
+            }
+
+            LazyColumn(
+                modifier = Modifier.fillMaxWidth(),
+                contentPadding = PaddingValues(16.dp),          //adds padding around content
+                verticalArrangement = Arrangement.spacedBy(24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                HomeTopBar(onSettingsClick)
-                LogoSection()
-
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(
-                            horizontal = 16.dp,
-                            vertical = 8.dp
-                        ),
-                ){
-                    SearchSection(
-                        //get states from the viewmodel
+                item {
+                    FavoriteSection(
+                        items = searchState.favorites,
                         modifier = Modifier,
                         textFieldState = searchState.searchTextFieldState,
                         onSearch = searchViewModel::onSearch,
                         searchResults = searchState.searchResults,
                         onNavigateToMap = onNavigateToMap,
-                        onSelectResult = searchViewModel::addRecentSearch,
-                        recentSearches = searchState.recentSearches
+                        onRemoveLocation = searchViewModel::removeFavoriteLocation
                     )
                 }
 
-                LazyColumn(
-                    modifier = Modifier.fillMaxWidth(),
-                    contentPadding = PaddingValues(16.dp),          //adds padding around content
-                    verticalArrangement = Arrangement.spacedBy(24.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    item {
-                        FavoriteSection(
-                            items = searchState.favorites,
-                            modifier = Modifier,
-                            onNavigateToMap = onNavigateToMap
-                        )
-                    }
+                item {
+                    RecentSection(
+                        items = searchState.recentSearches,
+                        modifier = Modifier,
+                        onNavigateToMap = onNavigateToMap,
+                        onRemoveLocation = searchViewModel::removeRecentSearch
+                    )
+                }
 
-                    item {
-                        RecentSection(
-                            items = searchState.recentSearches,
-                            modifier = Modifier,
-                            onNavigateToMap = onNavigateToMap
-                        )
-                    }
-
-                    item {
-                        EmergencyNumbersSection()
-                    }
+                item {
+                    EmergencySection()
                 }
             }
         }
     }
+}
 
-    @Composable
-    fun LogoSection(
-        modifier: Modifier = Modifier
+@Composable
+fun LogoSection(
+    modifier: Modifier = Modifier
+) {
+    BoxWithConstraints(
+        modifier = modifier.fillMaxWidth(),
+        contentAlignment = Alignment.Center
     ) {
-        BoxWithConstraints(
-            modifier = modifier.fillMaxWidth(),
-            contentAlignment = Alignment.Center
-        ) {
-            //Take 45% of available width and caps the value at 240dp max (coerceAtMost)
-            //This enables the logo to adjust to different screensizes,
-            //without becoming ridiculously large on big screens
-            val logoWidth = (maxWidth * 0.45f).coerceAtMost(240.dp)
+        //Take 45% of available width and caps the value at 240dp max (coerceAtMost)
+        //This enables the logo to adjust to different screensizes,
+        //without becoming ridiculously large on big screens
+        val logoWidth = (maxWidth * 0.45f).coerceAtMost(240.dp)
 
-            Image(
-                painter = painterResource(R.drawable.app_logo),
-                contentDescription = "App Logo",
-                modifier = Modifier
-                    .width(logoWidth)
-                    .wrapContentHeight()
-                    .padding(24.dp),
-                contentScale = ContentScale.Fit
+        Image(
+            painter = painterResource(R.drawable.app_logo),
+            contentDescription = "App Logo",
+            modifier = Modifier
+                .width(logoWidth)
+                .wrapContentHeight()
+                .padding(24.dp),
+            contentScale = ContentScale.Fit
+        )
+    }
+}
+
+@Composable
+fun FavoriteSection(
+    items: List<NamedLocation>,
+    modifier: Modifier = Modifier,
+    onNavigateToMap: (coordinate: Coordinate) -> Unit,
+    onRemoveLocation: (NamedLocation) -> Unit,
+    riskViewModel: RiskViewModel = koinViewModel()
+) {
+
+    val riskState by riskViewModel.riskState.collectAsState()
+
+    LaunchedEffect(items) {
+        if (items.isNotEmpty()) {
+            // Checks the first favorite's location as an example.
+            val firstLocation = items.first()
+            riskViewModel.avalancheChecker(
+                firstLocation.coordinate.latitude,
+                firstLocation.coordinate.longitude
             )
         }
     }
 
-    @Composable
-    fun FavoriteSection(
-        items: List<NamedLocation>,
-        modifier: Modifier = Modifier,
-        onNavigateToMap: (coordinate: Coordinate) -> Unit,
-        nveViewModel: NveViewModel = viewModel()
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
-
-        // Temporary solution while we are waiting for the actual dangerlevels, so this part is very changeable
-        val dangerCheckUiState by nveViewModel.dangerCheckUiState.collectAsState()
-
-        LaunchedEffect(items) {
-            if (items.isNotEmpty()) {
-                // Checks the first favorite's location as an example.
-                val firstLocation = items.first()
-                nveViewModel.avalancheChecker(
-                    firstLocation.coordinate.latitude,
-                    firstLocation.coordinate.longitude
+        Text(
+            text = stringResource(R.string.favorites_title),
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = Bold
+        )
+        LazyRow(
+            contentPadding = PaddingValues(horizontal = 8.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            items(items) { location ->
+                LocationCard(
+                    location,
+                    onNavigateToMap = onNavigateToMap,
+                    dangerLevel = riskState.dangerLevel,
+                    onRemoveLocation = onRemoveLocation,
+                    showDangerLevel = true,
+                    removeButtonAtBottom = true
                 )
             }
         }
+    }
+}
 
-        Column(
-            modifier = modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(10.dp)
+@Composable
+fun RecentSection(
+    items: List<NamedLocation>,
+    modifier: Modifier = Modifier,
+    onNavigateToMap: (coordinate: Coordinate) -> Unit,
+    onRemoveLocation: (NamedLocation) -> Unit
+) {
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
+        Text(
+            text = stringResource(R.string.recent_searches_title),
+            style = MaterialTheme.typography.titleMedium,
+                fontWeight = Bold
+        )
+
+        LazyRow(
+            contentPadding = PaddingValues(horizontal = 8.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Text(
-                text = stringResource(R.string.favorites_title),
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold
-
-            )
-            LazyRow(
-                contentPadding = PaddingValues(horizontal = 8.dp),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                items(items) { location ->
-                    LocationCard(
-                        location,
-                        onNavigateToMap = onNavigateToMap,
-                        dangerLevel = dangerCheckUiState.dangerLevel,
-                    )
-                }
+            items(items) { location ->
+                LocationCard(
+                    location,
+                    onNavigateToMap = onNavigateToMap,
+                    onRemoveLocation = onRemoveLocation,
+                )
             }
         }
     }
+}
 
-    @Composable
-    fun RecentSection(
-        items: List<NamedLocation>,
-        modifier: Modifier = Modifier,
-        onNavigateToMap: (coordinate: Coordinate) -> Unit
+@Composable
+fun LocationCard(
+    location: NamedLocation,
+    modifier: Modifier = Modifier,
+    onNavigateToMap: (coordinate: Coordinate) -> Unit,
+    onRemoveLocation: (NamedLocation) -> Unit,
+    showDangerLevel: Boolean = false,
+    dangerLevel: DangerLevelUiModel? = null,
+    removeButtonAtBottom: Boolean = false,
+) {
+    Box(
+        modifier = Modifier
+            .width(160.dp)
+            .wrapContentHeight()
     ) {
-        Column(
-            modifier = modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
-            Text(
-                text = stringResource(R.string.recent_searches_title),
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold
-            )
-
-            LazyRow(
-                contentPadding = PaddingValues(horizontal = 8.dp),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                items(items) { location ->
-                    LocationCard(
-                        location,
-                        onNavigateToMap = onNavigateToMap,
-                        dangerLevel = null,
-                    )
-                }
-            }
-        }
-    }
-
-    @Composable
-    fun LocationCard(
-        location: NamedLocation,
-        modifier: Modifier = Modifier,
-        onNavigateToMap: (coordinate: Coordinate) -> Unit,
-        dangerLevel: DangerLevelUiModel? = null,
-    ) {
-
         Card(
-            modifier = modifier
-                .width(160.dp)
-                .wrapContentHeight(),
+            modifier = Modifier,
             onClick = {
                 onNavigateToMap(location.coordinate)
             },
@@ -274,22 +284,23 @@
                 Text(
                     text = location.name,
                     modifier = Modifier.fillMaxWidth(),
-                    fontWeight = FontWeight.Bold,
+                    fontWeight = Bold,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
 
-                if (dangerLevel != null){
+                if (showDangerLevel) {
+                    val label = dangerLevel?.badgeLabelRes?.let { stringResource(it) } ?: ""
                     Text(
-                        text = stringResource(dangerLevel.badgeLabelRes),
+                        text = label,
                         fontSize = 12.sp,
-                        fontWeight = FontWeight.Bold,
+                        fontWeight = Bold,
                         color = Color.White,
                         letterSpacing = 0.5.sp,
                         modifier = Modifier
                             .clip(RoundedCornerShape(50))
-                            .background(dangerLevel.getColor())
+                            .background(dangerLevel?.getColor() ?: Color.Transparent)
                             .padding(
                                 horizontal = 10.dp,
                                 vertical = 4.dp
@@ -298,113 +309,62 @@
                 }
             }
         }
-    }
-
-    @Composable
-    fun HomeTopBar(
-        onSettingsClick: () -> Unit,
-        modifier: Modifier = Modifier
-    ){
-        Box(
-            modifier = modifier
-                .fillMaxWidth()
-                .padding(
-                    top = 16.dp,
-                    start = 20.dp,
-                    end = 20.dp),
+        IconButton(
+            onClick = { onRemoveLocation(location) },
+            modifier = Modifier
+                .align(if (removeButtonAtBottom) Alignment.BottomEnd else Alignment.CenterEnd)
+                .offset(x = (-12).dp, y = if (removeButtonAtBottom) (-8).dp else 0.dp)
+                .size(30.dp)
         ) {
-            Text(
-                text = stringResource(R.string.app_name),
-                style = MaterialTheme.typography.headlineLarge,
-                fontWeight = FontWeight.SemiBold,
-                modifier = Modifier
-                    .align(Alignment.Center)
+            Icon(
+                imageVector = Icons.Default.Close,
+                contentDescription = stringResource(R.string.remove),
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.size(30.dp)
             )
-
-            IconButton(
-                onClick = onSettingsClick,
-                modifier = Modifier
-                    .align(Alignment.CenterEnd)
-            ) {
-                Icon(
-                    Icons.Default.Settings,
-                    contentDescription = null)
-            }
         }
     }
+}
 
-    @Composable
-    fun EmergencyNumbersSection(
-        modifier: Modifier = Modifier,
+@Composable
+fun HomeTopBar(
+    onSettingsClick: () -> Unit,
+    modifier: Modifier = Modifier
+){
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(
+                top = 16.dp,
+                start = 20.dp,
+                end = 20.dp),
     ) {
-        Surface(
-            modifier = modifier
-                .padding(bottom = 8.dp)
-                .fillMaxWidth(),
-            shape = RoundedCornerShape(12.dp),
-            color = MaterialTheme.colorScheme.surface,
-            border = BorderStroke(1.dp, Color.Red)
-        ) {
-
-            Row(
-                modifier = Modifier
-                    .padding(16.dp),
-                verticalAlignment = Alignment.Top
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Phone,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier
-                        .padding(
-                            end = 16.dp,
-                            top = 4.dp
-                        )
-                )
-
-                Column(
-                    modifier = Modifier
-                        .weight(1f),
-                    verticalArrangement = Arrangement.spacedBy(4.dp)
-                ) {
-                    Text(
-                        text = stringResource(R.string.emergency_title),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        fontWeight = Bold,
-                        modifier = Modifier.padding(bottom = 8.dp)
-                    )
-                    EmergencyServices.entries.forEach { service ->
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                        ) {
-                            Text(
-                                text = stringResource(service.service),
-                                style = MaterialTheme.typography.bodyMedium,
-                                modifier = Modifier.weight(1f)
-                            )
-                            Spacer(modifier = Modifier.height(8.dp))
-                            Text(
-                                text = stringResource(service.number),
-                                style = MaterialTheme.typography.bodyMedium,
-                                fontWeight = FontWeight.Bold
-                            )
-                            Spacer(modifier = Modifier.height(8.dp))
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    @Preview
-    @Composable
-    fun HomeScreenPreview(
-    ) {
-        HomeScreen(
-            onSettingsClick = {},
-            onNavigateToMap = {},
+        Text(
+            text = stringResource(R.string.app_name),
+            style = MaterialTheme.typography.headlineLarge,
+            fontWeight = FontWeight.SemiBold,
+            modifier = Modifier
+                .align(Alignment.Center)
         )
-    }
 
+        IconButton(
+            onClick = onSettingsClick,
+            modifier = Modifier
+                .align(Alignment.CenterEnd)
+        ) {
+            Icon(
+                Icons.Default.Settings,
+                contentDescription = null)
+        }
+    }
+}
+
+@Preview
+@Composable
+fun HomeScreenPreview(){
+    HomeScreen(
+        onNavigateToMap = {},
+        onSettingsClick = {},
+        searchViewModel = viewModel()
+    )
+}
