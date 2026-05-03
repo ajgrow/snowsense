@@ -5,7 +5,9 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,8 +19,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.BottomSheetScaffold
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -43,10 +47,13 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import in2000.prosjekt.in2000project.R
@@ -58,6 +65,8 @@ import in2000.prosjekt.in2000project.ui.reusables.DatePicker
 import org.koin.compose.viewmodel.koinViewModel
 import java.time.MonthDay
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.mapbox.maps.dsl.cameraOptions
+import com.mapbox.maps.plugin.animation.MapAnimationOptions
 import in2000.prosjekt.in2000project.data.model.NamedLocation
 import in2000.prosjekt.in2000project.ui.search.SearchViewModel
 import in2000.prosjekt.in2000project.ui.settings.SettingsViewModel
@@ -92,10 +101,13 @@ fun MapRoute(
 
     val mapStateHolder: MapStateHolder = koinInject()
     val pin by mapStateHolder.pinnedPoint.collectAsStateWithLifecycle()
+    val overlayState by mapStateHolder.overlayState.collectAsStateWithLifecycle()
+
 
     LaunchedEffect(pin) {
         pin?.let {
             mapViewModel.onMapClick(it.latitude(), it.longitude())
+            nveViewModel.avalancheChecker(it.latitude(), it.longitude())
         }
     }
 
@@ -123,6 +135,7 @@ fun MapRoute(
 
     MapScreen(
         screenState = screenState,
+        overlayState = overlayState,
         dangerCheckUiState = dangerCheckUiState,
         searchState = searchState,
         coordinates = coordinates,
@@ -130,9 +143,9 @@ fun MapRoute(
             mapViewModel.onMapClick(lat, lon)
             nveViewModel.avalancheChecker(lat, lon)
         },
-        onOverlayRetry = { mapViewModel.onOverlayLoading() },
-        onOverlayLoaded = { mapViewModel.onOverlayLoaded() },
-        onOverlayError = { mapViewModel.onOverlayError() },
+        onOverlayRetry = { mapStateHolder.onOverlayLoading() },
+        onOverlayLoaded = { mapStateHolder.onOverlayLoaded() },
+        onOverlayError = { mapStateHolder.onOverlayError() },
         onSheetDismiss = { mapViewModel.onSheetDismissed() },
         onStartDateChange = { if (it != null) mapViewModel.onStartDateChange(it) },
         onEndDateChange = { if (it != null) mapViewModel.onEndDateChange(it) },
@@ -154,6 +167,7 @@ fun MapRoute(
 fun MapScreen(
     modifier: Modifier = Modifier,
     screenState: MapScreenState,
+    overlayState: OverlayState,
     dangerCheckUiState: DangerCheckUiState,
     searchState: SearchUiState,
     coordinates: String,
@@ -169,6 +183,14 @@ fun MapScreen(
     onSelectResult: (NamedLocation) -> Unit,
     onAddFavorite: () -> Unit,
 ) {
+    val focusManager = LocalFocusManager.current
+    val focusRequester = remember { FocusRequester() }
+    var isSearchActive by remember { mutableStateOf(false) }
+
+    LaunchedEffect(isSearchActive) {
+        if (isSearchActive) focusRequester.requestFocus()
+    }
+
     val skiArea = remember(screenState.climateState) {
         val state = screenState.climateState
         if (state is ClimateState.Success) {
@@ -223,68 +245,67 @@ fun MapScreen(
                         halfScreen
                     else 0.dp
 
-    BottomSheetScaffold(
-        containerColor = Color.Transparent,
-        scaffoldState = scaffoldState,
-        sheetPeekHeight = peekHeight,
-        sheetContent = {
-            BottomSheetContent(
-                area = skiArea,
-                climateState = screenState.climateState,
-                avalancheStatus = avalancheStatus,
-                dangerLevel = dangerCheckUiState.dangerLevel,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .heightIn(min = 320.dp)
-                    .navigationBarsPadding()
-                    .padding(bottom = 12.dp),
-                startDate = screenState.startDate,
-                endDate = screenState.endDate,
-                selectedYear = screenState.selectedYear,
-                onStartDateChange = { onStartDateChange(it) },
-                onEndDateChange = { onEndDateChange(it) },
-                onYearChange = onYearChange,
-                onAddFavorite = onAddFavorite
-            )
+    Box(
+        modifier = modifier.fillMaxSize()
+    ) {
+        when (overlayState) {
+            is OverlayState.Loading
+                -> OverlayStatusCard(
+                stringResource(R.string.overlay_loading))
+            is OverlayState.Error
+                -> OverlayRetryCard(
+                stringResource(R.string.overlay_error),
+                onOverlayRetry)
+            is OverlayState.Success
+                -> Unit
         }
-    ) { innerPadding ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-        ) {
-            when (screenState.overlayState) {
-                is OverlayState.Loading -> {
-                    OverlayStatusCard(
-                        message = stringResource(R.string.overlay_loading)
-                    )
-                }
 
-                is OverlayState.Error -> {
-                    OverlayRetryCard(
-                        message = stringResource(R.string.overlay_error),
-                        onRetry = onOverlayRetry
-                    )
-                }
-
-                is OverlayState.Success -> Unit
+        BottomSheetScaffold(
+            containerColor = Color.Transparent,
+            scaffoldState = scaffoldState,
+            sheetPeekHeight = peekHeight,
+            sheetContent = {
+                BottomSheetContent(
+                    area = skiArea,
+                    climateState = screenState.climateState,
+                    avalancheStatus = avalancheStatus,
+                    dangerLevel = dangerCheckUiState.dangerLevel,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(min = 320.dp)
+                        .navigationBarsPadding()
+                        .padding(bottom = 12.dp),
+                    startDate = screenState.startDate,
+                    endDate = screenState.endDate,
+                    selectedYear = screenState.selectedYear,
+                    onStartDateChange = { onStartDateChange(it) },
+                    onEndDateChange = { onEndDateChange(it) },
+                    onYearChange = onYearChange,
+                    onAddFavorite = onAddFavorite
+                )
             }
+        ) { innerPadding ->
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+            ) {
+                when (screenState.climateState) {
+                    is ClimateState.Idle -> Unit
 
-            when (screenState.climateState) {
-                is ClimateState.Idle -> Unit
+                    is ClimateState.Loading -> {
+                        Log.d("ClimateData", "Loading...")
+                    }
 
-                is ClimateState.Loading -> {
-                    Log.d("ClimateData", "Loading...")
-                }
+                    is ClimateState.Error -> {
+                        Log.d("ClimateData", "Error")
+                    }
 
-                is ClimateState.Error -> {
-                    Log.d("ClimateData", "Error")
-                }
-
-                is ClimateState.Success -> {
-                    val success = screenState.climateState
-                    val climateData = success.data
-                    Log.d("ClimateData", climateData.toString())
+                    is ClimateState.Success -> {
+                        val success = screenState.climateState
+                        val climateData = success.data
+                        Log.d("ClimateData", climateData.toString())
+                    }
                 }
             }
         }
@@ -477,6 +498,7 @@ fun MapScreenErrorPreview() {
             endDate = MonthDay.now(),
             selectedYear = 1
         ),
+        overlayState = OverlayState.Error,
         onMapClick = { _, _ -> },
         coordinates = "",
         onOverlayRetry = {},

@@ -16,6 +16,9 @@ class MapStateHolder {
     private val _requestedSearchLocation = MutableStateFlow<Point?>(null)
     val requestedSearchLocation: StateFlow<Point?> = _requestedSearchLocation.asStateFlow()
 
+    private val _overlayState = MutableStateFlow<OverlayState>(OverlayState.Success)
+    val overlayState: StateFlow<OverlayState> = _overlayState.asStateFlow()
+
     fun onPinPlaced(point: Point) {
         _pinnedPoint.value = point
     }
@@ -30,5 +33,15 @@ class MapStateHolder {
 
     fun clearRequestedSearchLocation() {
         _requestedSearchLocation.value = null
+    }
+
+    fun onOverlayLoading() {
+        _overlayState.value = OverlayState.Loading
+    }
+    fun onOverlayLoaded()  {
+        _overlayState.value = OverlayState.Success
+    }
+    fun onOverlayError()   {
+        _overlayState.value = OverlayState.Error
     }
 }
