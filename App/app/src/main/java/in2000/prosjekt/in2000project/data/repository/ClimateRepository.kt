@@ -32,5 +32,5 @@ interface ClimateRepository {
         periodStart: MonthDay,
         periodEnd: MonthDay,
         yearsBack: Int,
-    ): LocationClimateData
+    ): LocationClimateData?
 }
