@@ -65,7 +65,7 @@ fun InfoContent(
         modifier = modifier,
         topBar = {
             TopBar(
-                title = stringResource(R.string.about_app_title),
+                title = stringResource(R.string.information_title),
                 modifier = Modifier,
                 onSettingsClick = onSettingsClick
             )
