@@ -23,13 +23,13 @@ import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import in2000.prosjekt.in2000project.R
-import androidx.compose.ui.Alignment
 import android.content.Intent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.runtime.*
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.TextButton
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.net.toUri
 
@@ -40,13 +40,17 @@ fun EmergencySection(
 
     Column {
         Row(
-            modifier = Modifier.padding(bottom = 8.dp)
+            modifier = Modifier.padding(bottom = 8.dp) ,
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             Icon(
                 imageVector = Icons.Default.Phone,
                 contentDescription = stringResource(R.string.call_icon) ,
                 tint = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.padding(end = 4.dp)
+                modifier = Modifier
+                    .padding(end = 4.dp)
+                    .size(16.dp)
             )
             Text(
                 text = stringResource(R.string.emergency_title),
