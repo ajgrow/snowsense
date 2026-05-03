@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 /* dangerLevel is now a DangerLevelUiModel instead of a raw enum.*/
-data class DangerCheckUiState(
+data class RiskState(
     val isDanger: Boolean? = null,
     val dangerLevel: DangerLevelUiModel? = null
 )
@@ -22,8 +22,8 @@ class RiskViewModel(
     private val nveRepository: NveRepository,
     private val frostAvalancheRiskRepository: FrostAvalancheRiskRepository
 ): ViewModel() {
-    private var _dangerCheckUiState = MutableStateFlow(DangerCheckUiState())
-    val dangerCheckUiState = _dangerCheckUiState.asStateFlow()
+    private var _riskState = MutableStateFlow(RiskState())
+    val riskState = _riskState.asStateFlow()
 
     fun avalancheChecker(lat: Double, lon: Double){
         viewModelScope.launch {
@@ -37,7 +37,7 @@ class RiskViewModel(
 
             val dangerLevel = if (isDangerZone) slabDangerLevel.toUiModel() else DangerLevel.LOW.toUiModel()
 
-            _dangerCheckUiState.update { currentState ->
+            _riskState.update { currentState ->
                 currentState.copy(
                     isDanger = isDangerZone,
                     dangerLevel = dangerLevel
