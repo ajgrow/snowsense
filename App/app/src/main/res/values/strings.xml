@@ -143,5 +143,6 @@
     <string name="no_graph_data">No data to show.</string>
     <string name="not_checked">Not checked</string>
     <string name="call_icon">Call Icon</string>
+    <string name="remove">Remove</string>
 
 </resources>
