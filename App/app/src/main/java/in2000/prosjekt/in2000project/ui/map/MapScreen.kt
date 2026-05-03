@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
@@ -26,7 +25,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -44,26 +42,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import in2000.prosjekt.in2000project.R
 import in2000.prosjekt.in2000project.data.model.SkiArea
 import in2000.prosjekt.in2000project.data.model.toSkiArea
-import in2000.prosjekt.in2000project.ui.reusables.BottomBar
 import in2000.prosjekt.in2000project.ui.reusables.ClimateGraph
 import in2000.prosjekt.in2000project.ui.reusables.DangerLevelCard
 import in2000.prosjekt.in2000project.ui.reusables.DatePicker
-import in2000.prosjekt.in2000project.ui.reusables.TopBar
 import org.koin.compose.viewmodel.koinViewModel
 import java.time.MonthDay
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import in2000.prosjekt.in2000project.data.model.NamedLocation
 import in2000.prosjekt.in2000project.ui.search.SearchViewModel
 import in2000.prosjekt.in2000project.ui.settings.SettingsViewModel
 import in2000.prosjekt.in2000project.data.model.enums.DangerLevel
 import in2000.prosjekt.in2000project.ui.model.DangerLevelUiModel
 import in2000.prosjekt.in2000project.ui.model.toUiModel
 import in2000.prosjekt.in2000project.ui.reusables.TextInputDialog
+import in2000.prosjekt.in2000project.ui.search.SearchUiState
 import java.time.Year
 
 private val previewSkiArea = SkiArea(
@@ -78,101 +73,15 @@ private val previewSkiArea = SkiArea(
 //for use when the VM is ready
 @Composable
 fun MapRoute(
-    navController: NavController,
     coordinates: String,
     searchViewModel: SearchViewModel,
     mapViewModel: MapViewModel = koinViewModel(),
-    nveViewModel: NveViewModel = viewModel(),
-    settingsViewModel: SettingsViewModel = viewModel()
+    riskViewModel: RiskViewModel = koinViewModel(),
+    settingsViewModel: SettingsViewModel = koinViewModel()
 ) {
     val screenState by mapViewModel.screenState.collectAsState()
-    DisposableEffect(Unit) {
-        onDispose {
-            mapViewModel.onSheetDismissed()
-        }
-    }
-
-
-    MapScreen(
-        navController = navController,
-        screenState = screenState,
-        nveViewModel = nveViewModel,
-        onMapClick = { lat, lon ->
-            mapViewModel.onMapClick(lat, lon)
-            nveViewModel.avalancheChecker(lat, lon)
-        },
-        coordinates = coordinates,
-        onOverlayRetry = { mapViewModel.onOverlayLoading() },
-        onOverlayLoaded = { mapViewModel.onOverlayLoaded()},
-        onOverlayError = { mapViewModel.onOverlayError()},
-        onSheetDismiss = { mapViewModel.onSheetDismissed() },
-        onPeriodStart = { it ->
-            if (it != null) mapViewModel.onPeriodStart(it) },
-        onPeriodEnd = { it ->
-            if (it != null) mapViewModel.onPeriodEnd(it) },
-        onYearsBack = { it ->
-            if (it != null) mapViewModel.onYearsBack(it) },
-        settingsViewModel = settingsViewModel,
-        searchViewModel = searchViewModel
-    )
-}
-
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun MapScreen(
-    modifier: Modifier = Modifier,
-    navController: NavController,
-    screenState: MapScreenState,
-    nveViewModel: NveViewModel,
-    onMapClick: (Double, Double) -> Unit,
-    coordinates: String,
-    onOverlayRetry: () -> Unit,
-    onOverlayLoaded: () -> Unit,
-    onOverlayError: () -> Unit,
-    onSheetDismiss: () -> Unit,
-    onPeriodStart: (MonthDay?) -> Unit,
-    onPeriodEnd: (MonthDay?) -> Unit,
-    onYearsBack: (Int?) -> Unit,
-    settingsViewModel: SettingsViewModel,
-    searchViewModel: SearchViewModel
-) {
-    val skiArea = remember(screenState.climateState) {
-        val state = screenState.climateState
-        if (state is ClimateState.Success) {
-            state.data.toSkiArea()
-        } else {
-            null
-        }
-    } ?: previewSkiArea
-
+    val riskState by riskViewModel.riskState.collectAsState()
     val searchState by searchViewModel.searchState.collectAsStateWithLifecycle()
-
-    val dangerCheckUiState by nveViewModel.dangerCheckUiState.collectAsState()
-    //Controls whether the bottom sheet is visible or not by keeping track of if the user has clicked the map
-    //if this is set to null then the ModalBottomSheet is not open
-    var isSheetOpen by remember { mutableStateOf(false) }
-
-    LaunchedEffect(screenState.climateState) {
-        if (screenState.climateState is ClimateState.Success) {
-            isSheetOpen = true
-        }
-    }
-
-    var skipPartiallyExpanded by rememberSaveable {mutableStateOf(false)}
-
-    val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = skipPartiallyExpanded)
-
-    val avalancheStatus = when {
-        dangerCheckUiState.isDanger == true -> "High"
-        dangerCheckUiState.isDanger == false -> "Low"
-        else -> "Haven't checked"
-    }
-
-    var startDate by rememberSaveable { mutableStateOf<MonthDay?>(null) }
-    var endDate by rememberSaveable { mutableStateOf<MonthDay?>(null) }
-    var selectedYear by rememberSaveable { mutableStateOf<Int?>(null) }
-
 
     var showFavoriteDialog by remember { mutableStateOf(false) }
 
@@ -190,83 +99,152 @@ fun MapScreen(
         )
     }
 
-    Scaffold(
-        modifier = modifier,
-        topBar = {
-            TopBar(
-                modifier = Modifier,
-                navController = navController)
-        },
-        bottomBar = {
-            BottomBar(modifier, navController)
+    DisposableEffect(Unit) {
+        onDispose {
+            mapViewModel.onSheetDismissed()
         }
-    ) { paddingValues ->
+    }
 
-        //Main screen content
-        Column(
+    MapScreen(
+        screenState = screenState,
+        riskState = riskState,
+        searchState = searchState,
+        coordinates = coordinates,
+        onMapClick = { lat, lon ->
+            mapViewModel.onMapClick(lat, lon)
+            riskViewModel.avalancheChecker(lat, lon)
+        },
+        onOverlayRetry = { mapViewModel.onOverlayLoading() },
+        onOverlayLoaded = { mapViewModel.onOverlayLoaded() },
+        onOverlayError = { mapViewModel.onOverlayError() },
+        onSheetDismiss = { mapViewModel.onSheetDismissed() },
+        onStartDateChange = { if (it != null) mapViewModel.onStartDateChange(it) },
+        onEndDateChange = { if (it != null) mapViewModel.onEndDateChange(it) },
+        onYearChange = { if (it != null) mapViewModel.onYearChange(it) },
+        onSearch = { searchViewModel.onSearch() },
+        onSelectResult = { searchViewModel.addRecentSearch(it) },
+        onAddFavorite = {
+            screenState.climateCoordinate?.let { coordinate ->
+                searchViewModel.addPendingFavorite(coordinate)
+                showFavoriteDialog = true
+            }
+        }
+    )
+}
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MapScreen(
+    modifier: Modifier = Modifier,
+    screenState: MapScreenState,
+    riskState: DangerCheckUiState,
+    searchState: SearchUiState,
+    coordinates: String,
+    onMapClick: (Double, Double) -> Unit,
+    onOverlayRetry: () -> Unit,
+    onOverlayLoaded: () -> Unit,
+    onOverlayError: () -> Unit,
+    onSheetDismiss: () -> Unit,
+    onStartDateChange: (MonthDay?) -> Unit,
+    onEndDateChange: (MonthDay?) -> Unit,
+    onYearChange: (Int?) -> Unit,
+    onSearch: () -> Unit,
+    onSelectResult: (NamedLocation) -> Unit,
+    onAddFavorite: () -> Unit,
+) {
+    val skiArea = remember(screenState.climateState) {
+        val state = screenState.climateState
+        if (state is ClimateState.Success) {
+            state.data.toSkiArea()
+        } else {
+            null
+        }
+    } ?: previewSkiArea
+
+    //Controls whether the bottom sheet is visible or not by keeping track of if the user has clicked the map
+    //if this is set to null then the ModalBottomSheet is not open
+    var isSheetOpen by remember { mutableStateOf(false) }
+
+    LaunchedEffect(screenState.climateState) {
+        if (screenState.climateState is ClimateState.Success) {
+            isSheetOpen = true
+        }
+    }
+
+    var skipPartiallyExpanded by rememberSaveable {mutableStateOf(false)}
+
+    val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = skipPartiallyExpanded)
+
+    val avalancheStatus = when {
+        riskState.isDanger == true -> "High"
+        riskState.isDanger == false -> "Low"
+        else -> "Haven't checked"
+    }
+
+    var startDate by rememberSaveable { mutableStateOf<MonthDay?>(null) }
+    var endDate by rememberSaveable { mutableStateOf<MonthDay?>(null) }
+    var selectedYear by rememberSaveable { mutableStateOf<Int?>(null) }
+
+    //Main screen content
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+    ) {
+        Box(
             modifier = Modifier
-                .fillMaxSize()
-                // Makes sure the content is not hidden behind the top app bar or bottom app bar.
-                .padding(paddingValues)
-                .padding(16.dp)
+                .fillMaxWidth()
+                .weight(1f)
         ) {
-            Box(
+            //Map added here
+            //onMapClick is passed to the Map
+            MapboxView(
+                onMapClick = { point ->
+                    onMapClick(point.latitude(), point.longitude())
+                    isSheetOpen = true
+                },
+                onOverlayError = onOverlayError,
+                onOverlayLoaded = onOverlayLoaded,
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-            ) {
-                //Map added here
-                //onMapClick is passed to the Map
-                MapboxView(
-                    onMapClick = { point ->
-                        onMapClick(point.latitude(), point.longitude())
-                        nveViewModel.avalancheChecker(point.latitude(), point.longitude())
-                        isSheetOpen = true
-                    },
-                    onOverlayError = onOverlayError,
-                    onOverlayLoaded = onOverlayLoaded,
-                    modifier = Modifier
-                        .fillMaxSize(),
-                    coordinates = coordinates,
-                    searchState = searchState,
-                    onSearch = { searchViewModel.onSearch() },
-                    onSelectResult = searchViewModel::addRecentSearch
-                )
+                    .fillMaxSize(),
+                coordinates = coordinates,
+                searchState = searchState,
+                onSearch = { onSearch() },
+                onSelectResult = onSelectResult
+            )
 
-
-                when (screenState.overlayState) {
-                    is OverlayState.Loading -> {
-                        OverlayStatusCard(
-                            message = stringResource(R.string.overlay_loading)
-                        )
-                    }
-
-                    is OverlayState.Error -> {
-                        OverlayRetryCard(
-                            message = stringResource(R.string.overlay_error),
-                            onRetry = onOverlayRetry
-                        )
-                    }
-
-                    is OverlayState.Success -> Unit
+            when (screenState.overlayState) {
+                is OverlayState.Loading -> {
+                    OverlayStatusCard(
+                        message = stringResource(R.string.overlay_loading)
+                    )
                 }
 
-                when (screenState.climateState) {
-                    is ClimateState.Idle -> Unit
+                is OverlayState.Error -> {
+                    OverlayRetryCard(
+                        message = stringResource(R.string.overlay_error),
+                        onRetry = onOverlayRetry
+                    )
+                }
 
-                    is ClimateState.Loading -> {
-                        Log.d("ClimateData", "Loading...")
-                    }
+                is OverlayState.Success -> Unit
+            }
 
-                    is ClimateState.Error -> {
-                        Log.d("ClimateData", "Error")
-                    }
+            when (screenState.climateState) {
+                is ClimateState.Idle -> Unit
 
-                    is ClimateState.Success -> {
-                        val success = screenState.climateState
-                        val climateData = success.data
-                        Log.d("ClimateData", climateData.toString())
-                    }
+                is ClimateState.Loading -> {
+                    Log.d("ClimateData", "Loading...")
+                }
+
+                is ClimateState.Error -> {
+                    Log.d("ClimateData", "Error")
+                }
+
+                is ClimateState.Success -> {
+                    val success = screenState.climateState
+                    val climateData = success.data
+                    Log.d("ClimateData", climateData.toString())
                 }
             }
         }
@@ -285,36 +263,19 @@ fun MapScreen(
                 area = skiArea,
                 climateState = screenState.climateState,
                 avalancheStatus = avalancheStatus,
-                dangerLevel = dangerCheckUiState.dangerLevel,
+                dangerLevel = riskState.dangerLevel,
                 modifier = Modifier
                     .fillMaxWidth()
                     .heightIn(min = 320.dp)
                     .navigationBarsPadding()
                     .padding(bottom = 12.dp),
-                startDate = startDate,
-                endDate = endDate,
-                selectedYear = selectedYear,
-                onStartDateChange = {
-                    startDate = it
-                    onPeriodStart(it)
-                },
-                onEndDateChange = {
-                    endDate = it
-                    onPeriodEnd(it)
-                },
-                onYearChange = { year ->
-                    selectedYear = year
-                    year?.let {
-                        val calculatedYearsBack = Year.now().value - it
-                        onYearsBack(calculatedYearsBack)
-                    }
-                },
-                onAddFavorite = {
-                    if (screenState.climateCoordinate != null) {
-                        showFavoriteDialog = true
-                        searchViewModel.addPendingFavorite(screenState.climateCoordinate)
-                    }
-                }
+                startDate = screenState.startDate,
+                endDate = screenState.endDate,
+                selectedYear = screenState.selectedYear,
+                onStartDateChange = { onStartDateChange(it) },
+                onEndDateChange = { onEndDateChange(it) },
+                onYearChange = onYearChange,
+                onAddFavorite = onAddFavorite
             )
         }
     }
@@ -345,184 +306,153 @@ fun BottomSheetContent(
     val climateRows = emptyList<Pair<String, String>>()
 
 
-
-    // This is the content inside the bottom sheet.
-    Surface(
-        modifier = modifier.fillMaxWidth(),
-        color = MaterialTheme.colorScheme.surface
+    LazyColumn(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 20.dp, vertical = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 20.dp, vertical = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
+        item {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = 60.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                when (climateState) {
+                    is ClimateState.Loading -> {
+                        CircularProgressIndicator(modifier = Modifier.size(26.dp))
+                    }
 
-            item {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .heightIn(min = 60.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    when (climateState) {
-                        is ClimateState.Loading -> {
-                            CircularProgressIndicator(modifier = Modifier.size(26.dp))
-                        }
+                    is ClimateState.Error -> {
+                        Text(
+                            text = stringResource(R.string.climate_error_desc),
+                            color = MaterialTheme.colorScheme.error,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
 
-                        is ClimateState.Error -> {
-                            Text(
-                                text = stringResource(R.string.climate_error_desc),
-                                color = MaterialTheme.colorScheme.error,
-                                style = MaterialTheme.typography.bodyMedium
-                            )
-                        }
+                    else -> {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column {
+                                Text(
+                                    text = stringResource(R.string.weather_station_desc),
+                                    style = MaterialTheme.typography.labelSmall
+                                )
+                                Text(
+                                    text = area.name,
+                                    style = MaterialTheme.typography.titleLarge,
+                                )
+                            }
+                            IconButton(
+                                modifier = Modifier,
+                                onClick = {
+                                    onAddFavorite()
+                                }
 
-                        else -> {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Column {
-                                    Text(
-                                        text = stringResource(R.string.weather_station_desc),
-                                        style = MaterialTheme.typography.labelSmall
-                                    )
-                                    Text(
-                                        text = area.name,
-                                        style = MaterialTheme.typography.titleLarge,
-                                    )
-                                }
-                                IconButton(
-                                    modifier = Modifier,
-                                    onClick = {
-                                        onAddFavorite()
-                                    }
-
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Default.Star,
-                                        contentDescription = ""
-                                    )
-                                }
+                                Icon(
+                                    imageVector = Icons.Default.Star,
+                                    contentDescription = ""
+                                )
                             }
                         }
                     }
-
-                    DangerLevelCard(uiModel =  dangerLevel)
-
                 }
-            }
 
-            item {
-                HorizontalDivider()
-            }
+                DangerLevelCard(uiModel =  dangerLevel)
 
-            item {
-                DatePicker(
-                    startDate = startDate,
-                    endDate = endDate,
-                    selectedYear = selectedYear,
-                    onStartDateChange = onStartDateChange,
-                    onEndDateChange = onEndDateChange,
-                    onYearChange = onYearChange,
+            }
+        }
+
+        item {
+            HorizontalDivider()
+        }
+
+        item {
+            DatePicker(
+                startDate = startDate,
+                endDate = endDate,
+                selectedYear = selectedYear,
+                onStartDateChange = onStartDateChange,
+                onEndDateChange = onEndDateChange,
+                onYearChange = onYearChange,
+            )
+
+            Surface(
+                modifier = Modifier
+                    .padding(8.dp)
+                    .fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
+                color = MaterialTheme.colorScheme.surfaceVariant
+            ) {
+                Text(
+                    text = stringResource(R.string.date_description),
+                    modifier = Modifier.padding(12.dp)
                 )
+            }
+        }
 
-                Surface(
+        item {
+            HorizontalDivider()
+        }
+
+
+        //THIS IS WHERE WE CAN PUT THE GRAPH COMPONENTS
+        item {
+            val currentYear = Year.now().value
+
+            val yearRange = remember(selectedYear) {
+                selectedYear?.let { it..currentYear }
+            }
+
+            if (yearRange == null ||
+                startDate == null ||
+                endDate == null
+            ) {
+                Box(
                     modifier = Modifier
-                        .padding(8.dp)
-                        .fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp),
-                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
-                    color = MaterialTheme.colorScheme.surfaceVariant
+                        .fillMaxWidth()
+                        .height(180.dp),
+                    contentAlignment = Alignment.Center
                 ) {
-                    Text(
-                        text = stringResource(R.string.date_description),
-                        modifier = Modifier.padding(12.dp)
+                    Text( text = stringResource(R.string.no_date_selected_msg))
+                }
+            } else {
+                Column(verticalArrangement = Arrangement.spacedBy(24.dp)) {
+                    ClimateGraph(
+                        dataPoints = area.temperatureData,
+                        startDate = startDate,
+                        endDate = endDate,
+                        title = stringResource(R.string.mean_temp_desc)
                     )
-                }
-            }
 
-            item {
-                HorizontalDivider()
-            }
+                    HorizontalDivider()
 
-            items(climateRows) { row ->
-                ClimateRow(
-                    label = row.first,
-                    value = row.second)
-            }
+                    ClimateGraph(
+                        dataPoints = area.precipitationData,
+                        startDate = startDate,
+                        endDate = endDate,
+                        title = stringResource(R.string.mean_precip_desc)
+                    )
 
-            //THIS IS WHERE WE CAN PUT THE GRAPH COMPONENTS
-            item {
-                val currentYear = Year.now().value
+                    HorizontalDivider()
 
-                val yearRange = remember(selectedYear) {
-                    selectedYear?.let { it..currentYear }
-                }
+                    ClimateGraph(
+                        dataPoints = area.windSpeedData,
+                        startDate = startDate,
+                        endDate = endDate,
+                        title = stringResource(R.string.mean_wind_desc)
+                    )
 
-                if (yearRange == null ||
-                    startDate == null ||
-                    endDate == null
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(180.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text( text = stringResource(R.string.no_date_selected_msg))
-                    }
-                } else {
-                    Column(verticalArrangement = Arrangement.spacedBy(24.dp)) {
-                        ClimateGraph(
-                            dataPoints = area.temperatureData,
-                            startDate = startDate,
-                            endDate = endDate,
-                            title = stringResource(R.string.mean_temp_desc)
-                        )
-
-                        HorizontalDivider()
-
-                        ClimateGraph(
-                            dataPoints = area.precipitationData,
-                            startDate = startDate,
-                            endDate = endDate,
-                            title = stringResource(R.string.mean_precip_desc)
-                        )
-
-                        HorizontalDivider()
-
-                        ClimateGraph(
-                            dataPoints = area.windSpeedData,
-                            startDate = startDate,
-                            endDate = endDate,
-                            title = stringResource(R.string.mean_wind_desc)
-                        )
-
-                    }
                 }
             }
         }
-    }
-}
-
-@Composable
-fun ClimateRow(
-    label: String,
-    value: String
-) {
-    // This creates the rows of information within the bottom sheet i.e. Average snowfall, Average rainfall etc.
-    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-        Text(
-            text = label,
-            style = MaterialTheme.typography.labelLarge
-        )
-        Text(
-            text = value,
-            style = MaterialTheme.typography.bodyLarge
-        )
     }
 }
 
@@ -530,27 +460,29 @@ fun ClimateRow(
 @Composable
 fun MapScreenErrorPreview() {
     MapScreen(
-        navController = rememberNavController(),
         screenState = MapScreenState(
             overlayState = OverlayState.Error,
             climateState = ClimateState.Idle,
             climateCoordinate = null,
-            periodStart = MonthDay.now(),
-            periodEnd = MonthDay.now(),
-            yearsBack = 1
+            startDate = MonthDay.now(),
+            endDate = MonthDay.now(),
+            selectedYear = 1
         ),
-        nveViewModel = viewModel(),
         onMapClick = { _, _ -> },
         coordinates = "",
         onOverlayRetry = {},
         onOverlayLoaded = {},
         onOverlayError = {},
         onSheetDismiss = {},
-        settingsViewModel = viewModel(),
-        onPeriodStart = {},
-        onPeriodEnd = {},
-        onYearsBack = {},
-        searchViewModel = koinViewModel()
+        onStartDateChange = {},
+        onEndDateChange = {},
+        onYearChange = {},
+        modifier = Modifier,
+        riskState = DangerCheckUiState(),
+        searchState = SearchUiState(),
+        onSearch = {},
+        onSelectResult = {},
+        onAddFavorite = {},
     )
 }
 
