@@ -247,7 +247,7 @@ fun YearDropdown(
     modifier: Modifier = Modifier
 ) {
     var expanded by remember { mutableStateOf(false) }
-    val years = remember(currentYear) { (1900..currentYear).toList().reversed() }
+    val years = remember(currentYear) { (1900..<currentYear).toList().reversed() }
 
     ExposedDropdownMenuBox(
         expanded = expanded,

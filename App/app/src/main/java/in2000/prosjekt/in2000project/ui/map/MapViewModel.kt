@@ -98,7 +98,7 @@ class MapViewModel(
         fetchClimateData(lat, lon)
     }
 
-    fun onPeriodStart(start: MonthDay) {
+    fun onStartDateChange(start: MonthDay) {
         val current = _screenState.value
         val end = setTimeBoundary(start, current.endDate)
 
@@ -111,7 +111,7 @@ class MapViewModel(
         refetchIfLocationKnown()
     }
 
-    fun onPeriodEnd(end: MonthDay) {
+    fun onEndDateChange(end: MonthDay) {
         val current = _screenState.value
         val start = setTimeBoundary(current.startDate, end)
 
@@ -124,12 +124,12 @@ class MapViewModel(
         refetchIfLocationKnown()
     }
 
-    fun onYearsBack(yearsBack: Int) {
-        _screenState.value = _screenState.value.copy(
-            selectedYear = yearsBack
-        )
+    fun onYearChange(year: Int) {
+        val updated = _screenState.value.copy(selectedYear = year)
+        _screenState.value = updated
 
-        refetchIfLocationKnown()
+        val coordinate = updated.climateCoordinate ?: return
+        fetchClimateData(coordinate.latitude, coordinate.longitude)
     }
 
     private fun refetchIfLocationKnown() {

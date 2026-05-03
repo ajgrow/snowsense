@@ -7,9 +7,11 @@ import in2000.prosjekt.in2000project.data.repository.FrostAvalancheRiskRepositor
 import in2000.prosjekt.in2000project.data.repository.FrostClimateRepository
 import in2000.prosjekt.in2000project.data.repository.NveRepository
 import in2000.prosjekt.in2000project.network.KtorClient
+import in2000.prosjekt.in2000project.ui.information.InfoViewModel
 import in2000.prosjekt.in2000project.ui.map.MapViewModel
 import in2000.prosjekt.in2000project.ui.map.RiskViewModel
 import in2000.prosjekt.in2000project.ui.search.SearchViewModel
+import in2000.prosjekt.in2000project.ui.settings.SettingsViewModel
 import in2000.prosjekt.in2000project.util.ApiKeys
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
@@ -24,4 +26,7 @@ val appModule = module {
     viewModel { MapViewModel(get()) }
     viewModel { RiskViewModel(get(), get()) }
     viewModel { SearchViewModel() }
+    viewModel { SettingsViewModel(get()) }
+    viewModel { InfoViewModel(get()) }
+
 }

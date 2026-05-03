@@ -1,15 +1,14 @@
 package in2000.prosjekt.in2000project.navigation
 
-import com.mapbox.maps.ScreenCoordinate
+import androidx.navigation.NavDestination
 
 sealed class Screen(
     val route: String
 ) {
-    object Home : Screen("home")
-    object Map : Screen("map/{coordinates}") {
+    data object Home : Screen("home")
+    data object Map : Screen("map/{coordinates}") {
         fun createRoute(coordinates: String) = "map/$coordinates"
     }
-    object Info : Screen("info")
-    object Settings : Screen("settings")
-
+    data object Info : Screen("info")
+    data object Settings : Screen("settings")
 }

@@ -13,17 +13,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import in2000.prosjekt.in2000project.R
-import in2000.prosjekt.in2000project.navigation.Screen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TopBar(
     modifier: Modifier = Modifier,
     title: String? = null,
-    navController: NavController
+    onSettingsClick: () -> Unit = {},
 ){
     CenterAlignedTopAppBar(
         modifier =  modifier,
@@ -35,11 +32,11 @@ fun TopBar(
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface
                 )
-            } //if title is not null
+            }
         },
         actions = {
             IconButton(
-                onClick = {navController.navigate(Screen.Settings.route)}
+                onClick = onSettingsClick
             ) {
                 Icon(
                     imageVector = Icons.Default.Settings,
@@ -56,5 +53,5 @@ fun TopBar(
 fun TopBarPreview(
     modifier: Modifier = Modifier
 ){
-    TopBar(modifier, "**title**", navController = rememberNavController())
+    TopBar(modifier, "**title**")
 }

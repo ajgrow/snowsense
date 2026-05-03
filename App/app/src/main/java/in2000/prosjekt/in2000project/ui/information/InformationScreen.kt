@@ -37,29 +37,27 @@ import in2000.prosjekt.in2000project.R
 import in2000.prosjekt.in2000project.data.model.enums.DangerLevel
 import in2000.prosjekt.in2000project.ui.reusables.BottomBar
 import in2000.prosjekt.in2000project.data.model.enums.EmergencyServices
+import in2000.prosjekt.in2000project.navigation.Screen
 import in2000.prosjekt.in2000project.ui.model.DangerLevelUiModel
 import in2000.prosjekt.in2000project.ui.model.toUiModel
 import in2000.prosjekt.in2000project.ui.reusables.TopBar
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun InfoScreen(
     modifier: Modifier = Modifier,
-    navController: NavController,
-    infoViewModel: InfoViewModel = viewModel()
+    onSettingsClick: () -> Unit = {},
+    infoViewModel: InfoViewModel = koinViewModel()
 ) {
     val uiState by infoViewModel.infoUiState.collectAsState()
 
     Scaffold(
         modifier = modifier,
-        topBar = {
-            TopBar(
+        topBar = { TopBar(
                 title = stringResource(R.string.about_app_title),
                 modifier = Modifier,
-                navController = navController)
-        },
-        bottomBar = {
-            BottomBar(modifier, navController)
-        }
+                onSettingsClick = onSettingsClick
+        ) },
     ) { paddingValues ->
 
         LazyColumn(

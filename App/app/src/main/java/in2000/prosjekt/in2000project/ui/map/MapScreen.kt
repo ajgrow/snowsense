@@ -138,7 +138,7 @@ fun MapRoute(
 fun MapScreen(
     modifier: Modifier = Modifier,
     screenState: MapScreenState,
-    riskState: DangerCheckUiState,
+    riskState: RiskUiState,
     searchState: SearchUiState,
     coordinates: String,
     onMapClick: (Double, Double) -> Unit,
@@ -306,23 +306,23 @@ fun BottomSheetContent(
     val climateRows = emptyList<Pair<String, String>>()
 
 
-    LazyColumn(
+        LazyColumn(
         modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = 20.dp, vertical = 8.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        item {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .heightIn(min = 60.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                when (climateState) {
-                    is ClimateState.Loading -> {
-                        CircularProgressIndicator(modifier = Modifier.size(26.dp))
-                    }
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp, vertical = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            item {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(min = 60.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    when (climateState) {
+                        is ClimateState.Loading -> {
+                            CircularProgressIndicator(modifier = Modifier.size(26.dp))
+                        }
 
                     is ClimateState.Error -> {
                         Text(
@@ -449,7 +449,6 @@ fun BottomSheetContent(
                         endDate = endDate,
                         title = stringResource(R.string.mean_wind_desc)
                     )
-
                 }
             }
         }
@@ -478,7 +477,7 @@ fun MapScreenErrorPreview() {
         onEndDateChange = {},
         onYearChange = {},
         modifier = Modifier,
-        riskState = DangerCheckUiState(),
+        riskState = RiskUiState(),
         searchState = SearchUiState(),
         onSearch = {},
         onSelectResult = {},

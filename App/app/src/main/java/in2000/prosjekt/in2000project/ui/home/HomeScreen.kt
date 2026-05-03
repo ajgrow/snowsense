@@ -21,6 +21,9 @@
     import androidx.compose.foundation.lazy.LazyColumn
     import androidx.compose.foundation.lazy.LazyRow
     import androidx.compose.foundation.lazy.items
+    import androidx.compose.material3.Card
+    import androidx.compose.material3.Scaffold
+    import androidx.compose.foundation.rememberScrollState
     import androidx.compose.foundation.shape.RoundedCornerShape
     import androidx.compose.material.icons.Icons
     import androidx.compose.material.icons.filled.Phone
@@ -71,7 +74,8 @@
     @Composable
     fun HomeScreen(
         modifier: Modifier = Modifier,
-        navController: NavController,
+        onSettingsClick: () -> Unit,
+        onNavigateToMap: (coordinate: Coordinate) -> Unit,
         searchViewModel: SearchViewModel = koinViewModel()
     ) {
         val focusManager = LocalFocusManager.current
@@ -79,8 +83,6 @@
 
         Scaffold(
             modifier = modifier,
-            topBar = {},
-            bottomBar = { BottomBar(modifier, navController) }
         ) { paddingValues ->
             Column(
                 modifier = Modifier
@@ -94,17 +96,8 @@
                     },
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                HomeTopBar(navController)
+                HomeTopBar(onSettingsClick)
                 LogoSection()
-
-                val onNavigateToMap = { coordinate: Coordinate ->
-                    val coordinateString = "${coordinate.longitude},${coordinate.latitude}"
-                    navController.navigate(Screen.Map.createRoute(coordinateString)) {
-                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
-                        launchSingleTop = false
-                        restoreState = false
-                    }
-                }
 
                 Box(
                     modifier = Modifier
@@ -180,8 +173,6 @@
             )
         }
     }
-
-
 
     @Composable
     fun FavoriteSection(
@@ -317,10 +308,11 @@
 
     @Composable
     fun HomeTopBar(
-        navController: NavController
+        onSettingsClick: () -> Unit,
+        modifier: Modifier = Modifier
     ){
         Box(
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxWidth()
                 .padding(
                     top = 16.dp,
@@ -336,8 +328,7 @@
             )
 
             IconButton(
-                onClick = {
-                    navController.navigate(Screen.Settings.route) },
+                onClick = onSettingsClick,
                 modifier = Modifier
                     .align(Alignment.CenterEnd)
             ) {
@@ -417,6 +408,9 @@
     @Composable
     fun HomeScreenPreview(
     ) {
-        HomeScreen(navController = rememberNavController())
+        HomeScreen(
+            onSettingsClick = {},
+            onNavigateToMap = {},
+        )
     }
 
