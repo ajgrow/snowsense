@@ -54,7 +54,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import in2000.prosjekt.in2000project.R
@@ -69,6 +68,7 @@ import java.time.MonthDay
 
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import in2000.prosjekt.in2000project.data.model.Coordinate
+import in2000.prosjekt.in2000project.data.model.NamedLocation
 import in2000.prosjekt.in2000project.ui.search.SearchViewModel
 import in2000.prosjekt.in2000project.ui.settings.SettingsViewModel
 import in2000.prosjekt.in2000project.data.model.enums.DangerLevel
@@ -76,6 +76,7 @@ import in2000.prosjekt.in2000project.ui.model.DangerLevelUiModel
 import in2000.prosjekt.in2000project.ui.model.toUiModel
 import in2000.prosjekt.in2000project.ui.reusables.TextInputDialog
 import kotlinx.coroutines.launch
+import in2000.prosjekt.in2000project.ui.search.SearchUiState
 import java.time.Year
 
 private val previewSkiArea = SkiArea(
@@ -94,37 +95,60 @@ fun MapRoute(
     coordinates: String,
     searchViewModel: SearchViewModel,
     mapViewModel: MapViewModel = koinViewModel(),
-    nveViewModel: NveViewModel = viewModel(),
-    settingsViewModel: SettingsViewModel = viewModel()
+    nveViewModel: NveViewModel = koinViewModel(),
+    settingsViewModel: SettingsViewModel = koinViewModel()
 ) {
     val screenState by mapViewModel.screenState.collectAsState()
+    val dangerCheckUiState by nveViewModel.dangerCheckUiState.collectAsState()
+    val searchState by searchViewModel.searchState.collectAsStateWithLifecycle()
+
+    var showFavoriteDialog by remember { mutableStateOf(false) }
+
+    if (showFavoriteDialog) {
+        TextInputDialog(
+            title = stringResource(R.string.name_favorite_prompt),
+            defaultValue = "",
+            onConfirm = { name ->
+                if (name.isNotBlank()) {
+                    searchViewModel.nameFavorite(name)
+                    showFavoriteDialog = false
+                }
+            },
+            onDismiss = { showFavoriteDialog = false }
+        )
+    }
+
     DisposableEffect(Unit) {
         onDispose {
             mapViewModel.onSheetDismissed()
         }
     }
 
-
     MapScreen(
         navController = navController,
         screenState = screenState,
-        nveViewModel = nveViewModel,
+        dangerCheckUiState = dangerCheckUiState,
+        searchState = searchState,
+        coordinates = coordinates,
         onMapClick = { lat, lon ->
             mapViewModel.onMapClick(lat, lon)
             nveViewModel.avalancheChecker(lat, lon)
         },
-        coordinates = coordinates,
         onOverlayRetry = { mapViewModel.onOverlayLoading() },
-        onOverlayLoaded = { mapViewModel.onOverlayLoaded()},
-        onOverlayError = { mapViewModel.onOverlayError()},
-        onPeriodStart = { it ->
-            if (it != null) mapViewModel.onPeriodStart(it) },
-        onPeriodEnd = { it ->
-            if (it != null) mapViewModel.onPeriodEnd(it) },
-        onYearsBack = { it ->
-            if (it != null) mapViewModel.onYearsBack(it) },
-        settingsViewModel = settingsViewModel,
-        searchViewModel = searchViewModel
+        onOverlayLoaded = { mapViewModel.onOverlayLoaded() },
+        onOverlayError = { mapViewModel.onOverlayError() },
+        onStartDateChange = { if (it != null) mapViewModel.onStartDateChange(it) },
+        onEndDateChange = { if (it != null) mapViewModel.onEndDateChange(it) },
+        onYearChange = { if (it != null) mapViewModel.onYearChange(it) },
+        onSearch = { searchViewModel.onSearch() },
+        onSelectResult = { searchViewModel.addRecentSearch(it) },
+        onAddFavorite = {
+            screenState.climateCoordinate?.let { coordinate ->
+                searchViewModel.addPendingFavorite(coordinate)
+                showFavoriteDialog = true
+            }
+        },
+        canAddFavorite = searchViewModel::canAddFavorite
     )
 }
 
@@ -135,17 +159,20 @@ fun MapScreen(
     modifier: Modifier = Modifier,
     navController: NavController,
     screenState: MapScreenState,
-    nveViewModel: NveViewModel,
-    onMapClick: (Double, Double) -> Unit,
+    dangerCheckUiState: DangerCheckUiState,
+    searchState: SearchUiState,
     coordinates: String,
+    onMapClick: (Double, Double) -> Unit,
     onOverlayRetry: () -> Unit,
     onOverlayLoaded: () -> Unit,
     onOverlayError: () -> Unit,
-    onPeriodStart: (MonthDay?) -> Unit,
-    onPeriodEnd: (MonthDay?) -> Unit,
-    onYearsBack: (Int?) -> Unit,
-    settingsViewModel: SettingsViewModel,
-    searchViewModel: SearchViewModel
+    onStartDateChange: (MonthDay?) -> Unit,
+    onEndDateChange: (MonthDay?) -> Unit,
+    onYearChange: (Int?) -> Unit,
+    onSearch: () -> Unit,
+    onSelectResult: (NamedLocation) -> Unit,
+    onAddFavorite: () -> Unit,
+    canAddFavorite: () -> Boolean
 ) {
     val skiArea = remember(screenState.climateState) {
         val state = screenState.climateState
@@ -157,10 +184,6 @@ fun MapScreen(
     } ?: previewSkiArea
 
     val scope = rememberCoroutineScope()
-
-    val searchState by searchViewModel.searchState.collectAsStateWithLifecycle()
-
-    val dangerCheckUiState by nveViewModel.dangerCheckUiState.collectAsState()
 
     //Controls whether the bottom sheet is visible or not by keeping track of if the user has clicked the map
     //if this is set to null then the ModalBottomSheet is not open
@@ -184,20 +207,6 @@ fun MapScreen(
 
 
     var showFavoriteDialog by remember { mutableStateOf(false) }
-
-    if (showFavoriteDialog) {
-        TextInputDialog(
-            title = stringResource(R.string.name_favorite_prompt),
-            defaultValue = "",
-            onConfirm = { name ->
-                if (name.isNotBlank()) {
-                    searchViewModel.nameFavorite(name)
-                    showFavoriteDialog = false
-                }
-            },
-            onDismiss = { showFavoriteDialog = false }
-        )
-    }
 
     val listState = rememberLazyListState()
     val showScrollButton by remember {
@@ -282,19 +291,19 @@ fun MapScreen(
                 MapboxView(
                     onMapClick = { point ->
                         onMapClick(point.latitude(), point.longitude())
-                        nveViewModel.avalancheChecker(point.latitude(), point.longitude())
                         if (!isSheetOpen) {
                             mapHeightPx = halfScreenPx
                             isSheetOpen = true
                         }
+                        isSheetOpen = true
                     },
                     onOverlayError = onOverlayError,
                     onOverlayLoaded = onOverlayLoaded,
                     modifier = Modifier.fillMaxSize(),
                     coordinates = coordinates,
                     searchState = searchState,
-                    onSearch = { searchViewModel.onSearch() },
-                    onSelectResult = searchViewModel::addRecentSearch
+                    onSearch = { onSearch() },
+                    onSelectResult = onSelectResult
                 )
                 when (screenState.overlayState) {
                     is OverlayState.Loading -> OverlayStatusCard(message = stringResource(R.string.overlay_loading))
@@ -312,29 +321,14 @@ fun MapScreen(
                         climateState = screenState.climateState,
                         dangerLevel = dangerCheckUiState.dangerLevel,
                         modifier = Modifier.fillMaxSize(),
-                        startDate = startDate,
-                        endDate = endDate,
-                        selectedYear = selectedYear,
-                        onStartDateChange = { startDate = it; onPeriodStart(it) },
-                        onEndDateChange = { endDate = it; onPeriodEnd(it) },
-                        onYearChange = { year ->
-                            selectedYear = year; year?.let { onYearsBack(Year.now().value - it) }
-                        },
-                        onAddFavorite = {
-                            if (screenState.climateCoordinate != null) {
-                                showFavoriteDialog = true
-                                searchViewModel.addPendingFavorite(screenState.climateCoordinate)
-                            }
-                        },
-
-                        canAddFavorite = {
-                            val coordinate = screenState.climateCoordinate
-                            if (coordinate != null) {
-                                !searchState.favorites.any { it.coordinate == coordinate }
-                            } else {
-                                false
-                            }
-                        },
+                        startDate = screenState.startDate,
+                        endDate = screenState.endDate,
+                        selectedYear = screenState.selectedYear,
+                        onStartDateChange = { onStartDateChange(it) },
+                        onEndDateChange = { onEndDateChange(it) },
+                        onYearChange = onYearChange,
+                        onAddFavorite = onAddFavorite,
+                        canAddFavorite = canAddFavorite,
                         listState = listState
                     )
                     if (showScrollButton) {
@@ -538,24 +532,6 @@ fun BottomSheetContent(
     }
 }
 
-@Composable
-fun ClimateRow(
-    label: String,
-    value: String
-) {
-    // This creates the rows of information within the bottom sheet i.e. Average snowfall, Average rainfall etc.
-    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-        Text(
-            text = label,
-            style = MaterialTheme.typography.labelLarge
-        )
-        Text(
-            text = value,
-            style = MaterialTheme.typography.bodyLarge
-        )
-    }
-}
-
 @Preview
 @Composable
 fun MapScreenErrorPreview() {
@@ -565,21 +541,22 @@ fun MapScreenErrorPreview() {
             overlayState = OverlayState.Error,
             climateState = ClimateState.Idle,
             climateCoordinate = null,
-            periodStart = MonthDay.now(),
-            periodEnd = MonthDay.now(),
-            yearsBack = 1
         ),
-        nveViewModel = viewModel(),
         onMapClick = { _, _ -> },
         coordinates = "",
         onOverlayRetry = {},
         onOverlayLoaded = {},
         onOverlayError = {},
-        settingsViewModel = viewModel(),
-        onPeriodStart = {},
-        onPeriodEnd = {},
-        onYearsBack = {},
-        searchViewModel = koinViewModel()
+        onStartDateChange = {},
+        onEndDateChange = {},
+        onYearChange = {},
+        modifier = Modifier,
+        dangerCheckUiState = DangerCheckUiState(),
+        searchState = SearchUiState(),
+        onSearch = {},
+        onSelectResult = {},
+        onAddFavorite = {},
+        canAddFavorite = { false }
     )
 }
 

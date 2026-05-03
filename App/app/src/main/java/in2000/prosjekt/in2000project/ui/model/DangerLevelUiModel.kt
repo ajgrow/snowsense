@@ -13,6 +13,7 @@ provides a single source of truth for the composables that use them
 data class DangerLevelUiModel(
     val level: DangerLevel,
     @StringRes val titleRes: Int,
+    @StringRes val badgeLabelRes: Int,
     @StringRes val descriptionRes: Int,
     val lightColor: Color,
     val darkColor: Color
@@ -30,6 +31,7 @@ fun DangerLevel.toUiModel(): DangerLevelUiModel {
         DangerLevel.LOW -> DangerLevelUiModel(
             level = this,
             titleRes = R.string.danger_level_1_title,
+            badgeLabelRes = R.string.danger_level_2_badge,
             descriptionRes = R.string.danger_level_1_description,
             lightColor = DangerColorLevel1,
             darkColor = DangerColorLevel1Dark
@@ -37,13 +39,14 @@ fun DangerLevel.toUiModel(): DangerLevelUiModel {
         DangerLevel.MODERATE -> DangerLevelUiModel(
             level = this,
             titleRes = R.string.danger_level_2_title,
-            descriptionRes = R.string.danger_level_2_description,
+            badgeLabelRes = R.string.danger_level_2_badge,            descriptionRes = R.string.danger_level_2_description,
             lightColor = DangerColorLevel2,
             darkColor = DangerColorLevel2Dark
         )
         DangerLevel.CONSIDERABLE -> DangerLevelUiModel(
             level = this,
             titleRes = R.string.danger_level_3_title,
+            badgeLabelRes = R.string.danger_level_3_badge,
             descriptionRes = R.string.danger_level_3_description,
             lightColor = DangerColorLevel3,
             darkColor = DangerColorLevel3Dark
@@ -51,6 +54,7 @@ fun DangerLevel.toUiModel(): DangerLevelUiModel {
         DangerLevel.HIGH -> DangerLevelUiModel(
             level = this,
             titleRes = R.string.danger_level_4_title,
+            badgeLabelRes = R.string.danger_level_4_badge,
             descriptionRes = R.string.danger_level_4_description,
             lightColor = DangerColorLevel4,
             darkColor = DangerColorLevel4Dark
@@ -58,6 +62,7 @@ fun DangerLevel.toUiModel(): DangerLevelUiModel {
         DangerLevel.VERY_HIGH -> DangerLevelUiModel(
             level = this,
             titleRes = R.string.danger_level_5_title,
+            badgeLabelRes = R.string.danger_level_5_badge,
             descriptionRes = R.string.danger_level_5_description,
             lightColor = DangerColorLevel5,
             darkColor = DangerColorLevel5Dark

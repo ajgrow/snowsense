@@ -33,6 +33,12 @@
     <string name="danger_level_5_title">5 - Very High</string>
     <string name="danger_level_5_description">Extraordinary avalanche conditions.\n\nNumerous very large and often extremely large natural avalanches can be expected, even in moderately steep terrain.\n\nVery rarely forecast.</string>
 
+    <string name="danger_level_1_badge">LEVEL 1</string>
+    <string name="danger_level_2_badge">LEVEL 2</string>
+    <string name="danger_level_3_badge">LEVEL 3</string>
+    <string name="danger_level_4_badge">LEVEL 4</string>
+    <string name="danger_level_5_badge">LEVEL 5</string>
+
     <string name="date_description">Define a date range and the number of years back to visualize historical trends in temperature, wind, and precipitation.</string>
 
     <string name="police_service">Police</string>
