@@ -1,6 +1,5 @@
 package in2000.prosjekt.in2000project.ui.home
 
-    import androidx.compose.foundation.BorderStroke
     import androidx.compose.foundation.Image
     import androidx.compose.foundation.background
     import androidx.compose.foundation.clickable
@@ -10,7 +9,6 @@ package in2000.prosjekt.in2000project.ui.home
     import androidx.compose.foundation.layout.BoxWithConstraints
     import androidx.compose.foundation.layout.Column
     import androidx.compose.foundation.layout.PaddingValues
-    import androidx.compose.foundation.layout.Row
     import androidx.compose.foundation.layout.fillMaxSize
     import androidx.compose.foundation.layout.fillMaxWidth
     import androidx.compose.foundation.layout.padding
@@ -19,17 +17,15 @@ package in2000.prosjekt.in2000project.ui.home
     import androidx.compose.foundation.lazy.LazyColumn
     import androidx.compose.foundation.lazy.LazyRow
     import androidx.compose.foundation.lazy.items
+    import androidx.compose.material3.Card
+    import androidx.compose.material3.Scaffold
     import androidx.compose.foundation.shape.RoundedCornerShape
     import androidx.compose.material.icons.Icons
-    import androidx.compose.material.icons.filled.Phone
     import androidx.compose.material.icons.filled.Settings
-    import androidx.compose.material3.Card
     import androidx.compose.material3.CardDefaults
     import androidx.compose.material3.Icon
     import androidx.compose.material3.IconButton
     import androidx.compose.material3.MaterialTheme
-    import androidx.compose.material3.Scaffold
-    import androidx.compose.material3.Surface
     import androidx.compose.material3.Text
     import androidx.compose.runtime.Composable
     import androidx.compose.runtime.LaunchedEffect
@@ -52,35 +48,29 @@ package in2000.prosjekt.in2000project.ui.home
     import androidx.compose.ui.text.font.FontWeight.Companion.Bold
     import androidx.compose.ui.text.style.TextOverflow
     import androidx.compose.ui.unit.sp
-    import androidx.navigation.NavController
-    import androidx.navigation.NavGraph.Companion.findStartDestination
-    import androidx.navigation.compose.rememberNavController
     import in2000.prosjekt.in2000project.R
     import in2000.prosjekt.in2000project.data.model.Coordinate
     import in2000.prosjekt.in2000project.data.model.NamedLocation
-    import in2000.prosjekt.in2000project.navigation.Screen
     import in2000.prosjekt.in2000project.ui.map.NveViewModel
     import in2000.prosjekt.in2000project.ui.model.DangerLevelUiModel
-    import in2000.prosjekt.in2000project.ui.reusables.BottomBar
     import in2000.prosjekt.in2000project.ui.reusables.EmergencySection
     import in2000.prosjekt.in2000project.ui.reusables.SearchSection
     import in2000.prosjekt.in2000project.ui.search.SearchViewModel
     import org.koin.compose.viewmodel.koinViewModel
 
-@Composable
-fun HomeScreen(
-    modifier: Modifier = Modifier,
-    navController: NavController,
-    searchViewModel: SearchViewModel = koinViewModel()
-) {
+    @Composable
+    fun HomeScreen(
+        modifier: Modifier = Modifier,
+        onSettingsClick: () -> Unit,
+        onNavigateToMap: (coordinate: Coordinate) -> Unit,
+        searchViewModel: SearchViewModel = koinViewModel()
+    ) {
+        val focusManager = LocalFocusManager.current
+        val searchState by searchViewModel.searchState.collectAsStateWithLifecycle()
 
-    val focusManager = LocalFocusManager.current
-    val searchState by searchViewModel.searchState.collectAsStateWithLifecycle()
 
         Scaffold(
             modifier = modifier,
-            topBar = {},
-            bottomBar = { BottomBar(modifier, navController) }
         ) { paddingValues ->
             Column(
                 modifier = Modifier
@@ -94,17 +84,8 @@ fun HomeScreen(
                     },
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                HomeTopBar(navController)
+                HomeTopBar(onSettingsClick)
                 LogoSection()
-
-                val onNavigateToMap = { coordinate: Coordinate ->
-                    val coordinateString = "${coordinate.longitude},${coordinate.latitude}"
-                    navController.navigate(Screen.Map.createRoute(coordinateString)) {
-                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
-                        launchSingleTop = false
-                        restoreState = false
-                    }
-                }
 
                 Box(
                     modifier = Modifier
@@ -180,8 +161,6 @@ fun HomeScreen(
             )
         }
     }
-
-
 
     @Composable
     fun FavoriteSection(
@@ -317,10 +296,11 @@ fun HomeScreen(
 
     @Composable
     fun HomeTopBar(
-        navController: NavController
+        onSettingsClick: () -> Unit,
+        modifier: Modifier = Modifier
     ){
         Box(
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxWidth()
                 .padding(
                     top = 16.dp,
@@ -336,8 +316,7 @@ fun HomeScreen(
             )
 
             IconButton(
-                onClick = {
-                    navController.navigate(Screen.Settings.route) },
+                onClick = onSettingsClick,
                 modifier = Modifier
                     .align(Alignment.CenterEnd)
             ) {
@@ -352,7 +331,8 @@ fun HomeScreen(
 @Composable
 fun HomeScreenPreview(){
     HomeScreen(
-        navController = rememberNavController(),
+        onNavigateToMap = {},
+        onSettingsClick = {},
         searchViewModel = viewModel()
     )
 }

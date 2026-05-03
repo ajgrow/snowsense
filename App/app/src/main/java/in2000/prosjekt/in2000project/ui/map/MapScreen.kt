@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
@@ -26,7 +25,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -44,16 +42,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import in2000.prosjekt.in2000project.R
 import in2000.prosjekt.in2000project.data.model.SkiArea
 import in2000.prosjekt.in2000project.data.model.toSkiArea
-import in2000.prosjekt.in2000project.ui.reusables.BottomBar
 import in2000.prosjekt.in2000project.ui.reusables.ClimateGraph
 import in2000.prosjekt.in2000project.ui.reusables.DangerLevelCard
 import in2000.prosjekt.in2000project.ui.reusables.DatePicker
-import in2000.prosjekt.in2000project.ui.reusables.TopBar
 import org.koin.compose.viewmodel.koinViewModel
 import java.time.MonthDay
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -79,7 +73,6 @@ private val previewSkiArea = SkiArea(
 //for use when the VM is ready
 @Composable
 fun MapRoute(
-    navController: NavController,
     coordinates: String,
     searchViewModel: SearchViewModel,
     mapViewModel: MapViewModel = koinViewModel(),
@@ -113,7 +106,6 @@ fun MapRoute(
     }
 
     MapScreen(
-        navController = navController,
         screenState = screenState,
         dangerCheckUiState = dangerCheckUiState,
         searchState = searchState,
@@ -145,7 +137,6 @@ fun MapRoute(
 @Composable
 fun MapScreen(
     modifier: Modifier = Modifier,
-    navController: NavController,
     screenState: MapScreenState,
     dangerCheckUiState: DangerCheckUiState,
     searchState: SearchUiState,
@@ -191,82 +182,69 @@ fun MapScreen(
         else -> "Haven't checked"
     }
 
-    Scaffold(
-        modifier = modifier,
-        topBar = {
-            TopBar(
-                modifier = Modifier,
-                navController = navController)
-        },
-        bottomBar = {
-            BottomBar(modifier, navController)
-        }
-    ) { paddingValues ->
+    var startDate by rememberSaveable { mutableStateOf<MonthDay?>(null) }
+    var endDate by rememberSaveable { mutableStateOf<MonthDay?>(null) }
+    var selectedYear by rememberSaveable { mutableStateOf<Int?>(null) }
 
-        //Main screen content
-        Column(
+    //Main screen content
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+    ) {
+        Box(
             modifier = Modifier
-                .fillMaxSize()
-                // Makes sure the content is not hidden behind the top app bar or bottom app bar.
-                .padding(paddingValues)
-                .padding(16.dp)
+                .fillMaxWidth()
+                .weight(1f)
         ) {
-            Box(
+            //Map added here
+            //onMapClick is passed to the Map
+            MapboxView(
+                onMapClick = { point ->
+                    onMapClick(point.latitude(), point.longitude())
+                    isSheetOpen = true
+                },
+                onOverlayError = onOverlayError,
+                onOverlayLoaded = onOverlayLoaded,
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-            ) {
-                //Map added here
-                //onMapClick is passed to the Map
-                MapboxView(
-                    onMapClick = { point ->
-                        onMapClick(point.latitude(), point.longitude())
-                        isSheetOpen = true
-                    },
-                    onOverlayError = onOverlayError,
-                    onOverlayLoaded = onOverlayLoaded,
-                    modifier = Modifier
-                        .fillMaxSize(),
-                    coordinates = coordinates,
-                    searchState = searchState,
-                    onSearch = { onSearch() },
-                    onSelectResult = onSelectResult
-                )
+                    .fillMaxSize(),
+                coordinates = coordinates,
+                searchState = searchState,
+                onSearch = { onSearch() },
+                onSelectResult = onSelectResult
+            )
 
-
-                when (screenState.overlayState) {
-                    is OverlayState.Loading -> {
-                        OverlayStatusCard(
-                            message = stringResource(R.string.overlay_loading)
-                        )
-                    }
-
-                    is OverlayState.Error -> {
-                        OverlayRetryCard(
-                            message = stringResource(R.string.overlay_error),
-                            onRetry = onOverlayRetry
-                        )
-                    }
-
-                    is OverlayState.Success -> Unit
+            when (screenState.overlayState) {
+                is OverlayState.Loading -> {
+                    OverlayStatusCard(
+                        message = stringResource(R.string.overlay_loading)
+                    )
                 }
 
-                when (screenState.climateState) {
-                    is ClimateState.Idle -> Unit
+                is OverlayState.Error -> {
+                    OverlayRetryCard(
+                        message = stringResource(R.string.overlay_error),
+                        onRetry = onOverlayRetry
+                    )
+                }
 
-                    is ClimateState.Loading -> {
-                        Log.d("ClimateData", "Loading...")
-                    }
+                is OverlayState.Success -> Unit
+            }
 
-                    is ClimateState.Error -> {
-                        Log.d("ClimateData", "Error")
-                    }
+            when (screenState.climateState) {
+                is ClimateState.Idle -> Unit
 
-                    is ClimateState.Success -> {
-                        val success = screenState.climateState
-                        val climateData = success.data
-                        Log.d("ClimateData", climateData.toString())
-                    }
+                is ClimateState.Loading -> {
+                    Log.d("ClimateData", "Loading...")
+                }
+
+                is ClimateState.Error -> {
+                    Log.d("ClimateData", "Error")
+                }
+
+                is ClimateState.Success -> {
+                    val success = screenState.climateState
+                    val climateData = success.data
+                    Log.d("ClimateData", climateData.toString())
                 }
             }
         }
@@ -328,19 +306,12 @@ fun BottomSheetContent(
     val climateRows = emptyList<Pair<String, String>>()
 
 
-
-    // This is the content inside the bottom sheet.
-    Surface(
-        modifier = modifier.fillMaxWidth(),
-        color = MaterialTheme.colorScheme.surface
-    ) {
         LazyColumn(
-            modifier = Modifier
+        modifier = modifier
                 .fillMaxWidth()
                 .padding(horizontal = 20.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-
             item {
                 Column(
                     modifier = Modifier
@@ -479,7 +450,6 @@ fun BottomSheetContent(
                             title = stringResource(R.string.mean_wind_desc)
                         )
 
-                    }
                 }
             }
         }
@@ -490,7 +460,6 @@ fun BottomSheetContent(
 @Composable
 fun MapScreenErrorPreview() {
     MapScreen(
-        navController = rememberNavController(),
         screenState = MapScreenState(
             overlayState = OverlayState.Error,
             climateState = ClimateState.Idle,

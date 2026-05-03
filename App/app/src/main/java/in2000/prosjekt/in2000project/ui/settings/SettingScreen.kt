@@ -25,19 +25,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material3.Button
 import androidx.compose.material3.Slider
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
-import androidx.navigation.NavController
 import in2000.prosjekt.in2000project.R
 
 @Composable
 fun SettingScreen(
     modifier: Modifier = Modifier,
-    navController: NavController,
+    onBackClick: () -> Unit,
     settingsViewModel: SettingsViewModel
 ) {
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
@@ -60,8 +58,7 @@ fun SettingScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(
-                    onClick = { navController.popBackStack() }
-
+                    onClick = onBackClick
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,

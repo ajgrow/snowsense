@@ -17,12 +17,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import in2000.prosjekt.in2000project.R
 import in2000.prosjekt.in2000project.data.model.enums.DangerLevel
+import in2000.prosjekt.in2000project.ui.model.DangerLevelUiModel
 import in2000.prosjekt.in2000project.ui.model.toUiModel
-import in2000.prosjekt.in2000project.ui.reusables.BottomBar
 import in2000.prosjekt.in2000project.ui.reusables.DangerLevelItem
 import in2000.prosjekt.in2000project.ui.reusables.EmergencySection
 import in2000.prosjekt.in2000project.ui.reusables.TopBar
@@ -31,23 +29,23 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun InfoScreen(
     modifier: Modifier = Modifier,
-    navController: NavController,
+    onSettingsClick: () -> Unit = {},
     infoViewModel: InfoViewModel = koinViewModel()
 ) {
     val uiState by infoViewModel.infoUiState.collectAsState()
 
     InfoContent(
         modifier = modifier,
-        navController = navController,
-        state = uiState
+        state = uiState,
+        onSettingsClick = onSettingsClick
     )
 }
 
 @Composable
 fun InfoContent(
     modifier: Modifier = Modifier,
-    navController: NavController,
     state: InfoUiState,
+    onSettingsClick: () -> Unit = {}
 ) {
     Scaffold(
         modifier = modifier,
@@ -55,14 +53,11 @@ fun InfoContent(
             TopBar(
                 title = stringResource(R.string.about_app_title),
                 modifier = Modifier,
-                navController = navController
+                onSettingsClick = onSettingsClick
             )
-        },
-        bottomBar = {
-            BottomBar(modifier, navController)
         }
     ) { paddingValues ->
-
+        
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
@@ -79,7 +74,7 @@ fun InfoContent(
                 modifier = Modifier.padding(bottom = 8.dp)
             ) }
 
-            items(state.dangerLevels) { uiModel ->
+            items(state.dangerLevels) { uiModel: DangerLevelUiModel ->
                 DangerLevelItem(
                     uiModel = uiModel,
                     modifier = Modifier.padding(vertical = 6.dp)
@@ -122,7 +117,6 @@ fun InfoContent(
 fun PreviewInfoScreen(){
     // Use InfoContent in Preview to avoid Koin dependency from InfoScreen
     InfoContent(
-        navController = rememberNavController(),
         state = InfoUiState(dangerLevels = DangerLevel.entries.map { it.toUiModel() })
     )
 }
