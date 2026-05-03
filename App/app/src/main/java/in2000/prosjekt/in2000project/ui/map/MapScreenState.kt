@@ -12,7 +12,8 @@ data class MapScreenState(
     val startDate: MonthDay = MonthDay.of(1, 1),
     val endDate: MonthDay = MonthDay.of(12, 31),
     val currentYear: Int = 1,
-    val selectedYear: Int = 1
+    val selectedYear: Int = 1,
+    val isSheetVisible: Boolean = false
 )
 
 sealed interface OverlayState {

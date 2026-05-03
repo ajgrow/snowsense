@@ -92,7 +92,8 @@ class MapViewModel(
     //when user taps map, fetches the info with the default date range
     fun onMapClick(lat: Double, lon: Double) {
         _screenState.value = _screenState.value.copy(
-            climateCoordinate = Coordinate(lat, lon)
+            climateCoordinate = Coordinate(lat, lon),
+            isSheetVisible = true
         )
         fetchClimateData(lat, lon)
     }
@@ -143,8 +144,18 @@ class MapViewModel(
 
     fun onSheetDismissed() {
         _screenState.value = _screenState.value.copy(
-            climateState = ClimateState.Idle
+            climateState = ClimateState.Idle,
+            isSheetVisible = false
         )
+    }
+
+    fun onEnter(validCoordinates: Boolean){
+        if (!validCoordinates) {
+            _screenState.value = _screenState.value.copy(
+                climateState = ClimateState.Idle,
+                isSheetVisible = false
+            )
+        }
     }
 
 }

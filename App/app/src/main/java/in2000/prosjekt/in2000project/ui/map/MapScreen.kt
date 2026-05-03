@@ -172,19 +172,6 @@ fun MapScreen(
         }
     } ?: previewSkiArea
 
-    //Controls whether the bottom sheet is visible or not by keeping track of if the user has clicked the map
-    //if this is set to null then the ModalBottomSheet is not open
-    var isSheetOpen by remember { mutableStateOf(false) }
-
-    LaunchedEffect(coordinates) {
-        isSheetOpen = false
-    }
-
-    LaunchedEffect(screenState.climateState) {
-        if (screenState.climateState is ClimateState.Success) {
-            isSheetOpen = true
-        }
-    }
 
     var skipPartiallyExpanded by rememberSaveable {mutableStateOf(false)}
 
@@ -226,7 +213,6 @@ fun MapScreen(
                 MapboxView(
                     onMapClick = { point ->
                         onMapClick(point.latitude(), point.longitude())
-                        isSheetOpen = true
                     },
                     onOverlayError = onOverlayError,
                     onOverlayLoaded = onOverlayLoaded,
@@ -278,9 +264,9 @@ fun MapScreen(
     }
 
     //This is for the bottom sheet - if isSheetOpen is set to true, then it will open otherwise, it stays closed
-    if (isSheetOpen){
+    if (screenState.isSheetVisible){
         ModalBottomSheet(
-            onDismissRequest = { isSheetOpen = false },
+            onDismissRequest = { onSheetDismiss() },
             sheetState = bottomSheetState,
             containerColor = MaterialTheme.colorScheme.surface,
             tonalElevation = 0.dp,
