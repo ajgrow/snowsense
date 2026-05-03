@@ -31,6 +31,7 @@ fun DangerLevel.toUiModel(): DangerLevelUiModel {
     return when (this) {
         DangerLevel.UNKNOWN -> DangerLevelUiModel(
             level = this,
+            numberRes = R.string.danger_level_0_number,
             titleRes = R.string.danger_level_0_title,
             badgeLabelRes = R.string.danger_level_0_badge,
             descriptionRes = R.string.danger_level_0_description,
