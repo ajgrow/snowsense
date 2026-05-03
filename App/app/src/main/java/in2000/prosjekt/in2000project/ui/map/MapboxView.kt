@@ -54,6 +54,8 @@ import in2000.prosjekt.in2000project.ui.reusables.SearchSection
 import in2000.prosjekt.in2000project.ui.search.SearchUiState
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.style.TextAlign
+import com.mapbox.maps.MapboxMap
+import in2000.prosjekt.in2000project.ui.search.SearchViewModel
 
 /*
 This global object is bad practice but it works and I
@@ -91,6 +93,29 @@ private const val WMS_DETAIL =
             "&BBOX={bbox-epsg-3857}&CRS=EPSG:3857&WIDTH=256&HEIGHT=256" +
             "&LAYERS=S2_snoskred_m_skogeffekt_Aktsomhetsomrade" +
             "&STYLES=&FORMAT=image/png&TRANSPARENT=TRUE"
+
+@Composable
+fun MapboxView2(
+    mapStateHolder: MapStateHolder,
+    modifier: Modifier = Modifier,
+) {
+    val viewportState = rememberMapViewportState {
+        setCameraOptions(
+            mapStateHolder.cameraOptions.value
+                ?: CameraOptions.Builder()
+                    .center(Point.fromLngLat(10.75, 59.91))
+                    .zoom(3.5)
+                    .build()
+        )
+    }
+
+    MapboxMap(
+        modifier = modifier.fillMaxSize(),
+        mapViewportState = viewportState,
+    ) {
+
+    }
+}
 
 @Composable
 fun MapboxView(
