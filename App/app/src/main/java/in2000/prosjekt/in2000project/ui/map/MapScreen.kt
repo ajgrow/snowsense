@@ -48,6 +48,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.stringResource
@@ -141,23 +142,22 @@ fun MapRoute(
             nveViewModel.avalancheChecker(lat, lon)
         },
         onSearchLocationRequested = mapStateHolder::onSearchLocationRequested,
-        onZoomIn = { mapStateHolder.onZoomIn() },
-        onZoomOut = { mapStateHolder.onZoomOut() },
-        onOverlayRetry = { mapStateHolder.onOverlayLoading() },
-        onOverlayLoaded = { mapStateHolder.onOverlayLoaded() },
-        onOverlayError = { mapStateHolder.onOverlayError() },
-        onSheetDismiss = { mapViewModel.onSheetDismissed() },
+        onZoomIn = mapStateHolder::onZoomIn,
+        onZoomOut = mapStateHolder::onZoomOut,
+        onOverlayRetry = mapStateHolder::onOverlayLoading,
+        onOverlayLoaded = mapStateHolder::onOverlayLoaded,
+        onOverlayError = mapStateHolder::onOverlayError,
+        onSheetDismiss = mapViewModel::onSheetDismissed,
         onStartDateChange = { it?.let(mapViewModel::onStartDateChange) },
         onEndDateChange = { it?.let(mapViewModel::onEndDateChange) },
         onYearChange = { it?.let(mapViewModel::onYearChange) },
         onSearch = searchViewModel::onSearch ,
-        onSelectResult = { searchViewModel.addRecentSearch(it) },
+        onSelectResult = searchViewModel::addRecentSearch,
         onAddFavorite = {
             screenState.climateCoordinate?.let { coordinate ->
                 searchViewModel.addPendingFavorite(coordinate)
-                showFavoriteDialog = true
-            }
-        }
+                showFavoriteDialog = true } },
+        onBottomPaddingChanged = mapStateHolder::onBottomPaddingChanged
     )
 }
 
@@ -186,6 +186,7 @@ fun MapScreen(
     onSearch: (String) -> Unit,
     onSelectResult: (NamedLocation) -> Unit,
     onAddFavorite: () -> Unit,
+    onBottomPaddingChanged: (Double) -> Unit,
 ) {
     val focusManager = LocalFocusManager.current
     val focusRequester = remember { FocusRequester() }
@@ -254,6 +255,12 @@ fun MapScreen(
     val peekHeight = if (screenState.climateState is ClimateState.Success)
                         halfScreen
                     else 0.dp
+
+    val density = LocalDensity.current.density
+    LaunchedEffect(peekHeight) {
+        onBottomPaddingChanged(peekHeight.value.toDouble() * density)
+    }
+
 
     Box(
         modifier = modifier.fillMaxSize()
@@ -592,6 +599,7 @@ fun MapScreenErrorPreview() {
         onSearch = {},
         onSelectResult = {},
         onAddFavorite = {},
+        onBottomPaddingChanged = {}
     )
 }
 

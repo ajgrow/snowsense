@@ -55,6 +55,7 @@ import in2000.prosjekt.in2000project.ui.search.SearchUiState
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.style.TextAlign
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.mapbox.maps.EdgeInsets
 import com.mapbox.maps.MapView
 import com.mapbox.maps.MapboxMap
 import com.mapbox.maps.plugin.annotation.generated.PointAnnotation
@@ -153,6 +154,18 @@ fun MapboxView(
 
     var mapViewState by remember {
         mutableStateOf<MapView?>(null)
+    }
+
+    val bottomPaddingPx by mapStateHolder.bottomPaddingPx.collectAsStateWithLifecycle()
+    LaunchedEffect(bottomPaddingPx) {
+        val pin = mapStateHolder.pinnedPoint.value
+        viewportState.easeTo(
+            cameraOptions {
+                pin?.let { center(it) }
+                padding(EdgeInsets(0.0, 0.0, bottomPaddingPx, 0.0))
+            },
+            MapAnimationOptions.Builder().duration(300).build()
+        )
     }
 
     val target by mapStateHolder.requestedSearchLocation.collectAsStateWithLifecycle()

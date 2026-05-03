@@ -32,6 +32,9 @@ class MapStateHolder {
     private val _overlayState = MutableStateFlow<OverlayState>(OverlayState.Success)
     val overlayState: StateFlow<OverlayState> = _overlayState.asStateFlow()
 
+    private val _bottomPaddingPx = MutableStateFlow(0.0)
+    val bottomPaddingPx: StateFlow<Double> = _bottomPaddingPx.asStateFlow()
+
     fun onPinPlaced(point: Point) {
         _pinnedPoint.value = point
     }
@@ -61,5 +64,9 @@ class MapStateHolder {
     }
     fun onZoomOut() {
         _commands.tryEmit(MapCommand.ZoomBy(-1.0))
+    }
+
+    fun onBottomPaddingChanged(px: Double) {
+        _bottomPaddingPx.value = px
     }
 }
