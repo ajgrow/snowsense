@@ -64,20 +64,31 @@ class FrostAvalancheRiskRepository(
 
         val observations = observationResponse.data
 
-        if (observations.isEmpty())
-            throw NoObservationsException(
-            this.name, elementsCsv, repeatingTimeRange.value
-            )
 
-        val hasAllElements = observations.all { atRefTime ->
-            requiredElements.all { elementId ->
-                atRefTime.observations.any { it.elementId == elementId }
-            }
+        // filter out today's observations which are incomplete,
+        // since we want to base the risk on complete data
+
+        val today = LocalDate.now()
+        val completeObservations = observations.filter { atRefTime ->
+            LocalDate.parse(
+                atRefTime.referenceTime.substringBefore("T")
+            ) < today
         }
 
-        if (!hasAllElements) return emptyList()
+        val records = completeObservations
+            .filter { atRefTime ->
+                requiredElements.all { elementId ->
+                    atRefTime.observations.any { it.elementId == elementId }
+                }
+            }
+            .map { it.toDailyWeatherRecord() }
 
-        return observations.map { it.toDailyWeatherRecord() }
+        if (records.isEmpty())
+            throw NoObservationsException(
+                this.name, elementsCsv, repeatingTimeRange.value
+            )
+
+        return records
     }
 
     private fun FrostV0ObservationsAtRefTime.toDailyWeatherRecord(
