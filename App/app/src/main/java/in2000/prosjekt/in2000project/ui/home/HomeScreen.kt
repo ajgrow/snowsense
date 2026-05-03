@@ -11,7 +11,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
@@ -21,6 +23,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.Scaffold
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -117,7 +120,8 @@ fun HomeScreen(
                     FavoriteSection(
                         items = searchState.favorites,
                         modifier = Modifier,
-                        onNavigateToMap = onNavigateToMap
+                        onNavigateToMap = onNavigateToMap,
+                        onRemoveLocation = searchViewModel::removeFavoriteLocation
                     )
                 }
 
@@ -125,7 +129,8 @@ fun HomeScreen(
                     RecentSection(
                         items = searchState.recentSearches,
                         modifier = Modifier,
-                        onNavigateToMap = onNavigateToMap
+                        onNavigateToMap = onNavigateToMap,
+                        onRemoveLocation = searchViewModel::removeRecentSearch
                     )
                 }
 
@@ -167,6 +172,7 @@ fun FavoriteSection(
     items: List<NamedLocation>,
     modifier: Modifier = Modifier,
     onNavigateToMap: (coordinate: Coordinate) -> Unit,
+    onRemoveLocation: (NamedLocation) -> Unit,
     riskViewModel: RiskViewModel = koinViewModel()
 ) {
 
@@ -201,6 +207,9 @@ fun FavoriteSection(
                     location,
                     onNavigateToMap = onNavigateToMap,
                     dangerLevel = riskState.dangerLevel,
+                    onRemoveLocation = onRemoveLocation,
+                    showDangerLevel = true,
+                    removeButtonAtBottom = true
                 )
             }
         }
@@ -211,7 +220,8 @@ fun FavoriteSection(
 fun RecentSection(
     items: List<NamedLocation>,
     modifier: Modifier = Modifier,
-    onNavigateToMap: (coordinate: Coordinate) -> Unit
+    onNavigateToMap: (coordinate: Coordinate) -> Unit,
+    onRemoveLocation: (NamedLocation) -> Unit
 ) {
     Column(
         modifier = modifier.fillMaxWidth(),
@@ -231,7 +241,7 @@ fun RecentSection(
                 LocationCard(
                     location,
                     onNavigateToMap = onNavigateToMap,
-                    dangerLevel = null,
+                    onRemoveLocation = onRemoveLocation,
                 )
             }
         }
@@ -243,52 +253,73 @@ fun LocationCard(
     location: NamedLocation,
     modifier: Modifier = Modifier,
     onNavigateToMap: (coordinate: Coordinate) -> Unit,
+    onRemoveLocation: (NamedLocation) -> Unit,
+    showDangerLevel: Boolean = false,
     dangerLevel: DangerLevelUiModel? = null,
+    removeButtonAtBottom: Boolean = false,
 ) {
-
-    Card(
-        modifier = modifier
+    Box(
+        modifier = Modifier
             .width(160.dp)
-            .wrapContentHeight(),
-        onClick = {
-            onNavigateToMap(location.coordinate)
-        },
-        shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
-        )
+            .wrapContentHeight()
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(12.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            Text(
-                text = location.name,
-                modifier = Modifier.fillMaxWidth(),
-                    fontWeight = Bold,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
+        Card(
+            modifier = Modifier,
+            onClick = {
+                onNavigateToMap(location.coordinate)
+            },
+            shape = RoundedCornerShape(20.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceVariant
             )
-
-            if (dangerLevel != null){
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(12.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
                 Text(
-                    text = stringResource(dangerLevel.badgeLabelRes),
-                    fontSize = 12.sp,
-                        fontWeight = Bold,
-                    color = Color.White,
-                    letterSpacing = 0.5.sp,
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(50))
-                        .background(dangerLevel.getColor())
-                        .padding(
-                            horizontal = 10.dp,
-                            vertical = 4.dp
-                        )
+                    text = location.name,
+                    modifier = Modifier.fillMaxWidth(),
+                    fontWeight = Bold,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
+
+                if (showDangerLevel) {
+                    val label = dangerLevel?.badgeLabelRes?.let { stringResource(it) } ?: ""
+                    Text(
+                        text = label,
+                        fontSize = 12.sp,
+                        fontWeight = Bold,
+                        color = Color.White,
+                        letterSpacing = 0.5.sp,
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(50))
+                            .background(dangerLevel?.getColor() ?: Color.Transparent)
+                            .padding(
+                                horizontal = 10.dp,
+                                vertical = 4.dp
+                            )
+                    )
+                }
             }
+        }
+        IconButton(
+            onClick = { onRemoveLocation(location) },
+            modifier = Modifier
+                .align(if (removeButtonAtBottom) Alignment.BottomEnd else Alignment.CenterEnd)
+                .offset(x = (-12).dp, y = if (removeButtonAtBottom) (-8).dp else 0.dp)
+                .size(30.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.Close,
+                contentDescription = stringResource(R.string.remove),
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.size(30.dp)
+            )
         }
     }
 }
