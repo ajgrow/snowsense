@@ -85,10 +85,26 @@ fun MapRoute(
 
     var showFavoriteDialog by remember { mutableStateOf(false) }
 
+    val skiArea = remember(screenState.climateState) {
+        val state = screenState.climateState
+        if (state is ClimateState.Success) {
+            state.data.toSkiArea()
+        } else {
+            null
+        }
+    } ?: previewSkiArea
+
     if (showFavoriteDialog) {
         TextInputDialog(
             title = stringResource(R.string.name_favorite_prompt),
-            defaultValue = "",
+            defaultValue = when(screenState.climateState) {
+                is ClimateState.Success -> {
+                    skiArea.name
+                }
+                else -> {
+                    ""
+                }
+            },
             onConfirm = { name ->
                 if (name.isNotBlank()) {
                     searchViewModel.nameFavorite(name)
@@ -128,7 +144,8 @@ fun MapRoute(
                 searchViewModel.addPendingFavorite(coordinate)
                 showFavoriteDialog = true
             }
-        }
+        },
+        skiArea = skiArea
     )
 }
 
@@ -152,15 +169,9 @@ fun MapScreen(
     onSearch: () -> Unit,
     onSelectResult: (NamedLocation) -> Unit,
     onAddFavorite: () -> Unit,
+    skiArea: SkiArea
 ) {
-    val skiArea = remember(screenState.climateState) {
-        val state = screenState.climateState
-        if (state is ClimateState.Success) {
-            state.data.toSkiArea()
-        } else {
-            null
-        }
-    } ?: previewSkiArea
+
 
     //Controls whether the bottom sheet is visible or not by keeping track of if the user has clicked the map
     //if this is set to null then the ModalBottomSheet is not open
@@ -262,7 +273,6 @@ fun MapScreen(
             BottomSheetContent(
                 area = skiArea,
                 climateState = screenState.climateState,
-                avalancheStatus = avalancheStatus,
                 dangerLevel = riskState.dangerLevel,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -285,7 +295,6 @@ fun MapScreen(
 fun BottomSheetContent(
     area: SkiArea,
     climateState: ClimateState,
-    avalancheStatus: String,
     dangerLevel: DangerLevelUiModel?,
     modifier: Modifier = Modifier,
     startDate: MonthDay?,
@@ -402,8 +411,6 @@ fun BottomSheetContent(
             HorizontalDivider()
         }
 
-
-        //THIS IS WHERE WE CAN PUT THE GRAPH COMPONENTS
         item {
             val currentYear = Year.now().value
 
@@ -421,7 +428,7 @@ fun BottomSheetContent(
                         .height(180.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text( text = stringResource(R.string.no_date_selected_msg))
+                    Text(text = stringResource(R.string.no_date_selected_msg))
                 }
             } else {
                 Column(verticalArrangement = Arrangement.spacedBy(24.dp)) {
@@ -482,6 +489,7 @@ fun MapScreenErrorPreview() {
         onSearch = {},
         onSelectResult = {},
         onAddFavorite = {},
+        skiArea = previewSkiArea
     )
 }
 
@@ -492,7 +500,6 @@ fun BottomSheetPreview() {
     BottomSheetContent(
         area = previewSkiArea,
         climateState = ClimateState.Idle,
-        avalancheStatus = "High",
         dangerLevel = DangerLevel.HIGH.toUiModel(),
         startDate = null,
         endDate = null,
