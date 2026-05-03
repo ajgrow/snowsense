@@ -21,50 +21,34 @@
     import androidx.compose.foundation.lazy.LazyColumn
     import androidx.compose.foundation.lazy.LazyRow
     import androidx.compose.foundation.lazy.items
-    import androidx.compose.foundation.rememberScrollState
     import androidx.compose.foundation.shape.RoundedCornerShape
-    import androidx.compose.foundation.text.input.TextFieldState
-    import androidx.compose.foundation.verticalScroll
     import androidx.compose.material.icons.Icons
     import androidx.compose.material.icons.filled.Phone
     import androidx.compose.material.icons.filled.Settings
     import androidx.compose.material3.Card
     import androidx.compose.material3.CardDefaults
-    import androidx.compose.material3.DockedSearchBar
-    import androidx.compose.material3.ExperimentalMaterial3Api
     import androidx.compose.material3.Icon
     import androidx.compose.material3.IconButton
-    import androidx.compose.material3.ListItem
     import androidx.compose.material3.MaterialTheme
     import androidx.compose.material3.Scaffold
-    import androidx.compose.material3.SearchBarDefaults
     import androidx.compose.material3.Surface
     import androidx.compose.material3.Text
     import androidx.compose.runtime.Composable
     import androidx.compose.runtime.LaunchedEffect
     import androidx.compose.runtime.collectAsState
     import androidx.compose.runtime.getValue
-    import androidx.compose.runtime.mutableStateOf
     import androidx.compose.runtime.remember
-    import androidx.compose.runtime.saveable.rememberSaveable
-    import androidx.compose.runtime.setValue
     import androidx.compose.ui.Alignment
     import androidx.compose.ui.Modifier
-    import androidx.compose.ui.focus.onFocusChanged
     import androidx.compose.ui.platform.LocalFocusManager
     import androidx.compose.ui.res.painterResource
     import androidx.compose.ui.res.stringResource
     import androidx.compose.ui.tooling.preview.Preview
     import androidx.compose.ui.unit.dp
     import androidx.lifecycle.compose.collectAsStateWithLifecycle
-    import androidx.lifecycle.viewmodel.compose.viewModel
-    import androidx.compose.runtime.setValue
     import androidx.compose.ui.draw.clip
     import androidx.compose.ui.graphics.Color
     import androidx.compose.ui.layout.ContentScale
-    import androidx.compose.ui.res.stringResource
-    import androidx.compose.ui.text.font.Font
-    import androidx.compose.ui.text.font.FontFamily
     import androidx.compose.ui.text.font.FontWeight
     import androidx.compose.ui.text.font.FontWeight.Companion.Bold
     import androidx.compose.ui.text.style.TextOverflow
@@ -75,16 +59,12 @@
     import in2000.prosjekt.in2000project.R
     import in2000.prosjekt.in2000project.data.model.Coordinate
     import in2000.prosjekt.in2000project.data.model.NamedLocation
-    import in2000.prosjekt.in2000project.data.model.enums.DangerLevel
     import in2000.prosjekt.in2000project.data.model.enums.EmergencyServices
     import in2000.prosjekt.in2000project.navigation.Screen
-    import in2000.prosjekt.in2000project.ui.map.NveViewModel
+    import in2000.prosjekt.in2000project.ui.map.RiskViewModel
     import in2000.prosjekt.in2000project.ui.model.DangerLevelUiModel
-    import in2000.prosjekt.in2000project.ui.model.toUiModel
     import in2000.prosjekt.in2000project.ui.reusables.BottomBar
-    import in2000.prosjekt.in2000project.ui.reusables.DangerLevelCard
     import in2000.prosjekt.in2000project.ui.reusables.SearchSection
-    import in2000.prosjekt.in2000project.ui.reusables.TopBar
     import in2000.prosjekt.in2000project.ui.search.SearchViewModel
     import org.koin.compose.viewmodel.koinViewModel
 
@@ -208,17 +188,16 @@
         items: List<NamedLocation>,
         modifier: Modifier = Modifier,
         onNavigateToMap: (coordinate: Coordinate) -> Unit,
-        nveViewModel: NveViewModel = viewModel()
+        riskViewModel: RiskViewModel = koinViewModel()
     ) {
 
-        // Temporary solution while we are waiting for the actual dangerlevels, so this part is very changeable
-        val dangerCheckUiState by nveViewModel.dangerCheckUiState.collectAsState()
+        val riskState by riskViewModel.riskState.collectAsState()
 
         LaunchedEffect(items) {
             if (items.isNotEmpty()) {
                 // Checks the first favorite's location as an example.
                 val firstLocation = items.first()
-                nveViewModel.avalancheChecker(
+                riskViewModel.avalancheChecker(
                     firstLocation.coordinate.latitude,
                     firstLocation.coordinate.longitude
                 )
@@ -243,7 +222,7 @@
                     LocationCard(
                         location,
                         onNavigateToMap = onNavigateToMap,
-                        dangerLevel = dangerCheckUiState.dangerLevel,
+                        dangerLevel = riskState.dangerLevel,
                     )
                 }
             }
