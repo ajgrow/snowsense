@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -29,7 +28,6 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -48,8 +46,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.stringResource
@@ -65,14 +63,13 @@ import in2000.prosjekt.in2000project.ui.reusables.DatePicker
 import org.koin.compose.viewmodel.koinViewModel
 import java.time.MonthDay
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.mapbox.maps.dsl.cameraOptions
-import com.mapbox.maps.plugin.animation.MapAnimationOptions
+import com.mapbox.geojson.Point
 import in2000.prosjekt.in2000project.data.model.NamedLocation
 import in2000.prosjekt.in2000project.ui.search.SearchViewModel
-import in2000.prosjekt.in2000project.ui.settings.SettingsViewModel
 import in2000.prosjekt.in2000project.data.model.enums.DangerLevel
 import in2000.prosjekt.in2000project.ui.model.DangerLevelUiModel
 import in2000.prosjekt.in2000project.ui.model.toUiModel
+import in2000.prosjekt.in2000project.ui.reusables.SearchSection
 import in2000.prosjekt.in2000project.ui.reusables.TextInputDialog
 import in2000.prosjekt.in2000project.ui.search.SearchUiState
 import org.koin.compose.koinInject
@@ -85,7 +82,6 @@ private val previewSkiArea = SkiArea(
     windSpeedData = emptyList(),
     snowDepthData = emptyList()
 )
-
 
 //for use when the VM is ready
 @Composable
@@ -100,10 +96,10 @@ fun MapRoute(
     val searchState by searchViewModel.searchState.collectAsStateWithLifecycle()
 
     val mapStateHolder: MapStateHolder = koinInject()
-    val pin by mapStateHolder.pinnedPoint.collectAsStateWithLifecycle()
+
     val overlayState by mapStateHolder.overlayState.collectAsStateWithLifecycle()
 
-
+    val pin by mapStateHolder.pinnedPoint.collectAsStateWithLifecycle()
     LaunchedEffect(pin) {
         pin?.let {
             mapViewModel.onMapClick(it.latitude(), it.longitude())
@@ -139,18 +135,22 @@ fun MapRoute(
         dangerCheckUiState = dangerCheckUiState,
         searchState = searchState,
         coordinates = coordinates,
+        pinnedPoint = pin,
         onMapClick = { lat, lon ->
             mapViewModel.onMapClick(lat, lon)
             nveViewModel.avalancheChecker(lat, lon)
         },
+        onSearchLocationRequested = mapStateHolder::onSearchLocationRequested,
+        onZoomIn = { mapStateHolder.onZoomIn() },
+        onZoomOut = { mapStateHolder.onZoomOut() },
         onOverlayRetry = { mapStateHolder.onOverlayLoading() },
         onOverlayLoaded = { mapStateHolder.onOverlayLoaded() },
         onOverlayError = { mapStateHolder.onOverlayError() },
         onSheetDismiss = { mapViewModel.onSheetDismissed() },
-        onStartDateChange = { if (it != null) mapViewModel.onStartDateChange(it) },
-        onEndDateChange = { if (it != null) mapViewModel.onEndDateChange(it) },
-        onYearChange = { if (it != null) mapViewModel.onYearChange(it) },
-        onSearch = { searchViewModel.onSearch() },
+        onStartDateChange = { it?.let(mapViewModel::onStartDateChange) },
+        onEndDateChange = { it?.let(mapViewModel::onEndDateChange) },
+        onYearChange = { it?.let(mapViewModel::onYearChange) },
+        onSearch = searchViewModel::onSearch ,
         onSelectResult = { searchViewModel.addRecentSearch(it) },
         onAddFavorite = {
             screenState.climateCoordinate?.let { coordinate ->
@@ -171,7 +171,11 @@ fun MapScreen(
     dangerCheckUiState: DangerCheckUiState,
     searchState: SearchUiState,
     coordinates: String,
+    pinnedPoint: Point?,
     onMapClick: (Double, Double) -> Unit,
+    onSearchLocationRequested: (Point) -> Unit,
+    onZoomIn: () -> Unit,
+    onZoomOut: () -> Unit,
     onOverlayRetry: () -> Unit,
     onOverlayLoaded: () -> Unit,
     onOverlayError: () -> Unit,
@@ -179,14 +183,20 @@ fun MapScreen(
     onStartDateChange: (MonthDay?) -> Unit,
     onEndDateChange: (MonthDay?) -> Unit,
     onYearChange: (Int?) -> Unit,
-    onSearch: () -> Unit,
+    onSearch: (String) -> Unit,
     onSelectResult: (NamedLocation) -> Unit,
     onAddFavorite: () -> Unit,
 ) {
     val focusManager = LocalFocusManager.current
     val focusRequester = remember { FocusRequester() }
-    var isSearchActive by remember { mutableStateOf(false) }
 
+    var isSearchActive by remember { mutableStateOf(false) }
+    LaunchedEffect(pinnedPoint) {
+        if (isSearchActive) {
+            isSearchActive = false
+            focusManager.clearFocus()
+        }
+    }
     LaunchedEffect(isSearchActive) {
         if (isSearchActive) focusRequester.requestFocus()
     }
@@ -258,6 +268,70 @@ fun MapScreen(
                 onOverlayRetry)
             is OverlayState.Success
                 -> Unit
+        }
+
+        val mapButtonModifier = Modifier.size(50.dp)
+
+        Column(
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+
+            Button(
+                onClick = { isSearchActive = !isSearchActive },
+                modifier = mapButtonModifier,
+                contentPadding = PaddingValues(0.dp),
+//                enabled = !isSearchActive
+            ) {
+                Icon(imageVector = Icons.Default.Search, contentDescription = "Open Search")
+            }
+
+            Spacer(Modifier.height(8.dp))
+
+            Button(
+                modifier = mapButtonModifier,
+                onClick = onZoomIn
+            ) {
+                Text(
+                    text = "+",
+                    textAlign = TextAlign.Center
+                )
+            }
+
+            Spacer(Modifier.height(8.dp))
+
+            Button(
+                modifier = mapButtonModifier,
+                onClick = onZoomOut
+            ) {
+                Text(
+                    text = "-",
+                    textAlign = TextAlign.Center
+                )
+            }
+
+        }
+
+        if (isSearchActive) {
+            SearchSection(
+                modifier = Modifier
+                    .focusRequester(focusRequester)
+                    .padding(top = 24.dp),
+                textFieldState = searchState.searchTextFieldState,
+                onSearch = onSearch,
+                searchResults = searchState.searchResults,
+                onNavigateToMap = { coordinate ->
+                    onSearchLocationRequested(
+                        Point.fromLngLat(
+                            coordinate.longitude,
+                            coordinate.latitude) )
+                      isSearchActive = false
+                      focusManager.clearFocus() },
+                onSelectResult = onSelectResult,
+                recentSearches = searchState.recentSearches
+            )
         }
 
         BottomSheetScaffold(
@@ -500,7 +574,11 @@ fun MapScreenErrorPreview() {
         ),
         overlayState = OverlayState.Error,
         onMapClick = { _, _ -> },
+        onSearchLocationRequested = {},
+        onZoomIn = {},
+        onZoomOut = {},
         coordinates = "",
+        pinnedPoint = null,
         onOverlayRetry = {},
         onOverlayLoaded = {},
         onOverlayError = {},
@@ -516,7 +594,6 @@ fun MapScreenErrorPreview() {
         onAddFavorite = {},
     )
 }
-
 
 @Preview(showBackground = true)
 @Composable

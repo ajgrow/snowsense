@@ -2,11 +2,24 @@ package in2000.prosjekt.in2000project.ui.map
 
 import com.mapbox.geojson.Point
 import com.mapbox.maps.CameraOptions
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 class MapStateHolder {
+
+    sealed interface MapCommand {
+        data class ZoomBy(val delta: Double) : MapCommand
+    }
+    private val _commands = MutableSharedFlow<MapCommand>(
+        // queue presses while awaiting MapboxView collection
+        extraBufferCapacity = 8
+    )
+
+    val commands: SharedFlow<MapCommand> = _commands.asSharedFlow()
     private val _pinnedPoint = MutableStateFlow<Point?>(null)
     val pinnedPoint: StateFlow<Point?> = _pinnedPoint.asStateFlow()
 
@@ -22,7 +35,6 @@ class MapStateHolder {
     fun onPinPlaced(point: Point) {
         _pinnedPoint.value = point
     }
-
     fun onCameraIdle(cameraOptions: CameraOptions) {
         _cameraOptions.value = cameraOptions
     }
@@ -30,7 +42,6 @@ class MapStateHolder {
     fun onSearchLocationRequested(point: Point) {
         _requestedSearchLocation.value = point
     }
-
     fun clearRequestedSearchLocation() {
         _requestedSearchLocation.value = null
     }
@@ -43,5 +54,12 @@ class MapStateHolder {
     }
     fun onOverlayError()   {
         _overlayState.value = OverlayState.Error
+    }
+
+    fun onZoomIn()  {
+        _commands.tryEmit(MapCommand.ZoomBy(+1.0))
+    }
+    fun onZoomOut() {
+        _commands.tryEmit(MapCommand.ZoomBy(-1.0))
     }
 }

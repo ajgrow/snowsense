@@ -119,8 +119,8 @@ class SearchViewModel: ViewModel(){
         }
     }
 
-    fun onSearch(){
-        val query = queryBuilder.buildQuery(_searchState.value.searchTextFieldState.text.toString())
+    fun onSearch(searchQuery: String){
+        val query = queryBuilder.buildQuery(searchQuery)
         viewModelScope.launch {
             val results = locationRepository.getNamedLocations(query)
             _searchState.update { it.copy(searchResults = results) }

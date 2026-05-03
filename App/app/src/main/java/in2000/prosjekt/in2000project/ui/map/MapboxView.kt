@@ -167,6 +167,20 @@ fun MapboxView(
         }
     }
 
+    LaunchedEffect(Unit) {
+        mapStateHolder.commands.collect { cmd ->
+            when (cmd) {
+                is MapStateHolder.MapCommand.ZoomBy -> {
+                    val current = viewportState.cameraState?.zoom ?: 10.0
+                    viewportState.easeTo(
+                        cameraOptions { zoom(current + cmd.delta) },
+                        MapAnimationOptions.Builder().duration(300).build()
+                    )
+                }
+            }
+        }
+    }
+
     MapboxMap(
         modifier = modifier.fillMaxSize(),
         mapViewportState = viewportState,
@@ -204,6 +218,11 @@ fun MapboxView(
                         mapView.mapboxMap
                             .cameraState.toCameraOptions())
                 }
+
+            mapView.mapboxMap.subscribeMapLoadingError { error ->
+                Log.e(TAG, "Map loading error: ${error.message}")
+                mapStateHolder.onOverlayError()
+            }
         }
 
         LaunchedEffect(pinPoint, pinManager) {
@@ -316,11 +335,7 @@ fun MapboxView2(
     onMapClick: (Point) -> Unit,
     coordinates: String,
     onOverlayError: () -> Unit,
-    onOverlayLoaded: () -> Unit,
     modifier: Modifier = Modifier,
-    searchState: SearchUiState,
-    onSearch: (String) -> Unit,
-    onSelectResult: (NamedLocation) -> Unit
 ) {
 
     val (hasSearch, searchLng, searchLat) = remember(coordinates) {
@@ -349,7 +364,6 @@ fun MapboxView2(
     val viewportState = rememberMapViewportState {
         setCameraOptions(initialCamera)
     }
-
 
     val mapRecreateKey = remember(hasSearch, searchLat, searchLng) {
         if (hasSearch) System.currentTimeMillis() else "default"
@@ -412,13 +426,6 @@ fun MapboxView2(
                         onOverlayError()
                     }
 
-
-                    idleSubscription = mapView.mapboxMap.subscribeMapIdle {
-                        viewportState.cameraState?.toCameraOptions()?.let {
-                            MapCameraRepository.updateCameraOptions(it)
-                        }
-                    }
-
                     if (hasSearch && searchLat != null && searchLng != null){
                         val searchPoint = Point.fromLngLat(searchLng, searchLat)
 
@@ -432,102 +439,6 @@ fun MapboxView2(
                         addPin?.invoke(searchPoint)
                     }
                 }
-            }
-
-            val mapButtonModifier = Modifier.size(50.dp)
-
-            Column(
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-
-                Button(
-                    onClick = { isSearchActive = true },
-                    modifier = mapButtonModifier,
-                    contentPadding = PaddingValues(0.dp),
-                    enabled = !isSearchActive
-                ) {
-                    Icon(imageVector = Icons.Default.Search, contentDescription = "Open Search")
-                }
-
-                Spacer(Modifier.height(8.dp))
-
-                Button(
-                    modifier = mapButtonModifier,
-                    onClick = {
-                        val currentZoom = viewportState
-                            .cameraState?.zoom ?: 10.0
-                        viewportState.easeTo(
-                            cameraOptions {
-                                zoom(currentZoom + 1.0)
-                            },
-                            MapAnimationOptions.Builder()
-                                .duration(300)
-                                .build()
-                        )
-                    }
-                ) {
-                    Text(
-                        text = "+",
-                        textAlign = TextAlign.Center
-                    )
-                }
-
-                Spacer(Modifier.height(8.dp))
-
-                Button(
-                    modifier = mapButtonModifier,
-                    onClick = {
-                        val currentZoom = viewportState
-                            .cameraState?.zoom ?: 10.0
-                        viewportState.easeTo(
-                            cameraOptions {
-                                zoom(currentZoom - 1.0)
-                            },
-                            MapAnimationOptions.Builder()
-                                .duration(300)
-                                .build()
-                        )
-                    }
-                ) {
-                    Text(
-                        text = "-",
-                        textAlign = TextAlign.Center
-                    )
-                }
-
-            }
-
-            val onNavigateToMap: (Coordinate) -> Unit = { coordinate ->
-                val point = Point.fromLngLat(coordinate.longitude, coordinate.latitude)
-                viewportState.easeTo(
-                    cameraOptions {
-                        center(point)
-                        zoom(12.0)
-                    }
-                )
-                MapCameraRepository.updatePinnedPoint(point)
-                addPin?.invoke(point)
-            }
-
-            if (isSearchActive) {
-                SearchSection(
-                    modifier = Modifier
-                        .focusRequester(focusRequester)
-                        .padding(top = 24.dp),
-                    textFieldState = searchState.searchTextFieldState,
-                    onSearch = onSearch,
-                    searchResults = searchState.searchResults,
-                    onNavigateToMap = { coordinate ->
-                        onNavigateToMap(coordinate)
-                        isSearchActive = false
-                        focusManager.clearFocus()
-                    },
-                    onSelectResult = onSelectResult,
-                    recentSearches = searchState.recentSearches
-                )
             }
         }
     }

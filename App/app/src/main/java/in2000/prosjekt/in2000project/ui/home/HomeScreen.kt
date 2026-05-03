@@ -23,23 +23,14 @@
     import androidx.compose.foundation.lazy.items
     import androidx.compose.material3.Card
     import androidx.compose.material3.Scaffold
-    import androidx.compose.foundation.rememberScrollState
     import androidx.compose.foundation.shape.RoundedCornerShape
-    import androidx.compose.foundation.text.input.TextFieldState
-    import androidx.compose.foundation.verticalScroll
     import androidx.compose.material.icons.Icons
     import androidx.compose.material.icons.filled.Phone
     import androidx.compose.material.icons.filled.Settings
-    import androidx.compose.material3.Card
     import androidx.compose.material3.CardDefaults
-    import androidx.compose.material3.DockedSearchBar
-    import androidx.compose.material3.ExperimentalMaterial3Api
     import androidx.compose.material3.Icon
     import androidx.compose.material3.IconButton
-    import androidx.compose.material3.ListItem
     import androidx.compose.material3.MaterialTheme
-    import androidx.compose.material3.Scaffold
-    import androidx.compose.material3.SearchBarDefaults
     import androidx.compose.material3.Surface
     import androidx.compose.material3.Text
     import androidx.compose.runtime.Composable
@@ -56,33 +47,20 @@
     import androidx.compose.ui.unit.dp
     import androidx.lifecycle.compose.collectAsStateWithLifecycle
     import androidx.lifecycle.viewmodel.compose.viewModel
-    import androidx.compose.runtime.setValue
     import androidx.compose.ui.draw.clip
     import androidx.compose.ui.graphics.Color
     import androidx.compose.ui.layout.ContentScale
-    import androidx.compose.ui.res.stringResource
-    import androidx.compose.ui.text.font.Font
-    import androidx.compose.ui.text.font.FontFamily
     import androidx.compose.ui.text.font.FontWeight
     import androidx.compose.ui.text.font.FontWeight.Companion.Bold
     import androidx.compose.ui.text.style.TextOverflow
     import androidx.compose.ui.unit.sp
-    import androidx.navigation.NavController
-    import androidx.navigation.NavGraph.Companion.findStartDestination
-    import androidx.navigation.compose.rememberNavController
     import in2000.prosjekt.in2000project.R
     import in2000.prosjekt.in2000project.data.model.Coordinate
     import in2000.prosjekt.in2000project.data.model.NamedLocation
-    import in2000.prosjekt.in2000project.data.model.enums.DangerLevel
     import in2000.prosjekt.in2000project.data.model.enums.EmergencyServices
-    import in2000.prosjekt.in2000project.navigation.Screen
     import in2000.prosjekt.in2000project.ui.map.NveViewModel
     import in2000.prosjekt.in2000project.ui.model.DangerLevelUiModel
-    import in2000.prosjekt.in2000project.ui.model.toUiModel
-    import in2000.prosjekt.in2000project.ui.reusables.BottomBar
-    import in2000.prosjekt.in2000project.ui.reusables.DangerLevelCard
     import in2000.prosjekt.in2000project.ui.reusables.SearchSection
-    import in2000.prosjekt.in2000project.ui.reusables.TopBar
     import in2000.prosjekt.in2000project.ui.search.SearchViewModel
     import org.koin.compose.viewmodel.koinViewModel
 
@@ -126,7 +104,7 @@
                         //get states from the viewmodel
                         modifier = Modifier,
                         textFieldState = searchState.searchTextFieldState,
-                        onSearch = { searchViewModel.onSearch() },
+                        onSearch = searchViewModel::onSearch,
                         searchResults = searchState.searchResults,
                         onNavigateToMap = onNavigateToMap,
                         onSelectResult = searchViewModel::addRecentSearch,
