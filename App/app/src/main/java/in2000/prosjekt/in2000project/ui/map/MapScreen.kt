@@ -42,6 +42,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleResumeEffect
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import in2000.prosjekt.in2000project.R
 import in2000.prosjekt.in2000project.data.model.SkiArea
 import in2000.prosjekt.in2000project.data.model.toSkiArea
@@ -115,10 +119,9 @@ fun MapRoute(
         )
     }
 
-    DisposableEffect(Unit) {
-        onDispose {
-            mapViewModel.onSheetDismissed()
-        }
+    LaunchedEffect (Unit) {
+        mapViewModel.onSheetDismissed()
+        MapCameraRepository.clearPinnedPoint()
     }
 
     MapScreen(
@@ -173,15 +176,6 @@ fun MapScreen(
 ) {
 
 
-    //Controls whether the bottom sheet is visible or not by keeping track of if the user has clicked the map
-    //if this is set to null then the ModalBottomSheet is not open
-    var isSheetOpen by remember { mutableStateOf(false) }
-
-    LaunchedEffect(screenState.climateState) {
-        if (screenState.climateState is ClimateState.Success) {
-            isSheetOpen = true
-        }
-    }
 
     var skipPartiallyExpanded by rememberSaveable {mutableStateOf(false)}
 
@@ -212,7 +206,6 @@ fun MapScreen(
             MapboxView(
                 onMapClick = { point ->
                     onMapClick(point.latitude(), point.longitude())
-                    isSheetOpen = true
                 },
                 onOverlayError = onOverlayError,
                 onOverlayLoaded = onOverlayLoaded,
@@ -262,9 +255,9 @@ fun MapScreen(
     }
 
     //This is for the bottom sheet - if isSheetOpen is set to true, then it will open otherwise, it stays closed
-    if (isSheetOpen){
+    if (screenState.isSheetVisible){
         ModalBottomSheet(
-            onDismissRequest = { isSheetOpen = false },
+            onDismissRequest = { onSheetDismiss() },
             sheetState = bottomSheetState,
             containerColor = MaterialTheme.colorScheme.surface,
             tonalElevation = 0.dp,
@@ -311,18 +304,18 @@ fun BottomSheetContent(
                 .fillMaxWidth()
                 .padding(horizontal = 20.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            item {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .heightIn(min = 60.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    when (climateState) {
-                        is ClimateState.Loading -> {
-                            CircularProgressIndicator(modifier = Modifier.size(26.dp))
-                        }
+    ) {
+        item {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = 60.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                when (climateState) {
+                    is ClimateState.Loading -> {
+                        CircularProgressIndicator(modifier = Modifier.size(26.dp))
+                    }
 
                     is ClimateState.Error -> {
                         Text(
@@ -361,9 +354,11 @@ fun BottomSheetContent(
                                 )
                             }
                         }
-                        DangerLevelCard(uiModel = dangerLevel)
                     }
                 }
+
+                DangerLevelCard(uiModel =  dangerLevel)
+
             }
         }
 
