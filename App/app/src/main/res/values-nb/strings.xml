@@ -139,4 +139,8 @@
     <string name="not_checked">Ikke sjekket</string>
     <string name="call_icon">Ringe ikon</string>
 
+    <string name="other_resources_title">Andre nyttige kilder</string>
+    <string name="other_resouces_descr">Her er noen nyttige kilder vi anbefaler å sjekke før du drar på tur.</string>
+
+
 </resources>
