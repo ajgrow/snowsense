@@ -103,8 +103,9 @@ fun MapboxView(
         setCameraOptions(
             mapStateHolder.cameraOptions.value
                 ?: CameraOptions.Builder()
-                    .center(Point.fromLngLat(10.75, 59.91))
-                    .zoom(3.5)
+                    .center(Point.fromLngLat(15.0, 65.0))
+                    .bearing(16.0)
+                    .zoom(4.1)
                     .build()
         )
     }
@@ -113,7 +114,23 @@ fun MapboxView(
         modifier = modifier.fillMaxSize(),
         mapViewportState = viewportState,
     ) {
+        MapEffect(Unit) { mapView ->
 
+            val mapBoxMap = mapView.mapboxMap
+
+            val bounds = CoordinateBounds(
+                Point.fromLngLat(3.0, 54.0),
+                Point.fromLngLat(33.0, 73.0)
+            )
+
+            mapBoxMap.setBounds(
+                CameraBoundsOptions.Builder()
+                    .bounds(bounds)
+                    .minZoom(3.5)
+                    .maxZoom(18.0)
+                    .build()
+            )
+        }
     }
 }
 
