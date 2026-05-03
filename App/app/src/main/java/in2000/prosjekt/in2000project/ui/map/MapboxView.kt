@@ -155,6 +155,18 @@ fun MapboxView(
         mutableStateOf<MapView?>(null)
     }
 
+    val target by mapStateHolder.requestedSearchLocation.collectAsStateWithLifecycle()
+    LaunchedEffect(target) {
+        target?.let { point ->
+            viewportState.easeTo(
+                cameraOptions { center(point); zoom(12.0) },
+                MapAnimationOptions.Builder().duration(500).build()
+            )
+            mapStateHolder.onPinPlaced(point)
+            mapStateHolder.clearRequestedSearchLocation() // event consumed
+        }
+    }
+
     MapboxMap(
         modifier = modifier.fillMaxSize(),
         mapViewportState = viewportState,
