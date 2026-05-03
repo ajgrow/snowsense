@@ -55,7 +55,9 @@ import in2000.prosjekt.in2000project.ui.search.SearchUiState
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.style.TextAlign
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.mapbox.maps.MapView
 import com.mapbox.maps.MapboxMap
+import com.mapbox.maps.plugin.annotation.generated.PointAnnotation
 import in2000.prosjekt.in2000project.ui.search.SearchViewModel
 
 /*
@@ -101,14 +103,56 @@ fun MapboxView(
     modifier: Modifier = Modifier,
 ) {
     val viewportState = rememberMapViewportState {
+        val savedCamera = mapStateHolder.cameraOptions.value
+        val pin = mapStateHolder.pinnedPoint.value
+
         setCameraOptions(
-            mapStateHolder.cameraOptions.value
-                ?: CameraOptions.Builder()
+            when {
+                pin != null && savedCamera != null
+                    -> CameraOptions.Builder()
+                    .center(pin)
+                    .zoom(savedCamera.zoom ?: 10.0)
+                    .bearing(savedCamera.bearing)
+                    .pitch(savedCamera.pitch)
+                    .build()
+
+                savedCamera != null
+                    -> savedCamera
+
+                pin != null
+                    -> CameraOptions.Builder()
+                    .center(pin)
+                    .zoom(10.0)
+                    .build()
+
+
+                else
+                    -> CameraOptions.Builder()
                     .center(Point.fromLngLat(15.0, 65.0))
                     .bearing(16.0)
                     .zoom(4.1)
                     .build()
+            }
         )
+    }
+
+    var idleSubscription by remember {
+        mutableStateOf<Cancelable?>(null) }
+
+    DisposableEffect(Unit) {
+        onDispose { idleSubscription?.cancel() }
+    }
+
+    var pinManager by remember {
+        mutableStateOf<PointAnnotationManager?>(null)
+    }
+    var currentPin by remember {
+        mutableStateOf<PointAnnotation?>(null) }
+
+    val pinPoint by mapStateHolder.pinnedPoint.collectAsStateWithLifecycle()
+
+    var mapViewState by remember {
+        mutableStateOf<MapView?>(null)
     }
 
     MapboxMap(
@@ -117,11 +161,73 @@ fun MapboxView(
     ) {
         MapEffect(Unit) { mapView ->
 
+            mapViewState = mapView
+
             mapView.mapboxMap.setBounds()
 
             mapView.mapboxMap.loadStyle(
                 Style.OUTDOORS,
                 Style::addNveAvalancheRiskLayers)
+
+            mapView.gestures.addOnMapClickListener { point ->
+                mapStateHolder.onPinPlaced(point)
+                true
+            }
+
+            pinManager = mapView.annotations
+                .createPointAnnotationManager()
+
+            mapStateHolder.pinnedPoint.value?.let { pin ->
+                mapView.mapboxMap.setCamera(
+                    CameraOptions.Builder()
+                        .center(pin)
+                        .zoom(mapStateHolder.cameraOptions.value?.zoom ?: 10.0)
+                        .build()
+                )
+            }
+
+            idleSubscription = mapView.mapboxMap
+                .subscribeMapIdle {
+                    mapStateHolder.onCameraIdle(
+                        mapView.mapboxMap
+                            .cameraState.toCameraOptions())
+                }
+        }
+
+        LaunchedEffect(pinPoint, pinManager) {
+            val currentPinManager = pinManager
+                ?: return@LaunchedEffect
+
+            val point = pinPoint
+
+            if (point == null) {
+                currentPin?.let { pointAnnotation ->
+                    currentPinManager.delete(pointAnnotation)
+                }
+
+                currentPin = null
+
+                return@LaunchedEffect
+            }
+
+            val existing = currentPin
+            if(existing == null) {
+                val bitmap = BitmapFactory.decodeResource(
+                    mapViewState?.context?.resources
+                        ?: return@LaunchedEffect,
+                    R.drawable.red_marker
+                )
+
+                currentPin = currentPinManager
+                    .create(PointAnnotationOptions()
+                        .withPoint(point)
+                        .withIconImage(bitmap)
+                        .withIconSize(0.3)
+                    )
+            } else {
+                existing.point = point
+                currentPinManager.update(existing)
+            }
         }
     }
 }
@@ -192,7 +298,6 @@ private fun MapboxMap.setBounds() {
             .build()
     )
 }
-
 
 @Composable
 fun MapboxView2(
@@ -275,31 +380,6 @@ fun MapboxView2(
                     MapCameraRepository.lastCameraOptions?.let {
                         mapView.mapboxMap.setCamera(it)
                     }
-
-
-                    val annotationApi = mapView.annotations
-                    val pointAnnotationManager: PointAnnotationManager = annotationApi.createPointAnnotationManager()
-
-                    fun localAddPin(point: Point){
-                        pointAnnotationManager.deleteAll()
-                        val bitmap = BitmapFactory.decodeResource(
-                            mapView.context.resources,
-                            R.drawable.red_marker
-                        )
-
-                        val pointAnnotationOptions = PointAnnotationOptions()
-                            .withPoint(point)
-                            .withIconImage(bitmap)
-                            .withIconSize(0.3)
-                        pointAnnotationManager.create(pointAnnotationOptions)
-
-                    }
-
-                    MapCameraRepository.lastPinnedPoint?.let {
-                        localAddPin(it)
-                    }
-
-                    addPin = ::localAddPin
 
                     //this click listener just works generally on the map
                     mapView.gestures.addOnMapClickListener { point ->
