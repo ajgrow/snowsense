@@ -18,22 +18,28 @@
 
     <string name="danger_levels_title">Skredfaregrader</string>
 
+    <string name="danger_level_0_number"></string>
     <string name="danger_level_0_title">Ukjent</string>
     <string name="danger_level_0_description">Vi har ikke tilstrekkelige målinger for det valgte området.</string>
 
-    <string name="danger_level_1_title">1 - Lav</string>
+    <string name="danger_level_1_number">1</string>
+    <string name="danger_level_1_title">- Lav</string>
     <string name="danger_level_1_description">Generelt stabile forhold.\n\nUtløsning er vanligvis kun mulig ved stor tilleggsbelastning i isolerte områder med svært bratt terreng. Kun små og middels store naturlige skred er mulig.\n\nTypiske faresignaler:\nSjelden noen faresignaler.\n\nVarslet rundt 20% av vintersesongen. Rundt 5% av skredulykker.</string>
 
-    <string name="danger_level_2_title">2 - Moderat</string>
+    <string name="danger_level_2_number">2</string>
+    <string name="danger_level_2_title">- Moderat</string>
     <string name="danger_level_2_description">Økte skredforhold i enkelte terrengformasjoner.\n\nUtløsning er mulig, hovedsakelig ved stor tilleggsbelastning, spesielt i bratte heng som er angitt. Svært store naturlige skred er lite sannsynlig.\n\nTypiske faresignaler:\nOfte ingen faresignaler, men det betyr ikke nødvendigvis at det er trygt. Vær ekstra oppmerksom dersom vedvarende svakt lag er et av skredproblemene.\n\nVarslet rundt 50% av vintersesongen. Rundt 30% av skredulykker.</string>
 
-    <string name="danger_level_3_title">3 - Betydelig</string>
+    <string name="danger_level_3_number">3</string>
+    <string name="danger_level_3_title">- Betydelig</string>
     <string name="danger_level_3_description">Farlige skredforhold.\n\nUtløsning er mulig, selv ved liten tilleggsbelastning, spesielt i bratte heng som er angitt. I enkelte situasjoner kan noen store, og i isolerte tilfeller svært store naturlige skred forekomme.\n\nTypiske faresignaler:\nFersk skredaktivitet, sprekker og \'drønn\' i snøen. Fjernutløsning er typisk, spesielt dersom vedvarende svakt lag er et av skredproblemene.\n\nVarslet rundt 30% av vintersesongen. Rundt 50% av skredulykker.</string>
 
-    <string name="danger_level_4_title">4 - Høy</string>
+    <string name="danger_level_4_number">4</string>
+    <string name="danger_level_4_title">- Høy</string>
     <string name="danger_level_4_description">Svært farlige skredforhold.\n\nUtløsning er sannsynlig, selv ved liten tilleggsbelastning, i mange bratte heng. I noen tilfeller kan mange store og ofte svært store naturlige skred forventes.\n\nTypiske faresignaler:\nUtbredt fersk skredaktivitet, sprekker og \'drønn\' i snøen. Fjernutløsning er typisk.\n\nVarsles kun noen få dager i løpet av vinteren. Rundt 10% av skredulykker.</string>
 
-    <string name="danger_level_5_title">5 - Svært høy</string>
+    <string name="danger_level_5_number">5</string>
+    <string name="danger_level_5_title">- Svært høy</string>
     <string name="danger_level_5_description">Ekstreme skredforhold.\n\nMange svært store og ofte ekstremt store naturlige skred kan forventes, selv i moderat bratt terreng.\n\nSvært sjelden varslet.</string>
 
     <string name="danger_level_0_badge">UKJENT</string>
@@ -45,12 +51,17 @@
 
     <string name="date_description">Velg en datoperiode og år siden for å se historiske klimadata for temperatur, vind og nedbør.</string>
 
-    <string name="police_service">Politi</string>
-    <string name="police_number">112</string>
-    <string name="fire_service">Brann</string>
-    <string name="fire_number">110</string>
-    <string name="ambulance_service">Ambulanse</string>
-    <string name="ambulance_number">113</string>
+    <string name="emergency_title">Nødnummer</string>
+    <string name="emergency_desc">Ved nødsituasjon, ring et av disse numrene</string>
+    <string name="emergency_call_desc">Ring</string>
+    <string name="police_rescue_service">Politi / redning</string>
+    <string name="police_rescue_number">112</string>
+    <string name="medical_service">Medisinsk</string>
+    <string name="medical_number">113</string>
+
+    <string name="call_dialog_title">Ring %1$s?</string>
+    <string name="dialog_yes">Ja</string>
+    <string name="dialog_no">Nei</string>
 
     <string name="map_title">Kart</string>
     <string name="map_instruction">Velg et område for å se historiske klimadata.</string>
@@ -118,7 +129,6 @@
     
     <string name="hide_info">Skjul info ▲</string>
     <string name="show_info">Vis info ▼</string>
-    <string name="emergency_title">Nødnummer</string>
 
     <string name="weather_station_desc">Målestasjon</string>
 
@@ -132,5 +142,6 @@
 
     <string name="no_graph_data">Ingen data å vise.</string>
     <string name="not_checked">Ikke sjekket</string>
+    <string name="call_icon">Ringe ikon</string>
 
 </resources>

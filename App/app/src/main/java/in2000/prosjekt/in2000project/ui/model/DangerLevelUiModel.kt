@@ -12,6 +12,7 @@ provides a single source of truth for the composables that use them
  */
 data class DangerLevelUiModel(
     val level: DangerLevel,
+    @StringRes val numberRes: Int,
     @StringRes val titleRes: Int,
     @StringRes val badgeLabelRes: Int,
     @StringRes val descriptionRes: Int,
@@ -38,6 +39,7 @@ fun DangerLevel.toUiModel(): DangerLevelUiModel {
         )
         DangerLevel.LOW -> DangerLevelUiModel(
             level = this,
+            numberRes = R.string.danger_level_1_number,
             titleRes = R.string.danger_level_1_title,
             badgeLabelRes = R.string.danger_level_1_badge,
             descriptionRes = R.string.danger_level_1_description,
@@ -46,6 +48,7 @@ fun DangerLevel.toUiModel(): DangerLevelUiModel {
         )
         DangerLevel.MODERATE -> DangerLevelUiModel(
             level = this,
+            numberRes = R.string.danger_level_2_number,
             titleRes = R.string.danger_level_2_title,
             badgeLabelRes = R.string.danger_level_2_badge,            descriptionRes = R.string.danger_level_2_description,
             lightColor = DangerColorLevel2,
@@ -53,6 +56,7 @@ fun DangerLevel.toUiModel(): DangerLevelUiModel {
         )
         DangerLevel.CONSIDERABLE -> DangerLevelUiModel(
             level = this,
+            numberRes = R.string.danger_level_3_number,
             titleRes = R.string.danger_level_3_title,
             badgeLabelRes = R.string.danger_level_3_badge,
             descriptionRes = R.string.danger_level_3_description,
@@ -61,6 +65,7 @@ fun DangerLevel.toUiModel(): DangerLevelUiModel {
         )
         DangerLevel.HIGH -> DangerLevelUiModel(
             level = this,
+            numberRes = R.string.danger_level_4_number,
             titleRes = R.string.danger_level_4_title,
             badgeLabelRes = R.string.danger_level_4_badge,
             descriptionRes = R.string.danger_level_4_description,
@@ -69,6 +74,7 @@ fun DangerLevel.toUiModel(): DangerLevelUiModel {
         )
         DangerLevel.VERY_HIGH -> DangerLevelUiModel(
             level = this,
+            numberRes = R.string.danger_level_5_number,
             titleRes = R.string.danger_level_5_title,
             badgeLabelRes = R.string.danger_level_5_badge,
             descriptionRes = R.string.danger_level_5_description,
