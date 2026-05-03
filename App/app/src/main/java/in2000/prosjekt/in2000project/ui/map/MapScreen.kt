@@ -42,6 +42,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
@@ -118,7 +119,7 @@ fun MapRoute(
         )
     }
 
-    LifecycleResumeEffect(Unit) {
+    LifecycleResumeEffect(Lifecycle.Event.ON_PAUSE) {
         onPauseOrDispose {
             mapViewModel.onSheetDismissed()
             MapCameraRepository.clearPinnedPoint()
