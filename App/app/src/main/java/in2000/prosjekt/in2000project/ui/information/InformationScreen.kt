@@ -15,10 +15,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight.Companion.Bold
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import in2000.prosjekt.in2000project.R
+import in2000.prosjekt.in2000project.data.model.enums.DangerLevel
+import in2000.prosjekt.in2000project.ui.model.toUiModel
 import in2000.prosjekt.in2000project.ui.reusables.BottomBar
 import in2000.prosjekt.in2000project.ui.reusables.DangerLevelItem
 import in2000.prosjekt.in2000project.ui.reusables.EmergencySection
@@ -33,6 +36,19 @@ fun InfoScreen(
 ) {
     val uiState by infoViewModel.infoUiState.collectAsState()
 
+    InfoContent(
+        modifier = modifier,
+        navController = navController,
+        state = uiState
+    )
+}
+
+@Composable
+fun InfoContent(
+    modifier: Modifier = Modifier,
+    navController: NavController,
+    state: InfoUiState,
+) {
     Scaffold(
         modifier = modifier,
         topBar = {
@@ -54,22 +70,16 @@ fun InfoScreen(
                 .padding(horizontal = 16.dp),
             contentPadding = PaddingValues(vertical = 16.dp)
         ) {
-            item { Text(
-                text = stringResource(R.string.emergency_title),
-                style = MaterialTheme.typography.bodyMedium,
-                fontWeight = Bold,
-                modifier = Modifier.padding(bottom = 8.dp)
-            ) }
             item { EmergencySection() }
 
             item { Text(
                 text = stringResource(R.string.danger_levels_title),
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.titleMedium,
                 fontWeight = Bold,
                 modifier = Modifier.padding(bottom = 8.dp)
             ) }
 
-            items(uiState.dangerLevels) { uiModel ->
+            items(state.dangerLevels) { uiModel ->
                 DangerLevelItem(
                     uiModel = uiModel,
                     modifier = Modifier.padding(vertical = 6.dp)
@@ -81,7 +91,7 @@ fun InfoScreen(
 
                     Text(
                         text = stringResource(R.string.avalanche_info_title),
-                        style = MaterialTheme.typography.bodyMedium,
+                        style = MaterialTheme.typography.titleMedium,
                         fontWeight = Bold,
                         modifier = Modifier.padding(bottom = 16.dp)
                     )
@@ -92,7 +102,7 @@ fun InfoScreen(
                     )
                     Text(
                         text = stringResource(R.string.team_title),
-                        style = MaterialTheme.typography.bodyMedium,
+                        style = MaterialTheme.typography.titleMedium,
                         fontWeight = Bold,
                         modifier = Modifier.padding(bottom = 16.dp)
                     )
@@ -105,4 +115,14 @@ fun InfoScreen(
             }
         }
     }
+}
+
+@Preview
+@Composable
+fun PreviewInfoScreen(){
+    // Use InfoContent in Preview to avoid Koin dependency from InfoScreen
+    InfoContent(
+        navController = rememberNavController(),
+        state = InfoUiState(dangerLevels = DangerLevel.entries.map { it.toUiModel() })
+    )
 }
