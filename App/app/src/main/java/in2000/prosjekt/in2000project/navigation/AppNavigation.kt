@@ -88,7 +88,7 @@ fun AppNavigation(){
 
                 composable(Screen.Settings.route) {
                     SettingScreen(
-                        navController = navController,
+                        onBackClick = navController::popBackStack,
                         settingsViewModel = settingsViewModel
                     )
                 }
