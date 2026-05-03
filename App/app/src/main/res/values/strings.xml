@@ -108,27 +108,24 @@
 
     <string name="name_favorite_prompt">Name this favorite</string>
 
-
     <string name="settings_title">Settings</string>
 
     <string name="back_button_desc">Back</string>
 
-    <string name="appearance_title">Appearance</string>
-    <string name="text_size_title">Text Size</string>
-    <string name="language_title">Language</string>
+    <string name="settings_appearance_title">Appearance</string>
+    <string name="settings_theme_system">Use device setting</string>
+    <string name="settings_theme_light">Light Mode</string>
+    <string name="settings_theme_dark">Dark Mode</string>
 
-    <string name="theme_system">Use device setting</string>
-    <string name="theme_light">Light Mode</string>
-    <string name="theme_dark">Dark Mode</string>
+    <string name="settings_text_size_title">Text Size</string>
+    <string name="settings_text_size_title_formatted">Text Size: %1$d%%</string>
+    <string name="settings_reset_default">Reset to Default</string>
 
-    <string name="text_small">Small</string>
-    <string name="text_medium">Medium</string>
-    <string name="text_large">Large</string>
-    
-    <string name="reset_default">Reset to Default</string>
-    <string name="text_size_label">Text size: %1$d%%</string>
+    <string name="settings_text_small">Small</string>
+    <string name="settings_text_medium">Medium</string>
+    <string name="settings_text_large">Large</string>
 
-    <string name="language_system">Use device setting</string>
+    <string name="settings_language_title">Language</string>
 
     <string name="hide_info">Hide info ▲</string>
     <string name="show_info">Show info ▼</string>
@@ -142,6 +139,7 @@
 
     <string name="climate_error_desc">Failed to load climate data, please try again.</string>
     <string name="no_date_selected_msg">Select a date interval to see historical trend graphs for the period.</string>
+
     <string name="no_graph_data">No data to show.</string>
     <string name="not_checked">Not checked</string>
     <string name="call_icon">Call Icon</string>

@@ -110,23 +110,21 @@
 
     <string name="back_button_desc">Tilbake</string>
 
-    <string name="appearance_title">Utseende</string>
-    <string name="text_size_title">Tekststørrelse</string>
-    <string name="language_title">Språk</string>
+    <string name="settings_appearance_title">Utseende</string>
+    <string name="settings_theme_system">Bruk enhetsinnstilling</string>
+    <string name="settings_theme_light">Lys modus</string>
+    <string name="settings_theme_dark">Mørk modus</string>
 
-    <string name="theme_system">Bruk enhetsinnstilling</string>
-    <string name="theme_light">Lys modus</string>
-    <string name="theme_dark">Mørk modus</string>
+    <string name="settings_text_size_title">Tekststørrelse: %1$d%%</string>
+    <string name="settings_text_size_title_formatted">Tekststørrelse: %1$d%%</string>
+    <string name="settings_reset_default">tilbakestille til standard</string>
 
-    <string name="text_small">Liten</string>
-    <string name="text_medium">Middels</string>
-    <string name="text_large">Stor</string>
-
-    <string name="reset_default">tilbakestille til standard</string>
-    <string name="text_size_label">Tekst størrelse: %1$d%%</string>
-
-    <string name="language_system">Bruk enhetsinnstilling</string>
+    <string name="settings_text_small">Liten</string>
+    <string name="settings_text_medium">Middels</string>
+    <string name="settings_text_large">Stor</string>
     
+    <string name="settings_language_title">Språk</string>
+
     <string name="hide_info">Skjul info ▲</string>
     <string name="show_info">Vis info ▼</string>
 
