@@ -1,9 +1,6 @@
 package in2000.prosjekt.in2000project.ui.map
 
 import android.util.Log
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import in2000.prosjekt.in2000project.data.model.Coordinate
@@ -13,7 +10,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.time.Month
 import java.time.MonthDay
+import java.time.Year
 
 class MapViewModel(
     private val frostClimateRepository: FrostClimateRepository
@@ -25,6 +24,17 @@ class MapViewModel(
     //we base this off the MapScreenState() data class rather than just one sealed interface.
     private val _screenState = MutableStateFlow(MapScreenState())
     val screenState: StateFlow<MapScreenState> = _screenState.asStateFlow()
+
+    init {
+        val now = MonthDay.now()
+        val currentYear = Year.now().value
+        _screenState.value = _screenState.value.copy(
+            startDate = now.with(now.month.minus(1)),
+            endDate = now,
+            currentYear = currentYear,
+            selectedYear = currentYear - 3
+        )
+    }
 
     //.copy() creates a new instance of the data class with a few of the properties changed while
     //everything else stays the same. StateFlow needs to identify the change but can't if you
@@ -64,7 +74,7 @@ class MapViewModel(
                     periodStart = current.periodStart,
                     periodEnd = current.periodEnd,
                     yearsBack = current.yearsBack
-                ) ?: throw NoObservationsException("","","")
+                ) ?: throw NoObservationsException("", "", "")
 
                 _screenState.value = _screenState.value.copy(
                     climateState = ClimateState.Success(climateData)
