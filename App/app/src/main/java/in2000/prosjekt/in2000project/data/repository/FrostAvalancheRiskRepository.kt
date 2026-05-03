@@ -57,12 +57,17 @@ class FrostAvalancheRiskRepository(
             repeatingTimeRange.value)
 
         if (observationResponse == null) {
-            return emptyList()
+            throw NoObservationsException(
+                this.name, elementsCsv, repeatingTimeRange.value
+            )
         }
 
         val observations = observationResponse.data
 
-        if (observations.isEmpty()) return emptyList()
+        if (observations.isEmpty())
+            throw NoObservationsException(
+            this.name, elementsCsv, repeatingTimeRange.value
+            )
 
         val hasAllElements = observations.all { atRefTime ->
             requiredElements.all { elementId ->
