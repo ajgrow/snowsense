@@ -5,9 +5,9 @@ package in2000.prosjekt.in2000project.data.model
  * for the requested period/elements.
  */
 class NoObservationsException(
-    stationName: String,
-    elements: String,
-    referenceTime: String,
+    stationName: String?,
+    elements: String?,
+    referenceTime: String?,
 ) : Exception(
     "No observations available at station $stationName"
     + "for $elements with reference time $referenceTime")

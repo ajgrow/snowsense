@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -31,15 +30,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
 import in2000.prosjekt.in2000project.R
 import in2000.prosjekt.in2000project.data.model.enums.DangerLevel
-import in2000.prosjekt.in2000project.ui.reusables.BottomBar
-import in2000.prosjekt.in2000project.data.model.enums.EmergencyServices
-import in2000.prosjekt.in2000project.navigation.Screen
 import in2000.prosjekt.in2000project.ui.model.DangerLevelUiModel
 import in2000.prosjekt.in2000project.ui.model.toUiModel
+import in2000.prosjekt.in2000project.ui.reusables.DangerLevelHeader
+import in2000.prosjekt.in2000project.ui.reusables.DangerLevelItem
+import in2000.prosjekt.in2000project.ui.reusables.EmergencySection
 import in2000.prosjekt.in2000project.ui.reusables.TopBar
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -51,15 +48,30 @@ fun InfoScreen(
 ) {
     val uiState by infoViewModel.infoUiState.collectAsState()
 
+    InfoContent(
+        modifier = modifier,
+        state = uiState,
+        onSettingsClick = onSettingsClick
+    )
+}
+
+@Composable
+fun InfoContent(
+    modifier: Modifier = Modifier,
+    state: InfoUiState,
+    onSettingsClick: () -> Unit = {}
+) {
     Scaffold(
         modifier = modifier,
-        topBar = { TopBar(
+        topBar = {
+            TopBar(
                 title = stringResource(R.string.about_app_title),
                 modifier = Modifier,
                 onSettingsClick = onSettingsClick
-        ) },
+            )
+        }
     ) { paddingValues ->
-
+        
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
@@ -67,58 +79,43 @@ fun InfoScreen(
                 .padding(horizontal = 16.dp),
             contentPadding = PaddingValues(vertical = 16.dp)
         ) {
-            item { EmergencyNumbersSection () }
-            item {
-                Column {
-                    Text(
-                        text = stringResource(R.string.team_title),
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = Bold,
-                        modifier = Modifier.padding(bottom = 16.dp)
-                    )
+            item { EmergencySection() }
 
-                    Text(
-                        text = stringResource(R.string.about_team_text),
-                        style = MaterialTheme.typography.bodySmall,
-                        modifier = Modifier.padding(bottom = 16.dp)
-                    )
+            item { Text(
+                text = stringResource(R.string.danger_levels_title),
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = Bold,
+                modifier = Modifier.padding(bottom = 8.dp)
+            ) }
 
-                    Text(
-                        text = stringResource(R.string.avalanche_info_title),
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = Bold,
-                        modifier = Modifier.padding(bottom = 16.dp)
-                    )
-
-                    Text(
-                        text = stringResource(R.string.avalanche_general_info_text),
-                        style = MaterialTheme.typography.bodySmall,
-                        modifier = Modifier.padding(bottom = 16.dp)
-                    )
-
-                    Text(
-                        text = stringResource(R.string.danger_levels_title),
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = Bold,
-                        modifier = Modifier.padding(bottom = 8.dp)
-                    )
-                }
-            }
-
-            items(uiState.dangerLevels) { uiModel ->
+            items(state.dangerLevels) { uiModel: DangerLevelUiModel ->
                 DangerLevelItem(
                     uiModel = uiModel,
                     modifier = Modifier.padding(vertical = 6.dp)
                 )
+            }
+
+            item {
+                Column {
+                    InfoBox(
+                        titleRes = R.string.avalanche_info_title,
+                        descRes = R.string.avalanche_general_info_text
+                    )
+                    InfoBox(
+                        titleRes = R.string.team_title,
+                        descRes = R.string.about_team_text
+                    )
+                }
             }
         }
     }
 }
 
 @Composable
-fun DangerLevelItem(
+fun InfoBox(
     modifier: Modifier = Modifier,
-    uiModel: DangerLevelUiModel
+    titleRes: Int,
+    descRes: Int
 ) {
     var expanded by rememberSaveable { mutableStateOf(false) }
 
@@ -127,87 +124,52 @@ fun DangerLevelItem(
             .padding(bottom = 8.dp)
             .fillMaxWidth()
             .clickable { expanded = !expanded },
-        shape = RoundedCornerShape(12.dp),
-        border = BorderStroke(1.dp, Color.Black)
-    ) {
-        Column(
+    ) { Column(
             modifier = Modifier.padding(8.dp)
         ) {
-            Row (
+            Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Surface(
-                    color = uiModel.getColor(),
-                    shape = RoundedCornerShape(8.dp)
-                ) {
-                    Text(
-                        text = stringResource(uiModel.titleRes),
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = Bold,
-                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)
-                    )
-                }
                 Text(
-                    text =
-                        if (expanded)
-                            stringResource(R.string.hide_info)
-                        else
-                            stringResource(R.string.show_info),
+                    text = stringResource(titleRes),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = Bold,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+                Text(
+                    text = if (expanded)
+                        stringResource(R.string.hide_info)
+                    else
+                        stringResource(R.string.show_info),
                     style = MaterialTheme.typography.bodySmall
                 )
             }
+
             AnimatedVisibility(visible = expanded) {
                 Text(
-                    text = stringResource(uiModel.descriptionRes),
+                    text = stringResource(descRes),
                     style = MaterialTheme.typography.bodySmall,
                     modifier = Modifier.padding(top = 4.dp)
                 )
-            }
         }
-    }
+    }        }
 }
-
+@Preview
 @Composable
-fun EmergencyNumbersSection(
-    modifier: Modifier = Modifier,
-) {
-    Surface(
-        modifier = modifier
-            .padding(bottom = 8.dp)
-            .fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
-        border = BorderStroke(1.dp, Color.Red)
-    ) {
-        Column(
-            modifier = Modifier.padding(12.dp)
-        ) {
-            Text(
-                text = stringResource(R.string.emergency_title),
-                style = MaterialTheme.typography.bodyMedium,
-                fontWeight = Bold,
-                modifier = Modifier.padding(bottom = 8.dp)
-            )
-            EmergencyServices.entries.forEach {
-                Row() {
-                    Text(text = stringResource(it.service))
-                    Spacer(modifier = Modifier.weight(1f))
-                    Text(text = stringResource(it.number))
-                }
-            }
-        }
-    }
+fun PreviewInfoScreen(){
+    // Use InfoContent in Preview to avoid Koin dependency from InfoScreen
+    InfoContent(
+        state = InfoUiState(dangerLevels = DangerLevel.entries.map { it.toUiModel() })
+    )
 }
 
 @Preview
 @Composable
-fun PrevDangerLevelItem(){
-    DangerLevelItem(uiModel = DangerLevel.HIGH.toUiModel())
-}
-
-@Preview
-@Composable
-fun prevEmergencySection() {
-    EmergencyNumbersSection()
+fun PrevInfoBox(){
+    InfoBox(
+        titleRes = R.string.team_title,
+        descRes = R.string.about_team_text
+    )
 }

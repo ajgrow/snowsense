@@ -178,9 +178,9 @@ class SlabAvalancheRiskAssessorTest {
     }
 
     @Test
-    fun assess_emptyInput_returnsLow() {
+    fun assess_emptyInput_returnsUnknown() {
         assertEquals(
-            DangerLevel.LOW,
+            DangerLevel.UNKNOWN,
             SlabAvalancheRiskAssessor.assess(emptyList()),
         )
     }

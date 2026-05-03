@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import in2000.prosjekt.in2000project.data.model.Coordinate
+import in2000.prosjekt.in2000project.data.model.NoObservationsException
 import in2000.prosjekt.in2000project.data.repository.FrostClimateRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -73,7 +74,7 @@ class MapViewModel(
                     periodStart = current.startDate,
                     periodEnd = current.endDate,
                     yearsBack = current.currentYear - current.selectedYear
-                )
+                ) ?: throw NoObservationsException("","","")
 
                 _screenState.value = _screenState.value.copy(
                     climateState = ClimateState.Success(climateData)

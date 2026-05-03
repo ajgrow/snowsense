@@ -36,5 +36,5 @@ interface FrostV0DataSource {
         sourceId: String,
         elementsCsv: String,
         referenceTime: String,
-    ): FrostV0ObservationResponse
+    ): FrostV0ObservationResponse?
 }

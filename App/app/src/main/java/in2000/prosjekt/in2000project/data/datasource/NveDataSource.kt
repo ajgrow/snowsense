@@ -2,17 +2,17 @@ package in2000.prosjekt.in2000project.data.datasource
 
 import in2000.prosjekt.in2000project.data.model.GeoJson
 import in2000.prosjekt.in2000project.network.KtorClient
+import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter
 
-class NveDataSource {
-
-    private val httpClient = KtorClient.client
-
+class NveDataSource(
+    private val client: HttpClient
+) {
     suspend fun getGeoJson(lat: Double, lon: Double, buffer: Int): GeoJson {
         return try {
-            httpClient
+            client
                 .get("https://kart.nve.no/enterprise/rest/services/SnoskredAktsomhet/MapServer/3/query"){
                     parameter("where", "1=1")
 
