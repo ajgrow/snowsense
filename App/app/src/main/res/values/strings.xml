@@ -139,5 +139,6 @@
     <string name="no_date_selected_msg">Select a date interval to see historical trend graphs for the period.</string>
     <string name="no_graph_data">No data to show.</string>
     <string name="not_checked">Not checked</string>
+    <string name="call_icon">Call Icon</string>
 
 </resources>

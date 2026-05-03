@@ -137,5 +137,6 @@
 
     <string name="no_graph_data">Ingen data å vise.</string>
     <string name="not_checked">Ikke sjekket</string>
+    <string name="call_icon">Ringe ikon</string>
 
 </resources>
