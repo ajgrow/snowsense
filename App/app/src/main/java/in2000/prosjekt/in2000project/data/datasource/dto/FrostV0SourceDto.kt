@@ -10,15 +10,15 @@ data class FrostV0SourceResponse (
 
 @Serializable
 data class FrostV0Source (
-    val id: String,
-    val name: String,
-    val shortName: String,
-    val geometry: FrostV0Point,
-    val distance: Double?,
-    val masl: Double?,
-    val validFrom: String?,
-    val county: String?,
-    val municipality: String?,
+    val id: String? = null,
+    val name: String? = null,
+    val shortName: String? = null,
+    val geometry: FrostV0Point? = null,
+    val distance: Double? = null,
+    val masl: Double? = null,
+    val validFrom: String? = null,
+    val county: String? = null,
+    val municipality: String? = null,
 )
 
 @Serializable
