@@ -73,7 +73,7 @@ class MapViewModel(
                     coordinate = Coordinate(lat, lon),
                     periodStart = current.startDate,
                     periodEnd = current.endDate,
-                    yearsBack = current.selectedYear
+                    yearsBack = current.currentYear - current.selectedYear
                 ) ?: throw NoObservationsException("","","")
 
                 _screenState.value = _screenState.value.copy(
