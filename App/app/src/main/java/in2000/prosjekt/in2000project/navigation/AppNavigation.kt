@@ -22,7 +22,7 @@ import org.koin.compose.viewmodel.koinViewModel
 fun AppNavigation(){
     val navController = rememberNavController()
 
-    val settingsViewModel: SettingsViewModel = viewModel()
+    val settingsViewModel: SettingsViewModel = koinViewModel()
 
     val searchViewModel: SearchViewModel = koinViewModel()
 

@@ -1,9 +1,6 @@
 package in2000.prosjekt.in2000project.ui.map
 
 import android.util.Log
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import in2000.prosjekt.in2000project.data.model.Coordinate
@@ -12,7 +9,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.time.Month
 import java.time.MonthDay
+import java.time.Year
 
 class MapViewModel(
     private val frostClimateRepository: FrostClimateRepository
@@ -24,6 +23,17 @@ class MapViewModel(
     //we base this off the MapScreenState() data class rather than just one sealed interface.
     private val _screenState = MutableStateFlow(MapScreenState())
     val screenState: StateFlow<MapScreenState> = _screenState.asStateFlow()
+
+    init {
+        val now = MonthDay.now()
+        val currentYear = Year.now().value
+        _screenState.value = _screenState.value.copy(
+            startDate = now.with(now.month.minus(1)),
+            endDate = now,
+            currentYear = currentYear,
+            selectedYear = currentYear - 3
+        )
+    }
 
     //.copy() creates a new instance of the data class with a few of the properties changed while
     //everything else stays the same. StateFlow needs to identify the change but can't if you
@@ -60,9 +70,9 @@ class MapViewModel(
                 val current = _screenState.value
                 val climateData = frostClimateRepository.getClimateDataForLocation(
                     coordinate = Coordinate(lat, lon),
-                    periodStart = current.periodStart,
-                    periodEnd = current.periodEnd,
-                    yearsBack = current.yearsBack
+                    periodStart = current.startDate,
+                    periodEnd = current.endDate,
+                    yearsBack = current.currentYear - current.selectedYear
                 )
 
                 _screenState.value = _screenState.value.copy(
@@ -87,12 +97,12 @@ class MapViewModel(
         fetchClimateData(lat, lon)
     }
 
-    fun onPeriodStart(start: MonthDay) {
+    fun onStartDateChange(start: MonthDay) {
         val current = _screenState.value
-        val end = setTimeBoundary(start, current.periodEnd)
+        val end = setTimeBoundary(start, current.endDate)
 
         _screenState.value = _screenState.value.copy(
-            periodStart = start
+            startDate = start
             //TIME BOUNDARY NOT IMPLEMENTED YET
             //periodEnd = end
         )
@@ -100,25 +110,25 @@ class MapViewModel(
         refetchIfLocationKnown()
     }
 
-    fun onPeriodEnd(end: MonthDay) {
+    fun onEndDateChange(end: MonthDay) {
         val current = _screenState.value
-        val start = setTimeBoundary(current.periodStart, end)
+        val start = setTimeBoundary(current.startDate, end)
 
         _screenState.value = _screenState.value.copy(
             //TIME BOUNDARY NOT IMPLEMENTED YET
             //periodStart = start,
-            periodEnd = end
+            endDate = end
         )
 
         refetchIfLocationKnown()
     }
 
-    fun onYearsBack(yearsBack: Int) {
-        _screenState.value = _screenState.value.copy(
-            yearsBack = yearsBack
-        )
+    fun onYearChange(year: Int) {
+        val updated = _screenState.value.copy(selectedYear = year)
+        _screenState.value = updated
 
-        refetchIfLocationKnown()
+        val coordinate = updated.climateCoordinate ?: return
+        fetchClimateData(coordinate.latitude, coordinate.longitude)
     }
 
     private fun refetchIfLocationKnown() {
