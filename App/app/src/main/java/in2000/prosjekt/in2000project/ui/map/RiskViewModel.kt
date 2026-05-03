@@ -31,9 +31,13 @@ class RiskViewModel(
             val geoJson = nveRepository.getGeoJson(lat, lon, 10)
             val isDangerZone = geoJson.features?.isNotEmpty() == true
 
-            val slabDangerLevel = frostAvalancheRiskRepository.getSlabAvalancheRiskForLocation(
-                Coordinate(lat, lon)
-            ).dangerLevel
+            val slabDangerLevel = try {
+                frostAvalancheRiskRepository.getSlabAvalancheRiskForLocation(
+                    Coordinate(lat, lon)
+                ).dangerLevel
+            } catch(e: Exception) {
+                DangerLevel.UNKNOWN
+            }
 
             val dangerLevel = if (isDangerZone) slabDangerLevel.toUiModel() else DangerLevel.LOW.toUiModel()
 
