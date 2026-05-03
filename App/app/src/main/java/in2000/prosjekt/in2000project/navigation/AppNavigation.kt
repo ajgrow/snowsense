@@ -30,7 +30,9 @@ import in2000.prosjekt.in2000project.ui.theme.In2000projectTheme
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun AppNavigation(){
+fun AppNavigation(
+    modifier: Modifier = Modifier
+){
     val navController = rememberNavController()
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -60,6 +62,7 @@ fun AppNavigation(){
                     )
                 }
             },
+            modifier = modifier,
             contentWindowInsets = ScaffoldDefaults
                 .contentWindowInsets
                 .run {
