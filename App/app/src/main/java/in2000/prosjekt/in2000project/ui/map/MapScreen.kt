@@ -18,6 +18,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -25,9 +26,12 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -39,6 +43,9 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -186,79 +193,32 @@ fun MapScreen(
     var endDate by rememberSaveable { mutableStateOf<MonthDay?>(null) }
     var selectedYear by rememberSaveable { mutableStateOf<Int?>(null) }
 
-    //Main screen content
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f)
-        ) {
-            //Map added here
-            //onMapClick is passed to the Map
-            MapboxView(
-                onMapClick = { point ->
-                    onMapClick(point.latitude(), point.longitude())
-                    isSheetOpen = true
-                },
-                onOverlayError = onOverlayError,
-                onOverlayLoaded = onOverlayLoaded,
-                modifier = Modifier
-                    .fillMaxSize(),
-                coordinates = coordinates,
-                searchState = searchState,
-                onSearch = { onSearch() },
-                onSelectResult = onSelectResult
-            )
+    val configuration = LocalWindowInfo.current
+    val halfScreen = configuration.containerDpSize.height / 2
 
-            when (screenState.overlayState) {
-                is OverlayState.Loading -> {
-                    OverlayStatusCard(
-                        message = stringResource(R.string.overlay_loading)
-                    )
-                }
+    val sheetState = rememberStandardBottomSheetState(
+        initialValue = SheetValue.Hidden,
+        skipHiddenState = false
+    )
+    val scaffoldState = rememberBottomSheetScaffoldState(
+        bottomSheetState = sheetState
+    )
 
-                is OverlayState.Error -> {
-                    OverlayRetryCard(
-                        message = stringResource(R.string.overlay_error),
-                        onRetry = onOverlayRetry
-                    )
-                }
-
-                is OverlayState.Success -> Unit
-            }
-
-            when (screenState.climateState) {
-                is ClimateState.Idle -> Unit
-
-                is ClimateState.Loading -> {
-                    Log.d("ClimateData", "Loading...")
-                }
-
-                is ClimateState.Error -> {
-                    Log.d("ClimateData", "Error")
-                }
-
-                is ClimateState.Success -> {
-                    val success = screenState.climateState
-                    val climateData = success.data
-                    Log.d("ClimateData", climateData.toString())
-                }
-            }
+    LaunchedEffect(screenState.climateState) {
+        if (screenState.climateState is ClimateState.Success) {
+            sheetState.partialExpand()
         }
     }
 
-    //This is for the bottom sheet - if isSheetOpen is set to true, then it will open otherwise, it stays closed
-    if (isSheetOpen){
-        ModalBottomSheet(
-            onDismissRequest = { isSheetOpen = false },
-            sheetState = bottomSheetState,
-            containerColor = MaterialTheme.colorScheme.surface,
-            tonalElevation = 0.dp,
-            modifier = Modifier.fillMaxHeight()
-        ) {
+    val peekHeight = if (screenState.climateState is ClimateState.Success)
+                        halfScreen
+                    else 0.dp
+
+    BottomSheetScaffold(
+        containerColor = Color.Transparent,
+        scaffoldState = scaffoldState,
+        sheetPeekHeight = peekHeight,
+        sheetContent = {
             BottomSheetContent(
                 area = skiArea,
                 climateState = screenState.climateState,
@@ -277,6 +237,47 @@ fun MapScreen(
                 onYearChange = onYearChange,
                 onAddFavorite = onAddFavorite
             )
+        }
+    ) { innerPadding ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+        ) {
+//            when (screenState.overlayState) {
+//                is OverlayState.Loading -> {
+//                    OverlayStatusCard(
+//                        message = stringResource(R.string.overlay_loading)
+//                    )
+//                }
+//
+//                is OverlayState.Error -> {
+//                    OverlayRetryCard(
+//                        message = stringResource(R.string.overlay_error),
+//                        onRetry = onOverlayRetry
+//                    )
+//                }
+//
+//                is OverlayState.Success -> Unit
+//            }
+//
+//            when (screenState.climateState) {
+//                is ClimateState.Idle -> Unit
+//
+//                is ClimateState.Loading -> {
+//                    Log.d("ClimateData", "Loading...")
+//                }
+//
+//                is ClimateState.Error -> {
+//                    Log.d("ClimateData", "Error")
+//                }
+//
+//                is ClimateState.Success -> {
+//                    val success = screenState.climateState
+//                    val climateData = success.data
+//                    Log.d("ClimateData", climateData.toString())
+//                }
+//            }
         }
     }
 }

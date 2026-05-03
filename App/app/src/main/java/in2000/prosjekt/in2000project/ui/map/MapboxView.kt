@@ -95,7 +95,7 @@ private const val WMS_DETAIL =
             "&STYLES=&FORMAT=image/png&TRANSPARENT=TRUE"
 
 @Composable
-fun MapboxView2(
+fun MapboxView(
     mapStateHolder: MapStateHolder,
     modifier: Modifier = Modifier,
 ) {
@@ -118,7 +118,7 @@ fun MapboxView2(
 }
 
 @Composable
-fun MapboxView(
+fun MapboxView2(
     onMapClick: (Point) -> Unit,
     coordinates: String,
     onOverlayError: () -> Unit,

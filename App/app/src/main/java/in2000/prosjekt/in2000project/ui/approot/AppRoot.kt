@@ -19,7 +19,7 @@ import androidx.navigation.compose.rememberNavController
 import in2000.prosjekt.in2000project.navigation.AppNavigation
 import in2000.prosjekt.in2000project.navigation.NavigationActions
 import in2000.prosjekt.in2000project.ui.map.MapStateHolder
-import in2000.prosjekt.in2000project.ui.map.MapboxView2
+import in2000.prosjekt.in2000project.ui.map.MapboxView
 import in2000.prosjekt.in2000project.ui.reusables.BottomBar
 import in2000.prosjekt.in2000project.ui.reusables.isBottomBarScreen
 import in2000.prosjekt.in2000project.ui.settings.SettingsViewModel
@@ -70,7 +70,7 @@ fun AppRoot(
             Box(
                 modifier = Modifier.padding(innerPadding)
             ) {
-                MapboxView2(
+                MapboxView(
                     mapStateHolder = mapStateHolder,
                     modifier = Modifier.fillMaxSize(),
                 )
