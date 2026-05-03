@@ -3,11 +3,13 @@ package in2000.prosjekt.in2000project.ui.approot
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.runtime.Composable
@@ -18,6 +20,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import in2000.prosjekt.in2000project.navigation.AppNavigation
 import in2000.prosjekt.in2000project.navigation.NavigationActions
+import in2000.prosjekt.in2000project.navigation.Screen
 import in2000.prosjekt.in2000project.ui.map.MapStateHolder
 import in2000.prosjekt.in2000project.ui.map.MapboxView
 import in2000.prosjekt.in2000project.ui.reusables.BottomBar
@@ -43,6 +46,8 @@ fun AppRoot(
         themeMode = settingsViewModel.themeMode,
         textScale = settingsViewModel.textScale,
     ) {
+        val onMapRoute = currentDestination?.route == Screen.Map.route
+
         Scaffold(
             modifier = modifier,
             containerColor = Color.Transparent,
@@ -74,6 +79,14 @@ fun AppRoot(
                     mapStateHolder = mapStateHolder,
                     modifier = Modifier.fillMaxSize(),
                 )
+
+                if (!onMapRoute) {
+                    Box(
+                        Modifier
+                            .fillMaxSize()
+                            .background(MaterialTheme.colorScheme.background)
+                    )
+                }
 
                 AppNavigation(
                     navController = navController,
