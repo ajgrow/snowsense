@@ -30,7 +30,7 @@ object SlabAvalancheRiskAssessor {
     private const val THRESHOLD_VERY_HIGH = 0.75
 
     fun assess(days: List<DailyWeatherRecord>): DangerLevel {
-        if (days.isEmpty()) return DangerLevel.LOW
+        if (days.isEmpty()) return DangerLevel.UNKNOWN
 
         val sorted = days.sortedBy { it.date }
         val recent = sorted.takeLast(RECENT_DAYS)
