@@ -25,6 +25,7 @@ import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
+import androidx.compose.material3.Surface
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
@@ -46,101 +47,106 @@ fun SettingScreen(
     val textScale = settingsViewModel.textScale
     val languageMode = settingsViewModel.languageMode
 
-    Column(
+    Surface(
         modifier = modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        TopBar(
-            title = stringResource(R.string.settings_title),
-            onBackClick = onBackClick,
-        )
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState()),
+            modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            SettingsSection(
-                title = stringResource(R.string.settings_appearance_title),
+            TopBar(
+                title = stringResource(R.string.settings_title),
+                onBackClick = onBackClick,
+            )
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
-                SettingsRadioOption(
-                    title = stringResource(R.string.settings_theme_system),
-                    selected = themeMode == ThemeMode.SYSTEM,
-                    onClick = { settingsViewModel.setTheme(ThemeMode.SYSTEM) },
-                )
-
-                SettingsRadioOption(
-                    title = stringResource(R.string.settings_theme_light),
-                    selected = themeMode == ThemeMode.LIGHT,
-                    onClick = { settingsViewModel.setTheme(ThemeMode.LIGHT) },
-                )
-
-                SettingsRadioOption(
-                    title = stringResource(R.string.settings_theme_dark),
-                    selected = themeMode == ThemeMode.DARK,
-                    onClick = { settingsViewModel.setTheme(ThemeMode.DARK) },
-                )
-            }
-
-            SettingsSection(
-                title = stringResource(
-                    R.string.settings_text_size_title_formatted,
-                    (textScale * 100).toInt()),
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    modifier = Modifier
-                        .fillMaxWidth()
+                SettingsSection(
+                    title = stringResource(R.string.settings_appearance_title),
                 ) {
+                    SettingsRadioOption(
+                        title = stringResource(R.string.settings_theme_system),
+                        selected = themeMode == ThemeMode.SYSTEM,
+                        onClick = { settingsViewModel.setTheme(ThemeMode.SYSTEM) },
+                    )
 
-                    Slider(
-                        value = textScale,
-                        onValueChange = { settingsViewModel.updateTextScale(it) },
-                        valueRange = 0.5f..2.0f,
+                    SettingsRadioOption(
+                        title = stringResource(R.string.settings_theme_light),
+                        selected = themeMode == ThemeMode.LIGHT,
+                        onClick = { settingsViewModel.setTheme(ThemeMode.LIGHT) },
+                    )
+
+                    SettingsRadioOption(
+                        title = stringResource(R.string.settings_theme_dark),
+                        selected = themeMode == ThemeMode.DARK,
+                        onClick = { settingsViewModel.setTheme(ThemeMode.DARK) },
+                    )
+                }
+
+                SettingsSection(
+                    title = stringResource(
+                        R.string.settings_text_size_title_formatted,
+                        (textScale * 100).toInt()
+                    ),
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween,
                         modifier = Modifier
-                            .size(32.dp)
-                            .weight(1f),
-                        track = { sliderState ->
-                            SliderDefaults.Track(
-                                sliderState = sliderState,
-                                modifier = Modifier.height(8.dp)
+                            .fillMaxWidth()
+                    ) {
+
+                        Slider(
+                            value = textScale,
+                            onValueChange = { settingsViewModel.updateTextScale(it) },
+                            valueRange = 0.5f..2.0f,
+                            modifier = Modifier
+                                .size(32.dp)
+                                .weight(1f),
+                            track = { sliderState ->
+                                SliderDefaults.Track(
+                                    sliderState = sliderState,
+                                    modifier = Modifier.height(8.dp)
+                                )
+                            }
+                        )
+
+                        IconButton(
+                            onClick = { settingsViewModel.resetTextScale() },
+                            modifier = Modifier
+                                .padding(8.dp)
+                                .size(24.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Refresh,
+                                contentDescription = stringResource(R.string.settings_reset_default),
                             )
+                        }
+                    }
+                }
+
+                SettingsSection(
+                    title = stringResource(R.string.settings_language_title),
+                ) {
+                    SettingsRadioOption(
+                        title = "English",
+                        selected = languageMode == AppLanguageMode.ENGLISH,
+                        onClick = {
+                            settingsViewModel.setLanguage(AppLanguageMode.ENGLISH)
                         }
                     )
 
-                    IconButton(
-                        onClick = { settingsViewModel.resetTextScale() },
-                        modifier = Modifier
-                            .padding(8.dp)
-                            .size(24.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Refresh,
-                            contentDescription = stringResource(R.string.settings_reset_default),
-                        )
-                    }
+                    SettingsRadioOption(
+                        title = "Norsk",
+                        selected = languageMode == AppLanguageMode.NORWEGIAN,
+                        onClick = {
+                            settingsViewModel.setLanguage(AppLanguageMode.NORWEGIAN)
+                        }
+                    )
                 }
-            }
-
-            SettingsSection(
-                title = stringResource(R.string.settings_language_title),
-            ) {
-                SettingsRadioOption(
-                    title = "English",
-                    selected = languageMode == AppLanguageMode.ENGLISH,
-                    onClick = {
-                        settingsViewModel.setLanguage(AppLanguageMode.ENGLISH)
-                    }
-                )
-
-                SettingsRadioOption(
-                    title = "Norsk",
-                    selected = languageMode == AppLanguageMode.NORWEGIAN,
-                    onClick = {
-                        settingsViewModel.setLanguage(AppLanguageMode.NORWEGIAN)
-                    }
-                )
             }
         }
     }
