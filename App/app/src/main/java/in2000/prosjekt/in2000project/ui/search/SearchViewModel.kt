@@ -1,19 +1,24 @@
 package in2000.prosjekt.in2000project.ui.search
 
+import android.app.Application
+import android.content.Context
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.runtime.snapshotFlow
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import in2000.prosjekt.in2000project.data.datasource.LocationQueryBuilder
 import in2000.prosjekt.in2000project.data.model.Coordinate
 import in2000.prosjekt.in2000project.data.model.NamedLocation
 import in2000.prosjekt.in2000project.data.repository.LocationRepository
+import in2000.prosjekt.in2000project.data.repository.SearchRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
 
 data class SearchUiState (
     val searchTextFieldState: TextFieldState = TextFieldState(),
@@ -22,9 +27,13 @@ data class SearchUiState (
     val recentSearches: List<NamedLocation> = emptyList(),
     val awaitingFavoriteName: Coordinate? = null
 )
-class SearchViewModel: ViewModel(){
-
-    private val _searchState = MutableStateFlow(SearchUiState())
+class SearchViewModel(
+    private val searchRepository: SearchRepository
+): ViewModel(){
+    private val _searchState = MutableStateFlow(SearchUiState(
+        favorites = searchRepository.loadFavorites(),
+        recentSearches = searchRepository.loadRecentSearches()
+    ))
     val searchState: StateFlow<SearchUiState> = _searchState.asStateFlow()
     val queryBuilder = LocationQueryBuilder()
     val locationRepository = LocationRepository()
@@ -46,18 +55,6 @@ class SearchViewModel: ViewModel(){
                     }
                 }
         }
-
-        viewModelScope.launch {
-            //Once we have a repository in place, we will call it here
-            //example: val data = searchRepository.getData()
-            _searchState.update { currentState ->
-                //make a new copy of currentState (SearchUiState) with these changes, and update _searchState accordingly (.update)
-                currentState.copy(
-                    favorites = emptyList(),
-                    recentSearches = emptyList()
-                )
-            }
-        }
     }
 
     fun updateSearchTextFieldState(textFieldState: TextFieldState){
@@ -72,12 +69,14 @@ class SearchViewModel: ViewModel(){
                 .take(5)
             it.copy(recentSearches = updated)
         }
+        searchRepository.saveRecentSearches(_searchState.value.recentSearches)
     }
 
     fun removeRecentSearch(location: NamedLocation) {
         _searchState.update {
             it.copy(recentSearches = it.recentSearches - location)
         }
+        searchRepository.saveRecentSearches(_searchState.value.recentSearches)
     }
 
     fun addPendingFavorite(coordinate: Coordinate) {
@@ -111,12 +110,14 @@ class SearchViewModel: ViewModel(){
                 .take(5)
             it.copy(favorites = updated)
         }
+        searchRepository.saveFavorites(_searchState.value.favorites)
     }
 
     fun removeFavoriteLocation(location: NamedLocation) {
         _searchState.update {
             it.copy(favorites = it.favorites - location)
         }
+        searchRepository.saveFavorites(_searchState.value.favorites)
     }
 
     fun onSearch(){

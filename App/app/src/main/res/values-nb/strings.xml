@@ -18,6 +18,10 @@
 
     <string name="danger_levels_title">Skredfaregrader</string>
 
+    <string name="danger_level_0_number"></string>
+    <string name="danger_level_0_title">Ukjent</string>
+    <string name="danger_level_0_description">Vi har ikke tilstrekkelige målinger for det valgte området.</string>
+
     <string name="danger_level_1_number">1</string>
     <string name="danger_level_1_title">- Lav</string>
     <string name="danger_level_1_description">Generelt stabile forhold.\n\nUtløsning er vanligvis kun mulig ved stor tilleggsbelastning i isolerte områder med svært bratt terreng. Kun små og middels store naturlige skred er mulig.\n\nTypiske faresignaler:\nSjelden noen faresignaler.\n\nVarslet rundt 20% av vintersesongen. Rundt 5% av skredulykker.</string>
@@ -38,6 +42,7 @@
     <string name="danger_level_5_title">- Svært høy</string>
     <string name="danger_level_5_description">Ekstreme skredforhold.\n\nMange svært store og ofte ekstremt store naturlige skred kan forventes, selv i moderat bratt terreng.\n\nSvært sjelden varslet.</string>
 
+    <string name="danger_level_0_badge">UKJENT</string>
     <string name="danger_level_1_badge">LEVEL 1</string>
     <string name="danger_level_2_badge">LEVEL 2</string>
     <string name="danger_level_3_badge">LEVEL 3</string>
@@ -105,23 +110,21 @@
 
     <string name="back_button_desc">Tilbake</string>
 
-    <string name="appearance_title">Utseende</string>
-    <string name="text_size_title">Tekststørrelse</string>
-    <string name="language_title">Språk</string>
+    <string name="settings_appearance_title">Utseende</string>
+    <string name="settings_theme_system">Bruk enhetsinnstilling</string>
+    <string name="settings_theme_light">Lys modus</string>
+    <string name="settings_theme_dark">Mørk modus</string>
 
-    <string name="theme_system">Bruk enhetsinnstilling</string>
-    <string name="theme_light">Lys modus</string>
-    <string name="theme_dark">Mørk modus</string>
+    <string name="settings_text_size_title">Tekststørrelse: %1$d%%</string>
+    <string name="settings_text_size_title_formatted">Tekststørrelse: %1$d%%</string>
+    <string name="settings_reset_default">tilbakestille til standard</string>
 
-    <string name="text_small">Liten</string>
-    <string name="text_medium">Middels</string>
-    <string name="text_large">Stor</string>
-
-    <string name="reset_default">tilbakestille til standard</string>
-    <string name="text_size_label">Tekst størrelse: %1$d%%</string>
-
-    <string name="language_system">Bruk enhetsinnstilling</string>
+    <string name="settings_text_small">Liten</string>
+    <string name="settings_text_medium">Middels</string>
+    <string name="settings_text_large">Stor</string>
     
+    <string name="settings_language_title">Språk</string>
+
     <string name="hide_info">Skjul info ▲</string>
     <string name="show_info">Vis info ▼</string>
 
@@ -138,6 +141,7 @@
     <string name="no_graph_data">Ingen data å vise.</string>
     <string name="not_checked">Ikke sjekket</string>
     <string name="call_icon">Ringe ikon</string>
+    <string name="remove">Fjern</string>
 
     <string name="other_resources_title">Andre nyttige kilder</string>
     <string name="other_resouces_descr">Her er noen nyttige kilder vi anbefaler å sjekke før du drar på tur.</string>

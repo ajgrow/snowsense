@@ -44,23 +44,52 @@ class FrostAvalancheRiskRepository(
     private suspend fun FrostV0Source.getDailyWeatherRecords(
         repeatingTimeRange: FrostReferenceTime
     ): List<DailyWeatherRecord> {
-        val elementsCsv = listOf(
+        val requiredElements = listOf(
             ElementType.TEMPERATURE_MEAN_P1D.frostElementId,
-            ElementType.PRECIPITATION_SUM_P1D.frostElementId)
-            .joinToString(",")
+            ElementType.PRECIPITATION_SUM_P1D.frostElementId
+        )
+
+        val elementsCsv = requiredElements.joinToString(",")
 
         val observationResponse = frostV0DataSource.getObservations(
-            this.id,
+            this.id ?: "",
             elementsCsv,
             repeatingTimeRange.value)
 
-        if (observationResponse.data.isEmpty())
+        if (observationResponse == null) {
             throw NoObservationsException(
-                this.name,
-                elementsCsv,
-                repeatingTimeRange.value)
+                this.name, elementsCsv, repeatingTimeRange.value
+            )
+        }
 
-        return observationResponse.data.map { it.toDailyWeatherRecord() }
+        val observations = observationResponse.data
+
+
+        // filter out today's observations which are incomplete,
+        // since we want to base the risk on complete data
+
+        val today = LocalDate.now()
+        val completeObservations = observations
+            .filter { atRefTime ->
+                LocalDate.parse(
+                    atRefTime.referenceTime.substringBefore("T")
+                ) < today
+            }
+
+        val records = completeObservations
+            .filter { atRefTime ->
+                requiredElements.all { elementId ->
+                    atRefTime.observations.any { it.elementId == elementId }
+                }
+            }
+            .map { it.toDailyWeatherRecord() }
+
+        if (records.isEmpty())
+            throw NoObservationsException(
+                this.name, elementsCsv, repeatingTimeRange.value
+            )
+
+        return records
     }
 
     private fun FrostV0ObservationsAtRefTime.toDailyWeatherRecord(

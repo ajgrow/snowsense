@@ -146,11 +146,27 @@ class SlabAvalancheRiskTest {
         val result = repository.getSlabAvalancheRiskForLocation(
             Coordinate(59.9, 10.7),
         )
-        assertEquals(DangerLevel.LOW, result.dangerLevel)
+        assertEquals(DangerLevel.UNKNOWN, result.dangerLevel)
     }
 
     @Test
-    fun missingTemperatureOnAllDays_shouldGiveLow() = runTest {
+    fun missingPrecipitationData_shouldGiveUnknown() = runTest {
+        fakeDataSource.observationResponse = makeObsResponse(
+            makeDay("2026-04-01T00:00:00Z", temp = -5.0, precip = null),
+            makeDay("2026-03-31T00:00:00Z", temp = -5.0, precip = 5.0),
+            makeDay("2026-03-30T00:00:00Z", temp = -5.0, precip = null),
+        )
+
+        val result = repository.getSlabAvalancheRiskForLocation(
+            Coordinate(59.9, 10.7),
+        )
+        assertEquals(DangerLevel.UNKNOWN, result.dangerLevel)
+    }
+
+    // Exception handling
+
+    @Test(expected = NoObservationsException::class)
+    fun missingTemperatureOnAllDays_shouldGiveUnknown() = runTest {
         fakeDataSource.observationResponse = makeObsResponse(
             makeDay("2026-04-01T00:00:00Z", temp = null, precip = 10.0),
             makeDay("2026-03-30T00:00:00Z", temp = null, precip = 10.0),
@@ -162,24 +178,8 @@ class SlabAvalancheRiskTest {
         val result = repository.getSlabAvalancheRiskForLocation(
             Coordinate(59.9, 10.7),
         )
-        assertEquals(DangerLevel.LOW, result.dangerLevel)
+        assertEquals(DangerLevel.UNKNOWN, result.dangerLevel)
     }
-
-    @Test
-    fun missingPrecipitationData_shouldGiveLow() = runTest {
-        fakeDataSource.observationResponse = makeObsResponse(
-            makeDay("2026-04-01T00:00:00Z", temp = -5.0, precip = null),
-            makeDay("2026-03-31T00:00:00Z", temp = -5.0, precip = 5.0),
-            makeDay("2026-03-30T00:00:00Z", temp = -5.0, precip = null),
-        )
-
-        val result = repository.getSlabAvalancheRiskForLocation(
-            Coordinate(59.9, 10.7),
-        )
-        assertEquals(DangerLevel.LOW, result.dangerLevel)
-    }
-
-    // Exception handling
 
     @Test(expected = NoStationFoundException::class)
     fun noWeatherStationNearby_shouldThrowException() = runTest {
