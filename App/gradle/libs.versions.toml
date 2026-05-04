@@ -24,6 +24,7 @@ foundationLayout = "1.10.6"
 uiText = "1.10.6"
 foundationVersion = "1.11.0"
 appcompat = "1.7.1"
+composeMaterialCore = "1.6.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -70,6 +71,7 @@ foundation = { group = "androidx.compose.foundation", name = "foundation", versi
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 androidx-compose-runtime = { group = "androidx.compose.runtime", name = "runtime", version.ref = "runtime" }
 koin-compose-viewmodel = { module = "io.insert-koin:koin-compose-viewmodel", version = "4.2.1" }
+androidx-compose-material-core = { group = "androidx.wear.compose", name = "compose-material-core", version.ref = "composeMaterialCore" }
 
 
 [plugins]

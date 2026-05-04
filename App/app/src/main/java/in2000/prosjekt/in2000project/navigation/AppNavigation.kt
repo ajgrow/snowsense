@@ -1,120 +1,69 @@
 package in2000.prosjekt.in2000project.navigation
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
-import androidx.compose.foundation.layout.WindowInsetsSides
-import androidx.compose.foundation.layout.only
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavType
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
+import com.mapbox.geojson.Point
 import in2000.prosjekt.in2000project.ui.home.HomeScreen
 import in2000.prosjekt.in2000project.ui.information.InfoScreen
 import in2000.prosjekt.in2000project.ui.map.MapRoute
-import in2000.prosjekt.in2000project.ui.reusables.BottomBar
-import in2000.prosjekt.in2000project.ui.reusables.isBottomBarScreen
+import in2000.prosjekt.in2000project.ui.map.MapStateHolder
 import in2000.prosjekt.in2000project.ui.search.SearchViewModel
 import in2000.prosjekt.in2000project.ui.settings.SettingScreen
 import in2000.prosjekt.in2000project.ui.settings.SettingsViewModel
-import in2000.prosjekt.in2000project.ui.theme.In2000projectTheme
+import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun AppNavigation(){
-    val navController = rememberNavController()
-
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentDestination = navBackStackEntry?.destination
-
+fun AppNavigation(
+    navController: NavHostController,
+    settingsViewModel: SettingsViewModel,
+    modifier: Modifier = Modifier
+){
     val navigationActions = NavigationActions(navController)
+    val mapStateHolder: MapStateHolder = koinInject()
 
-    val settingsViewModel: SettingsViewModel = koinViewModel()
+    val searchViewModel = koinViewModel<SearchViewModel>()
 
-    val searchViewModel: SearchViewModel = koinViewModel()
-
-    In2000projectTheme(
-        themeMode = settingsViewModel.themeMode,
-        textScale = settingsViewModel.textScale,
+    NavHost(
+        navController = navController,
+        startDestination = Screen.Home.route,
+        modifier = modifier
     ) {
-        Scaffold(
-            bottomBar = {
-                AnimatedVisibility(
-                    visible = currentDestination.isBottomBarScreen(),
-                    enter = slideInVertically { it },
-                    exit = slideOutVertically { it },
-                ) {
-                    BottomBar(
-                        currentRoute = currentDestination?.route,
-                        onClick = navigationActions
-                            ::navigateToTab
+        composable(Screen.Home.route) {
+            HomeScreen(
+                onSettingsClick = { navController
+                    .navigate(Screen
+                        .Settings.route) },
+                onNavigateToMap = { coordinate ->
+                    mapStateHolder.flyToSearch(
+                        Point.fromLngLat(
+                            coordinate.longitude,
+                            coordinate.latitude)
                     )
-                }
-            },
-            contentWindowInsets = ScaffoldDefaults
-                .contentWindowInsets
-                .run {
-                    if (currentDestination.isBottomBarScreen())
-                        this
-                    else
-                        only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal)
-                }
-        ) { innerPadding ->
-            NavHost(
-                modifier = Modifier.padding(innerPadding),
-                startDestination = Screen.Home.route,
-                navController = navController
-            ) {
-                composable(Screen.Home.route) {
-                    HomeScreen(
-                        onSettingsClick = { navController
-                            .navigate(Screen
-                                .Settings.route) },
-                        onNavigateToMap = navigationActions
-                            ::navigateToMapCoordinates,
-                        searchViewModel = searchViewModel
-                    )
-                }
+                    navigationActions.navigateToTab(Screen.Map.route) },
+                searchViewModel = searchViewModel
+            )
+        }
 
-                composable(
-                    route = Screen.Map.route,
-                    arguments = listOf(
-                        navArgument("coordinates") {
-                            type = NavType.StringType
-                        }
-                    )
-                ) { backStackEntry ->
-                    val coordinates = backStackEntry.arguments
-                        ?.getString("coordinates")!!
-                    MapRoute(
-                        coordinates = coordinates,
-                        searchViewModel = searchViewModel
-                    )
-                }
+        composable(Screen.Map.route) {
+            MapRoute(searchViewModel = searchViewModel)
+        }
 
-                composable(Screen.Info.route) {
-                    InfoScreen(
-                        onSettingsClick = { navController
-                            .navigate(Screen
-                                .Settings.route) })
-                }
+        composable(Screen.Info.route) {
+            InfoScreen(
+                onSettingsClick = { navController
+                    .navigate(Screen
+                        .Settings.route) })
+        }
 
-                composable(Screen.Settings.route) {
-                    SettingScreen(
-                        onBackClick = navController::popBackStack,
-                        settingsViewModel = settingsViewModel
-                    )
-                }
-            }
+        composable(Screen.Settings.route) {
+            SettingScreen(
+                onBackClick = navController::popBackStack,
+                settingsViewModel = settingsViewModel
+            )
         }
     }
 }
