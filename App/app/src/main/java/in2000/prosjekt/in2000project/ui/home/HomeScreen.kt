@@ -9,12 +9,15 @@ package in2000.prosjekt.in2000project.ui.home
     import androidx.compose.foundation.layout.BoxWithConstraints
     import androidx.compose.foundation.layout.Column
     import androidx.compose.foundation.layout.PaddingValues
+    import androidx.compose.foundation.layout.WindowInsets
     import androidx.compose.foundation.layout.fillMaxSize
     import androidx.compose.foundation.layout.fillMaxWidth
+    import androidx.compose.foundation.layout.navigationBars
     import androidx.compose.foundation.layout.offset
     import androidx.compose.foundation.layout.padding
     import androidx.compose.foundation.layout.size
     import androidx.compose.foundation.layout.width
+    import androidx.compose.foundation.layout.windowInsetsPadding
     import androidx.compose.foundation.layout.wrapContentHeight
     import androidx.compose.foundation.lazy.LazyColumn
     import androidx.compose.foundation.lazy.LazyRow
@@ -94,7 +97,7 @@ fun HomeScreen(
                     .fillMaxWidth()
                     .padding(
                         horizontal = 16.dp,
-                        vertical = 8.dp
+
                     ),
             ){
                 SearchSection(
@@ -111,7 +114,12 @@ fun HomeScreen(
 
             LazyColumn(
                 modifier = Modifier.fillMaxWidth(),
-                contentPadding = PaddingValues(16.dp),          //adds padding around content
+                contentPadding = PaddingValues(
+                    start = 16.dp,
+                    end = 16.dp,
+                    top = 16.dp,
+                    bottom = 0.dp
+                ), //adds padding around content
                 verticalArrangement = Arrangement.spacedBy(24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
