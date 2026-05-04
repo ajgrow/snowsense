@@ -1,15 +1,17 @@
 package in2000.prosjekt.in2000project.ui.information
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.tooling.preview.Preview
@@ -18,10 +20,7 @@ import in2000.prosjekt.in2000project.R
 import in2000.prosjekt.in2000project.data.model.enums.DangerLevel
 import in2000.prosjekt.in2000project.ui.model.DangerLevelUiModel
 import in2000.prosjekt.in2000project.ui.model.toUiModel
-import in2000.prosjekt.in2000project.ui.reusables.DangerLevelItem
-import in2000.prosjekt.in2000project.ui.reusables.EmergencySection
-import in2000.prosjekt.in2000project.ui.reusables.TopBar
-import in2000.prosjekt.in2000project.ui.reusables.ExternalResources
+import in2000.prosjekt.in2000project.ui.reusables.*
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -67,16 +66,12 @@ fun InfoContent(
             item { EmergencySection() }
 
             item {
-                Text(
-                    text = stringResource(R.string.danger_levels_title),
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = Bold
+                DangerLevelsSection(
+                    dangerLevels = state.dangerLevels
                 )
             }
 
-            items(state.dangerLevels) { uiModel: DangerLevelUiModel ->
-                DangerLevelItem(uiModel = uiModel)
-            }
+            item { SafetyAdviceSection() }
 
             item {
                 InfoBox(
@@ -104,6 +99,27 @@ fun InfoContent(
 }
 
 @Composable
+fun DangerLevelsSection(
+    dangerLevels: List<DangerLevelUiModel>,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        Text(
+            text = stringResource(R.string.danger_levels_title),
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = Bold
+        )
+
+        dangerLevels.forEach { uiModel ->
+            DangerLevelItem(uiModel = uiModel)
+        }
+    }
+}
+
+@Composable
 fun InfoBox(
     modifier: Modifier = Modifier,
     titleRes: Int,
@@ -116,7 +132,15 @@ fun InfoBox(
     Surface(
         modifier = modifier
             .fillMaxWidth()
+            .padding(bottom = 16.dp)
+            .border(
+                width = 1.dp,
+                color = MaterialTheme.colorScheme.outline,
+                shape = RoundedCornerShape(16.dp)
+            )
             .clickable { expanded = !expanded },
+        shape = RoundedCornerShape(16.dp),
+        color = MaterialTheme.colorScheme.surface
     ) {
         Column(modifier = Modifier.padding(12.dp)) {
 
@@ -151,6 +175,144 @@ fun InfoBox(
 
                     content?.invoke()
                 }
+            }
+        }
+    }
+}
+
+@Composable
+fun SafetyAdvice(
+    modifier: Modifier = Modifier,
+    title: String,
+    bullets: List<String>,
+    showDivider: Boolean = true
+) {
+    var expanded by rememberSaveable { mutableStateOf(false) }
+    val expandedText = stringResource(if (expanded) R.string.hide_info else R.string.show_info)
+
+    Column(modifier = modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { expanded = !expanded }
+                .padding(12.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = Bold,
+                modifier = Modifier.weight(1f)
+            )
+
+            Text(
+                text = expandedText,
+                style = MaterialTheme.typography.bodySmall,
+            )
+        }
+
+        AnimatedVisibility(visible = expanded) {
+            Column(
+                modifier = Modifier.padding(start = 12.dp, end = 12.dp, bottom = 12.dp),
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                bullets.forEach { bullet ->
+                    Text(
+                        text = "• $bullet",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+        }
+
+        if (showDivider) {
+            Divider(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 12.dp),
+                color = MaterialTheme.colorScheme.surfaceVariant,
+                thickness = 0.5.dp
+            )
+        }
+    }
+}
+
+@Composable
+fun SafetyAdviceSection(modifier: Modifier = Modifier) {
+    Surface(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(bottom = 16.dp)
+            .border(
+                width = 1.dp,
+                color = MaterialTheme.colorScheme.outline,
+                shape = RoundedCornerShape(16.dp)
+            ),
+        shape = RoundedCornerShape(16.dp),
+        color = MaterialTheme.colorScheme.surface
+    ) {
+        Column(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Column(
+                modifier = Modifier.padding(
+                    start = 8.dp,
+                    top = 10.dp,
+                    end = 8.dp,
+                    bottom = 6.dp
+                ),
+                verticalArrangement = Arrangement.spacedBy(6.dp)
+            ) {
+                Text(
+                    text = stringResource(R.string.safety_advice_title),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = Bold
+                )
+
+                Text(
+                    text = stringResource(R.string.safety_advice_desc),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(bottomStart = 16.dp, bottomEnd = 16.dp))
+            ) {
+                SafetyAdvice(
+                    title = stringResource(R.string.before_you_go_title),
+                    bullets = listOf(
+                        stringResource(R.string.before_you_go_1),
+                        stringResource(R.string.before_you_go_2),
+                        stringResource(R.string.before_you_go_3),
+                        stringResource(R.string.before_you_go_4)
+                    )
+                )
+
+                SafetyAdvice(
+                    title = stringResource(R.string.while_you_are_out_title),
+                    bullets = listOf(
+                        stringResource(R.string.while_you_are_out_1),
+                        stringResource(R.string.while_you_are_out_2),
+                        stringResource(R.string.while_you_are_out_3),
+                        stringResource(R.string.while_you_are_out_4)
+                    )
+                )
+
+                SafetyAdvice(
+                    title = stringResource(R.string.if_something_goes_wrong_title),
+                    bullets = listOf(
+                        stringResource(R.string.if_something_goes_wrong_1),
+                        stringResource(R.string.if_something_goes_wrong_2),
+                        stringResource(R.string.if_something_goes_wrong_3),
+                        stringResource(R.string.if_something_goes_wrong_4)
+                    ),
+                    showDivider = false
+                )
             }
         }
     }
