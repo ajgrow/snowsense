@@ -1,7 +1,10 @@
 package in2000.prosjekt.in2000project.ui.settings
 
+import androidx.appcompat.widget.DialogTitle
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -10,6 +13,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material3.Icon
@@ -18,20 +22,28 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
+import androidx.compose.material3.Surface
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import in2000.prosjekt.in2000project.R
+import androidx.compose.material.icons.filled.*
 
-@OptIn(ExperimentalMaterial3Api::class)
+
 @Composable
 fun SettingScreen(
     modifier: Modifier = Modifier,
@@ -46,178 +58,330 @@ fun SettingScreen(
     val textScale = settingsViewModel.textScale
     val languageMode = settingsViewModel.languageMode
 
-    Column(
-        modifier = modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
+    Surface(
+        modifier = modifier
+            .fillMaxSize()
     ) {
-        TopBar(
-            title = stringResource(R.string.settings_title),
-            onBackClick = onBackClick,
-        )
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            SettingsSection(
-                title = stringResource(R.string.settings_appearance_title),
+
+            // Top bar
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp)
             ) {
-                SettingsRadioOption(
-                    title = stringResource(R.string.settings_theme_system),
-                    selected = themeMode == ThemeMode.SYSTEM,
-                    onClick = { settingsViewModel.setTheme(ThemeMode.SYSTEM) },
+                IconButton(
+                    onClick = onBackClick
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = stringResource(R.string.back_button_desc)
+                    )
+                }
+
+                Text(
+                    text = stringResource(R.string.settings_title),
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.onSurface
                 )
 
-                SettingsRadioOption(
-                    title = stringResource(R.string.settings_theme_light),
-                    selected = themeMode == ThemeMode.LIGHT,
-                    onClick = { settingsViewModel.setTheme(ThemeMode.LIGHT) },
-                )
-
-                SettingsRadioOption(
-                    title = stringResource(R.string.settings_theme_dark),
-                    selected = themeMode == ThemeMode.DARK,
-                    onClick = { settingsViewModel.setTheme(ThemeMode.DARK) },
-                )
-            }
-
-            SettingsSection(
-                title = stringResource(
-                    R.string.settings_text_size_title_formatted,
-                    (textScale * 100).toInt()),
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween,
+                Column(
                     modifier = Modifier
-                        .fillMaxWidth()
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState())
+                        .padding(12.dp),
+                    verticalArrangement = Arrangement.spacedBy(20.dp)
                 ) {
 
-                    Slider(
-                        value = textScale,
-                        onValueChange = { settingsViewModel.updateTextScale(it) },
-                        valueRange = 0.5f..2.0f,
-                        modifier = Modifier
-                            .size(32.dp)
-                            .weight(1f),
-                        track = { sliderState ->
-                            SliderDefaults.Track(
-                                sliderState = sliderState,
-                                modifier = Modifier.height(8.dp)
+                    // appearance/theme
+
+                    SettingsGrouping(
+                        title = stringResource(R.string.settings_appearance_title)
+                    ) {
+                        ThemeSettingRow(
+                            icon = Icons.Default.PhoneAndroid,
+                            label = stringResource(R.string.settings_theme_system),
+                            selected = themeMode == ThemeMode.SYSTEM,
+                            onClick = {
+                                settingsViewModel.setTheme(ThemeMode.SYSTEM)
+                            }
+                        )
+
+                        SettingsDivider()
+
+                        ThemeSettingRow(
+                            icon = Icons.Default.LightMode,
+                            label = stringResource(R.string.settings_theme_light),
+                            selected = themeMode == ThemeMode.LIGHT,
+                            onClick = {
+                                settingsViewModel.setTheme(ThemeMode.LIGHT)
+                            }
+                        )
+
+                        SettingsDivider()
+
+                        ThemeSettingRow(
+                            icon = Icons.Default.DarkMode,
+                            label = stringResource(R.string.settings_theme_dark),
+                            selected = themeMode == ThemeMode.DARK,
+                            onClick = {
+                                settingsViewModel.setTheme(ThemeMode.DARK)
+                            }
+                        )
+                    }
+
+                    // Text resizing
+                    SettingsGrouping(
+                        title = stringResource(
+                            R.string.settings_text_size_title_formatted,
+                            (textScale * 100).toInt()
+                            )
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(8.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.TextFields,
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .size(20.dp),
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+
+                            Slider(
+                                value = textScale,
+                                onValueChange = { settingsViewModel.updateTextScale(it) },
+                                valueRange = 0.5f..2.0f,
+                                modifier = Modifier.weight(1f),
+                                colors = SliderDefaults.colors(
+                                    thumbColor = MaterialTheme.colorScheme.primary,
+                                    activeTrackColor = MaterialTheme.colorScheme.primary
+                                )
+                            )
+
+                            IconButton(
+                                onClick = { settingsViewModel.resetTextScale() },
+                                modifier = Modifier
+                                    .size(32.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Refresh,
+                                    contentDescription = stringResource(R.string.settings_reset_default),
+                                    modifier = Modifier
+                                        .size(20.dp),
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp)
+                                    .clip(RoundedCornerShape(8.dp))
+                                    .background(MaterialTheme.colorScheme.surfaceContainerHighest)
+                                    .padding(12.dp)
+                            ) {
+                                Text(
+                                    text = "Preview text  Aa",
+                                    style = MaterialTheme.typography.bodyMedium.copy(
+                                        fontSize = MaterialTheme.typography.bodyMedium.fontSize * textScale
+                                    ),
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        }
+                    }
+
+                    SettingsGrouping(
+                        title = stringResource(R.string.settings_language_title)
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(12.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Language,
+                                    contentDescription = null,
+                                    modifier = Modifier
+                                        .size(20.dp),
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                                Text(
+                                    text = if (languageMode == AppLanguageMode.ENGLISH) "English"
+                                            else "Norsk",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+
+                            LanguageControl(
+                                selectedLanguage = languageMode,
+                                onSelect = {
+                                    settingsViewModel.setLanguage(it)
+                                }
                             )
                         }
-                    )
-
-                    IconButton(
-                        onClick = { settingsViewModel.resetTextScale() },
-                        modifier = Modifier
-                            .padding(8.dp)
-                            .size(24.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Refresh,
-                            contentDescription = stringResource(R.string.settings_reset_default),
-                        )
                     }
                 }
             }
+        }
+    }
 
-            SettingsSection(
-                title = stringResource(R.string.settings_language_title),
+}
+
+
+@Composable
+private fun LanguageControl(
+    selectedLanguage: AppLanguageMode,
+    onSelect: (AppLanguageMode) -> Unit
+){
+
+    val options = listOf(
+        AppLanguageMode.ENGLISH to "English",
+        AppLanguageMode.NORWEGIAN to "Norsk"
+    )
+
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(50))
+            .background(MaterialTheme.colorScheme.surfaceVariant)
+    ) {
+        options.forEach { (mode, label) ->
+            val selected = selectedLanguage == mode
+            val bgColor = if (selected) MaterialTheme.colorScheme.primary
+                            else MaterialTheme.colorScheme.surfaceVariant
+            val textColor = if (selected) MaterialTheme.colorScheme.onPrimary
+                            else MaterialTheme.colorScheme.onSurfaceVariant
+
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .weight(1f)
+                    .clip(RoundedCornerShape(50))
+                    .background(bgColor)
+                    .clickable {onSelect(mode)}
+                    .padding(vertical = 12.dp),
             ) {
-                SettingsRadioOption(
-                    title = "English",
-                    selected = languageMode == AppLanguageMode.ENGLISH,
-                    onClick = {
-                        settingsViewModel.setLanguage(AppLanguageMode.ENGLISH)
-                    }
-                )
-
-                SettingsRadioOption(
-                    title = "Norsk",
-                    selected = languageMode == AppLanguageMode.NORWEGIAN,
-                    onClick = {
-                        settingsViewModel.setLanguage(AppLanguageMode.NORWEGIAN)
-                    }
+                Text(
+                    text = label,
+                    style = MaterialTheme.typography.labelLarge,
+                    fontWeight = if (selected) FontWeight.SemiBold
+                                else FontWeight.Normal,
+                    color = textColor
                 )
             }
         }
     }
 }
 
-@Composable
-private fun TopBar(
-    title: String,
-    onBackClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Row(
-        modifier = modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        IconButton(
-            onClick = onBackClick
-        ) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                contentDescription = stringResource(R.string.back_button_desc)
-            )
-        }
 
-        Text(
-            text = title,
-            style = MaterialTheme.typography.titleLarge,
-            color = MaterialTheme.colorScheme.onSurface
-        )
-    }
-}
 
 @Composable
-private fun SettingsSection(
+private fun SettingsGrouping(
     title: String,
     modifier: Modifier = Modifier,
-    content: @Composable () -> Unit,
+    content: @Composable () -> Unit
 ) {
     Column(
-        verticalArrangement = Arrangement.spacedBy(2.dp),
-        modifier = modifier.padding(horizontal = 24.dp)
+        modifier = Modifier
     ) {
         Text(
-            text = title,
-            style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.padding(
-                top = 16.dp,
-                bottom = 8.dp,
-            ),
+            text = title.uppercase(),
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.primary,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier
+                .padding(
+                    start = 4.dp,
+                    bottom = 4.dp
+                )
         )
-        content()
+
+        Surface(
+            shape = RoundedCornerShape(16.dp),
+            color = MaterialTheme.colorScheme.surfaceContainer,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Column{
+                content()
+            }
+        }
     }
 }
 
+
 @Composable
-fun SettingsRadioOption(
-    title: String,
+private fun ThemeSettingRow(
+    icon: ImageVector,
+    label: String,
     selected: Boolean,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    enabled: Boolean = true,
+    onClick: () -> Unit
 ) {
+    val bgColor = if (selected) MaterialTheme.colorScheme.primaryContainer
+                    else MaterialTheme.colorScheme.surfaceContainer
+
     Row(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxWidth()
-            .clickable(enabled = enabled, onClick = onClick)
-            .padding(vertical = 2.dp),
-        verticalAlignment = Alignment.CenterVertically
+            .background(bgColor)
+            .clickable(onClick = onClick)
+            .padding(
+                horizontal = 16.dp,
+                vertical = 16.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
+
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            tint = if (selected) MaterialTheme.colorScheme.onPrimaryContainer
+                    else MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier
+                .size(20.dp),
+        )
+
+        Text(
+            text = label,
+            style = MaterialTheme.typography.bodyLarge,
+            color = if (selected) MaterialTheme.colorScheme.onPrimaryContainer
+                    else MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier
+                .weight(1f)
+        )
+
         RadioButton(
             selected = selected,
             onClick = onClick,
-            enabled = enabled
-        )
-        Text(
-            text = title,
-            modifier = Modifier.padding(start = 8.dp),
+            colors = RadioButtonDefaults.colors(
+                selectedColor = MaterialTheme.colorScheme.primary,
+                unselectedColor = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         )
     }
+}
+
+@Composable
+private fun SettingsDivider(){
+    HorizontalDivider(
+        modifier = Modifier
+            .padding(start = 52.dp),
+        color = MaterialTheme.colorScheme.outlineVariant
+    )
 }
