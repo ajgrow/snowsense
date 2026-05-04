@@ -1,7 +1,9 @@
 package in2000.prosjekt.in2000project.ui.reusables
 
+import android.view.Window
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Info
@@ -26,8 +28,8 @@ fun BottomBar(
     onClick: (String) -> Unit,
 ) {
     NavigationBar(
-        modifier = modifier.height(64.dp),
-        windowInsets = WindowInsets()
+        modifier = modifier,
+        windowInsets = WindowInsets.navigationBars
     ) {
         NavigationBarItem(
             selected = currentRoute == Screen.Home.route,
