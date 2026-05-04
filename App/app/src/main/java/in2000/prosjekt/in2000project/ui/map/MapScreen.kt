@@ -2,12 +2,14 @@ package in2000.prosjekt.in2000project.ui.map
 
 import android.util.Log
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.gestures.animateScrollBy
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -16,31 +18,39 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.Button
+import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SheetState
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberBottomSheetScaffoldState
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -72,6 +82,8 @@ import in2000.prosjekt.in2000project.ui.reusables.SearchSection
 import in2000.prosjekt.in2000project.ui.reusables.TextInputDialog
 import in2000.prosjekt.in2000project.ui.search.SearchUiState
 import org.koin.compose.koinInject
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import java.time.Year
 
 private val previewSkiArea = SkiArea(
@@ -167,8 +179,19 @@ fun MapRoute(
         onAddFavorite = {
             screenState.climateCoordinate?.let { coordinate ->
                 searchViewModel.addPendingFavorite(coordinate)
-                showFavoriteDialog = true } },
-        onBottomPaddingChanged = mapStateHolder::setBottomPadding
+                showFavoriteDialog = true
+            }
+        },
+        onBottomPaddingChanged = mapStateHolder::setBottomPadding,
+        skiArea = skiArea,
+        canAddFavorite = {
+            val coordinate = screenState.climateCoordinate
+            if (coordinate != null) {
+                !searchState.favorites.any { it.coordinate == coordinate }
+            } else {
+                false
+            }
+        }
     )
 }
 
@@ -196,6 +219,8 @@ fun MapScreen(
     onSearch: (String) -> Unit,
     onSelectResult: (NamedLocation) -> Unit,
     onAddFavorite: () -> Unit,
+    canAddFavorite: () -> Boolean,
+    skiArea: SkiArea,
     onBottomPaddingChanged: (Double) -> Unit,
 ) {
     val focusManager = LocalFocusManager.current
@@ -238,6 +263,36 @@ fun MapScreen(
 
     val showSheet = screenState.isSheetVisible
     val peekHeight = if (showSheet) halfScreen else 0.dp
+
+    val listState = rememberLazyListState()
+
+    val scope = rememberCoroutineScope()
+
+    val showScrollButton by remember {
+        derivedStateOf {
+            val layoutInfo = listState.layoutInfo
+            val lastItem = layoutInfo.visibleItemsInfo.lastOrNull()
+
+            if (layoutInfo.totalItemsCount == 0 || lastItem == null) return@derivedStateOf false
+
+            if (lastItem.index < layoutInfo.totalItemsCount - 1) {
+                true
+            } else {
+                lastItem.offset + lastItem.size > layoutInfo.viewportEndOffset
+            }
+        }
+    }
+
+    val onScrollButtonClicked: () -> Unit = {
+        scope.launch {
+            launch { sheetState.expand() }
+            launch {
+                snapshotFlow { listState.layoutInfo.viewportEndOffset }
+                    .first()
+                listState.animateScrollBy(listState.layoutInfo.totalItemsCount * 10_000f)
+            }
+        }
+    }
 
     LaunchedEffect(showSheet, pinnedPoint) {
         if (showSheet)
@@ -351,7 +406,12 @@ fun MapScreen(
                     onStartDateChange = { onStartDateChange(it) },
                     onEndDateChange = { onEndDateChange(it) },
                     onYearChange = onYearChange,
-                    onAddFavorite = onAddFavorite
+                    onAddFavorite = onAddFavorite,
+                    canAddFavorite = canAddFavorite,
+                    sheetState = scaffoldState.bottomSheetState,
+                    listState = listState,
+                    onScrollButtonClicked = onScrollButtonClicked,
+                    showScrollButton = showScrollButton,
                 )
             }
         ) { innerPadding ->
@@ -379,9 +439,22 @@ fun MapScreen(
                 }
             }
         }
+
+        if (showScrollButton && showSheet) {
+            Button(
+                onClick = onScrollButtonClicked,
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = 80.dp)
+                    .navigationBarsPadding()
+            ) {
+                Icon(Icons.Default.KeyboardArrowDown, contentDescription = null)
+            }
+        }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BottomSheetContent(
     area: SkiArea,
@@ -394,158 +467,162 @@ fun BottomSheetContent(
     onStartDateChange: (MonthDay?) -> Unit,
     onEndDateChange: (MonthDay?) -> Unit,
     onYearChange: (Int?) -> Unit,
-    onAddFavorite: () -> Unit
+    canAddFavorite: () -> Boolean,
+    onAddFavorite: () -> Unit,
+    sheetState: SheetState,
+    listState: LazyListState,
+    onScrollButtonClicked: () -> Unit,
+    showScrollButton: Boolean,
 ) {
-
-    /*
-    val climateRows = listOf(
-        "Avalanche status" to avalancheStatus,
-    )
-    */
-
-    val climateRows = emptyList<Pair<String, String>>()
-
-    LazyColumn(
+    Box(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 20.dp, vertical = 8.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+            .fillMaxHeight()
     ) {
-        item {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .heightIn(min = 60.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                when (climateState) {
-                    is ClimateState.Loading -> {
-                        CircularProgressIndicator(modifier = Modifier.size(26.dp))
-                    }
+        LazyColumn(
+            state = listState,
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp, vertical = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            item {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(min = 60.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    when (climateState) {
+                        is ClimateState.Loading -> {
+                            CircularProgressIndicator(modifier = Modifier.size(26.dp))
+                        }
 
-                    is ClimateState.Error -> {
-                        Text(
-                            text = stringResource(R.string.climate_error_desc),
-                            color = MaterialTheme.colorScheme.error,
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                    }
+                        is ClimateState.Error -> {
+                            Text(
+                                text = stringResource(R.string.climate_error_desc),
+                                color = MaterialTheme.colorScheme.error,
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                        }
 
-                    else -> {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Column {
-                                Text(
-                                    text = stringResource(R.string.weather_station_desc),
-                                    style = MaterialTheme.typography.labelSmall
-                                )
-                                Text(
-                                    text = area.name,
-                                    style = MaterialTheme.typography.titleLarge,
-                                )
-                            }
-                            IconButton(
-                                modifier = Modifier,
-                                onClick = {
-                                    onAddFavorite()
-                                }
-
+                        else -> {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Icon(
-                                    imageVector = Icons.Default.Star,
-                                    contentDescription = ""
-                                )
+                                Column {
+                                    Text(
+                                        text = stringResource(R.string.weather_station_desc),
+                                        style = MaterialTheme.typography.labelSmall
+                                    )
+                                    Text(
+                                        text = area.name,
+                                        style = MaterialTheme.typography.titleLarge,
+                                    )
+                                }
+                                IconButton(
+                                    enabled = canAddFavorite(),
+                                    modifier = Modifier,
+                                    onClick = {
+                                        onAddFavorite()
+                                    }
+
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Star,
+                                        contentDescription = ""
+                                    )
+                                }
                             }
                         }
                     }
+
+                    DangerLevelCard(uiModel = dangerLevel)
+
                 }
-
-                DangerLevelCard(uiModel =  dangerLevel)
-
             }
-        }
 
-        item {
-            HorizontalDivider()
-        }
+            item {
+                HorizontalDivider()
+            }
 
-        item {
-            DatePicker(
-                startDate = startDate,
-                endDate = endDate,
-                selectedYear = selectedYear,
-                onStartDateChange = onStartDateChange,
-                onEndDateChange = onEndDateChange,
-                onYearChange = onYearChange,
-            )
-
-            Surface(
-                modifier = Modifier
-                    .padding(8.dp)
-                    .fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
-                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
-                color = MaterialTheme.colorScheme.surfaceVariant
-            ) {
-                Text(
-                    text = stringResource(R.string.date_description),
-                    modifier = Modifier.padding(12.dp)
+            item {
+                DatePicker(
+                    startDate = startDate,
+                    endDate = endDate,
+                    selectedYear = selectedYear,
+                    onStartDateChange = onStartDateChange,
+                    onEndDateChange = onEndDateChange,
+                    onYearChange = onYearChange,
                 )
-            }
-        }
 
-        item {
-            HorizontalDivider()
-        }
-
-        item {
-            val currentYear = Year.now().value
-
-            val yearRange = remember(selectedYear) {
-                selectedYear?.let { it..currentYear }
-            }
-
-            if (yearRange == null ||
-                startDate == null ||
-                endDate == null
-            ) {
-                Box(
+                Surface(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .height(180.dp),
-                    contentAlignment = Alignment.Center
+                        .padding(8.dp)
+                        .fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
+                    color = MaterialTheme.colorScheme.surfaceVariant
                 ) {
-                    Text(text = stringResource(R.string.no_date_selected_msg))
+                    Text(
+                        text = stringResource(R.string.date_description),
+                        modifier = Modifier.padding(12.dp)
+                    )
                 }
-            } else {
-                Column(verticalArrangement = Arrangement.spacedBy(24.dp)) {
-                    ClimateGraph(
-                        dataPoints = area.temperatureData,
-                        startDate = startDate,
-                        endDate = endDate,
-                        title = stringResource(R.string.mean_temp_desc)
-                    )
+            }
 
-                    HorizontalDivider()
+            item {
+                HorizontalDivider()
+            }
 
-                    ClimateGraph(
-                        dataPoints = area.precipitationData,
-                        startDate = startDate,
-                        endDate = endDate,
-                        title = stringResource(R.string.mean_precip_desc)
-                    )
+            item {
+                val currentYear = Year.now().value
 
-                    HorizontalDivider()
+                val yearRange = remember(selectedYear) {
+                    selectedYear?.let { it..currentYear }
+                }
 
-                    ClimateGraph(
-                        dataPoints = area.windSpeedData,
-                        startDate = startDate,
-                        endDate = endDate,
-                        title = stringResource(R.string.mean_wind_desc)
-                    )
+                if (yearRange == null ||
+                    startDate == null ||
+                    endDate == null
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(180.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(text = stringResource(R.string.no_date_selected_msg))
+                    }
+                } else {
+                    Column(verticalArrangement = Arrangement.spacedBy(24.dp)) {
+                        ClimateGraph(
+                            dataPoints = area.temperatureData,
+                            startDate = startDate,
+                            endDate = endDate,
+                            title = stringResource(R.string.mean_temp_desc)
+                        )
+
+                        HorizontalDivider()
+
+                        ClimateGraph(
+                            dataPoints = area.precipitationData,
+                            startDate = startDate,
+                            endDate = endDate,
+                            title = stringResource(R.string.mean_precip_desc)
+                        )
+
+                        HorizontalDivider()
+
+                        ClimateGraph(
+                            dataPoints = area.windSpeedData,
+                            startDate = startDate,
+                            endDate = endDate,
+                            title = stringResource(R.string.mean_wind_desc)
+                        )
+                    }
                 }
             }
         }
@@ -583,13 +660,20 @@ fun MapScreenErrorPreview() {
         onSearch = {},
         onSelectResult = {},
         onAddFavorite = {},
+        canAddFavorite = { false },
+        skiArea = previewSkiArea,
         onBottomPaddingChanged = {}
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Preview(showBackground = true)
 @Composable
 fun BottomSheetPreview() {
+    val sheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = false
+    )
+
     BottomSheetContent(
         area = previewSkiArea,
         climateState = ClimateState.Idle,
@@ -600,6 +684,11 @@ fun BottomSheetPreview() {
         onStartDateChange = { },
         onEndDateChange = { },
         onYearChange = { },
-        onAddFavorite = { }
+        onAddFavorite = { },
+        canAddFavorite = { false },
+        sheetState = sheetState,
+        listState = rememberLazyListState(),
+        onScrollButtonClicked = { },
+        showScrollButton = false
     )
 }
