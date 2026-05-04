@@ -2,6 +2,7 @@ package in2000.prosjekt.in2000project.ui.map
 
 import android.util.Log
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.gestures.animateScrollBy
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -29,6 +30,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.SheetState
+import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -43,11 +46,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Popup
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.navigation.NavController
@@ -70,6 +76,7 @@ import in2000.prosjekt.in2000project.ui.model.DangerLevelUiModel
 import in2000.prosjekt.in2000project.ui.model.toUiModel
 import in2000.prosjekt.in2000project.ui.reusables.TextInputDialog
 import in2000.prosjekt.in2000project.ui.search.SearchUiState
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.time.Year
 
@@ -192,29 +199,9 @@ fun MapScreen(
     skiArea: SkiArea
 ) {
 
-    val scope = rememberCoroutineScope()
-
-    //Controls whether the bottom sheet is visible or not by keeping track of if the user has clicked the map
-    //if this is set to null then the ModalBottomSheet is not open
-    var isSheetOpen by remember { mutableStateOf(false) }
-
-
     var skipPartiallyExpanded by rememberSaveable {mutableStateOf(false)}
 
     val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = skipPartiallyExpanded)
-
-    val listState = rememberLazyListState()
-    val showScrollButton by remember {
-        derivedStateOf {
-            val layoutInfo = listState.layoutInfo
-            val lastItem = layoutInfo.visibleItemsInfo.lastOrNull()
-            if (lastItem == null || lastItem.index < layoutInfo.totalItemsCount - 1) {
-                true
-            } else {
-                lastItem.offset + lastItem.size > layoutInfo.viewportEndOffset
-            }
-        }
-    }
 
     val avalancheStatus = when {
         riskState.isDanger == true -> "High"
@@ -290,58 +277,38 @@ fun MapScreen(
     }
 
     //This is for the bottom sheet - if isSheetOpen is set to true, then it will open otherwise, it stays closed
-    if (screenState.isSheetVisible){
-        Box(
-            modifier = Modifier.fillMaxWidth()
+    if (screenState.isSheetVisible) {
+        ModalBottomSheet(
+            onDismissRequest = { onSheetDismiss() },
+            sheetState = bottomSheetState,
+            containerColor = MaterialTheme.colorScheme.surface,
+            tonalElevation = 0.dp,
+            modifier = Modifier.fillMaxHeight()
         ) {
-            ModalBottomSheet(
-                onDismissRequest = { onSheetDismiss() },
-                sheetState = bottomSheetState,
-                containerColor = MaterialTheme.colorScheme.surface,
-                tonalElevation = 0.dp,
-                modifier = Modifier.fillMaxHeight()
-            ) {
-                BottomSheetContent(
-                    area = skiArea,
-                    climateState = screenState.climateState,
-                    dangerLevel = riskState.dangerLevel,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .heightIn(min = 320.dp)
-                        .navigationBarsPadding()
-                        .padding(bottom = 12.dp),
-                    startDate = screenState.startDate,
-                    endDate = screenState.endDate,
-                    selectedYear = screenState.selectedYear,
-                    onStartDateChange = { onStartDateChange(it) },
-                    onEndDateChange = { onEndDateChange(it) },
-                    onYearChange = onYearChange,
-                    onAddFavorite = onAddFavorite,
-                    canAddFavorite = canAddFavorite,
-                    listState = listState
-                )
-            }
-            if (showScrollButton) {
-                Button(
-                    onClick = {
-                        scope.launch {
-                            val lastIndex = listState.layoutInfo.totalItemsCount - 1
-                            val lastItemSize = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.size ?: 0
-                            listState.animateScrollToItem(lastIndex, scrollOffset = lastItemSize)
-                        }
-                    },
-                    modifier = Modifier.align(Alignment.BottomCenter).padding(64.dp)
-                ) {
-                    Icon(
-                        Icons.Default.KeyboardArrowDown,
-                        contentDescription = "Scroll down"
-                    )
-                }
-            }
+            BottomSheetContent(
+                area = skiArea,
+                climateState = screenState.climateState,
+                dangerLevel = riskState.dangerLevel,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = 320.dp)
+                    .navigationBarsPadding()
+                    .padding(bottom = 12.dp),
+                startDate = screenState.startDate,
+                endDate = screenState.endDate,
+                selectedYear = screenState.selectedYear,
+                onStartDateChange = { onStartDateChange(it) },
+                onEndDateChange = { onEndDateChange(it) },
+                onYearChange = onYearChange,
+                onAddFavorite = onAddFavorite,
+                canAddFavorite = canAddFavorite,
+                sheetState = bottomSheetState
+            )
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BottomSheetContent(
     area: SkiArea,
@@ -356,151 +323,210 @@ fun BottomSheetContent(
     onYearChange: (Int?) -> Unit,
     canAddFavorite: () -> Boolean,
     onAddFavorite: () -> Unit,
-    listState: LazyListState
+    sheetState: SheetState
 ) {
 
-    LazyColumn(
-        modifier = modifier
+    val listState = rememberLazyListState()
+    val scope = rememberCoroutineScope()
+
+    val showScrollButton by remember {
+        derivedStateOf {
+            val layoutInfo = listState.layoutInfo
+            val lastItem = layoutInfo.visibleItemsInfo.lastOrNull()
+
+            if (layoutInfo.totalItemsCount == 0 || lastItem == null) return@derivedStateOf false
+
+            if (lastItem.index < layoutInfo.totalItemsCount - 1) {
+                true
+            } else {
+                lastItem.offset + lastItem.size > layoutInfo.viewportEndOffset
+            }
+        }
+    }
+
+    Box(modifier = modifier) {
+        LazyColumn(
+            state = listState,
+            modifier = modifier
                 .fillMaxWidth()
                 .padding(horizontal = 20.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        item {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .heightIn(min = 60.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                when (climateState) {
-                    is ClimateState.Loading -> {
-                        CircularProgressIndicator(modifier = Modifier.size(26.dp))
-                    }
+        ) {
+            item {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(min = 60.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    when (climateState) {
+                        is ClimateState.Loading -> {
+                            CircularProgressIndicator(modifier = Modifier.size(26.dp))
+                        }
 
-                    is ClimateState.Error -> {
-                        Text(
-                            text = stringResource(R.string.climate_error_desc),
-                            color = MaterialTheme.colorScheme.error,
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                    }
+                        is ClimateState.Error -> {
+                            Text(
+                                text = stringResource(R.string.climate_error_desc),
+                                color = MaterialTheme.colorScheme.error,
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                        }
 
-                    else -> {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Column {
-                                Text(
-                                    text = stringResource(R.string.weather_station_desc),
-                                    style = MaterialTheme.typography.labelSmall
-                                )
-                                Text(
-                                    text = area.name,
-                                    style = MaterialTheme.typography.titleLarge,
-                                )
-                            }
-                            IconButton(
-                                modifier = Modifier,
-                                onClick = {
-                                    onAddFavorite()
-                                }
-
+                        else -> {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Icon(
-                                    imageVector = Icons.Default.Star,
-                                    contentDescription = ""
-                                )
+                                Column {
+                                    Text(
+                                        text = stringResource(R.string.weather_station_desc),
+                                        style = MaterialTheme.typography.labelSmall
+                                    )
+                                    Text(
+                                        text = area.name,
+                                        style = MaterialTheme.typography.titleLarge,
+                                    )
+                                }
+                                IconButton(
+                                    enabled = canAddFavorite(),
+                                    modifier = Modifier,
+                                    onClick = {
+                                        onAddFavorite()
+                                    }
+
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Star,
+                                        contentDescription = ""
+                                    )
+                                }
                             }
                         }
                     }
+
+                    DangerLevelCard(uiModel = dangerLevel)
+
                 }
-
-                DangerLevelCard(uiModel =  dangerLevel)
-
             }
-        }
 
-        item {
-            HorizontalDivider()
-        }
+            item {
+                HorizontalDivider()
+            }
 
-        item {
-            DatePicker(
-                startDate = startDate,
-                endDate = endDate,
-                selectedYear = selectedYear,
-                onStartDateChange = onStartDateChange,
-                onEndDateChange = onEndDateChange,
-                onYearChange = onYearChange,
-            )
-
-            Surface(
-                modifier = Modifier
-                    .padding(8.dp)
-                    .fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
-                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
-                color = MaterialTheme.colorScheme.surfaceVariant
-            ) {
-                Text(
-                    text = stringResource(R.string.date_description),
-                    modifier = Modifier.padding(12.dp)
+            item {
+                DatePicker(
+                    startDate = startDate,
+                    endDate = endDate,
+                    selectedYear = selectedYear,
+                    onStartDateChange = onStartDateChange,
+                    onEndDateChange = onEndDateChange,
+                    onYearChange = onYearChange,
                 )
-            }
-        }
 
-        item {
-            HorizontalDivider()
-        }
-
-        item {
-            val currentYear = Year.now().value
-
-            val yearRange = remember(selectedYear) {
-                selectedYear?.let { it..currentYear }
-            }
-
-            if (yearRange == null ||
-                startDate == null ||
-                endDate == null
-            ) {
-                Box(
+                Surface(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .height(180.dp),
-                    contentAlignment = Alignment.Center
+                        .padding(8.dp)
+                        .fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
+                    color = MaterialTheme.colorScheme.surfaceVariant
                 ) {
-                    Text(text = stringResource(R.string.no_date_selected_msg))
-                }
-            } else {
-                Column(verticalArrangement = Arrangement.spacedBy(24.dp)) {
-                    ClimateGraph(
-                        dataPoints = area.temperatureData,
-                        startDate = startDate,
-                        endDate = endDate,
-                        title = stringResource(R.string.mean_temp_desc)
-                    )
-
-                    HorizontalDivider()
-
-                    ClimateGraph(
-                        dataPoints = area.precipitationData,
-                        startDate = startDate,
-                        endDate = endDate,
-                        title = stringResource(R.string.mean_precip_desc)
-                    )
-
-                    HorizontalDivider()
-
-                    ClimateGraph(
-                        dataPoints = area.windSpeedData,
-                        startDate = startDate,
-                        endDate = endDate,
-                        title = stringResource(R.string.mean_wind_desc)
+                    Text(
+                        text = stringResource(R.string.date_description),
+                        modifier = Modifier.padding(12.dp)
                     )
                 }
+            }
+
+            item {
+                HorizontalDivider()
+            }
+
+            item {
+                val currentYear = Year.now().value
+
+                val yearRange = remember(selectedYear) {
+                    selectedYear?.let { it..currentYear }
+                }
+
+                if (yearRange == null ||
+                    startDate == null ||
+                    endDate == null
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(180.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(text = stringResource(R.string.no_date_selected_msg))
+                    }
+                } else {
+                    Column(verticalArrangement = Arrangement.spacedBy(24.dp)) {
+                        ClimateGraph(
+                            dataPoints = area.temperatureData,
+                            startDate = startDate,
+                            endDate = endDate,
+                            title = stringResource(R.string.mean_temp_desc)
+                        )
+
+                        HorizontalDivider()
+
+                        ClimateGraph(
+                            dataPoints = area.precipitationData,
+                            startDate = startDate,
+                            endDate = endDate,
+                            title = stringResource(R.string.mean_precip_desc)
+                        )
+
+                        HorizontalDivider()
+
+                        ClimateGraph(
+                            dataPoints = area.windSpeedData,
+                            startDate = startDate,
+                            endDate = endDate,
+                            title = stringResource(R.string.mean_wind_desc)
+                        )
+                    }
+                }
+            }
+        }
+
+        if (showScrollButton) {
+            val translationY by remember {
+                derivedStateOf {
+                    try {
+                        -sheetState.requireOffset()
+                    } catch (e: Exception) {
+                        0f
+                    }
+                }
+            }
+
+            Button(
+                onClick = {
+                    scope.launch {
+                        launch { sheetState.expand() }
+
+                        launch {
+                            snapshotFlow { listState.layoutInfo.viewportEndOffset }
+                                .first()
+
+                            listState.animateScrollBy(
+                                listState.layoutInfo.totalItemsCount * 10_000f
+                            )
+                        }
+                    }
+                },
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = 16.dp)
+                    .graphicsLayer {
+                        this.translationY = translationY
+                    }
+            ) {
+                Icon(Icons.Default.KeyboardArrowDown, contentDescription = null)
             }
         }
     }
@@ -539,9 +565,14 @@ fun MapScreenErrorPreview() {
 }
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Preview(showBackground = true)
 @Composable
 fun BottomSheetPreview() {
+    val sheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = false
+    )
+
     BottomSheetContent(
         area = previewSkiArea,
         climateState = ClimateState.Idle,
@@ -553,7 +584,7 @@ fun BottomSheetPreview() {
         onEndDateChange = { },
         onYearChange = { },
         onAddFavorite = { },
-        listState = rememberLazyListState(),
-        canAddFavorite = { false }
+        canAddFavorite = { false },
+        sheetState = sheetState
     )
 }
