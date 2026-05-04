@@ -43,7 +43,7 @@ class SettingsViewModel(application: Application)
     }
 
     fun resetTextScale(){
-        updateTextScale(1.0f)
+        updateTextScale(1.5f)
     }
 
     fun setLanguage(mode: AppLanguageMode) {

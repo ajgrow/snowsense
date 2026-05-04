@@ -42,6 +42,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import in2000.prosjekt.in2000project.R
 import androidx.compose.material.icons.filled.*
+import in2000.prosjekt.in2000project.ui.reusables.TopBar
 
 
 @Composable
@@ -69,178 +70,159 @@ fun SettingScreen(
 
             // Top bar
 
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
+            TopBar(
+                title = stringResource(R.string.settings_title)
+            )
+
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp)
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .padding(12.dp),
+                verticalArrangement = Arrangement.spacedBy(20.dp)
             ) {
-                IconButton(
-                    onClick = onBackClick
+
+                // appearance/theme
+
+                SettingsGrouping(
+                    title = stringResource(R.string.settings_appearance_title)
                 ) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = stringResource(R.string.back_button_desc)
+                    ThemeSettingRow(
+                        icon = Icons.Default.PhoneAndroid,
+                        label = stringResource(R.string.settings_theme_system),
+                        selected = themeMode == ThemeMode.SYSTEM,
+                        onClick = {
+                            settingsViewModel.setTheme(ThemeMode.SYSTEM)
+                        }
+                    )
+
+                    SettingsDivider()
+
+                    ThemeSettingRow(
+                        icon = Icons.Default.LightMode,
+                        label = stringResource(R.string.settings_theme_light),
+                        selected = themeMode == ThemeMode.LIGHT,
+                        onClick = {
+                            settingsViewModel.setTheme(ThemeMode.LIGHT)
+                        }
+                    )
+
+                    SettingsDivider()
+
+                    ThemeSettingRow(
+                        icon = Icons.Default.DarkMode,
+                        label = stringResource(R.string.settings_theme_dark),
+                        selected = themeMode == ThemeMode.DARK,
+                        onClick = {
+                            settingsViewModel.setTheme(ThemeMode.DARK)
+                        }
                     )
                 }
 
-                Text(
-                    text = stringResource(R.string.settings_title),
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.SemiBold,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .verticalScroll(rememberScrollState())
-                        .padding(12.dp),
-                    verticalArrangement = Arrangement.spacedBy(20.dp)
+                // Text resizing
+                SettingsGrouping(
+                    title = stringResource(
+                        R.string.settings_text_size_title_formatted,
+                        (textScale * 100).toInt()
+                        )
                 ) {
-
-                    // appearance/theme
-
-                    SettingsGrouping(
-                        title = stringResource(R.string.settings_appearance_title)
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        ThemeSettingRow(
-                            icon = Icons.Default.PhoneAndroid,
-                            label = stringResource(R.string.settings_theme_system),
-                            selected = themeMode == ThemeMode.SYSTEM,
-                            onClick = {
-                                settingsViewModel.setTheme(ThemeMode.SYSTEM)
-                            }
+                        Icon(
+                            imageVector = Icons.Default.TextFields,
+                            contentDescription = null,
+                            modifier = Modifier
+                                .size(20.dp),
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
                         )
 
-                        SettingsDivider()
-
-                        ThemeSettingRow(
-                            icon = Icons.Default.LightMode,
-                            label = stringResource(R.string.settings_theme_light),
-                            selected = themeMode == ThemeMode.LIGHT,
-                            onClick = {
-                                settingsViewModel.setTheme(ThemeMode.LIGHT)
-                            }
+                        Slider(
+                            value = textScale,
+                            onValueChange = { settingsViewModel.updateTextScale(it) },
+                            valueRange = 0.5f..2.0f,
+                            modifier = Modifier.weight(1f),
+                            colors = SliderDefaults.colors(
+                                thumbColor = MaterialTheme.colorScheme.primary,
+                                activeTrackColor = MaterialTheme.colorScheme.primary
+                            )
                         )
 
-                        SettingsDivider()
-
-                        ThemeSettingRow(
-                            icon = Icons.Default.DarkMode,
-                            label = stringResource(R.string.settings_theme_dark),
-                            selected = themeMode == ThemeMode.DARK,
-                            onClick = {
-                                settingsViewModel.setTheme(ThemeMode.DARK)
-                            }
-                        )
+                        IconButton(
+                            onClick = { settingsViewModel.resetTextScale() },
+                            modifier = Modifier
+                                .size(32.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Refresh,
+                                contentDescription = stringResource(R.string.settings_reset_default),
+                                modifier = Modifier
+                                    .size(20.dp),
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
                     }
 
-                    // Text resizing
-                    SettingsGrouping(
-                        title = stringResource(
-                            R.string.settings_text_size_title_formatted,
-                            (textScale * 100).toInt()
-                            )
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp)
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(MaterialTheme.colorScheme.surfaceContainerHighest)
+                            .padding(12.dp)
+                    ) {
+                        Text(
+                            text = "Preview text  Aa",
+                            style = MaterialTheme.typography.bodyMedium.copy(
+                                fontSize = MaterialTheme.typography.bodyMedium.fontSize * textScale
+                            ),
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+
+                // language / språk
+                SettingsGrouping(
+                    title = stringResource(R.string.settings_language_title)
+                ) {
+                    Column(
+                        modifier = Modifier.padding(12.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(8.dp),
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
                             Icon(
-                                imageVector = Icons.Default.TextFields,
+                                imageVector = Icons.Default.Language,
                                 contentDescription = null,
                                 modifier = Modifier
                                     .size(20.dp),
                                 tint = MaterialTheme.colorScheme.onSurfaceVariant
                             )
-
-                            Slider(
-                                value = textScale,
-                                onValueChange = { settingsViewModel.updateTextScale(it) },
-                                valueRange = 0.5f..2.0f,
-                                modifier = Modifier.weight(1f),
-                                colors = SliderDefaults.colors(
-                                    thumbColor = MaterialTheme.colorScheme.primary,
-                                    activeTrackColor = MaterialTheme.colorScheme.primary
-                                )
-                            )
-
-                            IconButton(
-                                onClick = { settingsViewModel.resetTextScale() },
-                                modifier = Modifier
-                                    .size(32.dp)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Refresh,
-                                    contentDescription = stringResource(R.string.settings_reset_default),
-                                    modifier = Modifier
-                                        .size(20.dp),
-                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            }
-
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(16.dp)
-                                    .clip(RoundedCornerShape(8.dp))
-                                    .background(MaterialTheme.colorScheme.surfaceContainerHighest)
-                                    .padding(12.dp)
-                            ) {
-                                Text(
-                                    text = "Preview text  Aa",
-                                    style = MaterialTheme.typography.bodyMedium.copy(
-                                        fontSize = MaterialTheme.typography.bodyMedium.fontSize * textScale
-                                    ),
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            }
-                        }
-                    }
-
-                    SettingsGrouping(
-                        title = stringResource(R.string.settings_language_title)
-                    ) {
-                        Column(
-                            modifier = Modifier.padding(12.dp),
-                            verticalArrangement = Arrangement.spacedBy(12.dp)
-                        ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(8.dp)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Language,
-                                    contentDescription = null,
-                                    modifier = Modifier
-                                        .size(20.dp),
-                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                                Text(
-                                    text = if (languageMode == AppLanguageMode.ENGLISH) "English"
-                                            else "Norsk",
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            }
-
-                            LanguageControl(
-                                selectedLanguage = languageMode,
-                                onSelect = {
-                                    settingsViewModel.setLanguage(it)
-                                }
+                            Text(
+                                text = if (languageMode == AppLanguageMode.ENGLISH) "English"
+                                        else "Norsk",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
+
+                        LanguageControl(
+                            selectedLanguage = languageMode,
+                            onSelect = {
+                                settingsViewModel.setLanguage(it)
+                            }
+                        )
                     }
                 }
             }
         }
     }
-
 }
 
 
