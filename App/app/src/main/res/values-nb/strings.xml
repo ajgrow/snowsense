@@ -161,19 +161,19 @@
     <string name="safety_advice_title">Sikkerhet i skredterreng</string>
     <string name="safety_advice_desc">Råd for trygg ferdsel i områder med skredfare</string>
 
-    <string name="before_you_go_title">Før turen</string>
+    <string name="before_you_go_title">1. Før turen</string>
     <string name="before_you_go_1">Sjekk vær- og skredvarsel</string>
     <string name="before_you_go_2">Unngå bratt terreng</string>
     <string name="before_you_go_3">Gi beskjed om hvor du skal</string>
     <string name="before_you_go_4">Velg trygge ruter</string>
 
-    <string name="while_you_are_out_title">Underveis</string>
+    <string name="while_you_are_out_title">2. Underveis</string>
     <string name="while_you_are_out_1">Følg trygge ruter</string>
     <string name="while_you_are_out_2">Se etter faretegn i snøen</string>
     <string name="while_you_are_out_3">Snu hvis du er i tvil</string>
     <string name="while_you_are_out_4">Vær oppmerksom på endringer i snøforholdene</string>
 
-    <string name="if_something_goes_wrong_title">Hvis uhellet er ute</string>
+    <string name="if_something_goes_wrong_title">3. Hvis uhellet er ute</string>
     <string name="if_something_goes_wrong_1">Prøv å komme deg ut til siden</string>
     <string name="if_something_goes_wrong_2">Kast av deg sekken</string>
     <string name="if_something_goes_wrong_3">Beskytt hode og ansikt</string>
