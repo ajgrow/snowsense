@@ -15,9 +15,13 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -32,9 +36,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -52,6 +58,7 @@ import in2000.prosjekt.in2000project.data.model.toSkiArea
 import in2000.prosjekt.in2000project.ui.reusables.ClimateGraph
 import in2000.prosjekt.in2000project.ui.reusables.DangerLevelCard
 import in2000.prosjekt.in2000project.ui.reusables.DatePicker
+import in2000.prosjekt.in2000project.ui.reusables.TopBar
 import org.koin.compose.viewmodel.koinViewModel
 import java.time.MonthDay
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -63,6 +70,7 @@ import in2000.prosjekt.in2000project.ui.model.DangerLevelUiModel
 import in2000.prosjekt.in2000project.ui.model.toUiModel
 import in2000.prosjekt.in2000project.ui.reusables.TextInputDialog
 import in2000.prosjekt.in2000project.ui.search.SearchUiState
+import kotlinx.coroutines.launch
 import java.time.Year
 
 private val previewSkiArea = SkiArea(
@@ -148,7 +156,15 @@ fun MapRoute(
                 showFavoriteDialog = true
             }
         },
-        skiArea = skiArea
+        skiArea = skiArea,
+        canAddFavorite = {
+            val coordinate = screenState.climateCoordinate
+            if (coordinate != null) {
+                !searchState.favorites.any { it.coordinate == coordinate }
+            } else {
+                false
+            }
+        }
     )
 }
 
@@ -172,14 +188,33 @@ fun MapScreen(
     onSearch: () -> Unit,
     onSelectResult: (NamedLocation) -> Unit,
     onAddFavorite: () -> Unit,
+    canAddFavorite: () -> Boolean,
     skiArea: SkiArea
 ) {
 
+    val scope = rememberCoroutineScope()
+
+    //Controls whether the bottom sheet is visible or not by keeping track of if the user has clicked the map
+    //if this is set to null then the ModalBottomSheet is not open
+    var isSheetOpen by remember { mutableStateOf(false) }
 
 
     var skipPartiallyExpanded by rememberSaveable {mutableStateOf(false)}
 
     val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = skipPartiallyExpanded)
+
+    val listState = rememberLazyListState()
+    val showScrollButton by remember {
+        derivedStateOf {
+            val layoutInfo = listState.layoutInfo
+            val lastItem = layoutInfo.visibleItemsInfo.lastOrNull()
+            if (lastItem == null || lastItem.index < layoutInfo.totalItemsCount - 1) {
+                true
+            } else {
+                lastItem.offset + lastItem.size > layoutInfo.viewportEndOffset
+            }
+        }
+    }
 
     val avalancheStatus = when {
         riskState.isDanger == true -> "High"
@@ -256,30 +291,53 @@ fun MapScreen(
 
     //This is for the bottom sheet - if isSheetOpen is set to true, then it will open otherwise, it stays closed
     if (screenState.isSheetVisible){
-        ModalBottomSheet(
-            onDismissRequest = { onSheetDismiss() },
-            sheetState = bottomSheetState,
-            containerColor = MaterialTheme.colorScheme.surface,
-            tonalElevation = 0.dp,
-            modifier = Modifier.fillMaxHeight()
+        Box(
+            modifier = Modifier.fillMaxWidth()
         ) {
-            BottomSheetContent(
-                area = skiArea,
-                climateState = screenState.climateState,
-                dangerLevel = riskState.dangerLevel,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .heightIn(min = 320.dp)
-                    .navigationBarsPadding()
-                    .padding(bottom = 12.dp),
-                startDate = screenState.startDate,
-                endDate = screenState.endDate,
-                selectedYear = screenState.selectedYear,
-                onStartDateChange = { onStartDateChange(it) },
-                onEndDateChange = { onEndDateChange(it) },
-                onYearChange = onYearChange,
-                onAddFavorite = onAddFavorite
-            )
+            ModalBottomSheet(
+                onDismissRequest = { onSheetDismiss() },
+                sheetState = bottomSheetState,
+                containerColor = MaterialTheme.colorScheme.surface,
+                tonalElevation = 0.dp,
+                modifier = Modifier.fillMaxHeight()
+            ) {
+                BottomSheetContent(
+                    area = skiArea,
+                    climateState = screenState.climateState,
+                    dangerLevel = riskState.dangerLevel,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(min = 320.dp)
+                        .navigationBarsPadding()
+                        .padding(bottom = 12.dp),
+                    startDate = screenState.startDate,
+                    endDate = screenState.endDate,
+                    selectedYear = screenState.selectedYear,
+                    onStartDateChange = { onStartDateChange(it) },
+                    onEndDateChange = { onEndDateChange(it) },
+                    onYearChange = onYearChange,
+                    onAddFavorite = onAddFavorite,
+                    canAddFavorite = canAddFavorite,
+                    listState = listState
+                )
+            }
+            if (showScrollButton) {
+                Button(
+                    onClick = {
+                        scope.launch {
+                            val lastIndex = listState.layoutInfo.totalItemsCount - 1
+                            val lastItemSize = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.size ?: 0
+                            listState.animateScrollToItem(lastIndex, scrollOffset = lastItemSize)
+                        }
+                    },
+                    modifier = Modifier.align(Alignment.BottomCenter).padding(64.dp)
+                ) {
+                    Icon(
+                        Icons.Default.KeyboardArrowDown,
+                        contentDescription = "Scroll down"
+                    )
+                }
+            }
         }
     }
 }
@@ -296,7 +354,9 @@ fun BottomSheetContent(
     onStartDateChange: (MonthDay?) -> Unit,
     onEndDateChange: (MonthDay?) -> Unit,
     onYearChange: (Int?) -> Unit,
-    onAddFavorite: () -> Unit
+    canAddFavorite: () -> Boolean,
+    onAddFavorite: () -> Unit,
+    listState: LazyListState
 ) {
 
     LazyColumn(
@@ -473,6 +533,7 @@ fun MapScreenErrorPreview() {
         onSearch = {},
         onSelectResult = {},
         onAddFavorite = {},
+        canAddFavorite = { false },
         skiArea = previewSkiArea
     )
 }
@@ -491,6 +552,8 @@ fun BottomSheetPreview() {
         onStartDateChange = { },
         onEndDateChange = { },
         onYearChange = { },
-        onAddFavorite = { }
+        onAddFavorite = { },
+        listState = rememberLazyListState(),
+        canAddFavorite = { false }
     )
 }
