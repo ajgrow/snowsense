@@ -69,11 +69,12 @@ class FrostAvalancheRiskRepository(
         // since we want to base the risk on complete data
 
         val today = LocalDate.now()
-        val completeObservations = observations.filter { atRefTime ->
-            LocalDate.parse(
-                atRefTime.referenceTime.substringBefore("T")
-            ) < today
-        }
+        val completeObservations = observations
+            .filter { atRefTime ->
+                LocalDate.parse(
+                    atRefTime.referenceTime.substringBefore("T")
+                ) < today
+            }
 
         val records = completeObservations
             .filter { atRefTime ->

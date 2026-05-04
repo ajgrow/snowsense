@@ -29,7 +29,7 @@ class FrostApiIntegrationTest {
 
     companion object {
         val BLINDERN = Coordinate(59.9423, 10.72)
-        val BOVERDAL = Coordinate(61.62373, 8.27996)
+        val FROYSTUL = Coordinate(59.7383, 8.4245)
     }
 
     private lateinit var client: HttpClient
@@ -123,10 +123,10 @@ class FrostApiIntegrationTest {
     }
 
     @Test
-    fun boverdal_avalancheRisk_smokeTest() = runTest {
-        val result = avalancheRepository.getSlabAvalancheRiskForLocation(BOVERDAL)
+    fun froystul_avalancheRisk_smokeTest() = runTest {
+        val result = avalancheRepository.getSlabAvalancheRiskForLocation(FROYSTUL)
 
-        assertEquals(BOVERDAL, result.coordinate)
+        assertEquals(FROYSTUL, result.coordinate)
         assertContains(DangerLevel.entries, result.dangerLevel)
     }
 }
