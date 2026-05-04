@@ -68,11 +68,10 @@ fun ExternalResourceCard(
     onClick: () -> Unit
 ) {
     Surface(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onClick() },
+        modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
-        tonalElevation = 5.dp
+        tonalElevation = 5.dp,
+        onClick = onClick
     ) {
         Row(
             modifier = Modifier
@@ -94,7 +93,7 @@ fun ExternalResourceCard(
                 Text(
                     text = resource.description,
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
 

@@ -147,7 +147,7 @@
     <string name="remove">Remove</string>
 
     <string name="other_resources_title">Other useful resources</string>
-    <string name="other_resouces_descr">Here are some useful resources we recommend checking before heading out.</string>
+    <string name="other_resources_descr">Here are some useful resources we recommend checking before heading out.</string>
     <string name="varsom_title">Varsom</string>
     <string name="varsom_descr">Official avalanche forecasts with danger levels and local assessments.</string>
     <string name="varsom_url">https://www.varsom.no/snoskred/</string>

@@ -81,7 +81,7 @@ fun InfoContent(
             item {
                 InfoBox(
                     titleRes = R.string.other_resources_title,
-                    descRes = R.string.other_resouces_descr,
+                    descRes = R.string.other_resources_descr,
                     content = { ExternalResources() }
                 )
             }
@@ -111,6 +111,7 @@ fun InfoBox(
     content: (@Composable () -> Unit)? = null
 ) {
     var expanded by rememberSaveable { mutableStateOf(false) }
+    val expandedText = stringResource(if (expanded) R.string.hide_info else R.string.show_info)
 
     Surface(
         modifier = modifier
@@ -132,10 +133,7 @@ fun InfoBox(
                 )
 
                 Text(
-                    text = if (expanded)
-                        stringResource(R.string.hide_info)
-                    else
-                        stringResource(R.string.show_info),
+                    text = expandedText,
                     style = MaterialTheme.typography.bodySmall,
                 )
             }
