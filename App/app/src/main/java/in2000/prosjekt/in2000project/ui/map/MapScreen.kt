@@ -440,7 +440,9 @@ fun MapScreen(
             }
         }
 
-        if (showScrollButton && showSheet) {
+        val isSheetTargetingHidden = scaffoldState.bottomSheetState.targetValue == SheetValue.Hidden
+
+        if (showScrollButton && showSheet && !isSheetTargetingHidden) {
             Button(
                 onClick = onScrollButtonClicked,
                 modifier = Modifier
