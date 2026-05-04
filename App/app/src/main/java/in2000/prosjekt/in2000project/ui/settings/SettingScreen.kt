@@ -88,140 +88,157 @@ fun SettingScreen(
 
                 // appearance/theme
 
-                SettingsGrouping(
-                    title = stringResource(R.string.settings_appearance_title)
-                ) {
-                    ThemeSettingRow(
-                        icon = Icons.Default.PhoneAndroid,
-                        label = stringResource(R.string.settings_theme_system),
-                        selected = themeMode == ThemeMode.SYSTEM,
-                        onClick = {
-                            settingsViewModel.setTheme(ThemeMode.SYSTEM)
-                        }
+                Column {
+                    Text(
+                        text = stringResource(R.string.settings_appearance_title).uppercase(),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(4.dp)
                     )
-
-                    SettingsDivider()
-
-                    ThemeSettingRow(
-                        icon = Icons.Default.LightMode,
-                        label = stringResource(R.string.settings_theme_light),
-                        selected = themeMode == ThemeMode.LIGHT,
-                        onClick = {
-                            settingsViewModel.setTheme(ThemeMode.LIGHT)
-                        }
-                    )
-
-                    SettingsDivider()
-
-                    ThemeSettingRow(
-                        icon = Icons.Default.DarkMode,
-                        label = stringResource(R.string.settings_theme_dark),
-                        selected = themeMode == ThemeMode.DARK,
-                        onClick = {
-                            settingsViewModel.setTheme(ThemeMode.DARK)
-                        }
-                    )
-                }
-
-                // Text resizing
-                SettingsGrouping(
-                    title = stringResource(
-                        R.string.settings_text_size_title_formatted,
-                        (textScale * 100).toInt()
-                        )
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(8.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    Surface(
+                        shape = RoundedCornerShape(16.dp),
+                        color = MaterialTheme.colorScheme.surfaceContainer,
+                        modifier = Modifier.fillMaxWidth()
                     ) {
-                        Icon(
-                            imageVector = Icons.Default.TextFields,
-                            contentDescription = null,
-                            modifier = Modifier
-                                .size(20.dp),
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-
-                        Slider(
-                            value = textScale,
-                            onValueChange = { settingsViewModel.updateTextScale(it) },
-                            valueRange = 0.5f..2.0f,
-                            modifier = Modifier.weight(1f),
-                            colors = SliderDefaults.colors(
-                                thumbColor = MaterialTheme.colorScheme.primary,
-                                activeTrackColor = MaterialTheme.colorScheme.primary
+                        Column {
+                            ThemeSettingRow(
+                                icon = Icons.Default.PhoneAndroid,
+                                label = stringResource(R.string.settings_theme_system),
+                                selected = themeMode == ThemeMode.SYSTEM,
+                                onClick = { settingsViewModel.setTheme(ThemeMode.SYSTEM) }
                             )
-                        )
-
-                        IconButton(
-                            onClick = { settingsViewModel.resetTextScale() },
-                            modifier = Modifier
-                                .size(32.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Refresh,
-                                contentDescription = stringResource(R.string.settings_reset_default),
-                                modifier = Modifier
-                                    .size(20.dp),
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                            SettingsDivider()
+                            ThemeSettingRow(
+                                icon = Icons.Default.LightMode,
+                                label = stringResource(R.string.settings_theme_light),
+                                selected = themeMode == ThemeMode.LIGHT,
+                                onClick = { settingsViewModel.setTheme(ThemeMode.LIGHT) }
+                            )
+                            SettingsDivider()
+                            ThemeSettingRow(
+                                icon = Icons.Default.DarkMode,
+                                label = stringResource(R.string.settings_theme_dark),
+                                selected = themeMode == ThemeMode.DARK,
+                                onClick = { settingsViewModel.setTheme(ThemeMode.DARK) }
                             )
                         }
                     }
+                }
 
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp)
-                            .clip(RoundedCornerShape(8.dp))
-                            .background(MaterialTheme.colorScheme.surfaceContainerHighest)
-                            .padding(12.dp)
+                // Text resizing
+                Column {
+                    Text(
+                        text = stringResource(
+                            R.string.settings_text_size_title_formatted,
+                            (textScale * 100).toInt()
+                        ).uppercase(),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(4.dp)
+                    )
+                    Surface(
+                        shape = RoundedCornerShape(16.dp),
+                        color = MaterialTheme.colorScheme.surfaceContainer,
+                        modifier = Modifier.fillMaxWidth()
                     ) {
-                        Text(
-                            text = "Preview text  Aa",
-                            style = MaterialTheme.typography.bodyMedium.copy(
-                                fontSize = MaterialTheme.typography.bodyMedium.fontSize * textScale
-                            ),
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
+                        Column {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(8.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.TextFields,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(20.dp),
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                                Slider(
+                                    value = textScale,
+                                    onValueChange = { settingsViewModel.updateTextScale(it) },
+                                    valueRange = 0.5f..2.0f,
+                                    modifier = Modifier.weight(1f),
+                                    colors = SliderDefaults.colors(
+                                        thumbColor = MaterialTheme.colorScheme.primary,
+                                        activeTrackColor = MaterialTheme.colorScheme.primary
+                                    )
+                                )
+                                IconButton(
+                                    onClick = { settingsViewModel.resetTextScale() },
+                                    modifier = Modifier.size(32.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Refresh,
+                                        contentDescription = stringResource(R.string.settings_reset_default),
+                                        modifier = Modifier.size(20.dp),
+                                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                            }
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp)
+                                    .clip(RoundedCornerShape(8.dp))
+                                    .background(MaterialTheme.colorScheme.surfaceContainerHighest)
+                                    .padding(12.dp)
+                            ) {
+                                Text(
+                                    text = stringResource(R.string.preview_text_size),
+                                    style = MaterialTheme.typography.bodyMedium.copy(
+                                        fontSize = MaterialTheme.typography.bodyMedium.fontSize * textScale
+                                    ),
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        }
                     }
                 }
 
                 // language / språk
-                SettingsGrouping(
-                    title = stringResource(R.string.settings_language_title)
-                ) {
-                    Column(
-                        modifier = Modifier.padding(12.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                Column {
+                    Text(
+                        text = stringResource(R.string.settings_language_title).uppercase(),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(4.dp)
+                    )
+                    Surface(
+                        shape = RoundedCornerShape(16.dp),
+                        color = MaterialTheme.colorScheme.surfaceContainer,
+                        modifier = Modifier.fillMaxWidth()
                     ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        Column(
+                            modifier = Modifier.padding(12.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
-                            Icon(
-                                imageVector = Icons.Default.Language,
-                                contentDescription = null,
-                                modifier = Modifier
-                                    .size(20.dp),
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                            Text(
-                                text = if (languageMode == AppLanguageMode.ENGLISH) "English"
-                                        else "Norsk",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Language,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(20.dp),
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                                Text(
+                                    text = if (languageMode == AppLanguageMode.ENGLISH) "English"
+                                    else "Norsk",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                            LanguageControl(
+                                selectedLanguage = languageMode,
+                                onSelect = { settingsViewModel.setLanguage(it) }
                             )
                         }
-
-                        LanguageControl(
-                            selectedLanguage = languageMode,
-                            onSelect = {
-                                settingsViewModel.setLanguage(it)
-                            }
-                        )
                     }
                 }
             }
@@ -278,38 +295,6 @@ private fun LanguageControl(
 
 
 
-@Composable
-private fun SettingsGrouping(
-    title: String,
-    modifier: Modifier = Modifier,
-    content: @Composable () -> Unit
-) {
-    Column(
-        modifier = Modifier
-    ) {
-        Text(
-            text = title.uppercase(),
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.primary,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier
-                .padding(
-                    start = 4.dp,
-                    bottom = 4.dp
-                )
-        )
-
-        Surface(
-            shape = RoundedCornerShape(16.dp),
-            color = MaterialTheme.colorScheme.surfaceContainer,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Column{
-                content()
-            }
-        }
-    }
-}
 
 
 @Composable
