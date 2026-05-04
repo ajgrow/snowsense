@@ -5,15 +5,11 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.tooling.preview.Preview
@@ -25,6 +21,7 @@ import in2000.prosjekt.in2000project.ui.model.toUiModel
 import in2000.prosjekt.in2000project.ui.reusables.DangerLevelItem
 import in2000.prosjekt.in2000project.ui.reusables.EmergencySection
 import in2000.prosjekt.in2000project.ui.reusables.TopBar
+import in2000.prosjekt.in2000project.ui.reusables.ExternalResources
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -85,7 +82,7 @@ fun InfoContent(
                 InfoBox(
                     titleRes = R.string.other_resources_title,
                     descRes = R.string.other_resouces_descr,
-                    content = { Resources() }
+                    content = { ExternalResources() }
                 )
             }
 
@@ -160,92 +157,6 @@ fun InfoBox(
         }
     }
 }
-
-
-data class ResourceLink(
-    val title: String,
-    val description: String,
-    val url: String
-)
-
-@Composable
-fun Resources(modifier: Modifier = Modifier) {
-    val uriHandler = LocalUriHandler.current
-
-    val resources = listOf(
-        ResourceLink(
-            stringResource(R.string.varsom_title),
-            stringResource(R.string.varsom_descr),
-            stringResource(R.string.varsom_url)
-        ),
-        ResourceLink(
-            stringResource(R.string.regobs_title),
-            stringResource(R.string.regobs_desc),
-            stringResource(R.string.regobs_url)
-        ),
-        ResourceLink(
-            stringResource(R.string.nve_title),
-            stringResource(R.string.nve_desc),
-            stringResource(R.string.nve_url)
-        )
-    )
-
-    Column(
-        modifier = modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        resources.forEach { resource ->
-            ResourceLinkCard(resource = resource) {
-                uriHandler.openUri(resource.url)
-            }
-        }
-    }
-}
-
-@Composable
-fun ResourceLinkCard(
-    resource: ResourceLink,
-    onClick: () -> Unit
-) {
-    Surface(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onClick() },
-        shape = RoundedCornerShape(12.dp),
-        tonalElevation = 5.dp
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(12.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-
-            Column(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(2.dp)
-            ) {
-                Text(
-                    text = resource.title,
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = Bold
-                )
-
-                Text(
-                    text = resource.description,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer
-                )
-            }
-
-            Icon(
-                imageVector = Icons.Filled.KeyboardArrowRight,
-                contentDescription = "Open ${resource.title}"
-            )
-        }
-    }
-}
-
 
 @Preview(showBackground = true)
 @Composable
