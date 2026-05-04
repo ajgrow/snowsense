@@ -1,8 +1,7 @@
 package in2000.prosjekt.in2000project.ui.reusables
 
 import android.content.Intent
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.clickable
@@ -27,14 +26,13 @@ import in2000.prosjekt.in2000project.R
 fun EmergencySection(
     modifier: Modifier = Modifier,
 ) {
-    Card(
+    Surface(
         modifier = modifier
             .fillMaxWidth()
             .padding(bottom = 16.dp),
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(2.dp)
+        color = MaterialTheme.colorScheme.surface,
+        border = BorderStroke(1.dp, color = Color(0xFF8B0000))
     ) {
         Column(
             modifier = Modifier.fillMaxWidth()
