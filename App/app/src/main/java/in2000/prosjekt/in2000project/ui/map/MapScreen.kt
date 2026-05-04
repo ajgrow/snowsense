@@ -538,11 +538,10 @@ fun BottomSheetContent(
                                     )
                                 }
                             }
+
+                            DangerLevelCard(uiModel = dangerLevel)
                         }
                     }
-
-                    DangerLevelCard(uiModel = dangerLevel)
-
                 }
             }
 
