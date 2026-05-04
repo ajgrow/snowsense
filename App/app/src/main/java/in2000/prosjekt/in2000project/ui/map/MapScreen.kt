@@ -445,7 +445,7 @@ fun MapScreen(
                 onClick = onScrollButtonClicked,
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
-                    .padding(bottom = 80.dp)
+                    .padding(bottom = 10.dp)
                     .navigationBarsPadding()
             ) {
                 Icon(Icons.Default.KeyboardArrowDown, contentDescription = null)
