@@ -228,7 +228,7 @@ fun SafetyAdvice(
         }
 
         if (showDivider) {
-            Divider(
+            HorizontalDivider(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 12.dp),
@@ -302,7 +302,6 @@ fun SafetyAdviceSection(modifier: Modifier = Modifier) {
                         stringResource(R.string.while_you_are_out_4)
                     )
                 )
-
                 SafetyAdvice(
                     title = stringResource(R.string.if_something_goes_wrong_title),
                     bullets = listOf(
