@@ -14,16 +14,4 @@ class NavigationActions(
             launchSingleTop = true
             restoreState = false
         }
-
-    fun navigateToMapCoordinates(coordinate: Coordinate)
-            = navController
-        .navigate(
-            Screen.Map.createRoute(
-                "${coordinate.longitude},${coordinate.latitude}")
-        ) {
-            popUpTo(navController.graph.findStartDestination().id) {
-                saveState = true }
-            launchSingleTop = false
-            restoreState = false
-        }
 }

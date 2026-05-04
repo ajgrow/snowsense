@@ -109,6 +109,10 @@ fun MapboxView(
     mapStateHolder: MapStateHolder,
     modifier: Modifier = Modifier,
 ) {
+    var mapViewState by remember {
+        mutableStateOf<MapView?>(null)
+    }
+
     val viewportState = rememberMapViewportState {
         val savedCamera = mapStateHolder.cameraOptions.value
         val pin = mapStateHolder.pinnedPoint.value
@@ -157,17 +161,21 @@ fun MapboxView(
         mutableStateOf<PointAnnotation?>(null) }
 
     val pinPoint by mapStateHolder.pinnedPoint.collectAsStateWithLifecycle()
-
-    var mapViewState by remember {
-        mutableStateOf<MapView?>(null)
-    }
-
     val bottomPaddingPx by mapStateHolder.bottomPaddingPx.collectAsStateWithLifecycle()
-    LaunchedEffect(bottomPaddingPx) {
-        val pin = mapStateHolder.pinnedPoint.value
+
+    LaunchedEffect(pinPoint, bottomPaddingPx) {
+        if (mapStateHolder.requestedSearchLocation.value != null)
+            return@LaunchedEffect
+
+        val pin = pinPoint
+            ?: return@LaunchedEffect
+
+        val currentZoom = viewportState.cameraState?.zoom
+
         viewportState.easeTo(
             cameraOptions {
-                pin?.let { center(it) }
+                center(pin)
+                currentZoom?.let { zoom(it) }
                 padding(EdgeInsets(0.0, 0.0, bottomPaddingPx, 0.0))
             },
             MapAnimationOptions.Builder().duration(300).build()
@@ -178,11 +186,14 @@ fun MapboxView(
     LaunchedEffect(target) {
         target?.let { point ->
             viewportState.easeTo(
-                cameraOptions { center(point); zoom(12.0) },
-                MapAnimationOptions.Builder().duration(500).build()
+                cameraOptions {
+                    center(point)
+                    zoom(12.0)
+                    padding(EdgeInsets(0.0, 0.0, bottomPaddingPx, 0.0))},
+                MapAnimationOptions.Builder().duration(400).build()
             )
             mapStateHolder.onPinPlaced(point)
-            mapStateHolder.clearRequestedSearchLocation() // event consumed
+            mapStateHolder.clearRequestedSearchLocation()
         }
     }
 

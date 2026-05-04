@@ -85,7 +85,6 @@ private val previewSkiArea = SkiArea(
 //for use when the VM is ready
 @Composable
 fun MapRoute(
-    coordinates: String,
     searchViewModel: SearchViewModel,
     mapViewModel: MapViewModel = koinViewModel(),
     riskViewModel: RiskViewModel = koinViewModel(),
@@ -138,17 +137,16 @@ fun MapRoute(
         )
     }
 
-    LaunchedEffect (Unit) {
-        mapViewModel.onSheetDismissed()
-        MapCameraRepository.clearPinnedPoint()
-    }
+//    LaunchedEffect (Unit) {
+//        mapViewModel.onSheetDismissed()
+//        MapCameraRepository.clearPinnedPoint()
+//    }
 
     MapScreen(
         screenState = screenState,
         riskState = riskState,
         overlayState = overlayState,
         searchState = searchState,
-        coordinates = coordinates,
         pinnedPoint = pin,
         onMapClick = { lat, lon ->
             mapViewModel.onMapClick(lat, lon)
@@ -183,7 +181,6 @@ fun MapScreen(
     riskState: RiskUiState,
     overlayState: OverlayState,
     searchState: SearchUiState,
-    coordinates: String,
     pinnedPoint: Point?,
     onMapClick: (Double, Double) -> Unit,
     onSearchLocationRequested: (Point) -> Unit,
@@ -239,15 +236,15 @@ fun MapScreen(
         bottomSheetState = sheetState
     )
 
-    LaunchedEffect(screenState.climateState) {
-        if (screenState.climateState is ClimateState.Success) {
-            sheetState.partialExpand()
-        }
-    }
+    val showSheet = screenState.isSheetVisible
+    val peekHeight = if (showSheet) halfScreen else 0.dp
 
-    val peekHeight = if (screenState.climateState is ClimateState.Success)
-                        halfScreen
-                    else 0.dp
+    LaunchedEffect(showSheet, pinnedPoint) {
+        if (showSheet)
+            sheetState.partialExpand()
+        else
+            sheetState.hide()
+    }
 
     val density = LocalDensity.current.density
     LaunchedEffect(peekHeight) {
@@ -572,7 +569,6 @@ fun MapScreenErrorPreview() {
         onSearchLocationRequested = {},
         onZoomIn = {},
         onZoomOut = {},
-        coordinates = "",
         pinnedPoint = null,
         onOverlayRetry = {},
         onOverlayLoaded = {},

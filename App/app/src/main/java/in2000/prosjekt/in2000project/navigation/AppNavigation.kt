@@ -49,20 +49,8 @@ fun AppNavigation(
             )
         }
 
-        composable(
-            route = Screen.Map.route,
-            arguments = listOf(
-                navArgument("coordinates") {
-                    type = NavType.StringType
-                }
-            )
-        ) { backStackEntry ->
-            val coordinates = backStackEntry.arguments
-                ?.getString("coordinates")!!
-            MapRoute(
-                coordinates = coordinates,
-                searchViewModel = searchViewModel
-            )
+        composable(Screen.Map.route) {
+            MapRoute(searchViewModel = searchViewModel)
         }
 
         composable(Screen.Info.route) {

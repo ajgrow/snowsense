@@ -94,6 +94,7 @@ class MapViewModel(
     fun onMapClick(lat: Double, lon: Double) {
         _screenState.value = _screenState.value.copy(
             climateCoordinate = Coordinate(lat, lon),
+            climateState = ClimateState.Loading,
             isSheetVisible = true
         )
         fetchClimateData(lat, lon)
@@ -145,7 +146,6 @@ class MapViewModel(
 
     fun onSheetDismissed() {
         _screenState.value = _screenState.value.copy(
-            climateState = ClimateState.Idle,
             isSheetVisible = false
         )
     }
