@@ -3,10 +3,8 @@ package in2000.prosjekt.in2000project.navigation
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.navArgument
 import com.mapbox.geojson.Point
 import in2000.prosjekt.in2000project.ui.home.HomeScreen
 import in2000.prosjekt.in2000project.ui.information.InfoScreen
@@ -40,10 +38,11 @@ fun AppNavigation(
                     .navigate(Screen
                         .Settings.route) },
                 onNavigateToMap = { coordinate ->
-                    mapStateHolder.onSearchLocationRequested(
+                    mapStateHolder.flyToSearch(
                         Point.fromLngLat(
                             coordinate.longitude,
-                            coordinate.latitude) )
+                            coordinate.latitude)
+                    )
                     navigationActions.navigateToTab(Screen.Map.route) },
                 searchViewModel = searchViewModel
             )

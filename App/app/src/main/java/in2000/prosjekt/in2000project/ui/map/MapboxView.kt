@@ -161,50 +161,43 @@ fun MapboxView(
         mutableStateOf<PointAnnotation?>(null) }
 
     val pinPoint by mapStateHolder.pinnedPoint.collectAsStateWithLifecycle()
-    val bottomPaddingPx by mapStateHolder.bottomPaddingPx.collectAsStateWithLifecycle()
 
-    LaunchedEffect(pinPoint, bottomPaddingPx) {
-        if (mapStateHolder.requestedSearchLocation.value != null)
-            return@LaunchedEffect
-
-        val pin = pinPoint
-            ?: return@LaunchedEffect
-
-        val currentZoom = viewportState.cameraState?.zoom
-
-        viewportState.easeTo(
-            cameraOptions {
-                center(pin)
-                currentZoom?.let { zoom(it) }
-                padding(EdgeInsets(0.0, 0.0, bottomPaddingPx, 0.0))
-            },
-            MapAnimationOptions.Builder().duration(300).build()
-        )
-    }
-
-    val target by mapStateHolder.requestedSearchLocation.collectAsStateWithLifecycle()
-    LaunchedEffect(target) {
-        target?.let { point ->
-            viewportState.easeTo(
-                cameraOptions {
-                    center(point)
-                    zoom(12.0)
-                    padding(EdgeInsets(0.0, 0.0, bottomPaddingPx, 0.0))},
-                MapAnimationOptions.Builder().duration(400).build()
-            )
-            mapStateHolder.onPinPlaced(point)
-            mapStateHolder.clearRequestedSearchLocation()
-        }
-    }
+    val animationOptions = MapAnimationOptions.Builder().duration(300).build()
 
     LaunchedEffect(Unit) {
         mapStateHolder.commands.collect { cmd ->
+            val padding = EdgeInsets(
+                0.0,
+                0.0,
+                mapStateHolder.bottomPaddingPx.value,
+                0.0)
+
             when (cmd) {
+                is MapStateHolder.MapCommand.FlyTo ->
+                    viewportState.easeTo(
+                        cameraOptions {
+                            center(cmd.point)
+                            zoom(cmd.zoom)
+                            padding(padding)
+                        },
+                        animationOptions
+                    )
+                is MapStateHolder.MapCommand.Recenter -> {
+                    val currentZoom = viewportState.cameraState?.zoom
+                    viewportState.easeTo(
+                        cameraOptions {
+                            center(cmd.point)
+                            currentZoom?.let { zoom(it) }
+                            padding(padding)
+                        },
+                        animationOptions
+                    )
+                }
                 is MapStateHolder.MapCommand.ZoomBy -> {
                     val current = viewportState.cameraState?.zoom ?: 10.0
                     viewportState.easeTo(
                         cameraOptions { zoom(current + cmd.delta) },
-                        MapAnimationOptions.Builder().duration(300).build()
+                        animationOptions
                     )
                 }
             }
@@ -226,7 +219,7 @@ fun MapboxView(
                 Style::addNveAvalancheRiskLayers)
 
             mapView.gestures.addOnMapClickListener { point ->
-                mapStateHolder.onPinPlaced(point)
+                mapStateHolder.placePin(point)
                 true
             }
 

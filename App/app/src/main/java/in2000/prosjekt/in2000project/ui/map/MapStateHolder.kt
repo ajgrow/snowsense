@@ -12,22 +12,21 @@ import kotlinx.coroutines.flow.asStateFlow
 class MapStateHolder {
 
     sealed interface MapCommand {
+        data class FlyTo(val point: Point, val zoom: Double) : MapCommand
+        data class Recenter(val point: Point) : MapCommand
         data class ZoomBy(val delta: Double) : MapCommand
     }
+
     private val _commands = MutableSharedFlow<MapCommand>(
-        // queue presses while awaiting MapboxView collection
         extraBufferCapacity = 8
     )
-
     val commands: SharedFlow<MapCommand> = _commands.asSharedFlow()
+
     private val _pinnedPoint = MutableStateFlow<Point?>(null)
     val pinnedPoint: StateFlow<Point?> = _pinnedPoint.asStateFlow()
 
     private val _cameraOptions = MutableStateFlow<CameraOptions?>(null)
     val cameraOptions: StateFlow<CameraOptions?> = _cameraOptions.asStateFlow()
-
-    private val _requestedSearchLocation = MutableStateFlow<Point?>(null)
-    val requestedSearchLocation: StateFlow<Point?> = _requestedSearchLocation.asStateFlow()
 
     private val _overlayState = MutableStateFlow<OverlayState>(OverlayState.Success)
     val overlayState: StateFlow<OverlayState> = _overlayState.asStateFlow()
@@ -35,38 +34,37 @@ class MapStateHolder {
     private val _bottomPaddingPx = MutableStateFlow(0.0)
     val bottomPaddingPx: StateFlow<Double> = _bottomPaddingPx.asStateFlow()
 
-    fun onPinPlaced(point: Point) {
+    fun placePin(point: Point) {
         _pinnedPoint.value = point
+        if (_bottomPaddingPx.value > 0.0) {
+            _commands.tryEmit(MapCommand.Recenter(point))
+        }
     }
+
+    fun flyToSearch(point: Point, zoom: Double = SEARCH_ZOOM) {
+        _pinnedPoint.value = point
+        _commands.tryEmit(MapCommand.FlyTo(point, zoom))
+    }
+
+    fun setBottomPadding(px: Double) {
+        if (_bottomPaddingPx.value == px) return
+        _bottomPaddingPx.value = px
+        _pinnedPoint.value?.let {
+            _commands.tryEmit(MapCommand.Recenter(it)) }
+    }
+
     fun onCameraIdle(cameraOptions: CameraOptions) {
         _cameraOptions.value = cameraOptions
     }
 
-    fun onSearchLocationRequested(point: Point) {
-        _requestedSearchLocation.value = point
-    }
-    fun clearRequestedSearchLocation() {
-        _requestedSearchLocation.value = null
-    }
+    fun onOverlayLoading() { _overlayState.value = OverlayState.Loading }
+    fun onOverlayLoaded()  { _overlayState.value = OverlayState.Success }
+    fun onOverlayError()   { _overlayState.value = OverlayState.Error }
 
-    fun onOverlayLoading() {
-        _overlayState.value = OverlayState.Loading
-    }
-    fun onOverlayLoaded()  {
-        _overlayState.value = OverlayState.Success
-    }
-    fun onOverlayError()   {
-        _overlayState.value = OverlayState.Error
-    }
+    fun onZoomIn()  { _commands.tryEmit(MapCommand.ZoomBy(+1.0)) }
+    fun onZoomOut() { _commands.tryEmit(MapCommand.ZoomBy(-1.0)) }
 
-    fun onZoomIn()  {
-        _commands.tryEmit(MapCommand.ZoomBy(+1.0))
-    }
-    fun onZoomOut() {
-        _commands.tryEmit(MapCommand.ZoomBy(-1.0))
-    }
-
-    fun onBottomPaddingChanged(px: Double) {
-        _bottomPaddingPx.value = px
+    companion object {
+        const val SEARCH_ZOOM = 12.0
     }
 }

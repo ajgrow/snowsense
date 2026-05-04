@@ -152,7 +152,7 @@ fun MapRoute(
             mapViewModel.onMapClick(lat, lon)
             riskViewModel.avalancheChecker(lat, lon)
         },
-        onSearchLocationRequested = mapStateHolder::onSearchLocationRequested,
+        onSearchLocationRequested = mapStateHolder::flyToSearch,
         onZoomIn = mapStateHolder::onZoomIn,
         onZoomOut = mapStateHolder::onZoomOut,
         onOverlayRetry = mapStateHolder::onOverlayLoading,
@@ -168,7 +168,7 @@ fun MapRoute(
             screenState.climateCoordinate?.let { coordinate ->
                 searchViewModel.addPendingFavorite(coordinate)
                 showFavoriteDialog = true } },
-        onBottomPaddingChanged = mapStateHolder::onBottomPaddingChanged
+        onBottomPaddingChanged = mapStateHolder::setBottomPadding
     )
 }
 
