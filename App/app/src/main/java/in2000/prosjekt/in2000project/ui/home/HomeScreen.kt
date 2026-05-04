@@ -101,7 +101,7 @@ fun HomeScreen(
                     //get states from the viewmodel
                     modifier = Modifier,
                     textFieldState = searchState.searchTextFieldState,
-                    onSearch = { searchViewModel.onSearch() },
+                    onSearch = searchViewModel::onSearch,
                     searchResults = searchState.searchResults,
                     onNavigateToMap = onNavigateToMap,
                     onSelectResult = searchViewModel::addRecentSearch,
@@ -119,9 +119,6 @@ fun HomeScreen(
                     FavoriteSection(
                         items = searchState.favorites,
                         modifier = Modifier,
-                        textFieldState = searchState.searchTextFieldState,
-                        onSearch = searchViewModel::onSearch,
-                        searchResults = searchState.searchResults,
                         onNavigateToMap = onNavigateToMap,
                         onRemoveLocation = searchViewModel::removeFavoriteLocation
                     )

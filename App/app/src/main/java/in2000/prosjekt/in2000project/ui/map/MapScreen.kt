@@ -32,10 +32,8 @@ import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberBottomSheetScaffoldState
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -55,10 +53,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.compose.LifecycleResumeEffect
-import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import in2000.prosjekt.in2000project.R
 import in2000.prosjekt.in2000project.data.model.SkiArea
 import in2000.prosjekt.in2000project.data.model.toSkiArea
@@ -94,7 +88,6 @@ fun MapRoute(
     coordinates: String,
     searchViewModel: SearchViewModel,
     mapViewModel: MapViewModel = koinViewModel(),
-    nveViewModel: NveViewModel = koinViewModel(),
     riskViewModel: RiskViewModel = koinViewModel(),
 ) {
     val screenState by mapViewModel.screenState.collectAsState()
@@ -109,7 +102,7 @@ fun MapRoute(
     LaunchedEffect(pin) {
         pin?.let {
             mapViewModel.onMapClick(it.latitude(), it.longitude())
-            nveViewModel.avalancheChecker(it.latitude(), it.longitude())
+            riskViewModel.avalancheChecker(it.latitude(), it.longitude())
         }
     }
 
@@ -187,7 +180,7 @@ fun MapRoute(
 fun MapScreen(
     modifier: Modifier = Modifier,
     screenState: MapScreenState,
-    riskState: RiskState,
+    riskState: RiskUiState,
     overlayState: OverlayState,
     searchState: SearchUiState,
     coordinates: String,
@@ -589,7 +582,7 @@ fun MapScreenErrorPreview() {
         onEndDateChange = {},
         onYearChange = {},
         modifier = Modifier,
-        dangerCheckUiState = DangerCheckUiState(),
+        riskState = RiskUiState(),
         searchState = SearchUiState(),
         onSearch = {},
         onSelectResult = {},
