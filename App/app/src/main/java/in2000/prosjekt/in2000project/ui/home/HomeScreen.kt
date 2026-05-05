@@ -9,21 +9,17 @@ package in2000.prosjekt.in2000project.ui.home
     import androidx.compose.foundation.layout.BoxWithConstraints
     import androidx.compose.foundation.layout.Column
     import androidx.compose.foundation.layout.PaddingValues
-    import androidx.compose.foundation.layout.WindowInsets
     import androidx.compose.foundation.layout.fillMaxSize
     import androidx.compose.foundation.layout.fillMaxWidth
-    import androidx.compose.foundation.layout.navigationBars
     import androidx.compose.foundation.layout.offset
     import androidx.compose.foundation.layout.padding
     import androidx.compose.foundation.layout.size
     import androidx.compose.foundation.layout.width
-    import androidx.compose.foundation.layout.windowInsetsPadding
     import androidx.compose.foundation.layout.wrapContentHeight
     import androidx.compose.foundation.lazy.LazyColumn
     import androidx.compose.foundation.lazy.LazyRow
     import androidx.compose.foundation.lazy.items
     import androidx.compose.material3.Card
-    import androidx.compose.material3.Scaffold
     import androidx.compose.foundation.shape.RoundedCornerShape
     import androidx.compose.material.icons.Icons
     import androidx.compose.material.icons.filled.Settings
@@ -32,6 +28,7 @@ package in2000.prosjekt.in2000project.ui.home
     import androidx.compose.material3.Icon
     import androidx.compose.material3.IconButton
     import androidx.compose.material3.MaterialTheme
+    import androidx.compose.material3.Surface
     import androidx.compose.material3.Text
     import androidx.compose.runtime.Composable
     import androidx.compose.runtime.LaunchedEffect
@@ -74,13 +71,12 @@ fun HomeScreen(
     val focusManager = LocalFocusManager.current
     val searchState by searchViewModel.searchState.collectAsStateWithLifecycle()
 
-    Scaffold(
-        modifier = modifier,
-    ) { paddingValues ->
+    Surface(
+        modifier = modifier.fillMaxSize(),
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
                 .clickable(
                     indication = null,
                     interactionSource = remember { MutableInteractionSource() }
@@ -157,9 +153,6 @@ fun LogoSection(
         modifier = modifier.fillMaxWidth(),
         contentAlignment = Alignment.Center
     ) {
-        //Take 45% of available width and caps the value at 240dp max (coerceAtMost)
-        //This enables the logo to adjust to different screensizes,
-        //without becoming ridiculously large on big screens
         val logoWidth = (maxWidth * 0.45f).coerceAtMost(240.dp)
 
         Image(
