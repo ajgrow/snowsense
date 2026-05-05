@@ -48,7 +48,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
@@ -81,6 +80,7 @@ import in2000.prosjekt.in2000project.ui.model.toUiModel
 import in2000.prosjekt.in2000project.ui.reusables.SearchSection
 import in2000.prosjekt.in2000project.ui.reusables.TextInputDialog
 import in2000.prosjekt.in2000project.ui.search.SearchUiState
+import kotlinx.coroutines.flow.distinctUntilChanged
 import org.koin.compose.koinInject
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -110,6 +110,7 @@ fun MapRoute(
     val overlayState by mapStateHolder.overlayState.collectAsStateWithLifecycle()
 
     val pin by mapStateHolder.pinnedPoint.collectAsStateWithLifecycle()
+
     LaunchedEffect(pin) {
         pin?.let {
             mapViewModel.onMapClick(it.latitude(), it.longitude())
@@ -149,28 +150,20 @@ fun MapRoute(
         )
     }
 
-//    LaunchedEffect (Unit) {
-//        mapViewModel.onSheetDismissed()
-//        MapCameraRepository.clearPinnedPoint()
-//    }
-
     MapScreen(
         screenState = screenState,
         riskState = riskState,
         overlayState = overlayState,
         searchState = searchState,
         pinnedPoint = pin,
-        onMapClick = { lat, lon ->
-            mapViewModel.onMapClick(lat, lon)
-            riskViewModel.avalancheChecker(lat, lon)
-        },
         onSearchLocationRequested = mapStateHolder::flyToSearch,
         onZoomIn = mapStateHolder::onZoomIn,
         onZoomOut = mapStateHolder::onZoomOut,
         onOverlayRetry = mapStateHolder::onOverlayLoading,
-        onOverlayLoaded = mapStateHolder::onOverlayLoaded,
-        onOverlayError = mapStateHolder::onOverlayError,
-        onSheetDismiss = mapViewModel::onSheetDismissed,
+        onSheetDismiss = {
+            mapViewModel.onSheetDismissed()
+            mapStateHolder.clearPin()
+        },
         onStartDateChange = { it?.let(mapViewModel::onStartDateChange) },
         onEndDateChange = { it?.let(mapViewModel::onEndDateChange) },
         onYearChange = { it?.let(mapViewModel::onYearChange) },
@@ -183,7 +176,6 @@ fun MapRoute(
             }
         },
         onBottomPaddingChanged = mapStateHolder::setBottomPadding,
-        skiArea = skiArea,
         canAddFavorite = {
             val coordinate = screenState.climateCoordinate
             if (coordinate != null) {
@@ -205,13 +197,10 @@ fun MapScreen(
     overlayState: OverlayState,
     searchState: SearchUiState,
     pinnedPoint: Point?,
-    onMapClick: (Double, Double) -> Unit,
     onSearchLocationRequested: (Point) -> Unit,
     onZoomIn: () -> Unit,
     onZoomOut: () -> Unit,
     onOverlayRetry: () -> Unit,
-    onOverlayLoaded: () -> Unit,
-    onOverlayError: () -> Unit,
     onSheetDismiss: () -> Unit,
     onStartDateChange: (MonthDay?) -> Unit,
     onEndDateChange: (MonthDay?) -> Unit,
@@ -220,7 +209,6 @@ fun MapScreen(
     onSelectResult: (NamedLocation) -> Unit,
     onAddFavorite: () -> Unit,
     canAddFavorite: () -> Boolean,
-    skiArea: SkiArea,
     onBottomPaddingChanged: (Double) -> Unit,
 ) {
     val focusManager = LocalFocusManager.current
@@ -246,23 +234,24 @@ fun MapScreen(
         }
     } ?: previewSkiArea
 
-    var startDate by rememberSaveable { mutableStateOf<MonthDay?>(null) }
-    var endDate by rememberSaveable { mutableStateOf<MonthDay?>(null) }
-    var selectedYear by rememberSaveable { mutableStateOf<Int?>(null) }
-
     val configuration = LocalWindowInfo.current
     val halfScreen = configuration.containerDpSize.height / 2
 
+
+    val showSheet = screenState.isSheetVisible
+    val peekHeight = if (showSheet) halfScreen else 0.dp
+
     val sheetState = rememberStandardBottomSheetState(
-        initialValue = SheetValue.Hidden,
-        skipHiddenState = false
+        initialValue = if (showSheet) SheetValue.Expanded else SheetValue.Hidden,
+        skipHiddenState = false,
     )
+
     val scaffoldState = rememberBottomSheetScaffoldState(
         bottomSheetState = sheetState
     )
 
-    val showSheet = screenState.isSheetVisible
-    val peekHeight = if (showSheet) halfScreen else 0.dp
+
+
 
     val listState = rememberLazyListState()
 
@@ -294,16 +283,26 @@ fun MapScreen(
         }
     }
 
-    LaunchedEffect(showSheet, pinnedPoint) {
-        if (showSheet)
-            sheetState.partialExpand()
-        else
-            sheetState.hide()
+    LaunchedEffect(sheetState) {
+        var wasVisible = false
+        snapshotFlow { sheetState.currentValue }
+            .collect { current ->
+                if (current == SheetValue.Hidden) {
+                    if (wasVisible) {
+                        onSheetDismiss()
+                    }
+                } else {
+                    wasVisible = true
+                }
+            }
     }
 
-    val density = LocalDensity.current.density
-    LaunchedEffect(peekHeight) {
-        onBottomPaddingChanged(peekHeight.value.toDouble() * density)
+    LaunchedEffect(showSheet) {
+        if (showSheet) {
+            sheetState.show()
+        } else {
+            sheetState.hide()
+        }
     }
 
 
@@ -335,7 +334,6 @@ fun MapScreen(
                 onClick = { isSearchActive = !isSearchActive },
                 modifier = mapButtonModifier,
                 contentPadding = PaddingValues(0.dp),
-//                enabled = !isSearchActive
             ) {
                 Icon(imageVector = Icons.Default.Search, contentDescription = "Open Search")
             }
@@ -440,7 +438,7 @@ fun MapScreen(
             }
         }
 
-        val isSheetTargetingHidden = scaffoldState.bottomSheetState.targetValue == SheetValue.Hidden
+        val isSheetTargetingHidden = sheetState.targetValue == SheetValue.Hidden
 
         if (showScrollButton && showSheet && !isSheetTargetingHidden) {
             Button(
@@ -643,14 +641,11 @@ fun MapScreenErrorPreview() {
             selectedYear = 1
         ),
         overlayState = OverlayState.Error,
-        onMapClick = { _, _ -> },
         onSearchLocationRequested = {},
         onZoomIn = {},
         onZoomOut = {},
         pinnedPoint = null,
         onOverlayRetry = {},
-        onOverlayLoaded = {},
-        onOverlayError = {},
         onSheetDismiss = {},
         onStartDateChange = {},
         onEndDateChange = {},
@@ -662,8 +657,7 @@ fun MapScreenErrorPreview() {
         onSelectResult = {},
         onAddFavorite = {},
         canAddFavorite = { false },
-        skiArea = previewSkiArea,
-        onBottomPaddingChanged = {}
+        onBottomPaddingChanged = {},
     )
 }
 

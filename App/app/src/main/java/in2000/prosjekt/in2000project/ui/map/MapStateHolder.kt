@@ -41,6 +41,10 @@ class MapStateHolder {
         }
     }
 
+    fun clearPin() {
+        _pinnedPoint.value = null
+    }
+
     fun flyToSearch(point: Point, zoom: Double = SEARCH_ZOOM) {
         _pinnedPoint.value = point
         _commands.tryEmit(MapCommand.FlyTo(point, zoom))
