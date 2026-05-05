@@ -56,9 +56,8 @@ fun InfoContent(
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
                 .padding(horizontal = 16.dp),
-            contentPadding = PaddingValues(vertical = 16.dp),
+            contentPadding = paddingValues,
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
 

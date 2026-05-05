@@ -120,7 +120,9 @@
     <string name="settings_text_size_title">Text Size</string>
     <string name="settings_text_size_title_formatted">Text Size: %1$d%%</string>
     <string name="settings_reset_default">Reset to Default</string>
-
+    <string name="preview_text_size">Preview text  Aa</string>
+    
+    
     <string name="settings_text_small">Small</string>
     <string name="settings_text_medium">Medium</string>
     <string name="settings_text_large">Large</string>

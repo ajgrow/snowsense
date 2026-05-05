@@ -6,9 +6,7 @@ sealed class Screen(
     val route: String
 ) {
     data object Home : Screen("home")
-    data object Map : Screen("map/{coordinates}") {
-        fun createRoute(coordinates: String) = "map/$coordinates"
-    }
+    data object Map : Screen("map")
     data object Info : Screen("info")
     data object Settings : Screen("settings")
 }
