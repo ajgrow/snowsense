@@ -112,6 +112,8 @@ dependencies {
     implementation("com.patrykandpatrick.vico:compose:1.13.1")
     implementation("androidx.compose.foundation:foundation:1.6.0")
 
+    //Design: Extra icons
+    implementation("androidx.compose.material:material-icons-extended")
 }
 
 // Read local.properties to pass secrets to JVM test processes as system properties.
