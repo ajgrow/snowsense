@@ -1,8 +1,11 @@
 package in2000.prosjekt.in2000project.ui.reusables
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -31,6 +34,10 @@ import in2000.prosjekt.in2000project.R
 import in2000.prosjekt.in2000project.data.model.Coordinate
 import in2000.prosjekt.in2000project.data.model.NamedLocation
 import kotlin.collections.forEach
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.ui.platform.LocalWindowInfo
+import kotlin.math.exp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -39,9 +46,9 @@ fun SearchSection(
     searchResults: List<NamedLocation>,
     recentSearches: List<NamedLocation>,
     modifier: Modifier = Modifier,
-    onSearch: (String) -> Unit,
     onSelectResult: (location: NamedLocation) -> Unit,
-    onNavigateToMap: (coordinate: Coordinate) -> Unit
+    onNavigateToMap: (coordinate: Coordinate) -> Unit,
+    onActiveChange: (isActive: Boolean) -> Unit
 ) {
     val focusManager = LocalFocusManager.current
 
@@ -50,18 +57,26 @@ fun SearchSection(
     val query = textFieldState.text.toString()
     val isShowingRecents = query.isBlank() && recentSearches.isNotEmpty()
     val displayResults = if (isShowingRecents) recentSearches else searchResults
+    val isNorwegian = LocalConfiguration.current.locales[0].language in listOf("no", "nb", "nn")
 
-    //We should add some rules to the searchSection, like restrictions on type of input and input length
     DockedSearchBar(
         shape = RoundedCornerShape(20.dp),
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp)
+            //set the height of the container when expanded
+            .heightIn(min = if (expanded) LocalWindowInfo.current.containerDpSize.height * 0.4f else 0.dp)
             .onFocusChanged { focusState ->
                 if (!focusState.hasFocus) {
                     expanded = false
+                    onActiveChange(false)
+                } else {
+                    onActiveChange(true)
                 }
             },
+        onExpandedChange = {
+            expanded = it
+        },
         inputField = {
             SearchBarDefaults.InputField(
                 leadingIcon = {
@@ -78,13 +93,14 @@ fun SearchSection(
                 },
                 query = textFieldState.text.toString(),
                 onQueryChange = {
-                    textFieldState.edit { replace(0, length, it) }
+                    textFieldState.edit { replace(0, length, it.take(50)) }
                     expanded = true
                 },
                 onSearch = {
-                    onSearch(textFieldState.text.toString())
-                    expanded = true
-                    focusManager.clearFocus()
+                    searchResults.firstOrNull()?.let { location ->
+                        onSelectResult(location)
+                        onNavigateToMap(location.coordinate)
+                    }
                 },
                 expanded = expanded,
                 onExpandedChange = { expanded = it },
@@ -94,23 +110,41 @@ fun SearchSection(
             )
         },
         expanded = expanded,
-        onExpandedChange = { expanded = it }
-    ) {
-        Column(Modifier.verticalScroll(rememberScrollState())) {
-            displayResults.forEach { result ->
-                ListItem(
-                    headlineContent = { Text(result.name) },
-                    modifier = Modifier
-                        .clickable {
-                            onNavigateToMap(result.coordinate)
-                            onSelectResult(result)
-                            textFieldState.edit { replace(0, length, "") }
-                            expanded = false
-                            focusManager.clearFocus()
-                        }
-                        .fillMaxWidth()
-                )
+        content = {
+            Box(
+                //make sure the container's height is consistent when recentsearches is empty vs filled
+                modifier = Modifier
+                    .height(LocalWindowInfo.current.containerDpSize.height * 0.4f - SearchBarDefaults.InputFieldHeight)
+            ) {
+                Column(
+                    Modifier
+                        .verticalScroll(rememberScrollState())
+                ) {
+                    displayResults.forEach { result ->
+                        ListItem(
+                            headlineContent = { Text(result.name) },
+                            trailingContent = {
+                                Text(
+                                    if (isNorwegian) {
+                                        result.locationTypeNo
+                                    } else {
+                                        result.locationTypeEn
+                                    }
+                                )
+                            },
+                            modifier = Modifier
+                                .clickable {
+                                    onNavigateToMap(result.coordinate)
+                                    onSelectResult(result)
+                                    textFieldState.edit { replace(0, length, "") }
+                                    expanded = false
+                                    focusManager.clearFocus()
+                                }
+                                .fillMaxWidth()
+                        )
+                    }
+                }
             }
         }
-    }
+    )
 }
