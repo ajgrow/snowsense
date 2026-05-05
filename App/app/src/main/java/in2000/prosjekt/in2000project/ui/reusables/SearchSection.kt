@@ -60,7 +60,7 @@ fun SearchSection(
     val isNorwegian = LocalConfiguration.current.locales[0].language in listOf("no", "nb", "nn")
 
     DockedSearchBar(
-        shape = RoundedCornerShape(20.dp),
+        shape = RoundedCornerShape(16.dp),
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp)
