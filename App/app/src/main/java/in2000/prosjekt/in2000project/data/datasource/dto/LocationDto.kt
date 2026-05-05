@@ -10,6 +10,7 @@ data class LocationResponse (
 @Serializable
 data class LocationDto (
     val representasjonspunkt: CoordinateDto,
+    val navneobjekttype: String,
     val skrivemåte: String
 )
 
