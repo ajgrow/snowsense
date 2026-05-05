@@ -167,7 +167,6 @@ fun MapRoute(
         onStartDateChange = { it?.let(mapViewModel::onStartDateChange) },
         onEndDateChange = { it?.let(mapViewModel::onEndDateChange) },
         onYearChange = { it?.let(mapViewModel::onYearChange) },
-        onSearch = searchViewModel::onSearch ,
         onSelectResult = searchViewModel::addRecentSearch,
         onAddFavorite = {
             screenState.climateCoordinate?.let { coordinate ->
@@ -183,7 +182,8 @@ fun MapRoute(
             } else {
                 false
             }
-        }
+        },
+        onSearchbarActiveChange = searchViewModel::setSearchActive
     )
 }
 
@@ -205,11 +205,11 @@ fun MapScreen(
     onStartDateChange: (MonthDay?) -> Unit,
     onEndDateChange: (MonthDay?) -> Unit,
     onYearChange: (Int?) -> Unit,
-    onSearch: (String) -> Unit,
     onSelectResult: (NamedLocation) -> Unit,
     onAddFavorite: () -> Unit,
     canAddFavorite: () -> Boolean,
     onBottomPaddingChanged: (Double) -> Unit,
+    onSearchbarActiveChange: (isActive: Boolean) -> Unit
 ) {
     val focusManager = LocalFocusManager.current
     val focusRequester = remember { FocusRequester() }
@@ -237,7 +237,6 @@ fun MapScreen(
     val configuration = LocalWindowInfo.current
     val halfScreen = configuration.containerDpSize.height / 2
 
-
     val showSheet = screenState.isSheetVisible
     val peekHeight = if (showSheet) halfScreen else 0.dp
 
@@ -249,9 +248,6 @@ fun MapScreen(
     val scaffoldState = rememberBottomSheetScaffoldState(
         bottomSheetState = sheetState
     )
-
-
-
 
     val listState = rememberLazyListState()
 
@@ -373,9 +369,8 @@ fun MapScreen(
             SearchSection(
                 modifier = Modifier
                     .focusRequester(focusRequester)
-                    .padding(top = 24.dp),
+                    .padding(top = 120.dp),
                 textFieldState = searchState.searchTextFieldState,
-                onSearch = onSearch,
                 searchResults = searchState.searchResults,
                 onNavigateToMap = { coordinate ->
                     onSearchLocationRequested(
@@ -385,7 +380,8 @@ fun MapScreen(
                       isSearchActive = false
                       focusManager.clearFocus() },
                 onSelectResult = onSelectResult,
-                recentSearches = searchState.recentSearches
+                recentSearches = searchState.recentSearches,
+                onActiveChange = onSearchbarActiveChange
             )
         }
 
@@ -411,10 +407,7 @@ fun MapScreen(
                     onYearChange = onYearChange,
                     onAddFavorite = onAddFavorite,
                     canAddFavorite = canAddFavorite,
-                    sheetState = scaffoldState.bottomSheetState,
                     listState = listState,
-                    onScrollButtonClicked = onScrollButtonClicked,
-                    showScrollButton = showScrollButton,
                 )
             }
         ) { innerPadding ->
@@ -474,10 +467,7 @@ fun BottomSheetContent(
     onYearChange: (Int?) -> Unit,
     canAddFavorite: () -> Boolean,
     onAddFavorite: () -> Unit,
-    sheetState: SheetState,
     listState: LazyListState,
-    onScrollButtonClicked: () -> Unit,
-    showScrollButton: Boolean,
 ) {
     Box(
         modifier = modifier
@@ -658,11 +648,11 @@ fun MapScreenErrorPreview() {
         modifier = Modifier,
         riskState = RiskUiState(),
         searchState = SearchUiState(),
-        onSearch = {},
         onSelectResult = {},
         onAddFavorite = {},
         canAddFavorite = { false },
         onBottomPaddingChanged = {},
+        onSearchbarActiveChange = {}
     )
 }
 
@@ -686,9 +676,6 @@ fun BottomSheetPreview() {
         onYearChange = { },
         onAddFavorite = { },
         canAddFavorite = { false },
-        sheetState = sheetState,
         listState = rememberLazyListState(),
-        onScrollButtonClicked = { },
-        showScrollButton = false
     )
 }
