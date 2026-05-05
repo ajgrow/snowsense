@@ -147,16 +147,7 @@ class MapViewModel(
     fun onSheetDismissed() {
         _screenState.value = _screenState.value.copy(
             isSheetVisible = false
+
         )
     }
-
-    fun onEnter(validCoordinates: Boolean){
-        if (!validCoordinates) {
-            _screenState.value = _screenState.value.copy(
-                climateState = ClimateState.Idle,
-                isSheetVisible = false
-            )
-        }
-    }
-
 }

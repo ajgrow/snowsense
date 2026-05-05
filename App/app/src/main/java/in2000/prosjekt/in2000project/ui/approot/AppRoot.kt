@@ -50,7 +50,6 @@ fun AppRoot(
 
         Scaffold(
             modifier = modifier,
-            containerColor = Color.Transparent,
             bottomBar = {
                 AnimatedVisibility(
                     visible = currentDestination.isBottomBarScreen(),
@@ -73,7 +72,7 @@ fun AppRoot(
                 }
         ) { innerPadding ->
             Box(
-                modifier = Modifier.padding(innerPadding)
+                modifier = Modifier.fillMaxSize()
             ) {
                 MapboxView(
                     mapStateHolder = mapStateHolder,
@@ -91,7 +90,7 @@ fun AppRoot(
                 AppNavigation(
                     navController = navController,
                     settingsViewModel = settingsViewModel,
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier.fillMaxSize().padding(innerPadding),
                 )
             }
         }
