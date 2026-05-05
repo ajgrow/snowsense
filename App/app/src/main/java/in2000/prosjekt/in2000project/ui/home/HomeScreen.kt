@@ -1,68 +1,70 @@
 package in2000.prosjekt.in2000project.ui.home
 
-    import androidx.compose.foundation.Image
-    import androidx.compose.foundation.background
-    import androidx.compose.foundation.clickable
-    import androidx.compose.foundation.interaction.MutableInteractionSource
-    import androidx.compose.foundation.layout.Arrangement
-    import androidx.compose.foundation.layout.Box
-    import androidx.compose.foundation.layout.BoxWithConstraints
-    import androidx.compose.foundation.layout.Column
-    import androidx.compose.foundation.layout.PaddingValues
-    import androidx.compose.foundation.layout.WindowInsets
-    import androidx.compose.foundation.layout.fillMaxSize
-    import androidx.compose.foundation.layout.fillMaxWidth
-    import androidx.compose.foundation.layout.navigationBars
-    import androidx.compose.foundation.layout.offset
-    import androidx.compose.foundation.layout.padding
-    import androidx.compose.foundation.layout.size
-    import androidx.compose.foundation.layout.width
-    import androidx.compose.foundation.layout.windowInsetsPadding
-    import androidx.compose.foundation.layout.wrapContentHeight
-    import androidx.compose.foundation.lazy.LazyColumn
-    import androidx.compose.foundation.lazy.LazyRow
-    import androidx.compose.foundation.lazy.items
-    import androidx.compose.material3.Card
-    import androidx.compose.material3.Scaffold
-    import androidx.compose.foundation.shape.RoundedCornerShape
-    import androidx.compose.material.icons.Icons
-    import androidx.compose.material.icons.filled.Settings
-    import androidx.compose.material3.CardDefaults
-    import androidx.compose.material.icons.filled.Close
-    import androidx.compose.material3.Icon
-    import androidx.compose.material3.IconButton
-    import androidx.compose.material3.MaterialTheme
-    import androidx.compose.material3.Text
-    import androidx.compose.runtime.Composable
-    import androidx.compose.runtime.LaunchedEffect
-    import androidx.compose.runtime.collectAsState
-    import androidx.compose.runtime.getValue
-    import androidx.compose.runtime.remember
-    import androidx.compose.ui.Alignment
-    import androidx.compose.ui.Modifier
-    import androidx.compose.ui.platform.LocalFocusManager
-    import androidx.compose.ui.res.painterResource
-    import androidx.compose.ui.res.stringResource
-    import androidx.compose.ui.tooling.preview.Preview
-    import androidx.compose.ui.unit.dp
-    import androidx.lifecycle.compose.collectAsStateWithLifecycle
-    import androidx.lifecycle.viewmodel.compose.viewModel
-    import androidx.compose.ui.draw.clip
-    import androidx.compose.ui.graphics.Color
-    import androidx.compose.ui.layout.ContentScale
-    import androidx.compose.ui.text.font.FontWeight
-    import androidx.compose.ui.text.font.FontWeight.Companion.Bold
-    import androidx.compose.ui.text.style.TextOverflow
-    import androidx.compose.ui.unit.sp
-    import in2000.prosjekt.in2000project.R
-    import in2000.prosjekt.in2000project.data.model.Coordinate
-    import in2000.prosjekt.in2000project.data.model.NamedLocation
-    import in2000.prosjekt.in2000project.ui.map.RiskViewModel
-    import in2000.prosjekt.in2000project.ui.reusables.EmergencySection
-    import in2000.prosjekt.in2000project.ui.model.DangerLevelUiModel
-    import in2000.prosjekt.in2000project.ui.reusables.SearchSection
-    import in2000.prosjekt.in2000project.ui.search.SearchViewModel
-    import org.koin.compose.viewmodel.koinViewModel
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Card
+import androidx.compose.material3.Scaffold
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.font.FontWeight.Companion.Bold
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.sp
+import in2000.prosjekt.in2000project.R
+import in2000.prosjekt.in2000project.data.model.Coordinate
+import in2000.prosjekt.in2000project.data.model.NamedLocation
+import in2000.prosjekt.in2000project.ui.map.RiskViewModel
+import in2000.prosjekt.in2000project.ui.reusables.EmergencySection
+import in2000.prosjekt.in2000project.ui.model.DangerLevelUiModel
+import in2000.prosjekt.in2000project.ui.reusables.SearchSection
+import in2000.prosjekt.in2000project.ui.search.SearchViewModel
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun HomeScreen(
@@ -90,25 +92,30 @@ fun HomeScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             HomeTopBar(onSettingsClick)
-            LogoSection()
+            AnimatedVisibility(
+                visible = !searchState.isSearchActive,
+                enter = expandVertically() + fadeIn(),
+                exit = shrinkVertically() + fadeOut()
+            ) {
+                LogoSection()
+            }
 
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(
                         horizontal = 16.dp,
-
                     ),
             ){
                 SearchSection(
                     //get states from the viewmodel
                     modifier = Modifier,
                     textFieldState = searchState.searchTextFieldState,
-                    onSearch = searchViewModel::onSearch,
                     searchResults = searchState.searchResults,
                     onNavigateToMap = onNavigateToMap,
                     onSelectResult = searchViewModel::addRecentSearch,
-                    recentSearches = searchState.recentSearches
+                    recentSearches = searchState.recentSearches,
+                    onActiveChange = searchViewModel::setSearchActive
                 )
             }
 
