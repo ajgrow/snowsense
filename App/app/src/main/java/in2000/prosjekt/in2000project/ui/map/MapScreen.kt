@@ -283,6 +283,11 @@ fun MapScreen(
         }
     }
 
+    val density = LocalDensity.current.density
+    LaunchedEffect(peekHeight) {
+        onBottomPaddingChanged(peekHeight.value.toDouble() * density)
+    }
+
     LaunchedEffect(sheetState) {
         var wasVisible = false
         snapshotFlow { sheetState.currentValue }
