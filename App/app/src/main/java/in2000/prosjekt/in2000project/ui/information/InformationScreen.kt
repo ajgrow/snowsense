@@ -1,31 +1,16 @@
 package in2000.prosjekt.in2000project.ui.information
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.tooling.preview.Preview
@@ -34,10 +19,7 @@ import in2000.prosjekt.in2000project.R
 import in2000.prosjekt.in2000project.data.model.enums.DangerLevel
 import in2000.prosjekt.in2000project.ui.model.DangerLevelUiModel
 import in2000.prosjekt.in2000project.ui.model.toUiModel
-import in2000.prosjekt.in2000project.ui.reusables.DangerLevelHeader
-import in2000.prosjekt.in2000project.ui.reusables.DangerLevelItem
-import in2000.prosjekt.in2000project.ui.reusables.EmergencySection
-import in2000.prosjekt.in2000project.ui.reusables.TopBar
+import in2000.prosjekt.in2000project.ui.reusables.*
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -65,47 +47,72 @@ fun InfoContent(
         modifier = modifier,
         topBar = {
             TopBar(
-                title = stringResource(R.string.about_app_title),
-                modifier = Modifier,
+                title = stringResource(R.string.information_title),
                 onSettingsClick = onSettingsClick
             )
         }
     ) { paddingValues ->
-        
+
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(horizontal = 16.dp),
-            contentPadding = paddingValues
+            contentPadding = paddingValues,
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
+
             item { EmergencySection() }
 
-            item { Text(
-                text = stringResource(R.string.danger_levels_title),
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = Bold,
-                modifier = Modifier.padding(bottom = 8.dp)
-            ) }
+            item {
+                DangerLevelsSection(
+                    dangerLevels = state.dangerLevels
+                )
+            }
 
-            items(state.dangerLevels) { uiModel: DangerLevelUiModel ->
-                DangerLevelItem(
-                    uiModel = uiModel,
-                    modifier = Modifier.padding(vertical = 6.dp)
+            item { SafetyAdviceSection() }
+
+            item {
+                InfoBox(
+                    titleRes = R.string.other_resources_title,
+                    descRes = R.string.other_resources_descr,
+                    content = { ExternalResources() }
                 )
             }
 
             item {
-                Column {
-                    InfoBox(
-                        titleRes = R.string.avalanche_info_title,
-                        descRes = R.string.avalanche_general_info_text
-                    )
-                    InfoBox(
-                        titleRes = R.string.team_title,
-                        descRes = R.string.about_team_text
-                    )
-                }
+                InfoBox(
+                    titleRes = R.string.avalanche_info_title,
+                    descRes = R.string.avalanche_general_info_text
+                )
             }
+
+            item {
+                InfoBox(
+                    titleRes = R.string.team_title,
+                    descRes = R.string.about_team_text
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun DangerLevelsSection(
+    dangerLevels: List<DangerLevelUiModel>,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        Text(
+            text = stringResource(R.string.danger_levels_title),
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = Bold
+        )
+
+        dangerLevels.forEach { uiModel ->
+            DangerLevelItem(uiModel = uiModel)
         }
     }
 }
@@ -114,18 +121,27 @@ fun InfoContent(
 fun InfoBox(
     modifier: Modifier = Modifier,
     titleRes: Int,
-    descRes: Int
+    descRes: Int,
+    content: (@Composable () -> Unit)? = null
 ) {
     var expanded by rememberSaveable { mutableStateOf(false) }
+    val expandedText = stringResource(if (expanded) R.string.hide_info else R.string.show_info)
 
     Surface(
         modifier = modifier
-            .padding(bottom = 8.dp)
             .fillMaxWidth()
+            .padding(bottom = 16.dp)
+            .border(
+                width = 1.dp,
+                color = MaterialTheme.colorScheme.outline,
+                shape = RoundedCornerShape(16.dp)
+            )
             .clickable { expanded = !expanded },
-    ) { Column(
-            modifier = Modifier.padding(8.dp)
-        ) {
+        shape = RoundedCornerShape(16.dp),
+        color = MaterialTheme.colorScheme.surface
+    ) {
+        Column(modifier = Modifier.padding(12.dp)) {
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -135,38 +151,47 @@ fun InfoBox(
                     text = stringResource(titleRes),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = Bold,
-                    modifier = Modifier.padding(bottom = 8.dp)
+                    modifier = Modifier.weight(1f)
                 )
+
                 Text(
-                    text = if (expanded)
-                        stringResource(R.string.hide_info)
-                    else
-                        stringResource(R.string.show_info),
-                    style = MaterialTheme.typography.bodySmall
+                    text = expandedText,
+                    style = MaterialTheme.typography.bodySmall,
                 )
             }
 
             AnimatedVisibility(visible = expanded) {
-                Text(
-                    text = stringResource(descRes),
-                    style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.padding(top = 4.dp)
-                )
+                Column(
+                    modifier = Modifier.padding(top = 8.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Text(
+                        text = stringResource(descRes),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+
+                    content?.invoke()
+                }
+            }
         }
-    }        }
+    }
 }
-@Preview
+
+
+@Preview(showBackground = true)
 @Composable
-fun PreviewInfoScreen(){
-    // Use InfoContent in Preview to avoid Koin dependency from InfoScreen
+fun PreviewInfoScreen() {
     InfoContent(
-        state = InfoUiState(dangerLevels = DangerLevel.entries.map { it.toUiModel() })
+        state = InfoUiState(
+            dangerLevels = DangerLevel.entries.map { it.toUiModel() }
+        )
     )
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
-fun PrevInfoBox(){
+fun PreviewInfoBox() {
     InfoBox(
         titleRes = R.string.team_title,
         descRes = R.string.about_team_text

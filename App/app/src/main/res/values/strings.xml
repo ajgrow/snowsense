@@ -9,7 +9,7 @@
 
 
 
-    <string name="about_app_title">About the app</string>
+    <string name="information_title">Information</string>
     <string name="team_title">The Team</string>
     <string name="about_team_text">We are a group of dedicated and creative IN2000 students working together to create an informative and user-friendly avalanche safety app. Our goal going into this was to create a reliable tool that helps users make safer decisions when traveling to potential avalanche-prone areas. This page provides general information about avalanche risk levels and their meaning. Please return to the Home screen or the Map for the main features.</string>
 
@@ -144,7 +144,45 @@
 
     <string name="no_graph_data">No data to show.</string>
     <string name="not_checked">Not checked</string>
+
     <string name="call_icon">Call Icon</string>
     <string name="remove">Remove</string>
+
+    <string name="other_resources_title">Other useful resources</string>
+    <string name="other_resources_descr">Here are some useful resources we recommend checking before heading out.</string>
+
+    <string name="varsom_title">Varsom</string>
+    <string name="varsom_descr">Official avalanche forecasts with danger levels and local assessments.</string>
+    <string name="varsom_url">https://www.varsom.no/snoskred/</string>
+
+    <string name="regobs_title">Regobs</string>
+    <string name="regobs_desc">Real-time snow and avalanche observations from users and experts.</string>
+    <string name="regobs_url">https://regobs.no/</string>
+
+    <string name="nve_title">NVE</string>
+    <string name="nve_desc">Expert knowledge, statistics, and information about avalanches.</string>
+    <string name="nve_url">https://www.nve.no/naturfare/</string>
+
+    <string name="safety_advice_title">Safety advice</string>
+    <string name="safety_advice_desc">Essential safety tips for avalanche-prone areas</string>
+
+    <string name="before_you_go_title">1. Before you go</string>
+    <string name="before_you_go_1">Check the weather and avalanche forecast</string>
+    <string name="before_you_go_2">Avoid steep slopes</string>
+    <string name="before_you_go_3">Tell someone about your plans</string>
+    <string name="before_you_go_4">Choose conservative terrain</string>
+
+    <string name="while_you_are_out_title">2. While you are out</string>
+    <string name="while_you_are_out_1">Stick to ridges and safe zones</string>
+    <string name="while_you_are_out_2">Watch for signs of unstable snow</string>
+    <string name="while_you_are_out_3">Turn around if unsure</string>
+    <string name="while_you_are_out_4">Watch out for signs of unstable snow</string>
+
+    <string name="if_something_goes_wrong_title">3. If something goes wrong</string>
+    <string name="if_something_goes_wrong_1">Try to move to the side</string>
+    <string name="if_something_goes_wrong_2">Throw off your backpack</string>
+    <string name="if_something_goes_wrong_3">Protect your head and face</string>
+    <string name="if_something_goes_wrong_4">Call for help</string>
+
 
 </resources>

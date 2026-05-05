@@ -1,5 +1,6 @@
 package in2000.prosjekt.in2000project.ui.reusables
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -31,6 +32,7 @@ fun TopBar(
     Box(
         modifier = Modifier
             .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.surface)
             .padding(vertical = 4.dp),
         contentAlignment = Alignment.Center
     ){

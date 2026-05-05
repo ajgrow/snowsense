@@ -9,7 +9,7 @@
 
 
 
-    <string name="about_app_title">Om appen</string>
+    <string name="information_title">Informasjon</string>
     <string name="team_title">Teamet</string>
     <string name="about_team_text">Vi er en gruppe engasjerte og kreative IN2000-studenter som jobber sammen for å lage en informativ og brukervennlig skredvarsling-app. Målet vårt har vært å lage et pålitelig verktøy som hjelper brukere å ta tryggere beslutninger når de ferdes i områder med potensiell skredfare. Denne siden gir generell informasjon om skredfaregrader og hva de betyr. Gå tilbake til hjemskjermen eller kartet for hovedfunksjonene.</string>
 
@@ -143,5 +143,41 @@
     <string name="not_checked">Ikke sjekket</string>
     <string name="call_icon">Ringe-ikon</string>
     <string name="remove">Fjern</string>
+
+    <string name="other_resources_title">Andre nyttige kilder</string>
+    <string name="other_resources_descr">Her er noen nyttige kilder vi anbefaler å sjekke før du drar på tur.</string>
+
+    <string name="varsom_title">Varsom</string>
+    <string name="varsom_descr">Offisielle skredvarsler med faregrad og lokale vurderinger.</string>
+    <string name="varsom_url">https://www.varsom.no/snoskred/</string>
+
+    <string name="regobs_title">Regobs</string>
+    <string name="regobs_desc">Sanntidsobservasjoner av snø- og skredforhold fra brukere og fagfolk.</string>
+    <string name="regobs_url">https://regobs.no/</string>
+
+    <string name="nve_title">NVE</string>
+    <string name="nve_desc">Fakta, statistikk og kunnskap om skred og naturfarer.</string>
+    <string name="nve_url">https://www.nve.no/naturfare/</string>
+
+    <string name="safety_advice_title">Sikkerhet i skredterreng</string>
+    <string name="safety_advice_desc">Råd for trygg ferdsel i områder med skredfare</string>
+
+    <string name="before_you_go_title">1. Før turen</string>
+    <string name="before_you_go_1">Sjekk vær- og skredvarsel</string>
+    <string name="before_you_go_2">Unngå bratt terreng</string>
+    <string name="before_you_go_3">Gi beskjed om hvor du skal</string>
+    <string name="before_you_go_4">Velg trygge ruter</string>
+
+    <string name="while_you_are_out_title">2. Underveis</string>
+    <string name="while_you_are_out_1">Følg trygge ruter</string>
+    <string name="while_you_are_out_2">Se etter faretegn i snøen</string>
+    <string name="while_you_are_out_3">Snu hvis du er i tvil</string>
+    <string name="while_you_are_out_4">Vær oppmerksom på endringer i snøforholdene</string>
+
+    <string name="if_something_goes_wrong_title">3. Hvis uhellet er ute</string>
+    <string name="if_something_goes_wrong_1">Prøv å komme deg ut til siden</string>
+    <string name="if_something_goes_wrong_2">Kast av deg sekken</string>
+    <string name="if_something_goes_wrong_3">Beskytt hode og ansikt</string>
+    <string name="if_something_goes_wrong_4">Ring nødtelefon</string>
 
 </resources>
