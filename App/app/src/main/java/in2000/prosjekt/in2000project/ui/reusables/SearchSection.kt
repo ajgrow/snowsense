@@ -53,7 +53,7 @@ fun SearchSection(
 
     //We should add some rules to the searchSection, like restrictions on type of input and input length
     DockedSearchBar(
-        shape = RoundedCornerShape(20.dp),
+        shape = RoundedCornerShape(16.dp),
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp)
