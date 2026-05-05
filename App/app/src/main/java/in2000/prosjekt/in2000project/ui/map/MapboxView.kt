@@ -8,10 +8,13 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
@@ -23,6 +26,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import com.mapbox.common.Cancelable
 import com.mapbox.geojson.Point
@@ -59,31 +63,11 @@ import com.mapbox.maps.EdgeInsets
 import com.mapbox.maps.MapView
 import com.mapbox.maps.MapboxMap
 import com.mapbox.maps.plugin.annotation.generated.PointAnnotation
+import com.mapbox.maps.plugin.attribution.generated.AttributionSettings
+import com.mapbox.maps.plugin.compass.generated.CompassSettings
+import com.mapbox.maps.plugin.logo.generated.LogoSettings
+import com.mapbox.maps.plugin.scalebar.generated.ScaleBarSettings
 import in2000.prosjekt.in2000project.ui.search.SearchViewModel
-
-/*
-This global object is bad practice but it works and I
-have not found any other practical working alternatives.
-*/
-object MapCameraRepository {
-    var lastCameraOptions: CameraOptions? = null
-        private set
-    var lastPinnedPoint: Point? = null
-        private set
-
-    fun updateCameraOptions(options: CameraOptions) {
-        lastCameraOptions = options
-    }
-
-    fun updatePinnedPoint(point: Point) {
-        lastPinnedPoint = point
-    }
-
-    fun clearPinnedPoint() {
-        lastPinnedPoint = null
-    }
-}
-
 
 private const val TAG = "SnoskredWMS"
 
@@ -108,6 +92,7 @@ private const val WMS_DETAIL =
 fun MapboxView(
     mapStateHolder: MapStateHolder,
     modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
     var mapViewState by remember {
         mutableStateOf<MapView?>(null)
@@ -164,6 +149,14 @@ fun MapboxView(
 
     val animationOptions = MapAnimationOptions.Builder().duration(300).build()
 
+    val density = LocalDensity.current
+    val statusBarHeightPx = with(density) {
+        contentPadding.calculateTopPadding().toPx()
+    }
+    val bottomPaddingPx = with(density) {
+        contentPadding.calculateBottomPadding().toPx()
+    }
+
     LaunchedEffect(Unit) {
         mapStateHolder.commands.collect { cmd ->
             val padding = EdgeInsets(
@@ -207,7 +200,19 @@ fun MapboxView(
     MapboxMap(
         modifier = modifier.fillMaxSize(),
         mapViewportState = viewportState,
-    ) {
+        compass = {
+            Compass(
+                modifier = Modifier
+                    .padding(top = with(LocalDensity.current) { statusBarHeightPx.toDp() + 40.dp })
+            )
+        },
+        scaleBar = {
+            ScaleBar(
+                modifier = Modifier
+                    .padding(top = with(LocalDensity.current) { statusBarHeightPx.toDp() + 40.dp })
+            )
+        }
+    ){
         MapEffect(Unit) { mapView ->
 
             mapViewState = mapView
@@ -351,128 +356,5 @@ private fun MapboxMap.setBounds() {
             .maxZoom(18.0)
             .build()
     )
-}
-
-@Composable
-fun MapboxView2(
-    onMapClick: (Point) -> Unit,
-    coordinates: String,
-    onOverlayError: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-
-    val (hasSearch, searchLng, searchLat) = remember(coordinates) {
-        if (coordinates.isNotBlank() && coordinates != "0,0") {
-            val parts = coordinates.split(",")
-            if (parts.size == 2) {
-                Triple(true, parts[0].toDoubleOrNull(), parts[1].toDoubleOrNull())
-            } else Triple(false, null, null)
-        } else Triple(false, null, null)
-    }
-
-    val initialCamera = remember(hasSearch, searchLat, searchLng) {
-        if (hasSearch && searchLat != null && searchLng != null) {
-            CameraOptions.Builder()
-                .center(Point.fromLngLat(searchLng, searchLat))
-                .zoom(12.0)
-                .build()
-        } else {
-            MapCameraRepository.lastCameraOptions ?: CameraOptions.Builder()
-                .center(Point.fromLngLat(10.75, 59.91))
-                .zoom(3.5)
-                .build()
-        }
-    }
-
-    val viewportState = rememberMapViewportState {
-        setCameraOptions(initialCamera)
-    }
-
-    val mapRecreateKey = remember(hasSearch, searchLat, searchLng) {
-        if (hasSearch) System.currentTimeMillis() else "default"
-    }
-
-    val focusManager = LocalFocusManager.current
-    val focusRequester = remember { FocusRequester() }
-
-    var isSearchActive by remember { mutableStateOf(false) }
-
-    LaunchedEffect(isSearchActive) {
-        if (isSearchActive) {
-            focusRequester.requestFocus()
-        }
-    }
-
-    var idleSubscription by remember { mutableStateOf<Cancelable?>(null) }
-
-    DisposableEffect(Unit) {
-        onDispose {
-            viewportState.cameraState?.toCameraOptions()?.let {
-                MapCameraRepository.updateCameraOptions(it)
-            }
-            idleSubscription?.cancel()
-        }
-    }
-
-    var addPin by remember { mutableStateOf<((Point) -> Unit)?>(null) }
-
-    key(mapRecreateKey) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-        ){
-            MapboxMap(
-                modifier = modifier,
-                mapViewportState = viewportState
-            ) {
-                MapEffect(Unit) { mapView ->
-                    MapCameraRepository.lastCameraOptions?.let {
-                        mapView.mapboxMap.setCamera(it)
-                    }
-
-                    //this click listener just works generally on the map
-                    mapView.gestures.addOnMapClickListener { point ->
-                        if (!isSearchActive) {
-                            MapCameraRepository.updatePinnedPoint(point)
-                            addPin?.invoke(point)
-                            onMapClick(point)
-                        }
-
-                        isSearchActive = false
-                        focusManager.clearFocus()
-
-                        true
-                    }
-
-                    mapView.mapboxMap.subscribeMapLoadingError { error ->
-                        Log.e(TAG, "Map loading error: ${error.message}")
-                        onOverlayError()
-                    }
-
-                    if (hasSearch && searchLat != null && searchLng != null){
-                        val searchPoint = Point.fromLngLat(searchLng, searchLat)
-
-                        mapView.mapboxMap.setCamera(
-                            CameraOptions
-                                .Builder()
-                                .center(searchPoint)
-                                .zoom(12.0)
-                                .build())
-
-                        val isNewSearch = MapCameraRepository.lastPinnedPoint?.let {
-                            it.latitude() != searchLat || it.longitude() != searchLng
-                        } ?: true
-
-                        MapCameraRepository.updatePinnedPoint(searchPoint)
-                        addPin?.invoke(searchPoint)
-
-                        if (isNewSearch) {
-                            onMapClick(searchPoint)
-                        }
-                    }
-                }
-            }
-        }
-    }
 }
 
