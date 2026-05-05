@@ -90,11 +90,7 @@ fun HomeScreen(
 
             Box(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(
-                        horizontal = 16.dp,
-
-                    ),
+                    .fillMaxWidth(),
             ){
                 SearchSection(
                     //get states from the viewmodel
@@ -111,8 +107,8 @@ fun HomeScreen(
             LazyColumn(
                 modifier = Modifier.fillMaxWidth(),
                 contentPadding = PaddingValues(
-                    start = 16.dp,
-                    end = 16.dp,
+                    start = 0.dp,
+                    end = 0.dp,
                     top = 16.dp,
                     bottom = 0.dp
                 ), //adds padding around content
@@ -138,7 +134,9 @@ fun HomeScreen(
                 }
 
                 item {
-                    EmergencySection()
+                    EmergencySection(
+                        modifier = Modifier.padding(horizontal = 16.dp)
+                    )
                 }
             }
         }
@@ -196,7 +194,8 @@ fun FavoriteSection(
         Text(
             text = stringResource(R.string.favorites_title),
             style = MaterialTheme.typography.titleMedium,
-            fontWeight = Bold
+            fontWeight = Bold,
+            modifier = Modifier.padding(horizontal = 16.dp)
         )
         LazyRow(
             contentPadding = PaddingValues(horizontal = 8.dp),
@@ -230,7 +229,8 @@ fun RecentSection(
         Text(
             text = stringResource(R.string.recent_searches_title),
             style = MaterialTheme.typography.titleMedium,
-                fontWeight = Bold
+            fontWeight = Bold,
+            modifier = Modifier.padding(horizontal = 16.dp)
         )
 
         LazyRow(
@@ -268,7 +268,7 @@ fun LocationCard(
             onClick = {
                 onNavigateToMap(location.coordinate)
             },
-            shape = RoundedCornerShape(20.dp),
+            shape = RoundedCornerShape(16.dp),
             colors = CardDefaults.cardColors(
                 containerColor = MaterialTheme.colorScheme.surfaceVariant
             )
