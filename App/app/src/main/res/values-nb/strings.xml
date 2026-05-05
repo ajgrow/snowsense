@@ -18,8 +18,8 @@
 
     <string name="danger_levels_title">Skredfaregrader</string>
 
-    <string name="danger_level_0_number"></string>
-    <string name="danger_level_0_title">Ukjent</string>
+    <string name="danger_level_0_number">\?</string>
+    <string name="danger_level_0_title">- Ukjent</string>
     <string name="danger_level_0_description">Vi har ikke tilstrekkelige målinger for det valgte området.</string>
 
     <string name="danger_level_1_number">1</string>

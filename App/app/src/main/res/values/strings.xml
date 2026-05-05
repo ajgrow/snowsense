@@ -18,8 +18,8 @@
 
     <string name="danger_levels_title">Avalanche Danger Levels</string>
 
-    <string name="danger_level_0_number"></string>
-    <string name="danger_level_0_title">Unknown</string>
+    <string name="danger_level_0_number">\?</string>
+    <string name="danger_level_0_title">- Unknown</string>
     <string name="danger_level_0_description">We do not have adequate measurements for the specified area.</string>
 
     <string name="danger_level_1_number">1</string>
