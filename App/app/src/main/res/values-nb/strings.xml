@@ -122,7 +122,8 @@
     <string name="settings_text_small">Liten</string>
     <string name="settings_text_medium">Middels</string>
     <string name="settings_text_large">Stor</string>
-    
+    <string name="preview_text_size">Forhåndsvis tekst Aa</string>
+
     <string name="settings_language_title">Språk</string>
 
     <string name="hide_info">Skjul info ▲</string>
