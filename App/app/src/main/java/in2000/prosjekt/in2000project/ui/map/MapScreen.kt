@@ -83,6 +83,7 @@ import in2000.prosjekt.in2000project.ui.model.toUiModel
 import in2000.prosjekt.in2000project.ui.reusables.SearchSection
 import in2000.prosjekt.in2000project.ui.reusables.TextInputDialog
 import in2000.prosjekt.in2000project.ui.search.SearchUiState
+import kotlinx.coroutines.flow.drop
 import org.koin.compose.koinInject
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -296,10 +297,14 @@ fun MapScreen(
         onBottomPaddingChanged((peekHeight.value.toDouble()  + navigationBarHeight) * density.density)
     }
 
-    LaunchedEffect(sheetCoveredPx) {
-        if (sheetCoveredPx <= 10f) {
-            onSheetDismiss()
-        }
+    LaunchedEffect(sheetState) {
+        snapshotFlow { sheetState.currentValue }
+            .drop(1)
+            .collect { value ->
+                if (value == SheetValue.Hidden) {
+                    onSheetDismiss()
+                }
+            }
     }
 
     LaunchedEffect(sheetState) {
