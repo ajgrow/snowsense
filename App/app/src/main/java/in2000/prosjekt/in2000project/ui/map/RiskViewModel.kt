@@ -13,10 +13,17 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-/* dangerLevel is now a DangerLevelUiModel instead of a raw enum.*/
+data class LocationRiskState(
+    val coordinate: Coordinate,
+    val dangerLevel: DangerLevelUiModel? = null,
+    val isLoading: Boolean = false,
+    val isError: Boolean = false
+)
+
 data class RiskUiState(
     val isDanger: Boolean? = null,
-    val dangerLevel: DangerLevelUiModel? = null
+    val dangerLevel: DangerLevelUiModel? = null,
+    val locationRisks: Map<Coordinate, LocationRiskState> = emptyMap()
 )
 class RiskViewModel(
     private val nveRepository: NveRepository,
@@ -25,11 +32,21 @@ class RiskViewModel(
     private var _riskState = MutableStateFlow(RiskUiState())
     val riskState = _riskState.asStateFlow()
 
-    fun avalancheChecker(lat: Double, lon: Double){
+    fun avalancheChecker(lat: Double, lon: Double, isFavorite: Boolean = false){
+        val coordinate = Coordinate(lat, lon)
+
+        if (isFavorite) {
+            _riskState.update { currentState ->
+                val updatedMap = currentState.locationRisks.toMutableMap()
+                updatedMap[coordinate] = LocationRiskState(coordinate = coordinate, isLoading = true)
+                currentState.copy(locationRisks = updatedMap)
+            }
+        }
         viewModelScope.launch {
 
             val geoJson = nveRepository.getGeoJson(lat, lon, 10)
             val isDangerZone = geoJson.features?.isNotEmpty() == true
+
 
             val slabDangerLevel = try {
                 frostAvalancheRiskRepository.getSlabAvalancheRiskForLocation(
@@ -42,10 +59,20 @@ class RiskViewModel(
             val dangerLevel = if (isDangerZone) slabDangerLevel.toUiModel() else DangerLevel.LOW.toUiModel()
 
             _riskState.update { currentState ->
-                currentState.copy(
-                    isDanger = isDangerZone,
-                    dangerLevel = dangerLevel
-                )
+                if (!isFavorite) {
+                    currentState.copy(
+                        isDanger = isDangerZone,
+                        dangerLevel = dangerLevel
+                    )
+                } else {
+                    val updatedMap = currentState.locationRisks.toMutableMap()
+                    updatedMap[coordinate] = LocationRiskState(
+                        coordinate = coordinate,
+                        dangerLevel = dangerLevel,
+                        isLoading = false
+                    )
+                    currentState.copy(locationRisks = updatedMap)
+                }
             }
         }
     }
