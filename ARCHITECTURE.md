@@ -42,6 +42,38 @@ The **UI layer** consists of the screens and UI components the app uses to displ
 
 > Explain how the codebase achieves low coupling between modules and high cohesion within them.
 
+#### Low Coupling
+DataSource- and Repository-layers are always exposed as **interfaces**:
+- 'FrostV0DataSource' --> Implemented by 'KtorFrostV0DataSource'
+- 'ClimateRepository' --> Implemented by 'FrostClimateRepository'
+- 'AvalancheRiskRepository' --> Implemented by 'FrostAvalancheRiskRepository'
+
+ViewModels only depend on interfaces / concrete repository classes, never on datasource implementations directly.
+Binding takes place in 'AppModule.kt' via **Koin**
+```kotlin
+    single<FrostV0DataSource> { KtorFrostV0DataSource(client = get()) }
+    single { FrostClimateRepository(get()) }
+    viewModel { MapViewModel(get()) }
+```
+The reason this is important is because it means that it is rather trivial to replace for example Ktor with another HTTP library due to only the implementation class and AppModule being affected.
+
+It also makes it easy to test the repository layer with one 'FakeFrostV0DataSource' without touching production code
+
+#### High Cohesion
+Every Package has one clear responsability
+| package | Responsability |
+| --- | --- |
+| 'datasource'| Raw communication with an external source |
+| 'datasource/dto'| Dataobjects that miror API-contract |
+| 'repository' | Logic and aggregating |
+| 'data/model' | Internal app domainobjects |
+| 'di' | Dependenies graph |
+| 'navigation' | route definition and navigation logic |
+| 'network' | HTTP-client configuration |
+| 'ui/<screen>' | Everything that belongs to a screen: State, Screen, Viewmodel, ect...|
+| 'ui/reusables' | Reusable, stateless composables |
+| 'ui/model' | UI-specific maps/models |
+
 ### MVVM & Unidirectional Data Flow (UDF)
 
 > Describe how the MVVM pattern and UDF are applied across the app.
