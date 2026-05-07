@@ -9,11 +9,13 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -45,6 +47,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -80,7 +83,6 @@ import in2000.prosjekt.in2000project.ui.model.toUiModel
 import in2000.prosjekt.in2000project.ui.reusables.SearchSection
 import in2000.prosjekt.in2000project.ui.reusables.TextInputDialog
 import in2000.prosjekt.in2000project.ui.search.SearchUiState
-import kotlinx.coroutines.flow.distinctUntilChanged
 import org.koin.compose.koinInject
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -234,8 +236,19 @@ fun MapScreen(
         }
     } ?: previewSkiArea
 
-    val configuration = LocalWindowInfo.current
-    val halfScreen = configuration.containerDpSize.height / 2
+    val density = LocalDensity.current
+    
+    val halfScreen = LocalWindowInfo.current.containerDpSize.height / 2
+
+    val navigationBarHeight = WindowInsets.navigationBars.getBottom(density)
+
+    var sheetOffsetPx by remember { mutableFloatStateOf(0f) }
+    var sheetHiddenOffsetPx by remember { mutableFloatStateOf(0f) }
+    val sheetCoveredPx = (sheetHiddenOffsetPx - sheetOffsetPx).coerceAtLeast(0f)
+
+    val bottomPaddingDp = with(density) {
+        sheetCoveredPx.toDp()
+    }
 
     val showSheet = screenState.isSheetVisible
     val peekHeight = if (showSheet) halfScreen else 0.dp
@@ -279,23 +292,27 @@ fun MapScreen(
         }
     }
 
-    val density = LocalDensity.current.density
     LaunchedEffect(peekHeight) {
-        onBottomPaddingChanged(peekHeight.value.toDouble() * density)
+        onBottomPaddingChanged((peekHeight.value.toDouble()  + navigationBarHeight) * density.density)
+    }
+
+    LaunchedEffect(sheetCoveredPx) {
+        if (sheetCoveredPx <= 10f) {
+            onSheetDismiss()
+        }
     }
 
     LaunchedEffect(sheetState) {
-        var wasVisible = false
-        snapshotFlow { sheetState.currentValue }
-            .collect { current ->
-                if (current == SheetValue.Hidden) {
-                    if (wasVisible) {
-                        onSheetDismiss()
-                    }
-                } else {
-                    wasVisible = true
+        snapshotFlow {
+            runCatching { sheetState.requireOffset() }.getOrNull()
+        }.collect { offset ->
+            if (offset != null) {
+                sheetOffsetPx = offset
+                if (sheetState.currentValue == SheetValue.Hidden) {
+                    sheetHiddenOffsetPx = offset
                 }
             }
+        }
     }
 
     LaunchedEffect(showSheet) {
@@ -306,9 +323,8 @@ fun MapScreen(
         }
     }
 
-
     Box(
-        modifier = modifier.fillMaxSize()
+        modifier = Modifier.fillMaxSize()
     ) {
         when (overlayState) {
             is OverlayState.Loading
@@ -327,7 +343,8 @@ fun MapScreen(
         Column(
             modifier = Modifier
                 .align(Alignment.BottomEnd)
-                .padding(16.dp),
+                .padding(16.dp)
+                .padding(bottom = bottomPaddingDp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 

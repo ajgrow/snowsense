@@ -62,6 +62,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mapbox.maps.EdgeInsets
 import com.mapbox.maps.MapView
 import com.mapbox.maps.MapboxMap
+import com.mapbox.maps.extension.style.layers.properties.generated.ProjectionName
+import com.mapbox.maps.extension.style.projection.generated.Projection
+import com.mapbox.maps.extension.style.projection.generated.setProjection
 import com.mapbox.maps.plugin.annotation.generated.PointAnnotation
 import com.mapbox.maps.plugin.attribution.generated.AttributionSettings
 import com.mapbox.maps.plugin.compass.generated.CompassSettings
@@ -215,11 +218,19 @@ fun MapboxView(
     ){
         MapEffect(Unit) { mapView ->
 
+            val mapboxMap = mapView.mapboxMap
+
+            mapboxMap.getStyle { style ->
+                style.setProjection(
+                    Projection(ProjectionName.MERCATOR)
+                )
+            }
+
             mapViewState = mapView
 
-            mapView.mapboxMap.setBounds()
+            mapboxMap.setBounds()
 
-            mapView.mapboxMap.loadStyle(
+            mapboxMap.loadStyle(
                 Style.OUTDOORS,
                 Style::addNveAvalancheRiskLayers)
 
@@ -345,8 +356,8 @@ private fun Style.addNveAvalancheRiskLayers() {
 
 private fun MapboxMap.setBounds() {
     val bounds = CoordinateBounds(
-        Point.fromLngLat(3.0, 54.0),
-        Point.fromLngLat(33.0, 73.0)
+        Point.fromLngLat(-5.0, 48.0),
+        Point.fromLngLat(40.0, 75.0)
     )
 
     setBounds(

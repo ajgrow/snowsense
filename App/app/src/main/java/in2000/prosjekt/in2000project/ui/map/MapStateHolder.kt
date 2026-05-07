@@ -53,8 +53,9 @@ class MapStateHolder {
     fun setBottomPadding(px: Double) {
         if (_bottomPaddingPx.value == px) return
         _bottomPaddingPx.value = px
-        _pinnedPoint.value?.let {
-            _commands.tryEmit(MapCommand.Recenter(it)) }
+
+        val pointToRecenter = _pinnedPoint.value ?: _cameraOptions.value?.center
+        pointToRecenter?.let { _commands.tryEmit(MapCommand.Recenter(it)) }
     }
 
     fun onCameraIdle(cameraOptions: CameraOptions) {
