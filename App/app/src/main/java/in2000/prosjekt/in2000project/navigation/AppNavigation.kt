@@ -10,6 +10,7 @@ import in2000.prosjekt.in2000project.ui.home.HomeScreen
 import in2000.prosjekt.in2000project.ui.information.InfoScreen
 import in2000.prosjekt.in2000project.ui.map.MapRoute
 import in2000.prosjekt.in2000project.ui.map.MapStateHolder
+import in2000.prosjekt.in2000project.ui.map.RiskViewModel
 import in2000.prosjekt.in2000project.ui.search.SearchViewModel
 import in2000.prosjekt.in2000project.ui.settings.SettingScreen
 import in2000.prosjekt.in2000project.ui.settings.SettingsViewModel
@@ -26,6 +27,7 @@ fun AppNavigation(
     val mapStateHolder: MapStateHolder = koinInject()
 
     val searchViewModel = koinViewModel<SearchViewModel>()
+    val riskViewModel = koinViewModel<RiskViewModel>()
 
     NavHost(
         navController = navController,
@@ -44,7 +46,8 @@ fun AppNavigation(
                             coordinate.latitude)
                     )
                     navigationActions.navigateToTab(Screen.Map.route) },
-                searchViewModel = searchViewModel
+                searchViewModel = searchViewModel,
+                riskViewModel = riskViewModel
             )
         }
 
