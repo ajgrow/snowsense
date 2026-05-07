@@ -108,15 +108,12 @@ fun MapRoute(
     val riskState by riskViewModel.riskState.collectAsState()
     val searchState by searchViewModel.searchState.collectAsStateWithLifecycle()
 
-    val mapStateHolder: MapStateHolder = koinInject()
 
-    val overlayState by mapStateHolder.overlayState.collectAsStateWithLifecycle()
-
-    val pin by mapStateHolder.pinnedPoint.collectAsStateWithLifecycle()
+    val overlayState = screenState.overlayState
+    val pin = screenState.pinnedPoint
 
     LaunchedEffect(pin) {
         pin?.let {
-            mapViewModel.onMapClick(it.latitude(), it.longitude())
             riskViewModel.avalancheChecker(it.latitude(), it.longitude())
         }
     }
@@ -159,13 +156,13 @@ fun MapRoute(
         overlayState = overlayState,
         searchState = searchState,
         pinnedPoint = pin,
-        onSearchLocationRequested = mapStateHolder::flyToSearch,
-        onZoomIn = mapStateHolder::onZoomIn,
-        onZoomOut = mapStateHolder::onZoomOut,
-        onOverlayRetry = mapStateHolder::onOverlayLoading,
+        onSearchLocationRequested = mapViewModel::flyToSearch,
+        onZoomIn = mapViewModel::onZoomIn,
+        onZoomOut = mapViewModel::onZoomOut,
+        onOverlayRetry = mapViewModel::onOverlayLoading,
         onSheetDismiss = {
             mapViewModel.onSheetDismissed()
-            mapStateHolder.clearPin()
+            mapViewModel.clearPin()
         },
         onStartDateChange = { it?.let(mapViewModel::onStartDateChange) },
         onEndDateChange = { it?.let(mapViewModel::onEndDateChange) },
@@ -177,7 +174,7 @@ fun MapRoute(
                 showFavoriteDialog = true
             }
         },
-        onBottomPaddingChanged = mapStateHolder::setBottomPadding,
+        onBottomPaddingChanged = mapViewModel::setBottomPadding,
         canAddFavorite = {
             val coordinate = screenState.climateCoordinate
             if (coordinate != null) {

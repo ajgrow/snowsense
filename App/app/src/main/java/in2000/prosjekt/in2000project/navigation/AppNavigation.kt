@@ -9,7 +9,7 @@ import com.mapbox.geojson.Point
 import in2000.prosjekt.in2000project.ui.home.HomeScreen
 import in2000.prosjekt.in2000project.ui.information.InfoScreen
 import in2000.prosjekt.in2000project.ui.map.MapRoute
-import in2000.prosjekt.in2000project.ui.map.MapStateHolder
+import in2000.prosjekt.in2000project.ui.map.MapViewModel
 import in2000.prosjekt.in2000project.ui.search.SearchViewModel
 import in2000.prosjekt.in2000project.ui.settings.SettingScreen
 import in2000.prosjekt.in2000project.ui.settings.SettingsViewModel
@@ -20,12 +20,12 @@ import org.koin.compose.viewmodel.koinViewModel
 fun AppNavigation(
     navController: NavHostController,
     settingsViewModel: SettingsViewModel,
+    mapViewModel: MapViewModel,
     modifier: Modifier = Modifier
 ){
     val navigationActions = NavigationActions(navController)
-    val mapStateHolder: MapStateHolder = koinInject()
 
-    val searchViewModel = koinViewModel<SearchViewModel>()
+    val searchViewModel: SearchViewModel = koinViewModel()
 
     NavHost(
         navController = navController,
@@ -38,7 +38,7 @@ fun AppNavigation(
                     .navigate(Screen
                         .Settings.route) },
                 onNavigateToMap = { coordinate ->
-                    mapStateHolder.flyToSearch(
+                    mapViewModel.flyToSearch(
                         Point.fromLngLat(
                             coordinate.longitude,
                             coordinate.latitude)
@@ -49,7 +49,7 @@ fun AppNavigation(
         }
 
         composable(Screen.Map.route) {
-            MapRoute(searchViewModel = searchViewModel)
+            MapRoute(searchViewModel = searchViewModel, mapViewModel = mapViewModel)
         }
 
         composable(Screen.Info.route) {
