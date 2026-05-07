@@ -5,6 +5,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class NamedLocation (
     val name: String,
-    val coordinate: Coordinate
-    //could have more data here like location type, etc.
+    val coordinate: Coordinate,
+    val locationTypeNo: String = "",
+    val locationTypeEn: String = ""
 )

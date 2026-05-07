@@ -1,5 +1,10 @@
 package in2000.prosjekt.in2000project.ui.home
 
+    import androidx.compose.animation.AnimatedVisibility
+    import androidx.compose.animation.expandVertically
+    import androidx.compose.animation.fadeIn
+    import androidx.compose.animation.fadeOut
+    import androidx.compose.animation.shrinkVertically
     import androidx.compose.foundation.Image
     import androidx.compose.foundation.background
     import androidx.compose.foundation.clickable
@@ -86,7 +91,13 @@ fun HomeScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             HomeTopBar(onSettingsClick)
-            LogoSection()
+            AnimatedVisibility(
+                visible = !searchState.isSearchActive,
+                enter = expandVertically() + fadeIn(),
+                exit = shrinkVertically() + fadeOut()
+            ) {
+                LogoSection()
+            }
 
             Box(
                 modifier = Modifier
@@ -96,11 +107,11 @@ fun HomeScreen(
                     //get states from the viewmodel
                     modifier = Modifier,
                     textFieldState = searchState.searchTextFieldState,
-                    onSearch = searchViewModel::onSearch,
                     searchResults = searchState.searchResults,
                     onNavigateToMap = onNavigateToMap,
                     onSelectResult = searchViewModel::addRecentSearch,
-                    recentSearches = searchState.recentSearches
+                    recentSearches = searchState.recentSearches,
+                    onActiveChange = searchViewModel::setSearchActive
                 )
             }
 

@@ -7,7 +7,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import in2000.prosjekt.in2000project.data.datasource.LocationQueryBuilder
+import in2000.prosjekt.in2000project.data.datasource.buildLocationQuery
 import in2000.prosjekt.in2000project.data.model.Coordinate
 import in2000.prosjekt.in2000project.data.model.NamedLocation
 import in2000.prosjekt.in2000project.data.repository.LocationRepository
@@ -25,7 +25,8 @@ data class SearchUiState (
     val searchResults: List<NamedLocation> = emptyList(),
     val favorites: List<NamedLocation> = emptyList(),
     val recentSearches: List<NamedLocation> = emptyList(),
-    val awaitingFavoriteName: Coordinate? = null
+    val awaitingFavoriteName: Coordinate? = null,
+    val isSearchActive: Boolean = false
 )
 class SearchViewModel(
     private val searchRepository: SearchRepository
@@ -35,7 +36,6 @@ class SearchViewModel(
         recentSearches = searchRepository.loadRecentSearches()
     ))
     val searchState: StateFlow<SearchUiState> = _searchState.asStateFlow()
-    val queryBuilder = LocationQueryBuilder()
     val locationRepository = LocationRepository()
 
 
@@ -47,7 +47,7 @@ class SearchViewModel(
                 .debounce(300) //wait 300ms after user stops typing
                 .collect { query ->
                     if (query.isNotBlank()) {
-                        val built = queryBuilder.buildQuery(query)
+                        val built = buildLocationQuery(query)
                         val results = locationRepository.getNamedLocations(built)
                         _searchState.update { it.copy(searchResults = results) }
                     } else {
@@ -120,11 +120,7 @@ class SearchViewModel(
         searchRepository.saveFavorites(_searchState.value.favorites)
     }
 
-    fun onSearch(searchQuery: String){
-        val query = queryBuilder.buildQuery(searchQuery)
-        viewModelScope.launch {
-            val results = locationRepository.getNamedLocations(query)
-            _searchState.update { it.copy(searchResults = results) }
-        }
+    fun setSearchActive(active: Boolean) {
+        _searchState.update { it.copy(isSearchActive = active) }
     }
 }
