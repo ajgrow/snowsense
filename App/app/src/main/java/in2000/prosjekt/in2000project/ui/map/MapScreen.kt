@@ -237,7 +237,7 @@ fun MapScreen(
     } ?: previewSkiArea
 
     val density = LocalDensity.current
-    
+
     val halfScreen = LocalWindowInfo.current.containerDpSize.height / 2
 
     val navigationBarHeight = WindowInsets.navigationBars.getBottom(density)
