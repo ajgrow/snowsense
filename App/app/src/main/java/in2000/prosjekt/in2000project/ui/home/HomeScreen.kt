@@ -16,6 +16,7 @@ package in2000.prosjekt.in2000project.ui.home
     import androidx.compose.foundation.layout.PaddingValues
     import androidx.compose.foundation.layout.fillMaxSize
     import androidx.compose.foundation.layout.fillMaxWidth
+    import androidx.compose.foundation.layout.height
     import androidx.compose.foundation.layout.offset
     import androidx.compose.foundation.layout.padding
     import androidx.compose.foundation.layout.size
@@ -30,6 +31,7 @@ package in2000.prosjekt.in2000project.ui.home
     import androidx.compose.material.icons.filled.Settings
     import androidx.compose.material3.CardDefaults
     import androidx.compose.material.icons.filled.Close
+    import androidx.compose.material3.CircularProgressIndicator
     import androidx.compose.material3.Icon
     import androidx.compose.material3.IconButton
     import androidx.compose.material3.MaterialTheme
@@ -59,6 +61,8 @@ package in2000.prosjekt.in2000project.ui.home
     import in2000.prosjekt.in2000project.R
     import in2000.prosjekt.in2000project.data.model.Coordinate
     import in2000.prosjekt.in2000project.data.model.NamedLocation
+    import in2000.prosjekt.in2000project.ui.map.LocationRiskState
+    import in2000.prosjekt.in2000project.ui.map.RiskUiState
     import in2000.prosjekt.in2000project.ui.map.RiskViewModel
     import in2000.prosjekt.in2000project.ui.reusables.EmergencySection
     import in2000.prosjekt.in2000project.ui.model.DangerLevelUiModel
@@ -71,10 +75,24 @@ fun HomeScreen(
     modifier: Modifier = Modifier,
     onSettingsClick: () -> Unit,
     onNavigateToMap: (coordinate: Coordinate) -> Unit,
-    searchViewModel: SearchViewModel = koinViewModel()
+    searchViewModel: SearchViewModel = koinViewModel(),
+    riskViewModel: RiskViewModel = koinViewModel()
 ) {
     val focusManager = LocalFocusManager.current
     val searchState by searchViewModel.searchState.collectAsStateWithLifecycle()
+    val riskState by riskViewModel.riskState.collectAsState()
+
+    val favorites = searchState.favorites
+
+    LaunchedEffect(favorites) {
+        favorites.forEach { location ->
+            riskViewModel.avalancheChecker(
+                lat = location.coordinate.latitude,
+                lon = location.coordinate.longitude,
+                isFavorite = true
+            )
+        }
+    }
 
     Surface(
         modifier = modifier.fillMaxSize(),
@@ -131,7 +149,8 @@ fun HomeScreen(
                         items = searchState.favorites,
                         modifier = Modifier,
                         onNavigateToMap = onNavigateToMap,
-                        onRemoveLocation = searchViewModel::removeFavoriteLocation
+                        onRemoveLocation = searchViewModel::removeFavoriteLocation,
+                        riskState = riskState
                     )
                 }
 
@@ -182,22 +201,8 @@ fun FavoriteSection(
     modifier: Modifier = Modifier,
     onNavigateToMap: (coordinate: Coordinate) -> Unit,
     onRemoveLocation: (NamedLocation) -> Unit,
-    riskViewModel: RiskViewModel = koinViewModel()
+    riskState: RiskUiState
 ) {
-
-    val riskState by riskViewModel.riskState.collectAsState()
-
-    LaunchedEffect(items) {
-        if (items.isNotEmpty()) {
-            // Checks the first favorite's location as an example.
-            val firstLocation = items.first()
-            riskViewModel.avalancheChecker(
-                firstLocation.coordinate.latitude,
-                firstLocation.coordinate.longitude
-            )
-        }
-    }
-
     Column(
         modifier = modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(10.dp)
@@ -213,10 +218,12 @@ fun FavoriteSection(
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             items(items) { location ->
+                val locationRiskState = riskState.locationRisks[location.coordinate]
                 LocationCard(
                     location,
                     onNavigateToMap = onNavigateToMap,
-                    dangerLevel = riskState.dangerLevel,
+                    dangerLevel = locationRiskState?.dangerLevel,
+                    isLoading = locationRiskState?.isLoading == true,
                     onRemoveLocation = onRemoveLocation,
                     showDangerLevel = true,
                     removeButtonAtBottom = true
@@ -267,6 +274,7 @@ fun LocationCard(
     onRemoveLocation: (NamedLocation) -> Unit,
     showDangerLevel: Boolean = false,
     dangerLevel: DangerLevelUiModel? = null,
+    isLoading: Boolean = false,
     removeButtonAtBottom: Boolean = false,
 ) {
     Box(
@@ -301,20 +309,31 @@ fun LocationCard(
 
                 if (showDangerLevel) {
                     val label = dangerLevel?.badgeLabelRes?.let { stringResource(it) } ?: ""
-                    Text(
-                        text = label,
-                        fontSize = 12.sp,
-                        fontWeight = Bold,
-                        color = Color.White,
-                        letterSpacing = 0.5.sp,
+
+                    Box(
                         modifier = Modifier
+                            .height(30.dp)
                             .clip(RoundedCornerShape(50))
                             .background(dangerLevel?.getColor() ?: Color.Transparent)
-                            .padding(
-                                horizontal = 10.dp,
-                                vertical = 4.dp
+                            .padding(horizontal = 10.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        if (isLoading) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(12.dp),
+                                strokeWidth = 2.dp
                             )
-                    )
+                        } else {
+                            Text(
+                                text = label,
+                                fontSize = 12.sp,
+                                fontWeight = Bold,
+                                color = Color.White,
+                                letterSpacing = 0.5.sp,
+                                maxLines = 1
+                            )
+                        }
+                    }
                 }
             }
         }
