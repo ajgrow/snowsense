@@ -1,5 +1,10 @@
 # Architecture
 
+>This document is here to assist developers that are interested in familiarizing themselves with,
+>mainatining or further developing the SnowSense-app. it describes the project's parent structure
+>and other archetectural choices that have been made and which principles and patterns the code follows.
+
+
 ## Table of Contents
 
 1. [Code Structure & Architectural Choices](#1-code-structure--architectural-choices)
@@ -72,3 +77,74 @@ Once the SearchViewModel has received a list of search results, it updates the S
 ### API Level
 
 > Document API-level details — endpoints, contracts, versioning, and any relevant integration specifics.
+
+## 4. Package Structure
+```
+in2000.prosjekt.in2000project/
+|
+|--- data/
+|    |--- model/                            #Domainobjects
+|    |    |---enums/
+|    |    |    |--- DangerLevel
+|    |    |    |--- ElementType
+|    |    |    |---MeasurementUnit
+|    |    |---DailyWeatherRecord
+|    |    |---Coordinates.kt
+|    |    |---LocationClimateData.kt
+|    |    |---LocationRiskData.kt
+|    |    |---SkiArea
+|    |    |---GeoJson
+|    |    |---LocationClimateDataPoint
+|    |    |---NamedLocation
+|    |    |---NoObservationException.kt
+|    |    |---NoStationFoundException
+|    |    
+|    |--- datasource/                        # Communication with the API (Frost, NVE)
+|    |    |--- dto/                          # Dataobjects that mirror API-response
+|    |    |    |---FrostV0ObservasjonsDto.kt
+|    |    |    |---FrostV0SourceDto.kt
+|    |    |    |---LocationDto.kt
+|    |    |--- FrostV0DataSource             # Interface
+|    |    |--- KtorFrostV0DataSource         # Implementation
+|    |    |--- NveDataSource
+|    |    |--- LocationDataSource
+|    |    |--- LocationQueryBuilder.kt
+|    |
+|    |--- repository/                        # logic and aggregation of data
+|    |    |--- ClimateRepository.kt          # interface
+|    |    |--- FrostClimateRepository.kt     # implementation
+|    |    |--- AvalancheRiskRepository.kt    # interface
+|    |    |--- FrostAvalancheRiskRepository.kt 
+|    |    |--- SlabAvalancheRiskRepository.kt  # DomainLogic and objects
+|    |    |--- NveRepository.kt 
+|    |    |--- SearchRepository.kt
+|    |    |--- FrostReferenceTime.kt    #helping object
+|    |    |--- LocationRepository
+|    |    
+|    |--- datastore/
+|    |    |---DataStore.kt
+|    |
+|    |--- di/
+|    |    |--- AppModule.kt
+|    | 
+|    |--- navigation/
+|    |    |---Screen.kt            
+|    |    |--- AppNavigation.kt     # NavHost
+|    |    |--- NavigationActions.kt
+|    |
+|    |--- network/
+|    |    |---KtorClient.kt 
+|    |
+|    |---ui/
+|    |    |--- approot/             # AppRoot - Toplevel composable
+|    |    |--- home/                # HomeScreen
+|    |    |--- map/                 # MapScreen relevant
+|    |    |--- information/         # InfoScreen relevant
+|    |    |---search/               # SearchViewModel
+|    |    |--- settings/            # SettingScreen relevant
+|    |    |--- model/               # UI-models
+|    |    |--- reusables/           # Reusable Composables
+│    |
+|--- MainActivity.kt
+|----SnowSenseApplication.kt
+```
