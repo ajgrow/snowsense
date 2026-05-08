@@ -18,11 +18,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.mapbox.maps.MapView
 import in2000.prosjekt.in2000project.navigation.AppNavigation
 import in2000.prosjekt.in2000project.navigation.NavigationActions
 import in2000.prosjekt.in2000project.navigation.Screen
-import in2000.prosjekt.in2000project.ui.map.MapViewModel
+import in2000.prosjekt.in2000project.ui.map.MapStateHolder
 import in2000.prosjekt.in2000project.ui.map.MapboxView
 import in2000.prosjekt.in2000project.ui.reusables.BottomBar
 import in2000.prosjekt.in2000project.ui.reusables.isBottomBarScreen
@@ -35,7 +34,7 @@ import org.koin.compose.viewmodel.koinViewModel
 fun AppRoot(
     modifier: Modifier = Modifier
 ) {
-    val mapViewModel: MapViewModel = koinViewModel()
+    val mapStateHolder = koinInject<MapStateHolder>()
     val settingsViewModel: SettingsViewModel = koinViewModel()
 
     val navController = rememberNavController()
@@ -76,7 +75,7 @@ fun AppRoot(
                 modifier = Modifier.fillMaxSize()
             ) {
                 MapboxView(
-                    mapViewModel = mapViewModel,
+                    mapStateHolder = mapStateHolder,
                     modifier = Modifier.fillMaxSize(),
                 )
 
@@ -91,7 +90,6 @@ fun AppRoot(
                 AppNavigation(
                     navController = navController,
                     settingsViewModel = settingsViewModel,
-                    mapViewModel = mapViewModel,
                     modifier = Modifier.fillMaxSize().padding(innerPadding),
                 )
             }
