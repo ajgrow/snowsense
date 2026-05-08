@@ -79,7 +79,7 @@ The app follows MVVM pattern combined with UDF resulting in the following patter
 
 ### ViewModels
 - Holds `MutableStateFlow<ScreenState>`
-- Updates state through `.copy()` to ensure updates
+- Updates state through `.copy()`
 - Calls repository via `suspend` functions
 
 ↓ *suspend calls (`getClimateDataForLocation()`, `getNamedLocations()`, etc.)*
