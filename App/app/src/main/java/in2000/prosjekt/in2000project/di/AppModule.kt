@@ -9,7 +9,6 @@ import in2000.prosjekt.in2000project.data.repository.NveRepository
 import in2000.prosjekt.in2000project.data.repository.SearchRepository
 import in2000.prosjekt.in2000project.network.KtorClient
 import in2000.prosjekt.in2000project.ui.information.InfoViewModel
-import in2000.prosjekt.in2000project.ui.map.MapStateHolder
 import in2000.prosjekt.in2000project.ui.map.MapViewModel
 import in2000.prosjekt.in2000project.ui.map.RiskViewModel
 import in2000.prosjekt.in2000project.ui.search.SearchViewModel
@@ -22,7 +21,6 @@ val appModule = module {
     single<FrostV0DataSource> { KtorFrostV0DataSource(client = get()) }
     single<NveDataSource> { NveDataSource(client = get()) }
     single { FrostClimateRepository(get()) }
-    single { MapStateHolder() }
     single { FrostAvalancheRiskRepository(get()) }
     single { NveRepository(get()) }
     single { SearchRepository(get()) }
