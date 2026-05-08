@@ -144,7 +144,7 @@ The **UI layer** consists of the screens and UI components the app uses to displ
 in2000.prosjekt.in2000project/
 |
 |--- data/
-|    |--- model/                            #Domain objects
+|    |--- model/                                #Domain objects
 |    |    |---enums/
 |    |    |    |--- DangerLevel
 |    |    |    |--- ElementType
@@ -160,26 +160,26 @@ in2000.prosjekt.in2000project/
 |    |    |---NoObservationException.kt
 |    |    |---NoStationFoundException
 |    |    
-|    |--- datasource/                        # Communication with the API (Frost, NVE)
-|    |    |--- dto/                          # Data objects which mirror API-response
+|    |--- datasource/                           # Communication with the API (Frost, NVE)
+|    |    |--- dto/                             # Data objects which mirror API-response
 |    |    |    |---FrostV0ObservasjonsDto.kt
 |    |    |    |---FrostV0SourceDto.kt
 |    |    |    |---LocationDto.kt
-|    |    |--- FrostV0DataSource             # Interface
-|    |    |--- KtorFrostV0DataSource         # Implementation
+|    |    |--- FrostV0DataSource                # Interface
+|    |    |--- KtorFrostV0DataSource            # Implementation
 |    |    |--- NveDataSource
 |    |    |--- LocationDataSource
 |    |    |--- LocationQueryBuilder.kt
 |    |
-|    |--- repository/                        # Logic and aggregation of data
-|    |    |--- ClimateRepository.kt          # Interface
-|    |    |--- FrostClimateRepository.kt     # Implementation
-|    |    |--- AvalancheRiskRepository.kt    # Interface
-|    |    |--- FrostAvalancheRiskRepository.kt # Implementation
-|    |    |--- SlabAvalancheRiskRepository.kt  # Domain logic and objects
+|    |--- repository/                           # Logic and aggregation of data
+|    |    |--- ClimateRepository.kt             # Interface
+|    |    |--- FrostClimateRepository.kt        # Implementation
+|    |    |--- AvalancheRiskRepository.kt       # Interface
+|    |    |--- FrostAvalancheRiskRepository.kt  # Implementation
+|    |    |--- SlabAvalancheRiskRepository.kt   # Domain logic and objects
 |    |    |--- NveRepository.kt 
 |    |    |--- SearchRepository.kt
-|    |    |--- FrostReferenceTime.kt    # Helper object
+|    |    |--- FrostReferenceTime.kt            # Helper object
 |    |    |--- LocationRepository
 |    |    
 |    |--- datastore/
@@ -190,21 +190,21 @@ in2000.prosjekt.in2000project/
 |    | 
 |    |--- navigation/
 |    |    |---Screen.kt            
-|    |    |--- AppNavigation.kt     # NavHost
+|    |    |--- AppNavigation.kt                 # NavHost
 |    |    |--- NavigationActions.kt
 |    |
 |    |--- network/
 |    |    |---KtorClient.kt 
 |    |
 |    |---ui/
-|    |    |--- approot/                 # AppRoot - Toplevel composable
-|    |    |--- home/                    # HomeScreen
-|    |    |--- map/                     # MapScreen relevant
-|    |    |--- information/             # InfoScreen relevant
-|    |    |---search/                   # SearchViewModel
-|    |    |--- settings/                # SettingScreen relevant
-|    |    |--- model/                   # UI-models
-|    |    |--- reusables/               # Reusable Composables
+|    |    |--- approot/                         # AppRoot - Toplevel composable
+|    |    |--- home/                            # HomeScreen
+|    |    |--- map/                             # MapScreen relevant
+|    |    |--- information/                     # InfoScreen relevant
+|    |    |---search/                           # SearchViewModel
+|    |    |--- settings/                        # SettingScreen relevant
+|    |    |--- model/                           # UI-models
+|    |    |--- reusables/                       # Reusable Composables
 │    |
 |--- MainActivity.kt
 |----SnowSenseApplication.kt
