@@ -99,7 +99,7 @@ fun ExternalResourceCard(
 
             Icon(
                 imageVector = Icons.AutoMirrored.Default.KeyboardArrowRight,
-                contentDescription = "Open ${resource.title}"
+                contentDescription = stringResource(R.string.open_resource, resource.title)
             )
         }
     }

@@ -153,7 +153,7 @@ fun SettingScreen(
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.TextFields,
-                                    contentDescription = null,
+                                    contentDescription = stringResource(R.string.text_size),
                                     modifier = Modifier.size(20.dp),
                                     tint = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
@@ -223,7 +223,7 @@ fun SettingScreen(
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.Language,
-                                    contentDescription = null,
+                                    contentDescription = stringResource(R.string.language),
                                     modifier = Modifier.size(20.dp),
                                     tint = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
@@ -321,7 +321,7 @@ private fun ThemeSettingRow(
 
         Icon(
             imageVector = icon,
-            contentDescription = null,
+            contentDescription = label,
             tint = if (selected) MaterialTheme.colorScheme.onPrimaryContainer
                     else MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier

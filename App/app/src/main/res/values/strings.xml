@@ -79,6 +79,7 @@
     <string name="label_average_snowfall">Average snowfall</string>
     <string name="label_average_precipitation">Average precipitation</string>
     <string name="label_average_temperature">Average temperature</string>
+    <string name="open_search">Open Search</string>
 
 
 
@@ -183,6 +184,19 @@
     <string name="if_something_goes_wrong_2">Throw off your backpack</string>
     <string name="if_something_goes_wrong_3">Protect your head and face</string>
     <string name="if_something_goes_wrong_4">Call for help</string>
+
+    <string name="open_resource">Open %1$s</string>
+
+    <string name="open_settings">Open settings</string>
+
+    <string name="scroll_down">Scroll down</string>
+
+    <string name="open_menu">Open menu</string>
+
+    <string name="text_size">text size</string>
+
+    <string name="language">language</string>
+    <string name="favorite_button_desc">Add to favorites</string>
 
 
 </resources>
