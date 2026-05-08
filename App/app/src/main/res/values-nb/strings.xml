@@ -77,7 +77,7 @@
     <string name="label_average_snowfall">Gjennomsnittlig snøfall</string>
     <string name="label_average_precipitation">Gjennomsnittlig nedbør</string>
     <string name="label_average_temperature">Gjennomsnittstemperatur</string>
-
+    <string name="open_search">Åpen Søk</string>
 
 
     <string name="nav_home_desc">Gå til hjemskjerm</string>
@@ -179,5 +179,20 @@
     <string name="if_something_goes_wrong_2">Kast av deg sekken</string>
     <string name="if_something_goes_wrong_3">Beskytt hode og ansikt</string>
     <string name="if_something_goes_wrong_4">Ring nødtelefon</string>
+
+    <string name="open_resource">Åpne %1$s</string>
+
+    <string name="open_settings">åpne innstillinger</string>
+
+    <string name="scroll_down">Bla ned</string>
+
+    <string name="open_menu">Åpne menyen</string>
+
+    <string name="text_size">tekst størrelse</string>
+
+    <string name="language">Språk</string>
+
+
+
 
 </resources>

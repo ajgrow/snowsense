@@ -53,5 +53,5 @@ fun RetryView(
 @Preview
 @Composable
 fun RetryScreenPreview() {
-    RetryView(title = "Error", message = "No internet connection", onRetry = {})
+    RetryView(title = stringResource(R.string.error_title), message = stringResource(R.string.no_internet), onRetry = {})
 }

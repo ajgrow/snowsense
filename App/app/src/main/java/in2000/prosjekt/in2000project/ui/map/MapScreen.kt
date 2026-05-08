@@ -355,7 +355,9 @@ fun MapScreen(
                 modifier = mapButtonModifier,
                 contentPadding = PaddingValues(0.dp),
             ) {
-                Icon(imageVector = Icons.Default.Search, contentDescription = "Open Search")
+                Icon(
+                    imageVector = Icons.Default.Search,
+                    contentDescription = stringResource(R.string.open_search))
             }
 
             Spacer(Modifier.height(8.dp))
@@ -465,7 +467,9 @@ fun MapScreen(
                     .padding(bottom = 10.dp)
                     .navigationBarsPadding()
             ) {
-                Icon(Icons.Default.KeyboardArrowDown, contentDescription = null)
+                Icon(
+                    Icons.Default.KeyboardArrowDown,
+                    contentDescription = stringResource(R.string.scroll_down))
             }
         }
     }

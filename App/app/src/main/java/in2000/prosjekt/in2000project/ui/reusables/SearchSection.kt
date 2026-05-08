@@ -82,13 +82,13 @@ fun SearchSection(
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.Default.Menu,
-                        contentDescription = null
+                        contentDescription = stringResource(R.string.open_menu)
                     )
                 },
                 trailingIcon = {
                     Icon(
                         imageVector = Icons.Default.Search,
-                        contentDescription = null
+                        contentDescription = stringResource(R.string.open_search)
                     )
                 },
                 query = textFieldState.text.toString(),

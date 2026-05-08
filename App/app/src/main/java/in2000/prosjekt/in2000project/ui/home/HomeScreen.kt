@@ -185,7 +185,7 @@ fun LogoSection(
 
         Image(
             painter = painterResource(R.drawable.app_logo),
-            contentDescription = "App Logo",
+            contentDescription = stringResource(R.string.app_logo_description),
             modifier = Modifier
                 .width(logoWidth)
                 .wrapContentHeight()
@@ -382,7 +382,7 @@ fun HomeTopBar(
         ) {
             Icon(
                 Icons.Default.Settings,
-                contentDescription = null)
+                contentDescription = stringResource(R.string.open_settings))
         }
     }
 }
