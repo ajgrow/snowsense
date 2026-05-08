@@ -143,6 +143,12 @@ The app follows MVVM pattern combined with UDF resulting in the following patter
 
 > Document API-level details — endpoints, contracts, versioning, and any relevant integration specifics.
 
+| Configuration | Value | Reason |
+| --- | --- | --- |
+| 'minSdk' | 26 | Gives access to 'java.time'-API. and useable by over 95% of devices |
+| 'targetSdk' | 36 | minimal stable SDK for play Store |
+| 'compileSdk' | 36 | Compiles with the same SDK version as target to avoid warnings |
+
 ## 4. Package Structure
 ```
 in2000.prosjekt.in2000project/
