@@ -1,8 +1,8 @@
 # Architecture
 
 >This document is here to assist developers that are interested in familiarizing themselves with,
->mainatining or further developing the SnowSense-app. it describes the project's parent structure
->and other archetectural choices that have been made and which principles and patterns the code follows.
+>maintaining or further developing the SnowSense-app. it describes the project`s parent structure
+>and other architectural choices that have been made and which principles and patterns the code follows.
 
 
 ## Table of Contents
@@ -10,6 +10,7 @@
 1. [Code Structure & Architectural Choices](#1-code-structure--architectural-choices)
 2. [Object-Oriented Principles](#2-object-oriented-principles)
 3. [Technical Specifications](#3-technical-specifications)
+4. [Package Structure](#4-package-structure)
 
 ---
 
@@ -19,11 +20,23 @@
 
 > Document the high-level structure and design patterns used throughout the codebase.
 
-SnowSense's architecture follows the MVVM (Model-View-ViewModel) pattern, enabling separation of concerns. The application's structure is divided into three layers: a data layer, domain layer and UI layer.
+SnowSense is a frontend Android application built using Jetpack Compose. Its high-level architecture consists of:
+- DataSources responsible for querying APIs for weather, avalanche risk and location data
+- Repositories which map data to domain models
+- ViewModels managing UI state and interacting with repositories
+- UI components passing user events to ViewModels and observing and displaying UI state
 
-### Functional Decisions
+The application's architecture primarily applies these design patterns, among others:
+- MVVM (Model-View-ViewModel)
+- UDF (Unidirectional Data Flow)
+- Repository pattern
+- Dependency injection
+- State hoisting
+- Clean Architecture
 
-> Describe the choices made when planning and building the app's functionality.
+### Architecture Choices
+
+
 
 ## 2. Object-Oriented Principles
 
@@ -33,12 +46,13 @@ SnowSense's architecture follows the MVVM (Model-View-ViewModel) pattern, enabli
 
 #### Low Coupling
 DataSource- and Repository-layers are always exposed as **interfaces**:
-- 'FrostV0DataSource' --> Implemented by 'KtorFrostV0DataSource'
-- 'ClimateRepository' --> Implemented by 'FrostClimateRepository'
-- 'AvalancheRiskRepository' --> Implemented by 'FrostAvalancheRiskRepository'
+- `FrostV0DataSource` --> Implemented by `KtorFrostV0DataSource`
+- `ClimateRepository` --> Implemented by `FrostClimateRepository`
+- `AvalancheRiskRepository` --> Implemented by `FrostAvalancheRiskRepository`
 
-ViewModels only depend on interfaces / concrete repository classes, never on datasource implementations directly.
-Binding takes place in 'AppModule.kt' via **Koin**
+ViewModels only depend on repository interfaces, never on datasource implementations directly.
+
+Binding takes place in `AppModule.kt` via **Koin**
 ```kotlin
     single<FrostV0DataSource> { KtorFrostV0DataSource(client = get()) }
     single { FrostClimateRepository(get()) }
@@ -46,22 +60,22 @@ Binding takes place in 'AppModule.kt' via **Koin**
 ```
 The reason this is important is because it means that it is rather trivial to replace for example Ktor with another HTTP library due to only the implementation class and AppModule being affected.
 
-It also makes it easy to test the repository layer with one 'FakeFrostV0DataSource' without touching production code
+It also makes it easy to test the repository layer with one `FakeFrostV0DataSource` without touching production code.
 
 #### High Cohesion
 Every Package has one clear responsability
 | package | Responsability |
 | --- | --- |
-| 'datasource'| Raw communication with an external source |
-| 'datasource/dto'| Data objects that mirror API-contract |
-| 'repository' | Logic and aggregating |
-| 'data/model' | Internal app domain objects |
-| 'di' | Dependenies graph |
-| 'navigation' | route definition and navigation logic |
-| 'network' | HTTP-client configuration |
-| 'ui/<screen>' | Everything that belongs to a screen: State, Screen, Viewmodel, ect...|
-| 'ui/reusables' | Reusable, stateless composables |
-| 'ui/model' | UI-specific maps/models |
+| `datasource`| Raw communication with an external source |
+| `datasource/dto`| Data objects that mirror API-contract |
+| `repository` | Logic and aggregating |
+| `data/model` | Internal app domain objects |
+| `di` | Dependenies graph |
+| `navigation` | route definition and navigation logic |
+| `network` | HTTP-client configuration |
+| `ui/<screen>` | Everything that belongs to a screen: State, Screen, Viewmodel, ect...|
+| `ui/reusables` | Reusable, stateless composables |
+| `ui/model` | UI-specific maps/models |
 
 ### MVVM & Unidirectional Data Flow (UDF)
 
@@ -135,9 +149,9 @@ The **UI layer** consists of the screens and UI components the app uses to displ
 
 | Configuration | Value | Reason |
 | --- | --- | --- |
-| 'minSdk' | 26 | Gives access to 'java.time'-API. and useable by over 95% of devices |
-| 'targetSdk' | 36 | minimal stable SDK for play Store |
-| 'compileSdk' | 36 | Compiles with the same SDK version as target to avoid warnings |
+| `minSdk` | 26 | Gives access to `java.time`-API. and useable by over 95% of devices |
+| `targetSdk` | 36 | minimal stable SDK for play Store |
+| `compileSdk` | 36 | Compiles with the same SDK version as target to avoid warnings |
 
 ## 4. Package Structure
 ```
