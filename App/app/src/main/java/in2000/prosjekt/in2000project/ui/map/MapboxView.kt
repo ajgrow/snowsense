@@ -2,12 +2,30 @@ package in2000.prosjekt.in2000project.ui.map
 
 import android.graphics.BitmapFactory
 import android.util.Log
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import com.mapbox.common.Cancelable
@@ -25,17 +43,34 @@ import com.mapbox.maps.extension.style.layers.generated.rasterLayer
 import com.mapbox.maps.extension.style.sources.addSource
 import com.mapbox.maps.extension.style.sources.generated.rasterSource
 import com.mapbox.maps.plugin.animation.MapAnimationOptions
+import com.mapbox.maps.plugin.annotation.annotations
 import com.mapbox.maps.plugin.annotation.generated.PointAnnotationManager
+import com.mapbox.maps.plugin.annotation.generated.PointAnnotationOptions
+import com.mapbox.maps.plugin.annotation.generated.createPointAnnotationManager
+import com.mapbox.maps.plugin.gestures.gestures
 import com.mapbox.maps.toCameraOptions
+import in2000.prosjekt.in2000project.ui.settings.SettingsViewModel
+import in2000.prosjekt.in2000project.ui.settings.ThemeMode
 import in2000.prosjekt.in2000project.R
+import in2000.prosjekt.in2000project.data.model.Coordinate
+import in2000.prosjekt.in2000project.data.model.NamedLocation
+import in2000.prosjekt.in2000project.ui.reusables.SearchSection
+import in2000.prosjekt.in2000project.ui.search.SearchUiState
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.style.TextAlign
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mapbox.maps.EdgeInsets
 import com.mapbox.maps.MapView
 import com.mapbox.maps.MapboxMap
-import com.mapbox.maps.extension.compose.annotation.IconImage
 import com.mapbox.maps.extension.style.layers.properties.generated.ProjectionName
 import com.mapbox.maps.extension.style.projection.generated.Projection
 import com.mapbox.maps.extension.style.projection.generated.setProjection
-import com.mapbox.maps.extension.compose.annotation.generated.PointAnnotation
+import com.mapbox.maps.plugin.annotation.generated.PointAnnotation
+import com.mapbox.maps.plugin.attribution.generated.AttributionSettings
+import com.mapbox.maps.plugin.compass.generated.CompassSettings
+import com.mapbox.maps.plugin.logo.generated.LogoSettings
+import com.mapbox.maps.plugin.scalebar.generated.ScaleBarSettings
+import in2000.prosjekt.in2000project.ui.search.SearchViewModel
 
 private const val TAG = "SnoskredWMS"
 
@@ -58,7 +93,7 @@ private const val WMS_DETAIL =
 
 @Composable
 fun MapboxView(
-    mapViewModel: MapViewModel,
+    mapStateHolder: MapStateHolder,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
@@ -66,11 +101,9 @@ fun MapboxView(
         mutableStateOf<MapView?>(null)
     }
 
-    val mapScreenState by mapViewModel.screenState.collectAsState()
-
     val viewportState = rememberMapViewportState {
-        val savedCamera = mapScreenState.cameraOptions
-        val pin = mapScreenState.pinnedPoint
+        val savedCamera = mapStateHolder.cameraOptions.value
+        val pin = mapStateHolder.pinnedPoint.value
 
         setCameraOptions(
             when {
@@ -109,7 +142,13 @@ fun MapboxView(
         onDispose { idleSubscription?.cancel() }
     }
 
-    val pinPoint = mapScreenState.pinnedPoint
+    var pinManager by remember {
+        mutableStateOf<PointAnnotationManager?>(null)
+    }
+    var currentPin by remember {
+        mutableStateOf<PointAnnotation?>(null) }
+
+    val pinPoint by mapStateHolder.pinnedPoint.collectAsStateWithLifecycle()
 
     val animationOptions = MapAnimationOptions.Builder().duration(300).build()
 
@@ -117,16 +156,20 @@ fun MapboxView(
     val statusBarHeightPx = with(density) {
         contentPadding.calculateTopPadding().toPx()
     }
-    LaunchedEffect(mapViewModel) {
-        mapViewModel.mapActions.collect { cmd ->
+    val bottomPaddingPx = with(density) {
+        contentPadding.calculateBottomPadding().toPx()
+    }
+
+    LaunchedEffect(Unit) {
+        mapStateHolder.commands.collect { cmd ->
             val padding = EdgeInsets(
                 0.0,
                 0.0,
-                mapScreenState.bottomPaddingPx,
+                mapStateHolder.bottomPaddingPx.value,
                 0.0)
 
             when (cmd) {
-                is MapViewModel.MapAction.FlyTo ->
+                is MapStateHolder.MapCommand.FlyTo ->
                     viewportState.easeTo(
                         cameraOptions {
                             center(cmd.point)
@@ -135,7 +178,7 @@ fun MapboxView(
                         },
                         animationOptions
                     )
-                is MapViewModel.MapAction.Recenter -> {
+                is MapStateHolder.MapCommand.Recenter -> {
                     val currentZoom = viewportState.cameraState?.zoom
                     viewportState.easeTo(
                         cameraOptions {
@@ -146,7 +189,7 @@ fun MapboxView(
                         animationOptions
                     )
                 }
-                is MapViewModel.MapAction.ZoomBy -> {
+                is MapStateHolder.MapCommand.ZoomBy -> {
                     val current = viewportState.cameraState?.zoom ?: 10.0
                     viewportState.easeTo(
                         cameraOptions { zoom(current + cmd.delta) },
@@ -157,15 +200,9 @@ fun MapboxView(
         }
     }
 
-    val context = LocalContext.current
-
     MapboxMap(
         modifier = modifier.fillMaxSize(),
         mapViewportState = viewportState,
-        onMapClickListener = { point ->
-            mapViewModel.onMapClick(point.latitude(), point.longitude())
-            true
-        },
         compass = {
             Compass(
                 modifier = Modifier
@@ -178,33 +215,88 @@ fun MapboxView(
                     .padding(top = with(LocalDensity.current) { statusBarHeightPx.toDp() + 40.dp })
             )
         }
-    ) {
+    ){
         MapEffect(Unit) { mapView ->
+
             val mapboxMap = mapView.mapboxMap
 
             mapboxMap.getStyle { style ->
-                style.setProjection(Projection(ProjectionName.MERCATOR))
+                style.setProjection(
+                    Projection(ProjectionName.MERCATOR)
+                )
             }
+
+            mapViewState = mapView
 
             mapboxMap.setBounds()
 
-            mapboxMap.loadStyle(Style.OUTDOORS){ style ->
-                style.addNveAvalancheRiskLayers()
-                mapViewModel.onOverlayLoaded()
+            mapboxMap.loadStyle(
+                Style.OUTDOORS,
+                Style::addNveAvalancheRiskLayers)
+
+            mapView.gestures.addOnMapClickListener { point ->
+                mapStateHolder.placePin(point)
+                true
             }
 
-            mapView.mapboxMap.subscribeMapIdle {
-                mapViewModel.onCameraIdle(mapView.mapboxMap.cameraState.toCameraOptions())
+            pinManager = mapView.annotations
+                .createPointAnnotationManager()
+
+            mapStateHolder.pinnedPoint.value?.let { pin ->
+                mapView.mapboxMap.setCamera(
+                    CameraOptions.Builder()
+                        .center(pin)
+                        .zoom(mapStateHolder.cameraOptions.value?.zoom ?: 10.0)
+                        .build()
+                )
+            }
+
+            idleSubscription = mapView.mapboxMap
+                .subscribeMapIdle {
+                    mapStateHolder.onCameraIdle(
+                        mapView.mapboxMap
+                            .cameraState.toCameraOptions())
+                }
+
+            mapView.mapboxMap.subscribeMapLoadingError { error ->
+                Log.e(TAG, "Map loading error: ${error.message}")
+                mapStateHolder.onOverlayError()
             }
         }
 
-        pinPoint?.let { point ->
-            PointAnnotation(
-                point = point
-            ) {
-                val bitmap = BitmapFactory.decodeResource(context.resources, R.drawable.red_marker)
-                iconImage = IconImage(bitmap)
-                iconSize = 0.3
+        LaunchedEffect(pinPoint, pinManager) {
+            val currentPinManager = pinManager
+                ?: return@LaunchedEffect
+
+            val point = pinPoint
+
+            if (point == null) {
+                currentPin?.let { pointAnnotation ->
+                    currentPinManager.delete(pointAnnotation)
+                }
+
+                currentPin = null
+
+                return@LaunchedEffect
+            }
+
+            val existing = currentPin
+            if(existing == null) {
+                val bitmap = BitmapFactory.decodeResource(
+                    mapViewState?.context?.resources
+                        ?: return@LaunchedEffect,
+                    R.drawable.red_marker
+                )
+
+                currentPin = currentPinManager
+                    .create(PointAnnotationOptions()
+                        .withPoint(point)
+                        .withIconImage(bitmap)
+                        .withIconSize(0.3)
+                    )
+            } else {
+                existing.point = point
+                currentPinManager.update(existing)
             }
         }
     }
