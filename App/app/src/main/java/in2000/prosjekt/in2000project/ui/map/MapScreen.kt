@@ -170,6 +170,7 @@ fun MapRoute(
         onStartDateChange = { it?.let(mapViewModel::onStartDateChange) },
         onEndDateChange = { it?.let(mapViewModel::onEndDateChange) },
         onYearChange = { it?.let(mapViewModel::onYearChange) },
+        onQueryChange = searchViewModel::onQueryChange,
         onSelectResult = searchViewModel::addRecentSearch,
         onAddFavorite = {
             screenState.climateCoordinate?.let { coordinate ->
@@ -208,6 +209,7 @@ fun MapScreen(
     onStartDateChange: (MonthDay?) -> Unit,
     onEndDateChange: (MonthDay?) -> Unit,
     onYearChange: (Int?) -> Unit,
+    onQueryChange: (query: String) -> Unit,
     onSelectResult: (NamedLocation) -> Unit,
     onAddFavorite: () -> Unit,
     canAddFavorite: () -> Boolean,
@@ -394,8 +396,7 @@ fun MapScreen(
                 modifier = Modifier
                     .focusRequester(focusRequester)
                     .padding(top = 120.dp),
-                textFieldState = searchState.searchTextFieldState,
-                searchResults = searchState.searchResults,
+                searchState = searchState,
                 onNavigateToMap = { coordinate ->
                     onSearchLocationRequested(
                         Point.fromLngLat(
@@ -404,8 +405,8 @@ fun MapScreen(
                       isSearchActive = false
                       focusManager.clearFocus() },
                 onSelectResult = onSelectResult,
-                recentSearches = searchState.recentSearches,
-                onActiveChange = onSearchbarActiveChange
+                onActiveChange = onSearchbarActiveChange,
+                onQueryChange = onQueryChange
             )
         }
 
@@ -674,6 +675,7 @@ fun MapScreenErrorPreview() {
         modifier = Modifier,
         riskState = RiskUiState(),
         searchState = SearchUiState(),
+        onQueryChange = {},
         onSelectResult = {},
         onAddFavorite = {},
         canAddFavorite = { false },

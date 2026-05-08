@@ -124,11 +124,10 @@ fun HomeScreen(
                 SearchSection(
                     //get states from the viewmodel
                     modifier = Modifier,
-                    textFieldState = searchState.searchTextFieldState,
-                    searchResults = searchState.searchResults,
+                    searchState = searchState,
                     onNavigateToMap = onNavigateToMap,
+                    onQueryChange = searchViewModel::onQueryChange,
                     onSelectResult = searchViewModel::addRecentSearch,
-                    recentSearches = searchState.recentSearches,
                     onActiveChange = searchViewModel::setSearchActive
                 )
             }
