@@ -69,8 +69,6 @@ Every Package has one clear responsability
 
 The app follows MVVM pattern combined with UDF resulting in the following pattern:
 
-# Architecture Layers
-
 ### UI Components
 - **Observer:** consumes `screenState` via `StateFlow`
 - **Sender:** emits events to ViewModel through lambda callbacks
@@ -199,14 +197,14 @@ in2000.prosjekt.in2000project/
 |    |    |---KtorClient.kt 
 |    |
 |    |---ui/
-|    |    |--- approot/             # AppRoot - Toplevel composable
-|    |    |--- home/                # HomeScreen
-|    |    |--- map/                 # MapScreen relevant
-|    |    |--- information/         # InfoScreen relevant
-|    |    |---search/               # SearchViewModel
-|    |    |--- settings/            # SettingScreen relevant
-|    |    |--- model/               # UI-models
-|    |    |--- reusables/           # Reusable Composables
+|    |    |--- approot/                 # AppRoot - Toplevel composable
+|    |    |--- home/                    # HomeScreen
+|    |    |--- map/                     # MapScreen relevant
+|    |    |--- information/             # InfoScreen relevant
+|    |    |---search/                   # SearchViewModel
+|    |    |--- settings/                # SettingScreen relevant
+|    |    |--- model/                   # UI-models
+|    |    |--- reusables/               # Reusable Composables
 │    |
 |--- MainActivity.kt
 |----SnowSenseApplication.kt
