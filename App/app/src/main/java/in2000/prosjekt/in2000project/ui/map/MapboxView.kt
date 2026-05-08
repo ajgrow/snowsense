@@ -181,11 +181,17 @@ fun MapboxView(
     ) {
         MapEffect(Unit) { mapView ->
             val mapboxMap = mapView.mapboxMap
+
             mapboxMap.getStyle { style ->
                 style.setProjection(Projection(ProjectionName.MERCATOR))
             }
+
             mapboxMap.setBounds()
-            mapboxMap.loadStyle(Style.OUTDOORS, Style::addNveAvalancheRiskLayers)
+
+            mapboxMap.loadStyle(Style.OUTDOORS){ style ->
+                style.addNveAvalancheRiskLayers()
+                mapViewModel.onOverlayLoaded()
+            }
 
             mapView.mapboxMap.subscribeMapIdle {
                 mapViewModel.onCameraIdle(mapView.mapboxMap.cameraState.toCameraOptions())

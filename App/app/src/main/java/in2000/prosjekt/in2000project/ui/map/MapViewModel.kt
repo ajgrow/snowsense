@@ -161,6 +161,8 @@ class MapViewModel(
         _mapActions.tryEmit(
             MapAction.FlyTo(point, zoom)
         )
+
+        fetchClimateData(point.latitude(), point.longitude())
     }
 
     fun fetchClimateData(lat: Double, lon: Double) {
