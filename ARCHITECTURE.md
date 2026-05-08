@@ -19,22 +19,11 @@
 
 > Document the high-level structure and design patterns used throughout the codebase.
 
-SnowSense's architecture primarily follows the MVVM (Model-View-ViewModel) pattern, enabling separation of concerns. The application's structure is divided into three layers: a data layer, domain layer and UI layer.
-
-The **data layer** uses a Ktor API client with data sources fetching raw data from the various APIs in use (Frost, NVE, Kartverket). Repositories aggregate and transform this data from raw JSON objects containing daily weather measurements, location search responses and GeoJson polygons, into kotlin objects and computed averages which the rest of the app can display or use for further calculations. 
-
-The **domain layer** is used for complex logic such as avalanche risk estimation based on recent weather averages and selected time ranges.
-
-The **UI layer** consists of the screens and UI components the app uses to display climate data and risk evaluations based on locations and time ranges by querying repositories and domain-layer logic through ViewModels. This data is presented through trend graphs and risk level descriptions, as well as search results and saved user preferences.
-
-#### Patterns used throughout the project
-
+SnowSense's architecture follows the MVVM (Model-View-ViewModel) pattern, enabling separation of concerns. The application's structure is divided into three layers: a data layer, domain layer and UI layer.
 
 ### Functional Decisions
 
 > Describe the choices made when planning and building the app's functionality.
-
----
 
 ## 2. Object-Oriented Principles
 
@@ -64,9 +53,9 @@ Every Package has one clear responsability
 | package | Responsability |
 | --- | --- |
 | 'datasource'| Raw communication with an external source |
-| 'datasource/dto'| Dataobjects that miror API-contract |
+| 'datasource/dto'| Data objects that mirror API-contract |
 | 'repository' | Logic and aggregating |
-| 'data/model' | Internal app domainobjects |
+| 'data/model' | Internal app domain objects |
 | 'di' | Dependenies graph |
 | 'navigation' | route definition and navigation logic |
 | 'network' | HTTP-client configuration |
@@ -78,54 +67,42 @@ Every Package has one clear responsability
 
 > Describe how the MVVM pattern and UDF are applied across the app.
 
-The application is built around MVVM patterns and unidirectional data flow. As an example:
-
-On the View layer, the SearchBar composable calls "onQueryChanged" which is a lambda passed down through the UI call tree to the SearchBar from the SearchViewModel (on the ViewModel layer). 
-
-This ViewModel then queries the LocationRepository which in turn fetches a raw response from the KartVerket Stedsnavn API through the LocationDataSource and sorts out relevant data from DTOs into a list of usable NamedLocation objects. Both the Repository and DataSource belong to the Model layer.
-
-Once the SearchViewModel has received a list of search results, it updates the SearchUiState. This state is observed by the SearchBar composable, which is then updated to show the search results to the user.
-
 The app follows MVVM pattern combined with UDF resulting in the following pattern:
 
-```
-┌──────────────────────────────────────────────────────────┐
-|    UI-Layer    (Composables)                             |
-|    Reader: screenState (StateFlow)                       |
-|    Sender: Events sent to ViewModel through lambda       |
-└───────────────────────┬──────────────────────────────────┘
-                        |    events (onMapClick, onYearChange)
-                        ▼
-┌──────────────────────────────────────────────────────────┐
-|    ViewModel    (MapViewModel, RiskViewModel, ect...)    |
-|    -MutabletateFlow<ScreenState>                         |
-|    -Updates through the use of .copy()                   |
-|    -Calls repository through suspend functions           |
-└───────────────────────┬──────────────────────────────────┘
-                        |    suspend calls
-                        ▼
-┌──────────────────────────────────────────────────────────┐
-|    Repository.Layer                                      |
-|    -Aggregates data from datasources                     |
-|    -Returns domainobjects                                |
-└───────────────────────┬──────────────────────────────────┘
-                        |    suspend calls
-                        ▼
-┌──────────────────────────────────────────────────────────┐
-|    DataSource-Layer                                      |   
-|    -Communicate with API (Ktor)                          |
-|    -Return DTOs                                          |
-└──────────────────────────────────────────────────────────┘
+# Architecture Layers
 
-```
+### UI Components
+- **Observer:** consumes `screenState` via `StateFlow`
+- **Sender:** emits events to ViewModel through lambda callbacks
+
+↓ *events (`onMapClick`, `onYearChange`, etc.)*
+
+---
+
+### ViewModels
+- Holds `MutableStateFlow<ScreenState>`
+- Updates state through `.copy()` to ensure updates
+- Calls repository via `suspend` functions
+
+↓ *suspend calls (`getClimateDataForLocation()`, `getNamedLocations()`, etc.)*
+
+---
+
+### Repositories
+- Aggregates data from datasources
+- Returns domain objects
+
+↓ *suspend calls (`getNearestSource()`, `getObservations()`, `fetchNamesResponse()`, etc.)
+
+---
+
+### DataSources
+- Communicates with API via a Ktor HttpClient
+- Returns DTOs
 
 ### Exceptions & Justifications
 
 > Document any deliberate exceptions to the above principles.
-
-**`MapStateHolder`** *(if not replaced)*
-
-> This object may deviate from standard patterns. Provide reflection and justification for why this exception exists and what trade-offs were accepted.
 
 ---
 
@@ -135,9 +112,24 @@ The app follows MVVM pattern combined with UDF resulting in the following patter
 
 > High-level architectural overview — layers, modules, and how they interact.
 
+The **data layer** holds a Ktor API client with data sources fetching raw data from the various APIs in use (Frost, NVE, Kartverket). The repositories aggregate and transform this data from raw JSON objects containing daily weather measurements, location search responses and GeoJson polygons, returning domain objects and lists of computed averages which the rest of the app can display or use for further calculations. 
+
+The **domain layer** holds classes used for complex logic such as slab avalanche risk estimation based on recent weather averages and selected time ranges.
+
+The **UI layer** consists of the screens and UI components the app uses to display climate data and risk evaluations based on locations and time ranges by querying repositories and domain-layer logic through ViewModels. This data is presented through a map, trend graphs, risk level descriptions, as well as search results and saved user preferences.
+
 ### Technologies
 
 > List and briefly describe the key technologies, frameworks, and libraries used.
+
+| Technology | Type | Usage |
+| ---------- | ---- | ----- |
+| Jetpack Compose | UI Framework | Used to build MVVM-friendly UI components called Composables |
+| Mapbox Maps | SDK | Used to integrate a Mapbox Map which supports navigation, interaction, and custom layers. |
+| MET Frost v0     |  API endpoint    |  Used to fetch nearby weather stations and fetch historical climate data from them. |
+| NVE SnøskredAktsomhet | API endpoint | Used to display and query snow avalanche risk areas calculated from terrain steepness, tree cover, etc. |
+| Kartverket Stedsnavn | API endpoint | Used to fetch location search results |
+| Vico | Library | Used to render trend graphs |
 
 ### API Level
 
@@ -154,7 +146,7 @@ The app follows MVVM pattern combined with UDF resulting in the following patter
 in2000.prosjekt.in2000project/
 |
 |--- data/
-|    |--- model/                            #Domainobjects
+|    |--- model/                            #Domain objects
 |    |    |---enums/
 |    |    |    |--- DangerLevel
 |    |    |    |--- ElementType
@@ -171,7 +163,7 @@ in2000.prosjekt.in2000project/
 |    |    |---NoStationFoundException
 |    |    
 |    |--- datasource/                        # Communication with the API (Frost, NVE)
-|    |    |--- dto/                          # Dataobjects that mirror API-response
+|    |    |--- dto/                          # Data objects which mirror API-response
 |    |    |    |---FrostV0ObservasjonsDto.kt
 |    |    |    |---FrostV0SourceDto.kt
 |    |    |    |---LocationDto.kt
@@ -181,15 +173,15 @@ in2000.prosjekt.in2000project/
 |    |    |--- LocationDataSource
 |    |    |--- LocationQueryBuilder.kt
 |    |
-|    |--- repository/                        # logic and aggregation of data
-|    |    |--- ClimateRepository.kt          # interface
-|    |    |--- FrostClimateRepository.kt     # implementation
-|    |    |--- AvalancheRiskRepository.kt    # interface
-|    |    |--- FrostAvalancheRiskRepository.kt 
-|    |    |--- SlabAvalancheRiskRepository.kt  # DomainLogic and objects
+|    |--- repository/                        # Logic and aggregation of data
+|    |    |--- ClimateRepository.kt          # Interface
+|    |    |--- FrostClimateRepository.kt     # Implementation
+|    |    |--- AvalancheRiskRepository.kt    # Interface
+|    |    |--- FrostAvalancheRiskRepository.kt # Implementation
+|    |    |--- SlabAvalancheRiskRepository.kt  # Domain logic and objects
 |    |    |--- NveRepository.kt 
 |    |    |--- SearchRepository.kt
-|    |    |--- FrostReferenceTime.kt    #helping object
+|    |    |--- FrostReferenceTime.kt    # Helper object
 |    |    |--- LocationRepository
 |    |    
 |    |--- datastore/
