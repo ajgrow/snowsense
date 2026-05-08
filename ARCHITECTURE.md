@@ -86,6 +86,39 @@ This ViewModel then queries the LocationRepository which in turn fetches a raw r
 
 Once the SearchViewModel has received a list of search results, it updates the SearchUiState. This state is observed by the SearchBar composable, which is then updated to show the search results to the user.
 
+The app follows MVVM pattern combined with UDF resulting in the following pattern:
+
+```
+┌──────────────────────────────────────────────────────────┐
+|    UI-Layer    (Composables)                             |
+|    Reader: screenState (StateFlow)                       |
+|    Sender: Events sent to ViewModel through lambda       |
+└───────────────────────┬──────────────────────────────────┘
+                        |    events (onMapClick, onYearChange)
+                        ▼
+┌──────────────────────────────────────────────────────────┐
+|    ViewModel    (MapViewModel, RiskViewModel, ect...)    |
+|    -MutabletateFlow<ScreenState>                         |
+|    -Updates through the use of .copy()                   |
+|    -Calls repository through suspend functions           |
+└───────────────────────┬──────────────────────────────────┘
+                        |    suspend calls
+                        ▼
+┌──────────────────────────────────────────────────────────┐
+|    Repository.Layer                                      |
+|    -Aggregates data from datasources                     |
+|    -Returns domainobjects                                |
+└───────────────────────┬──────────────────────────────────┘
+                        |    suspend calls
+                        ▼
+┌──────────────────────────────────────────────────────────┐
+|    DataSource-Layer                                      |   
+|    -Communicate with API (Ktor)                          |
+|    -Return DTOs                                          |
+└──────────────────────────────────────────────────────────┘
+
+```
+
 ### Exceptions & Justifications
 
 > Document any deliberate exceptions to the above principles.
