@@ -550,7 +550,7 @@ fun BottomSheetContent(
                                 ) {
                                     Icon(
                                         imageVector = Icons.Default.Star,
-                                        contentDescription = ""
+                                        contentDescription = stringResource(R.string.favorite_button_desc)
                                     )
                                 }
                             }

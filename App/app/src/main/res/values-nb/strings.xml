@@ -191,8 +191,7 @@
     <string name="text_size">tekst størrelse</string>
 
     <string name="language">Språk</string>
-
-
+    <string name="favorite_button_desc">Legg til som favoritt</string>
 
 
 </resources>
