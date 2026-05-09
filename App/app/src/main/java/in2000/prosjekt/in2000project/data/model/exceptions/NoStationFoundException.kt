@@ -1,4 +1,6 @@
-package in2000.prosjekt.in2000project.data.model
+package in2000.prosjekt.in2000project.data.model.exceptions
+
+import in2000.prosjekt.in2000project.domain.model.Coordinate
 
 
 /**

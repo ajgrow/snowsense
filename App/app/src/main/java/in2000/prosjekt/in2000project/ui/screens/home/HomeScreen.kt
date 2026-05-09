@@ -59,8 +59,8 @@ package in2000.prosjekt.in2000project.ui.screens.home
     import androidx.compose.ui.text.style.TextOverflow
     import androidx.compose.ui.unit.sp
     import in2000.prosjekt.in2000project.R
-    import in2000.prosjekt.in2000project.data.model.Coordinate
-    import in2000.prosjekt.in2000project.data.model.NamedLocation
+    import in2000.prosjekt.in2000project.domain.model.Coordinate
+    import in2000.prosjekt.in2000project.domain.model.NamedLocation
     import in2000.prosjekt.in2000project.ui.viewmodels.RiskUiState
     import in2000.prosjekt.in2000project.ui.viewmodels.RiskViewModel
     import in2000.prosjekt.in2000project.ui.components.EmergencySection

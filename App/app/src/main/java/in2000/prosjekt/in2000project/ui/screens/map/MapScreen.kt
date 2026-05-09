@@ -65,8 +65,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import in2000.prosjekt.in2000project.R
-import in2000.prosjekt.in2000project.data.model.ClimateArea
-import in2000.prosjekt.in2000project.data.model.toClimateArea
+import in2000.prosjekt.in2000project.domain.model.ClimateArea
+import in2000.prosjekt.in2000project.domain.model.toClimateArea
 import in2000.prosjekt.in2000project.ui.components.ClimateGraph
 import in2000.prosjekt.in2000project.ui.components.DangerLevelCard
 import in2000.prosjekt.in2000project.ui.components.DatePicker
@@ -74,9 +74,9 @@ import org.koin.compose.viewmodel.koinViewModel
 import java.time.MonthDay
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mapbox.geojson.Point
-import in2000.prosjekt.in2000project.data.model.NamedLocation
+import in2000.prosjekt.in2000project.domain.model.NamedLocation
 import in2000.prosjekt.in2000project.ui.viewmodels.SearchViewModel
-import in2000.prosjekt.in2000project.data.model.enums.DangerLevel
+import in2000.prosjekt.in2000project.domain.model.enums.DangerLevel
 import in2000.prosjekt.in2000project.ui.model.DangerLevelUiModel
 import in2000.prosjekt.in2000project.ui.model.toUiModel
 import in2000.prosjekt.in2000project.ui.components.SearchSection

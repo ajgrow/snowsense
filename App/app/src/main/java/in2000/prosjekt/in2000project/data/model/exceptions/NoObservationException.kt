@@ -1,4 +1,4 @@
-package in2000.prosjekt.in2000project.data.model
+package in2000.prosjekt.in2000project.data.model.exceptions
 
 /**
  * Thrown when a station exists but has no observations

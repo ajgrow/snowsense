@@ -1,4 +1,4 @@
-package in2000.prosjekt.in2000project.data.model.enums
+package in2000.prosjekt.in2000project.domain.model.enums
 
 /** European Avalanche Danger Scale levels. */
 enum class DangerLevel {

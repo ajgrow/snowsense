@@ -4,8 +4,8 @@ import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import in2000.prosjekt.in2000project.data.model.Coordinate
-import in2000.prosjekt.in2000project.data.model.NamedLocation
+import in2000.prosjekt.in2000project.domain.model.Coordinate
+import in2000.prosjekt.in2000project.domain.model.NamedLocation
 import in2000.prosjekt.in2000project.data.repository.LocationRepository
 import in2000.prosjekt.in2000project.data.repository.SearchRepository
 import kotlinx.coroutines.flow.MutableStateFlow

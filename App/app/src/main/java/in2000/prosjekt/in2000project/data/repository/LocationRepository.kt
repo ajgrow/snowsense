@@ -1,8 +1,8 @@
 package in2000.prosjekt.in2000project.data.repository
 
 import in2000.prosjekt.in2000project.data.datasource.LocationDataSource
-import in2000.prosjekt.in2000project.data.model.Coordinate
-import in2000.prosjekt.in2000project.data.model.NamedLocation
+import in2000.prosjekt.in2000project.domain.model.Coordinate
+import in2000.prosjekt.in2000project.domain.model.NamedLocation
 import in2000.prosjekt.in2000project.util.LocationTypeTranslations
 
 class LocationRepository(

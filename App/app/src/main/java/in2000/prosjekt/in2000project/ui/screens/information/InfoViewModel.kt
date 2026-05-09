@@ -2,7 +2,7 @@ package in2000.prosjekt.in2000project.ui.screens.information
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
-import in2000.prosjekt.in2000project.data.model.enums.DangerLevel
+import in2000.prosjekt.in2000project.domain.model.enums.DangerLevel
 import in2000.prosjekt.in2000project.ui.model.DangerLevelUiModel
 import in2000.prosjekt.in2000project.ui.model.toUiModel
 import kotlinx.coroutines.flow.MutableStateFlow
