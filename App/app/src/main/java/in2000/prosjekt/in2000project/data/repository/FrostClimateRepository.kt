@@ -7,8 +7,8 @@ import in2000.prosjekt.in2000project.data.datasource.dto.FrostV0ObservationRespo
 import in2000.prosjekt.in2000project.domain.model.Coordinate
 import in2000.prosjekt.in2000project.domain.model.LocationClimateData
 import in2000.prosjekt.in2000project.domain.model.LocationClimateDataPoint
-import in2000.prosjekt.in2000project.domain.model.NoObservationsException
-import in2000.prosjekt.in2000project.domain.model.NoStationFoundException
+import in2000.prosjekt.in2000project.data.model.exceptions.NoObservationsException
+import in2000.prosjekt.in2000project.data.model.exceptions.NoStationFoundException
 import java.time.MonthDay
 import in2000.prosjekt.in2000project.domain.model.enums.ElementType
 import kotlin.collections.groupBy

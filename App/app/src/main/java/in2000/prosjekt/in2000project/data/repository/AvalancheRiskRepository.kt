@@ -2,8 +2,8 @@ package in2000.prosjekt.in2000project.data.repository
 
 import in2000.prosjekt.in2000project.domain.model.Coordinate
 import in2000.prosjekt.in2000project.domain.model.LocationSlabAvalancheRiskData
-import in2000.prosjekt.in2000project.domain.model.NoObservationsException
-import in2000.prosjekt.in2000project.domain.model.NoStationFoundException
+import in2000.prosjekt.in2000project.data.model.exceptions.NoObservationsException
+import in2000.prosjekt.in2000project.data.model.exceptions.NoStationFoundException
 import java.time.LocalDate
 
 /** Repository for avalanche risk assessments based on recent climate data. */
