@@ -92,7 +92,7 @@ class FrostClimateRepositoryTest {
                 id = "SN99999",
                 name = "Mystery Station",
                 shortName = "Mystery",
-                geometry = FrostV0Point(
+                geometry = FrostV0PointDto(
                     type = "Point", coordinates = listOf(70.0, 25.0),
                 ),
                 distance = null,

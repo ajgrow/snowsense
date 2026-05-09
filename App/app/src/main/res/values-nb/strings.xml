@@ -182,16 +182,18 @@
 
     <string name="open_resource">Åpne %1$s</string>
 
-    <string name="open_settings">åpne innstillinger</string>
+    <string name="open_settings">Åpne innstillinger</string>
 
     <string name="scroll_down">Bla ned</string>
 
     <string name="open_menu">Åpne menyen</string>
 
-    <string name="text_size">tekst størrelse</string>
+    <string name="text_size">Tekststørrelse</string>
 
     <string name="language">Språk</string>
     <string name="favorite_button_desc">Legg til som favoritt</string>
+    <string name="selected_area">Valgt område</string>
+    <string name="missing_station_name">Målestasjon uten navn</string>
 
 
 </resources>

@@ -1,7 +1,6 @@
 package in2000.prosjekt.in2000project
 
 import in2000.prosjekt.in2000project.data.datasource.LocationDataSource
-import in2000.prosjekt.in2000project.data.datasource.buildLocationQuery
 import in2000.prosjekt.in2000project.data.repository.LocationRepository
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
@@ -14,7 +13,7 @@ class SearchBarTest {
 
         runBlocking {
             val result = dataSource.getNamesResponse(
-                buildLocationQuery("blindern")
+                "blindern"
             )
             val name = result?.first()
             assertNotNull(name)
@@ -30,14 +29,16 @@ class SearchBarTest {
         val repository = LocationRepository()
 
         runBlocking {
-            val result = repository.getNamedLocations(buildLocationQuery("blindern"))
+            val result = repository.getNamedLocations("blindern")
             assertTrue(result.isNotEmpty())
         }
     }
 
     @Test
     fun testLocationQueryBuilder() {
-        val result = buildLocationQuery("blindern")
+        val dataSource = LocationDataSource()
+
+        val result = dataSource.buildLocationQuery("blindern")
         assertEquals(
             "https://api.kartverket.no/stedsnavn/v1/navn?sok=blindern&fuzzy=true&utkoordsys=4258&treffPerSide=10&side=1&filtrer=navn.representasjonspunkt%2Cnavn.skrivem%C3%A5te%2Cnavn.navneobjekttype",
             result

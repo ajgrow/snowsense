@@ -1,8 +1,8 @@
 package in2000.prosjekt.in2000project.data.repository
 
 import in2000.prosjekt.in2000project.data.datasource.FrostV0DataSource
-import in2000.prosjekt.in2000project.data.datasource.dto.FrostV0ObservationsAtRefTime
-import in2000.prosjekt.in2000project.data.datasource.dto.FrostV0Source
+import in2000.prosjekt.in2000project.data.datasource.dto.FrostV0ObservationsAtRefTimeDto
+import in2000.prosjekt.in2000project.data.datasource.dto.FrostV0SourceDto
 import in2000.prosjekt.in2000project.data.model.Coordinate
 import in2000.prosjekt.in2000project.data.model.DailyWeatherRecord
 import in2000.prosjekt.in2000project.data.model.LocationSlabAvalancheRiskData
@@ -41,7 +41,7 @@ class FrostAvalancheRiskRepository(
         )
     }
 
-    private suspend fun FrostV0Source.getDailyWeatherRecords(
+    private suspend fun FrostV0SourceDto.getDailyWeatherRecords(
         repeatingTimeRange: FrostReferenceTime
     ): List<DailyWeatherRecord> {
         val requiredElements = listOf(
@@ -92,7 +92,7 @@ class FrostAvalancheRiskRepository(
         return records
     }
 
-    private fun FrostV0ObservationsAtRefTime.toDailyWeatherRecord(
+    private fun FrostV0ObservationsAtRefTimeDto.toDailyWeatherRecord(
     ) = DailyWeatherRecord(
         LocalDate
             .parse(referenceTime.substringBefore("T")),

@@ -1,7 +1,7 @@
 package in2000.prosjekt.in2000project.data.datasource
 
-import in2000.prosjekt.in2000project.data.datasource.dto.FrostV0ObservationResponse
-import in2000.prosjekt.in2000project.data.datasource.dto.FrostV0Source
+import in2000.prosjekt.in2000project.data.datasource.dto.FrostV0ObservationResponseDto
+import in2000.prosjekt.in2000project.data.datasource.dto.FrostV0SourceDto
 import in2000.prosjekt.in2000project.data.model.Coordinate
 
 /**
@@ -14,12 +14,12 @@ interface FrostV0DataSource {
      * Finds the nearest weather station to the given coordinates.
      *
      * @param coordinate The point to search from (WGS-84).
-     * @return [FrostV0Source] The nearest station with distance in km.
+     * @return [FrostV0SourceDto] The nearest station with distance in km.
      * @throws java.io.IOException on network or I/O failures.
      */
     suspend fun getNearestSource(
         coordinate: Coordinate
-    ): FrostV0Source?
+    ): FrostV0SourceDto?
 
     /**
      * Fetches weather observations from a station.
@@ -29,12 +29,12 @@ interface FrostV0DataSource {
      *   See [element table](https://frost.met.no/elementtable) for valid IDs.
      * @param referenceTime ISO 8601 time range (half-open), e.g. `"2020-01-01/2025-01-01"`.
      *   Also supports `"latest"` for the most recent data.
-     * @return [FrostV0ObservationResponse] containing the observation data.
+     * @return [FrostV0ObservationResponseDto] containing the observation data.
      * @throws java.io.IOException on network or I/O failures.
      */
     suspend fun getObservations(
         sourceId: String,
         elementsCsv: String,
         referenceTime: String,
-    ): FrostV0ObservationResponse?
+    ): FrostV0ObservationResponseDto?
 }

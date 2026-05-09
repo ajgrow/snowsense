@@ -1,7 +1,6 @@
 package in2000.prosjekt.in2000project.data.datasource
 
-import in2000.prosjekt.in2000project.data.model.GeoJson
-import in2000.prosjekt.in2000project.network.KtorClient
+import in2000.prosjekt.in2000project.data.datasource.dto.GeoJsonResponseDto
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
@@ -10,7 +9,7 @@ import io.ktor.client.request.parameter
 class NveDataSource(
     private val client: HttpClient
 ) {
-    suspend fun getGeoJson(lat: Double, lon: Double, buffer: Int): GeoJson {
+    suspend fun getGeoJson(lat: Double, lon: Double, buffer: Int): GeoJsonResponseDto {
         return try {
             client
                 .get("https://kart.nve.no/enterprise/rest/services/SnoskredAktsomhet/MapServer/3/query"){
@@ -33,10 +32,10 @@ class NveDataSource(
                     parameter("outSR", "4326")
                     parameter("f", "geojson")
                 }
-                .body<GeoJson>()
+                .body<GeoJsonResponseDto>()
         } catch (e: Exception){
             e.printStackTrace()
-            GeoJson(
+            GeoJsonResponseDto(
                 features = emptyList(),
                 type = "FeatureCollection")
         }
