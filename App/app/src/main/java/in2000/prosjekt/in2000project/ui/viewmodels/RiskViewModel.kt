@@ -2,9 +2,10 @@ package in2000.prosjekt.in2000project.ui.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import in2000.prosjekt.in2000project.data.model.Coordinate
-import in2000.prosjekt.in2000project.data.model.enums.DangerLevel
 import in2000.prosjekt.in2000project.data.repository.AvalancheRiskRepository
+import in2000.prosjekt.in2000project.domain.model.Coordinate
+import in2000.prosjekt.in2000project.domain.model.enums.DangerLevel
+import in2000.prosjekt.in2000project.data.repository.FrostAvalancheRiskRepository
 import in2000.prosjekt.in2000project.data.repository.NveRepository
 import in2000.prosjekt.in2000project.domain.SlabAvalancheRiskAssessor
 import in2000.prosjekt.in2000project.ui.model.DangerLevelUiModel
