@@ -10,13 +10,15 @@ import java.time.LocalDate
 /** Repository for avalanche risk assessments based on recent climate data. */
 interface AvalancheRiskRepository {
     /**
-     * Assesses slab avalanche risk for the given location based on recent
+     * Constructs a list of weather records based on recent
      * weather observations from the nearest station.
      *
      * @param coordinate The map point to assess risk for (WGS-84).
      * @param currentDate The date to assess risk for (defaults to today).
-     * @param lookBackDays The number of days to look back in the climate records.
-     * @return [LocationSlabAvalancheRiskData] with the assessed danger level.
+     * @param lookBackDays The number of days to build the climate records
+     * backwards from currentDate.
+     * @return [List<DailyWeatherRecord>] consisting of daily weather records
+     * for the selected range.
      * @throws java.io.IOException on network failures.
      * @throws NoObservationsException if the station has no data for the requested period.
      * @throws NoStationFoundException if no station is found for the requested coordinate.
