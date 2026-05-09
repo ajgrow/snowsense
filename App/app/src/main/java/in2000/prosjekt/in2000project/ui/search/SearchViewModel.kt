@@ -1,10 +1,5 @@
 package in2000.prosjekt.in2000project.ui.search
 
-import android.app.Application
-import android.content.Context
-import androidx.compose.foundation.text.input.TextFieldState
-import androidx.compose.runtime.snapshotFlow
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import in2000.prosjekt.in2000project.data.datasource.buildLocationQuery
@@ -20,7 +15,6 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.serialization.json.Json
 
 data class SearchUiState (
     val query: String = "",
@@ -61,7 +55,16 @@ class SearchViewModel(
     }
 
     fun onQueryChange(query: String){
-        _searchState.update { it.copy(query = query) }
+        _searchState.update { it.copy(query = query.take(50)) }
+    }
+
+    fun selectSearchResult(location: NamedLocation) {
+        _searchState.update {
+            it.copy(
+                query = ""
+            )
+        }
+        addRecentSearch(location)
     }
 
     fun addRecentSearch(location: NamedLocation) {

@@ -35,7 +35,6 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SheetState
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -171,7 +170,7 @@ fun MapRoute(
         onEndDateChange = { it?.let(mapViewModel::onEndDateChange) },
         onYearChange = { it?.let(mapViewModel::onYearChange) },
         onQueryChange = searchViewModel::onQueryChange,
-        onSelectResult = searchViewModel::addRecentSearch,
+        onSelectResult = searchViewModel::selectSearchResult,
         onAddFavorite = {
             screenState.climateCoordinate?.let { coordinate ->
                 searchViewModel.addPendingFavorite(coordinate)

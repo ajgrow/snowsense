@@ -61,7 +61,6 @@ package in2000.prosjekt.in2000project.ui.home
     import in2000.prosjekt.in2000project.R
     import in2000.prosjekt.in2000project.data.model.Coordinate
     import in2000.prosjekt.in2000project.data.model.NamedLocation
-    import in2000.prosjekt.in2000project.ui.map.LocationRiskState
     import in2000.prosjekt.in2000project.ui.map.RiskUiState
     import in2000.prosjekt.in2000project.ui.map.RiskViewModel
     import in2000.prosjekt.in2000project.ui.reusables.EmergencySection
@@ -127,7 +126,7 @@ fun HomeScreen(
                     searchState = searchState,
                     onNavigateToMap = onNavigateToMap,
                     onQueryChange = searchViewModel::onQueryChange,
-                    onSelectResult = searchViewModel::addRecentSearch,
+                    onSelectResult = searchViewModel::selectSearchResult,
                     onActiveChange = searchViewModel::setSearchActive
                 )
             }
