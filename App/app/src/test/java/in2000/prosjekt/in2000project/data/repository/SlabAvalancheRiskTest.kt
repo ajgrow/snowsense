@@ -33,7 +33,7 @@ class SlabAvalancheRiskTest {
             makeDay("2026-03-30T00:00:00Z", temp = 0.0, precip = 0.0),
         )
 
-        val result = repository.getSlabAvalancheRiskForLocation(
+        val result = repository.getWeatherRecordsForLocation(
             Coordinate(59.9, 10.7),
         )
         assertEquals(DangerLevel.LOW, result.dangerLevel)
@@ -47,7 +47,7 @@ class SlabAvalancheRiskTest {
             makeDay("2026-03-30T00:00:00Z", temp = -5.0, precip = 5.0),
         )
 
-        val result = repository.getSlabAvalancheRiskForLocation(
+        val result = repository.getWeatherRecordsForLocation(
             Coordinate(59.9, 10.7),
         )
         assertEquals(DangerLevel.LOW, result.dangerLevel)
@@ -61,7 +61,7 @@ class SlabAvalancheRiskTest {
             makeDay("2026-03-30T00:00:00Z", temp = -5.0, precip = 0.0),
         )
 
-        val result = repository.getSlabAvalancheRiskForLocation(
+        val result = repository.getWeatherRecordsForLocation(
             Coordinate(59.9, 10.7),
         )
         assertEquals(DangerLevel.LOW, result.dangerLevel)
@@ -76,7 +76,7 @@ class SlabAvalancheRiskTest {
             makeDay("2026-03-29T00:00:00Z", temp = -5.0, precip = 25.0),
         )
 
-        val result = repository.getSlabAvalancheRiskForLocation(
+        val result = repository.getWeatherRecordsForLocation(
             Coordinate(59.9, 10.7),
         )
         assertEquals(DangerLevel.LOW, result.dangerLevel)
@@ -93,7 +93,7 @@ class SlabAvalancheRiskTest {
             makeDay("2026-04-01T00:00:00Z", temp = 2.0, precip = 15.0),
         )
 
-        val result = repository.getSlabAvalancheRiskForLocation(
+        val result = repository.getWeatherRecordsForLocation(
             Coordinate(59.9, 10.7),
         )
         assertEquals(DangerLevel.HIGH, result.dangerLevel)
@@ -110,7 +110,7 @@ class SlabAvalancheRiskTest {
             makeDay("2026-04-01T00:00:00Z", temp = 5.0, precip = 15.0),
         )
 
-        val result = repository.getSlabAvalancheRiskForLocation(
+        val result = repository.getWeatherRecordsForLocation(
             Coordinate(59.9, 10.7),
         )
         assertEquals(DangerLevel.VERY_HIGH, result.dangerLevel)
@@ -129,7 +129,7 @@ class SlabAvalancheRiskTest {
             makeDay("2026-04-01T00:00:00Z", temp = 10.0, precip = 30.0),
         )
 
-        val result = repository.getSlabAvalancheRiskForLocation(
+        val result = repository.getWeatherRecordsForLocation(
             Coordinate(59.9, 10.7),
         )
         assertEquals(DangerLevel.VERY_HIGH, result.dangerLevel)
@@ -143,7 +143,7 @@ class SlabAvalancheRiskTest {
             makeDay("2026-04-01T00:00:00Z", temp = -5.0, precip = 15.0)
         )
 
-        val result = repository.getSlabAvalancheRiskForLocation(
+        val result = repository.getWeatherRecordsForLocation(
             Coordinate(59.9, 10.7),
         )
         assertEquals(DangerLevel.UNKNOWN, result.dangerLevel)
@@ -157,7 +157,7 @@ class SlabAvalancheRiskTest {
             makeDay("2026-03-30T00:00:00Z", temp = -5.0, precip = null),
         )
 
-        val result = repository.getSlabAvalancheRiskForLocation(
+        val result = repository.getWeatherRecordsForLocation(
             Coordinate(59.9, 10.7),
         )
         assertEquals(DangerLevel.UNKNOWN, result.dangerLevel)
@@ -175,7 +175,7 @@ class SlabAvalancheRiskTest {
             makeDay("2026-03-27T00:00:00Z", temp = null, precip = 10.0),
         )
 
-        val result = repository.getSlabAvalancheRiskForLocation(
+        val result = repository.getWeatherRecordsForLocation(
             Coordinate(59.9, 10.7),
         )
         assertEquals(DangerLevel.UNKNOWN, result.dangerLevel)
@@ -184,7 +184,7 @@ class SlabAvalancheRiskTest {
     @Test(expected = NoStationFoundException::class)
     fun noWeatherStationNearby_shouldThrowException() = runTest {
         fakeDataSource.sourceResponse = makeSourceResponse()
-        repository.getSlabAvalancheRiskForLocation(
+        repository.getWeatherRecordsForLocation(
             Coordinate(59.9, 10.7),
         )
     }
@@ -192,7 +192,7 @@ class SlabAvalancheRiskTest {
     @Test(expected = NoObservationsException::class)
     fun noObservations_shouldThrowNoObservationsException() = runTest {
         fakeDataSource.observationResponse = makeObsResponse()
-        repository.getSlabAvalancheRiskForLocation(
+        repository.getWeatherRecordsForLocation(
             Coordinate(59.9, 10.7),
         )
     }
@@ -200,7 +200,7 @@ class SlabAvalancheRiskTest {
     @Test(expected = IOException::class)
     fun networkFailure_shouldThrowIOException() = runTest {
         fakeDataSource.shouldThrow = true
-        repository.getSlabAvalancheRiskForLocation(
+        repository.getWeatherRecordsForLocation(
             Coordinate(59.9, 10.7),
         )
     }

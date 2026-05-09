@@ -9,41 +9,37 @@ import in2000.prosjekt.in2000project.data.model.LocationSlabAvalancheRiskData
 import in2000.prosjekt.in2000project.data.model.NoObservationsException
 import in2000.prosjekt.in2000project.data.model.NoStationFoundException
 import in2000.prosjekt.in2000project.data.model.enums.ElementType
+import in2000.prosjekt.in2000project.domain.SlabAvalancheRiskAssessor
 import java.time.LocalDate
 
 class FrostAvalancheRiskRepository(
     private val frostV0DataSource: FrostV0DataSource,
 ): AvalancheRiskRepository {
 
-    override suspend fun getSlabAvalancheRiskForLocation(
+    override suspend fun getWeatherRecordsForLocation(
         coordinate: Coordinate,
         currentDate: LocalDate,
-    ): LocationSlabAvalancheRiskData {
+        lookBackDays: Int
+    ): List<DailyWeatherRecord> {
         val dataSource = frostV0DataSource.getNearestSource(coordinate)
             ?: throw NoStationFoundException(coordinate)
 
-        val startDate = currentDate.minusDays(
-            SlabAvalancheRiskAssessor
-                .LOOKBACK_DAYS.toLong())
+        val startDate = currentDate.minusDays(lookBackDays.toLong())
 
         val repeatingTimeRange = FrostReferenceTime.of(
             startDate = startDate,
             endDate = currentDate,
         )
 
-        val records = dataSource.getDailyWeatherRecords(repeatingTimeRange)
+        val records = getDailyWeatherRecords(dataSource, repeatingTimeRange)
 
-        val dangerLevel = SlabAvalancheRiskAssessor.assess(records)
-
-        return LocationSlabAvalancheRiskData(
-            coordinate = coordinate,
-            dangerLevel = dangerLevel,
-        )
+        return records
     }
 
-    private suspend fun FrostV0SourceDto.getDailyWeatherRecords(
+    private suspend fun getDailyWeatherRecords(
+        source: FrostV0SourceDto,
         repeatingTimeRange: FrostReferenceTime
-    ): List<DailyWeatherRecord> {
+    ) : List<DailyWeatherRecord> {
         val requiredElements = listOf(
             ElementType.TEMPERATURE_MEAN_P1D.frostElementId,
             ElementType.PRECIPITATION_SUM_P1D.frostElementId
@@ -52,13 +48,13 @@ class FrostAvalancheRiskRepository(
         val elementsCsv = requiredElements.joinToString(",")
 
         val observationResponse = frostV0DataSource.getObservations(
-            this.id ?: "",
+            source.id ?: "",
             elementsCsv,
             repeatingTimeRange.value)
 
         if (observationResponse == null) {
             throw NoObservationsException(
-                this.name, elementsCsv, repeatingTimeRange.value
+                source.name, elementsCsv, repeatingTimeRange.value
             )
         }
 
@@ -86,7 +82,7 @@ class FrostAvalancheRiskRepository(
 
         if (records.isEmpty())
             throw NoObservationsException(
-                this.name, elementsCsv, repeatingTimeRange.value
+                source.name, elementsCsv, repeatingTimeRange.value
             )
 
         return records

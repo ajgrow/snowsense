@@ -4,8 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import in2000.prosjekt.in2000project.data.model.Coordinate
 import in2000.prosjekt.in2000project.data.model.enums.DangerLevel
-import in2000.prosjekt.in2000project.data.repository.FrostAvalancheRiskRepository
+import in2000.prosjekt.in2000project.data.repository.AvalancheRiskRepository
 import in2000.prosjekt.in2000project.data.repository.NveRepository
+import in2000.prosjekt.in2000project.domain.SlabAvalancheRiskAssessor
 import in2000.prosjekt.in2000project.ui.model.DangerLevelUiModel
 import in2000.prosjekt.in2000project.ui.model.toUiModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,12 +28,13 @@ data class RiskUiState(
 )
 class RiskViewModel(
     private val nveRepository: NveRepository,
-    private val frostAvalancheRiskRepository: FrostAvalancheRiskRepository
+    private val avalancheRiskRepository: AvalancheRiskRepository,
+    private val slabAvalancheRiskAssessor: SlabAvalancheRiskAssessor
 ): ViewModel() {
     private var _riskState = MutableStateFlow(RiskUiState())
     val riskState = _riskState.asStateFlow()
 
-    fun avalancheChecker(lat: Double, lon: Double, isFavorite: Boolean = false){
+    fun updateDangerLevel(lat: Double, lon: Double, isFavorite: Boolean = false){
         val coordinate = Coordinate(lat, lon)
 
         if (isFavorite) {
@@ -43,16 +45,22 @@ class RiskViewModel(
             }
         }
         viewModelScope.launch {
-
             val isDangerZone = nveRepository.getGeoJsonStatus(lat, lon, 10)
 
-            val slabDangerLevel = try {
-                frostAvalancheRiskRepository.getSlabAvalancheRiskForLocation(
-                    Coordinate(lat, lon)
-                ).dangerLevel
+            val records = try {
+                avalancheRiskRepository.getWeatherRecordsForLocation(
+                    Coordinate(lat, lon),
+                    lookBackDays = SlabAvalancheRiskAssessor.LOOKBACK_DAYS
+                )
             } catch(e: Exception) {
-                DangerLevel.UNKNOWN
+                emptyList()
             }
+
+            val slabDangerLevel =
+                if (records.isNotEmpty())
+                    slabAvalancheRiskAssessor.assess(records)
+                else
+                    (DangerLevel.UNKNOWN)
 
             val dangerLevel = if (isDangerZone) slabDangerLevel.toUiModel() else DangerLevel.LOW.toUiModel()
 

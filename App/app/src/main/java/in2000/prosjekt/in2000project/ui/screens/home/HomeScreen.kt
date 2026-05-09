@@ -85,7 +85,7 @@ fun HomeScreen(
 
     LaunchedEffect(favorites) {
         favorites.forEach { location ->
-            riskViewModel.avalancheChecker(
+            riskViewModel.updateDangerLevel(
                 lat = location.coordinate.latitude,
                 lon = location.coordinate.longitude,
                 isFavorite = true

@@ -124,7 +124,7 @@ class FrostApiIntegrationTest {
 
     @Test
     fun froystul_avalancheRisk_smokeTest() = runTest {
-        val result = avalancheRepository.getSlabAvalancheRiskForLocation(FROYSTUL)
+        val result = avalancheRepository.getWeatherRecordsForLocation(FROYSTUL)
 
         assertEquals(FROYSTUL, result.coordinate)
         assertContains(DangerLevel.entries, result.dangerLevel)
