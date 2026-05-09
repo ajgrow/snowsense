@@ -1,7 +1,7 @@
 package in2000.prosjekt.in2000project.data.repository
 
 import android.content.Context
-import in2000.prosjekt.in2000project.data.model.NamedLocation
+import in2000.prosjekt.in2000project.domain.model.NamedLocation
 import kotlinx.serialization.json.Json
 
 class SearchRepository(context: Context) {

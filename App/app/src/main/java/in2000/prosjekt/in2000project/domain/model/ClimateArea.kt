@@ -1,6 +1,6 @@
-package in2000.prosjekt.in2000project.data.model
+package in2000.prosjekt.in2000project.domain.model
 
-import in2000.prosjekt.in2000project.data.model.enums.ElementType
+import in2000.prosjekt.in2000project.domain.model.enums.ElementType
 
 // This data class represents one ski touring area.
 // It now includes historical climate data separated by element type for graphing.

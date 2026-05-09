@@ -12,7 +12,7 @@ import in2000.prosjekt.in2000project.ui.screens.map.MapRoute
 import in2000.prosjekt.in2000project.ui.screens.map.MapStateHolder
 import in2000.prosjekt.in2000project.ui.viewmodels.RiskViewModel
 import in2000.prosjekt.in2000project.ui.viewmodels.SearchViewModel
-import in2000.prosjekt.in2000project.screens.settings.SettingScreen
+import in2000.prosjekt.in2000project.ui.screens.settings.SettingScreen
 import in2000.prosjekt.in2000project.ui.viewmodels.SettingsViewModel
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel

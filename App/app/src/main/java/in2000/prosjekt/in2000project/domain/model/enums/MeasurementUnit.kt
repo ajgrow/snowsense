@@ -1,4 +1,4 @@
-package in2000.prosjekt.in2000project.data.model.enums
+package in2000.prosjekt.in2000project.domain.model.enums
 
 enum class MeasurementUnit{
     CELSIUS,

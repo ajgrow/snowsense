@@ -8,8 +8,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.os.LocaleListCompat
 import androidx.lifecycle.AndroidViewModel
-import in2000.prosjekt.in2000project.screens.settings.AppLanguageMode
-import in2000.prosjekt.in2000project.screens.settings.ThemeMode
+import in2000.prosjekt.in2000project.ui.screens.settings.AppLanguageMode
+import in2000.prosjekt.in2000project.ui.screens.settings.ThemeMode
 import java.util.Locale
 
 class SettingsViewModel(application: Application)

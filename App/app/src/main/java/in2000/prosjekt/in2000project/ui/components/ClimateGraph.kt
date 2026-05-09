@@ -20,7 +20,7 @@ import com.patrykandpatrick.vico.compose.chart.line.lineChart
 import com.patrykandpatrick.vico.compose.component.textComponent
 import com.patrykandpatrick.vico.core.entry.entryModelOf
 import com.patrykandpatrick.vico.core.entry.entryOf
-import in2000.prosjekt.in2000project.data.model.LocationClimateDataPoint
+import in2000.prosjekt.in2000project.domain.model.LocationClimateDataPoint
 import java.time.MonthDay
 
 @Composable

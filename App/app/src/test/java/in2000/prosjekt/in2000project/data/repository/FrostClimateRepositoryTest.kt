@@ -2,10 +2,10 @@ package in2000.prosjekt.in2000project.data.repository
 
 import in2000.prosjekt.in2000project.data.datasource.*
 import in2000.prosjekt.in2000project.data.datasource.dto.*
-import in2000.prosjekt.in2000project.data.model.Coordinate
-import in2000.prosjekt.in2000project.data.model.NoObservationsException
-import in2000.prosjekt.in2000project.data.model.NoStationFoundException
-import in2000.prosjekt.in2000project.data.model.enums.ElementType
+import in2000.prosjekt.in2000project.domain.model.Coordinate
+import in2000.prosjekt.in2000project.domain.model.NoObservationsException
+import in2000.prosjekt.in2000project.domain.model.NoStationFoundException
+import in2000.prosjekt.in2000project.domain.model.enums.ElementType
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before

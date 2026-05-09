@@ -1,9 +1,9 @@
 package in2000.prosjekt.in2000project.data.repository
 
-import in2000.prosjekt.in2000project.data.model.Coordinate
-import in2000.prosjekt.in2000project.data.model.LocationClimateData
-import in2000.prosjekt.in2000project.data.model.NoObservationsException
-import in2000.prosjekt.in2000project.data.model.NoStationFoundException
+import in2000.prosjekt.in2000project.domain.model.Coordinate
+import in2000.prosjekt.in2000project.domain.model.LocationClimateData
+import in2000.prosjekt.in2000project.domain.model.NoObservationsException
+import in2000.prosjekt.in2000project.domain.model.NoStationFoundException
 import java.time.MonthDay
 
 /**

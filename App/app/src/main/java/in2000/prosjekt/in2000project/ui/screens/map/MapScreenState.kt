@@ -1,8 +1,8 @@
 package in2000.prosjekt.in2000project.ui.screens.map
 
-import in2000.prosjekt.in2000project.data.model.LocationClimateData
+import in2000.prosjekt.in2000project.domain.model.LocationClimateData
 import java.time.MonthDay
-import in2000.prosjekt.in2000project.data.model.Coordinate
+import in2000.prosjekt.in2000project.domain.model.Coordinate
 
 
 data class MapScreenState(

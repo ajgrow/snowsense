@@ -3,12 +3,12 @@ package in2000.prosjekt.in2000project.data.repository
 import in2000.prosjekt.in2000project.data.datasource.FrostV0DataSource
 import in2000.prosjekt.in2000project.data.datasource.dto.FrostV0ObservationsAtRefTimeDto
 import in2000.prosjekt.in2000project.data.datasource.dto.FrostV0SourceDto
-import in2000.prosjekt.in2000project.data.model.Coordinate
-import in2000.prosjekt.in2000project.data.model.DailyWeatherRecord
-import in2000.prosjekt.in2000project.data.model.LocationSlabAvalancheRiskData
-import in2000.prosjekt.in2000project.data.model.NoObservationsException
-import in2000.prosjekt.in2000project.data.model.NoStationFoundException
-import in2000.prosjekt.in2000project.data.model.enums.ElementType
+import in2000.prosjekt.in2000project.domain.model.Coordinate
+import in2000.prosjekt.in2000project.domain.model.DailyWeatherRecord
+import in2000.prosjekt.in2000project.domain.model.LocationSlabAvalancheRiskData
+import in2000.prosjekt.in2000project.domain.model.NoObservationsException
+import in2000.prosjekt.in2000project.domain.model.NoStationFoundException
+import in2000.prosjekt.in2000project.domain.model.enums.ElementType
 import java.time.LocalDate
 
 class FrostAvalancheRiskRepository(

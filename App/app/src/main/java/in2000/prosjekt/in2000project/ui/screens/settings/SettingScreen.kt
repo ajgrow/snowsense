@@ -1,4 +1,4 @@
-package in2000.prosjekt.in2000project.screens.settings
+package in2000.prosjekt.in2000project.ui.screens.settings
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable

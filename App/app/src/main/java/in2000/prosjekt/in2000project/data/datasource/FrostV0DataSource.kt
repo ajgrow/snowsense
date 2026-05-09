@@ -2,7 +2,7 @@ package in2000.prosjekt.in2000project.data.datasource
 
 import in2000.prosjekt.in2000project.data.datasource.dto.FrostV0ObservationResponseDto
 import in2000.prosjekt.in2000project.data.datasource.dto.FrostV0SourceDto
-import in2000.prosjekt.in2000project.data.model.Coordinate
+import in2000.prosjekt.in2000project.domain.model.Coordinate
 
 /**
  * Data source for MET Norway's Frost API (frost.met.no).
