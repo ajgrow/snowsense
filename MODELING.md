@@ -32,64 +32,72 @@ Class diagram representing the relevant data layer classes:
 
 ```mermaid
 classDiagram
-  class ClimateRepository {
-    <<interface>>
-    +getClimateDataForLocation(...) LocationClimateData
-  }
-  class AvalancheRiskRepository {
-    <<interface>>
-    +getWeatherRecordsForLocation(...) List~DailyWeatherRecord~
-  }
-  class FrostV0DataSource {
-    <<interface>>
-    +getNearestSource(coordinate: Coordinate) FrostV0SourceDto
-    +getObservations(...) FrostV0ObservationResponseDto
-  }
-  class FrostClimateRepository {
-    -frostV0DataSource: FrostV0DataSource
-    +getClimateDataForLocation(...) LocationClimateData
-  }
-  class FrostAvalancheRiskRepository {
-    -frostV0DataSource: FrostV0DataSource
-    +getWeatherRecordsForLocation(...) List~DailyWeatherRecord~
-  }
-  class KtorFrostV0DataSource {
-    -client: HttpClient
-    +getNearestSource(coordinate: Coordinate)
-    +getObservations(...) FrostV0ObservationResponseDto
-  }
-  class LocationRepository {
-    -dataSource: LocationDataSource
-    +getNamedLocations(query: String) List~NamedLocation~
-  }
-  class LocationDataSource {
-    -client: HttpClient
-    +getNamesResponse(query: String)
-    +buildLocationQuery(searchQuery: String) String
-  }
-  class NveRepository {
-    -nveDataSource: NveDataSource
-    +getGeoJsonStatus(...) Boolean
-  }
-  class NveDataSource {
-    -client: HttpClient
-    +getGeoJson(lat: Double, lon: Double, buffer: Int)
-  }
-  class SearchRepository {
-    -prefs: SharedPreferences
-    +saveFavorites(list: List~NamedLocation~)
-    +loadFavorites() List~NamedLocation~
-    +saveRecentSearches(list: List~NamedLocation~)
-    +loadRecentSearches() List~NamedLocation~
-  }
-  
-  ClimateRepository <|.. FrostClimateRepository : realizes
-  AvalancheRiskRepository <|.. FrostAvalancheRiskRepository : realizes
-  FrostV0DataSource <|.. KtorFrostV0DataSource : realizes
-  FrostClimateRepository --> FrostV0DataSource : uses
-  FrostAvalancheRiskRepository --> FrostV0DataSource : uses
-  LocationRepository --> LocationDataSource : uses
-  NveRepository --> NveDataSource : uses
+    class ClimateRepository {
+        <<interface>>
+        +getClimateDataForLocation(...) LocationClimateData
+    }
+    class AvalancheRiskRepository {
+        <<interface>>
+        +getWeatherRecordsForLocation(...) List~DailyWeatherRecord~
+    }
+    class FrostV0DataSource {
+        <<interface>>
+        +getNearestSource(coordinate: Coordinate) FrostV0SourceDto
+        +getObservations(...) FrostV0ObservationResponseDto
+    }
+    class FrostClimateRepository {
+        -frostV0DataSource: FrostV0DataSource
+        +getClimateDataForLocation(...) LocationClimateData
+    }
+    class FrostAvalancheRiskRepository {
+        -frostV0DataSource: FrostV0DataSource
+        +getWeatherRecordsForLocation(...) List~DailyWeatherRecord~
+    }
+    class KtorFrostV0DataSource {
+        -client: HttpClient
+        +getNearestSource(coordinate: Coordinate)
+        +getObservations(...) FrostV0ObservationResponseDto
+    }
+    class LocationRepository {
+        -dataSource: LocationDataSource
+        +getNamedLocations(query: String) List~NamedLocation~
+    }
+    class LocationDataSource {
+        -client: HttpClient
+        +getNamesResponse(query: String)
+        +buildLocationQuery(searchQuery: String) String
+    }
+    class NveRepository {
+        -nveDataSource: NveDataSource
+        +getGeoJsonStatus(...) Boolean
+    }
+    class NveDataSource {
+        -client: HttpClient
+        +getGeoJson(lat: Double, lon: Double, buffer: Int)
+    }
+    class SearchRepository {
+        -prefs: SharedPreferences
+        +saveFavorites(list: List~NamedLocation~)
+        +loadFavorites() List~NamedLocation~
+        +saveRecentSearches(list: List~NamedLocation~)
+        +loadRecentSearches() List~NamedLocation~
+    }
+
+    class NoObservationsException {
+        +stationName: String?
+        +elements: String?
+        +referenceTime: String?
+    }
+
+
+    ClimateRepository <|.. FrostClimateRepository : realizes
+    AvalancheRiskRepository <|.. FrostAvalancheRiskRepository : realizes
+    FrostV0DataSource <|.. KtorFrostV0DataSource : realizes
+    KtorFrostV0DataSource --> NoObservationsException : throws
+    FrostClimateRepository --> FrostV0DataSource : uses
+    FrostAvalancheRiskRepository --> FrostV0DataSource : uses
+    LocationRepository --> LocationDataSource : uses
+    NveRepository --> NveDataSource : uses
 ```
 Class diagram representing the relevant domain layer classes:
 1. Slab avalanche risk assessor, a business logic class which calculates estimated risk based on weather records returned by an AvalancheRiskRepository.
@@ -167,7 +175,7 @@ classDiagram
         VERY_HIGH
     }
 
-    SlabAvalancheRiskAssessor ..> DailyWeatherRecord
+    SlabAvalancheRiskAssessor ..> DailyWeatherRecord : uses
     SlabAvalancheRiskAssessor --> DangerLevel : returns
     NamedLocation "1" --> "1" Coordinate : has
     LocationClimateData "1" --> "1" Coordinate : has
