@@ -159,21 +159,10 @@ in2000.prosjekt.in2000project/
 |
 |--- data/
 |    |--- model/                                #Domain objects
-|    |    |---enums/
-|    |    |    |--- DangerLevel
-|    |    |    |--- ElementType
-|    |    |    |---MeasurementUnit
-|    |    |---DailyWeatherRecord
-|    |    |---Coordinates.kt
-|    |    |---LocationClimateData.kt
-|    |    |---LocationRiskData.kt
-|    |    |---SkiArea
-|    |    |---GeoJson
-|    |    |---LocationClimateDataPoint
-|    |    |---NamedLocation
-|    |    |---NoObservationException.kt
-|    |    |---NoStationFoundException
-|    |    
+|    |    |---exceptions
+|    |    |    |--- NoObservationException.kt
+|    |    |    |--- NoStationFoundException 
+|    |
 |    |--- datasource/                           # Communication with the API (Frost, NVE)
 |    |    |--- dto/                             # Data objects which mirror API-response
 |    |    |    |---FrostV0ObservasjonsDto.kt
@@ -184,7 +173,7 @@ in2000.prosjekt.in2000project/
 |    |    |--- NveDataSource
 |    |    |--- LocationDataSource
 |    |    |--- LocationQueryBuilder.kt
-|    |
+|    |    
 |    |--- repository/                           # Logic and aggregation of data
 |    |    |--- ClimateRepository.kt             # Interface
 |    |    |--- FrostClimateRepository.kt        # Implementation
@@ -195,31 +184,45 @@ in2000.prosjekt.in2000project/
 |    |    |--- SearchRepository.kt
 |    |    |--- FrostReferenceTime.kt            # Helper object
 |    |    |--- LocationRepository
-|    |    
-|    |--- datastore/
-|    |    |---DataStore.kt
-|    |
-|    |--- di/
-|    |    |--- AppModule.kt
+|    
+|--- domain /
+|    |--- model /
+|    |    |---enums/
+|    |    |    |--- DangerLevel
+|    |    |    |--- ElementType
+|    |    |    |--- MeasurementUnit
+|    |    |--- DailyWeatherRecord
+|    |    |--- Coordinates.kt
+|    |    |--- LocationClimateData.kt
+|    |    |--- LocationRiskData.kt
+|    |    |--- SkiArea
+|    |    |--- GeoJson
+|    |    |--- LocationClimateDataPoint
+|    |    |--- NamedLocation 
+|    |--- SlabAvalancheRiskAssessor.kt
+|    
+|--- di/
+|    |--- AppModule.kt
 |    | 
-|    |--- navigation/
-|    |    |---Screen.kt            
-|    |    |--- AppNavigation.kt                 # NavHost
-|    |    |--- NavigationActions.kt
-|    |
-|    |--- network/
-|    |    |---KtorClient.kt 
-|    |
-|    |---ui/
-|    |    |--- approot/                         # AppRoot - Toplevel composable
+|--- navigation/
+|    |--- Screen.kt            
+|    |--- AppNavigation.kt                      # NavHost
+|    |--- NavigationActions.kt
+|
+|--- network/
+|    |---KtorClient.kt 
+|    
+|---ui/
+|    |--- approot/                             
+|    |    |---AppRoot.kt
+|    |--- components/                           # Reusable Composables
+|    |--- screens/                            
 |    |    |--- home/                            # HomeScreen
 |    |    |--- map/                             # MapScreen relevant
 |    |    |--- information/                     # InfoScreen relevant
-|    |    |---search/                           # SearchViewModel
 |    |    |--- settings/                        # SettingScreen relevant
-|    |    |--- model/                           # UI-models
-|    |    |--- reusables/                       # Reusable Composables
-│    |
+|    |--- model/                                # UI-models
+│    
 |--- MainActivity.kt
 |----SnowSenseApplication.kt
 ```
