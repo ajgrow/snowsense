@@ -1,5 +1,6 @@
 package in2000.prosjekt.in2000project.data.model
 
+import in2000.prosjekt.in2000project.domain.model.Coordinate
 import org.junit.Assert.*
 import org.junit.Test
 

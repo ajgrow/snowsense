@@ -1,6 +1,6 @@
 package in2000.prosjekt.in2000project.data.repository
 
-import in2000.prosjekt.in2000project.data.datasource.dto.FrostV0Observation
+import in2000.prosjekt.in2000project.data.datasource.dto.FrostV0ObservationDto
 import in2000.prosjekt.in2000project.data.datasource.makeObservation
 import org.junit.Assert.*
 import org.junit.Test
@@ -42,7 +42,7 @@ class AverageByElementTest {
 
     @Test
     fun emptyInput_returnsEmptyMap() {
-        val obs = emptyList<FrostV0Observation>()
+        val obs = emptyList<FrostV0ObservationDto>()
         val result = obs.averageByElement()
         assertTrue(result.isEmpty())
     }

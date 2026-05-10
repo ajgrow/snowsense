@@ -1,7 +1,7 @@
 package in2000.prosjekt.in2000project.data.repository
 
-import in2000.prosjekt.in2000project.data.model.DailyWeatherRecord
-import in2000.prosjekt.in2000project.data.model.enums.DangerLevel
+import in2000.prosjekt.in2000project.domain.model.DailyWeatherRecord
+import in2000.prosjekt.in2000project.domain.model.enums.DangerLevel
 import kotlin.math.sqrt
 
 // Estimates slab avalanche danger from daily weather observations.
