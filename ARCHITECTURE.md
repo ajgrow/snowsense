@@ -86,7 +86,7 @@ Every Package has one clear responsability
 
 The app follows MVVM pattern combined with UDF resulting in the following pattern:
 
-### UI Components
+### UI
 - **Observer:** consumes `screenState` via `StateFlow`
 - **Sender:** emits events to ViewModel through lambda callbacks
 
@@ -94,7 +94,7 @@ The app follows MVVM pattern combined with UDF resulting in the following patter
 
 ---
 
-### ViewModels
+### ViewModel
 - Holds `MutableStateFlow<ScreenState>`
 - Updates state through `.copy()`
 - Calls repository via `suspend` functions
@@ -103,7 +103,7 @@ The app follows MVVM pattern combined with UDF resulting in the following patter
 
 ---
 
-### Repositories
+### Repository
 - Aggregates data from datasources
 - Returns domain objects
 
@@ -111,13 +111,9 @@ The app follows MVVM pattern combined with UDF resulting in the following patter
 
 ---
 
-### DataSources
+### DataSource
 - Communicates with API via a Ktor HttpClient
 - Returns DTOs
-
-### Exceptions & Justifications
-
-> Document any deliberate exceptions to the above principles.
 
 ---
 
