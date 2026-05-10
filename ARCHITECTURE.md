@@ -86,7 +86,7 @@ Every Package has one clear responsability
 
 The app follows MVVM pattern combined with UDF resulting in the following pattern:
 
-### UI
+### Screen
 - **Observer:** consumes `screenState` via `StateFlow`
 - **Sender:** emits events to ViewModel through lambda callbacks
 
@@ -131,24 +131,20 @@ The **UI layer** consists of the screens and UI components the app uses to displ
 
 ### Technologies
 
-> List and briefly describe the key technologies, frameworks, and libraries used.
-
-| Technology | Type | Usage |
-| ---------- | ---- | ----- |
-| Jetpack Compose | UI Framework | Used to build MVVM-friendly UI components called Composables |
-| Mapbox Maps | SDK | Used to integrate a Mapbox Map which supports navigation, interaction, and custom layers. |
-| MET Frost v0     |  API endpoint    |  Used to fetch nearby weather stations and fetch historical climate data from them. |
-| NVE SnøskredAktsomhet | API endpoint | Used to display and query snow avalanche risk areas calculated from terrain steepness, tree cover, etc. |
-| Kartverket Stedsnavn | API endpoint | Used to fetch location search results |
-| Vico | Library | Used to render trend graphs |
+| Technology | Type | Usage | Version |
+| ---------- | ---- | ----- | ------- |
+| Jetpack Compose | UI Framework | Used to build MVVM-friendly UI components called Composables | BOM 2025.05.00 |
+| Mapbox Maps for Android | SDK | Used to integrate a Mapbox Map which supports navigation, interaction, and custom layers. | 11.19.0 |
+| MET Frost |  API endpoint    |  Used to fetch nearby weather stations and fetch historical climate data from them. | v0 |
+| NVE SnøskredAktsomhet | API endpoint | Used to display and query snow avalanche risk areas calculated from terrain steepness, tree cover, etc. | Unversioned REST service |
+| Kartverket Stedsnavn | API endpoint | Used to fetch location search results |  Unversioned REST service |
+| Vico | Library | Used to render trend graphs | 1.13.1 |
 
 ### API Level
 
-> Document API-level details — endpoints, contracts, versioning, and any relevant integration specifics.
-
 | Configuration | Value | Reason |
 | --- | --- | --- |
-| `minSdk` | 26 | Gives access to `java.time`-API. and useable by over 95% of devices |
+| `minSdk` | 24 | Approximately 99% of Android users use Android 7 (API 24) or higher. Though minSdk API level 26 was at one point used due to support for `java.time`, it was discovered that simply using desugaring to backport support for `java.time` on API 24 was the more inclusive choice. |
 | `targetSdk` | 36 | minimal stable SDK for play Store |
 | `compileSdk` | 36 | Compiles with the same SDK version as target to avoid warnings |
 
@@ -163,41 +159,46 @@ in2000.prosjekt.in2000project/
 |    |    |    |--- NoStationFoundException 
 |    |
 |    |--- datasource/                           # Communication with the API (Frost, NVE)
-|    |    |--- dto/                             # Data objects which mirror API-response
+|    |    |--- dto/                             # Data transfer objects which mirror API-response
 |    |    |    |---FrostV0ObservasjonsDto.kt
 |    |    |    |---FrostV0SourceDto.kt
 |    |    |    |---LocationDto.kt
 |    |    |--- FrostV0DataSource                # Interface
 |    |    |--- KtorFrostV0DataSource            # Implementation
-|    |    |--- NveDataSource
-|    |    |--- LocationDataSource
-|    |    |--- LocationQueryBuilder.kt
+|    |    |--- AvalancheRiskDataSource          # Interface
+|    |    |--- KtorAvalancheRiskDataSource      # Implementation
+|    |    |--- LocationDataSource.kt            # Interface
+|    |    |--- KtorLocationDataSource.kt        # Implementation
 |    |    
-|    |--- repository/                           # Transformation and aggregation of data
-|    |    |--- ClimateRepository.kt             # Interface
-|    |    |--- FrostClimateRepository.kt        # Implementation
-|    |    |--- WeatherRepository.kt             # Interface
-|    |    |--- FrostWeatherRepository.kt        # Implementation
-|    |    |--- NveRepository.kt 
-|    |    |--- SearchRepository.kt
-|    |    |--- FrostReferenceTime.kt            # Helper object
-|    |    |--- LocationRepository
+|    |--- repository/                           # Transformation and aggregation of data. Implementations of domain-layer repository interfaces.
+|    |    |--- FrostClimateRepository.kt        
+|    |    |--- FrostWeatherRepository.kt       
+|    |    |--- NveAvalancheRiskRepository.kt 
+|    |    |--- SharedPreferencesSearchRepository.kt
+|    |    |--- KartverketLocationRepository
 |    
 |--- domain/
-|    |--- model/                               # Domain models
+|    |--- model/                                # Domain models
 |    |    |---enums/
 |    |    |    |--- DangerLevel
 |    |    |    |--- ElementType
 |    |    |    |--- MeasurementUnit
-|    |    |--- DailyWeatherRecord
+|    |    |--- ClimateArea.kt
+|    |    |--- DailyWeatherRecord.kt
 |    |    |--- Coordinates.kt
 |    |    |--- LocationClimateData.kt
 |    |    |--- LocationRiskData.kt
-|    |    |--- SkiArea
-|    |    |--- GeoJson
-|    |    |--- LocationClimateDataPoint
-|    |    |--- NamedLocation 
-|    |--- SlabAvalancheRiskAssessor.kt          
+|    |    |--- LocationClimateDataPoint.kt
+|    |    |--- NamedLocation.kt
+|    |    |--- FrostReferenceTime.kt            # Helper class
+|    |--- repository/                           # Repository interfaces
+|    |    |--- AvalancheRiskRepository.kt    
+|    |    |--- ClimateRepository.kt        
+|    |    |--- LocationRepository.kt    
+|    |    |--- SearchRepository.kt    
+|    |    |--- WeatherRepository.kt   
+|    |--- SlabAvalancheRiskAssessor.kt         # Business logic class
+|
 |    
 |--- di/
 |    |--- AppModule.kt
