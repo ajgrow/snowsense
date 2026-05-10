@@ -3,9 +3,8 @@ package in2000.prosjekt.in2000project.ui.viewmodels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import in2000.prosjekt.in2000project.domain.model.Coordinate
-import in2000.prosjekt.in2000project.domain.model.enums.DangerLevel
-import in2000.prosjekt.in2000project.data.repository.FrostAvalancheRiskRepository
-import in2000.prosjekt.in2000project.data.repository.NveRepository
+import in2000.prosjekt.in2000project.domain.model.NamedLocation
+import in2000.prosjekt.in2000project.domain.usecase.GetAvalancheDangerUseCase
 import in2000.prosjekt.in2000project.ui.model.DangerLevelUiModel
 import in2000.prosjekt.in2000project.ui.model.toUiModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,45 +20,52 @@ data class LocationRiskState(
 )
 
 data class RiskUiState(
-    val isDanger: Boolean? = null,
     val dangerLevel: DangerLevelUiModel? = null,
     val locationRisks: Map<Coordinate, LocationRiskState> = emptyMap()
 )
+
 class RiskViewModel(
-    private val nveRepository: NveRepository,
-    private val frostAvalancheRiskRepository: FrostAvalancheRiskRepository
+    private val getAvalancheDangerUseCase: GetAvalancheDangerUseCase,
 ): ViewModel() {
     private var _riskState = MutableStateFlow(RiskUiState())
     val riskState = _riskState.asStateFlow()
+    private val loadedFavoriteCoordinates = mutableSetOf<Coordinate>()
 
-    fun avalancheChecker(lat: Double, lon: Double, isFavorite: Boolean = false){
+    fun refreshFavoriteRisks(favorites: List<NamedLocation>) {
+        val toLoad = favorites
+            .map { it.coordinate }
+            .filterNot { loadedFavoriteCoordinates.contains(it) }
+
+        toLoad.forEach { coordinate ->
+            updateDangerLevel(
+                coordinate.latitude,
+                coordinate.longitude,
+                isFavorite = true)
+
+            loadedFavoriteCoordinates += coordinate
+        }
+    }
+
+    fun updateDangerLevel(lat: Double, lon: Double, isFavorite: Boolean = false){
         val coordinate = Coordinate(lat, lon)
 
         if (isFavorite) {
             _riskState.update { currentState ->
                 val updatedMap = currentState.locationRisks.toMutableMap()
-                updatedMap[coordinate] = LocationRiskState(coordinate = coordinate, isLoading = true)
+                updatedMap[coordinate] = LocationRiskState(
+                    coordinate = coordinate,
+                    isLoading = true)
                 currentState.copy(locationRisks = updatedMap)
             }
         }
+
         viewModelScope.launch {
-
-            val isDangerZone = nveRepository.getGeoJsonStatus(lat, lon, 10)
-
-            val slabDangerLevel = try {
-                frostAvalancheRiskRepository.getSlabAvalancheRiskForLocation(
-                    Coordinate(lat, lon)
-                ).dangerLevel
-            } catch(e: Exception) {
-                DangerLevel.UNKNOWN
-            }
-
-            val dangerLevel = if (isDangerZone) slabDangerLevel.toUiModel() else DangerLevel.LOW.toUiModel()
+            val dangerLevel = getAvalancheDangerUseCase(coordinate)
+                .toUiModel()
 
             _riskState.update { currentState ->
                 if (!isFavorite) {
                     currentState.copy(
-                        isDanger = isDangerZone,
                         dangerLevel = dangerLevel
                     )
                 } else {

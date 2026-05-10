@@ -4,11 +4,15 @@ import in2000.prosjekt.in2000project.data.datasource.FrostV0DataSource
 import in2000.prosjekt.in2000project.data.datasource.KtorFrostV0DataSource
 import in2000.prosjekt.in2000project.data.datasource.LocationDataSource
 import in2000.prosjekt.in2000project.data.datasource.NveDataSource
-import in2000.prosjekt.in2000project.data.repository.FrostAvalancheRiskRepository
+import in2000.prosjekt.in2000project.data.repository.WeatherRepository
+import in2000.prosjekt.in2000project.data.repository.FrostWeatherRepository
+import in2000.prosjekt.in2000project.data.repository.ClimateRepository
 import in2000.prosjekt.in2000project.data.repository.FrostClimateRepository
 import in2000.prosjekt.in2000project.data.repository.LocationRepository
 import in2000.prosjekt.in2000project.data.repository.NveRepository
 import in2000.prosjekt.in2000project.data.repository.SearchRepository
+import in2000.prosjekt.in2000project.domain.SlabAvalancheRiskAssessor
+import in2000.prosjekt.in2000project.domain.usecase.GetAvalancheDangerUseCase
 import in2000.prosjekt.in2000project.network.KtorClient
 import in2000.prosjekt.in2000project.ui.screens.information.InfoViewModel
 import in2000.prosjekt.in2000project.ui.screens.map.MapStateHolder
@@ -22,16 +26,19 @@ import org.koin.dsl.module
 val appModule = module {
     single { KtorClient.frostClient }
     single<FrostV0DataSource> { KtorFrostV0DataSource(client = get()) }
-    single<NveDataSource> { NveDataSource(client = get()) }
-    single<LocationDataSource> { LocationDataSource(client = get()) }
+    single { NveDataSource(client = get()) }
+    single { LocationDataSource(client = get()) }
     single { FrostClimateRepository(get()) }
-    single { MapStateHolder() }
-    single { FrostAvalancheRiskRepository(get()) }
+    single { SlabAvalancheRiskAssessor() }
+    single<WeatherRepository> { FrostWeatherRepository(get()) }
+    single<ClimateRepository> { FrostClimateRepository(get()) }
     single { NveRepository(get()) }
     single { SearchRepository(get()) }
     single { LocationRepository(get()) }
+    single { MapStateHolder() }
+    single { GetAvalancheDangerUseCase(get(), get(), get()) }
     viewModel { MapViewModel(get()) }
-    viewModel { RiskViewModel(get(), get()) }
+    viewModel { RiskViewModel(get()) }
     viewModel { SearchViewModel(get(), get()) }
     viewModel { SettingsViewModel(get()) }
     viewModel { InfoViewModel(get()) }
