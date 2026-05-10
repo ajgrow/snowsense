@@ -2,7 +2,9 @@ package in2000.prosjekt.in2000project.ui.screens.map
 
 import android.util.Log
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.animateScrollBy
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -104,15 +106,12 @@ fun MapRoute(
     searchViewModel: SearchViewModel,
     mapViewModel: MapViewModel = koinViewModel(),
     riskViewModel: RiskViewModel = koinViewModel(),
+    mapStateHolder: MapStateHolder = koinInject()
 ) {
-    val screenState by mapViewModel.screenState.collectAsState()
-    val riskState by riskViewModel.riskState.collectAsState()
+    val screenState by mapViewModel.screenState.collectAsStateWithLifecycle()
+    val riskState by riskViewModel.riskState.collectAsStateWithLifecycle()
     val searchState by searchViewModel.searchState.collectAsStateWithLifecycle()
-
-    val mapStateHolder: MapStateHolder = koinInject()
-
     val overlayState by mapStateHolder.overlayState.collectAsStateWithLifecycle()
-
     val pin by mapStateHolder.pinnedPoint.collectAsStateWithLifecycle()
 
     LaunchedEffect(pin) {
@@ -136,10 +135,11 @@ fun MapRoute(
     if (showFavoriteDialog) {
         TextInputDialog(
             title = stringResource(R.string.name_favorite_prompt),
-            defaultValue = when(screenState.climateState) {
+            defaultValue = when (screenState.climateState) {
                 is ClimateState.Success -> {
                     climateArea.stationName ?: stringResource(R.string.missing_station_name)
                 }
+
                 else -> {
                     ""
                 }
@@ -154,12 +154,15 @@ fun MapRoute(
         )
     }
 
+    LaunchedEffect(Unit) {
+        searchViewModel.clearQuery()
+    }
+
     MapScreen(
         screenState = screenState,
         riskState = riskState,
         overlayState = overlayState,
         searchState = searchState,
-        pinnedPoint = pin,
         onSearchLocationRequested = mapStateHolder::flyToSearch,
         onZoomIn = mapStateHolder::onZoomIn,
         onZoomOut = mapStateHolder::onZoomOut,
@@ -171,7 +174,8 @@ fun MapRoute(
         onStartDateChange = { it?.let(mapViewModel::onStartDateChange) },
         onEndDateChange = { it?.let(mapViewModel::onEndDateChange) },
         onYearChange = { it?.let(mapViewModel::onYearChange) },
-        onSelectResult = searchViewModel::addRecentSearch,
+        onQueryChange = searchViewModel::onQueryChange,
+        onSelectResult = searchViewModel::selectSearchResult,
         onAddFavorite = {
             screenState.climateCoordinate?.let { coordinate ->
                 searchViewModel.addPendingFavorite(coordinate)
@@ -187,7 +191,7 @@ fun MapRoute(
                 false
             }
         },
-        onSearchbarActiveChange = searchViewModel::setSearchActive
+        onSearchActiveChange = searchViewModel::setSearchActive
     )
 }
 
@@ -200,7 +204,6 @@ fun MapScreen(
     riskState: RiskUiState,
     overlayState: OverlayState,
     searchState: SearchUiState,
-    pinnedPoint: Point?,
     onSearchLocationRequested: (Point) -> Unit,
     onZoomIn: () -> Unit,
     onZoomOut: () -> Unit,
@@ -209,22 +212,17 @@ fun MapScreen(
     onStartDateChange: (MonthDay?) -> Unit,
     onEndDateChange: (MonthDay?) -> Unit,
     onYearChange: (Int?) -> Unit,
+    onQueryChange: (query: String) -> Unit,
     onSelectResult: (NamedLocation) -> Unit,
     onAddFavorite: () -> Unit,
     canAddFavorite: () -> Boolean,
     onBottomPaddingChanged: (Double) -> Unit,
-    onSearchbarActiveChange: (isActive: Boolean) -> Unit
+    onSearchActiveChange: (isActive: Boolean) -> Unit
 ) {
     val focusManager = LocalFocusManager.current
     val focusRequester = remember { FocusRequester() }
+    val isSearchActive = searchState.isSearchActive
 
-    var isSearchActive by remember { mutableStateOf(false) }
-    LaunchedEffect(pinnedPoint) {
-        if (isSearchActive) {
-            isSearchActive = false
-            focusManager.clearFocus()
-        }
-    }
     LaunchedEffect(isSearchActive) {
         if (isSearchActive) focusRequester.requestFocus()
     }
@@ -295,7 +293,7 @@ fun MapScreen(
     }
 
     LaunchedEffect(peekHeight) {
-        onBottomPaddingChanged((peekHeight.value.toDouble()  + navigationBarHeight) * density.density)
+        onBottomPaddingChanged((peekHeight.value.toDouble() + navigationBarHeight) * density.density)
     }
 
     LaunchedEffect(sheetState) {
@@ -355,13 +353,14 @@ fun MapScreen(
         ) {
 
             Button(
-                onClick = { isSearchActive = !isSearchActive },
+                onClick = { onSearchActiveChange(!isSearchActive) },
                 modifier = mapButtonModifier,
                 contentPadding = PaddingValues(0.dp),
             ) {
                 Icon(
                     imageVector = Icons.Default.Search,
-                    contentDescription = stringResource(R.string.open_search))
+                    contentDescription = stringResource(R.string.open_search)
+                )
             }
 
             Spacer(Modifier.height(8.dp))
@@ -391,22 +390,36 @@ fun MapScreen(
         }
 
         if (isSearchActive) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clickable(
+                        indication = null,
+                        interactionSource = remember { MutableInteractionSource() }
+                    ) {
+                        onSearchActiveChange(false)
+                        focusManager.clearFocus()
+                    }
+            )
+
             SearchSection(
                 modifier = Modifier
                     .focusRequester(focusRequester)
                     .padding(top = 120.dp),
-                textFieldState = searchState.searchTextFieldState,
-                searchResults = searchState.searchResults,
+                searchState = searchState,
                 onNavigateToMap = { coordinate ->
                     onSearchLocationRequested(
                         Point.fromLngLat(
                             coordinate.longitude,
-                            coordinate.latitude) )
-                      isSearchActive = false
-                      focusManager.clearFocus() },
+                            coordinate.latitude
+                        )
+                    )
+                    onSearchActiveChange(false)
+                    focusManager.clearFocus()
+                },
                 onSelectResult = onSelectResult,
-                recentSearches = searchState.recentSearches,
-                onActiveChange = onSearchbarActiveChange
+                onActiveChange = onSearchActiveChange,
+                onQueryChange = onQueryChange
             )
         }
 
@@ -473,7 +486,8 @@ fun MapScreen(
             ) {
                 Icon(
                     Icons.Default.KeyboardArrowDown,
-                    contentDescription = stringResource(R.string.scroll_down))
+                    contentDescription = stringResource(R.string.scroll_down)
+                )
             }
         }
     }
@@ -540,7 +554,8 @@ fun BottomSheetContent(
                                         style = MaterialTheme.typography.labelSmall
                                     )
                                     Text(
-                                        text = area.stationName ?: stringResource(R.string.missing_station_name),
+                                        text = area.stationName
+                                            ?: stringResource(R.string.missing_station_name),
                                         style = MaterialTheme.typography.titleLarge,
                                     )
                                 }
@@ -667,7 +682,6 @@ fun MapScreenErrorPreview() {
         onSearchLocationRequested = {},
         onZoomIn = {},
         onZoomOut = {},
-        pinnedPoint = null,
         onOverlayRetry = {},
         onSheetDismiss = {},
         onStartDateChange = {},
@@ -676,11 +690,12 @@ fun MapScreenErrorPreview() {
         modifier = Modifier,
         riskState = RiskUiState(),
         searchState = SearchUiState(),
+        onQueryChange = {},
         onSelectResult = {},
         onAddFavorite = {},
         canAddFavorite = { false },
         onBottomPaddingChanged = {},
-        onSearchbarActiveChange = {}
+        onSearchActiveChange = {},
     )
 }
 

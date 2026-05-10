@@ -35,26 +35,28 @@ import in2000.prosjekt.in2000project.domain.model.Coordinate
 import in2000.prosjekt.in2000project.domain.model.NamedLocation
 import kotlin.collections.forEach
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.ui.platform.LocalWindowInfo
+import in2000.prosjekt.in2000project.ui.viewmodels.SearchUiState
+import in2000.prosjekt.in2000project.ui.viewmodels.SearchViewModel
+import kotlin.math.exp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchSection(
-    textFieldState : TextFieldState,
-    searchResults: List<NamedLocation>,
-    recentSearches: List<NamedLocation>,
     modifier: Modifier = Modifier,
+    searchState: SearchUiState,
+    onQueryChange: (query: String) -> Unit,
     onSelectResult: (location: NamedLocation) -> Unit,
     onNavigateToMap: (coordinate: Coordinate) -> Unit,
     onActiveChange: (isActive: Boolean) -> Unit
 ) {
     val focusManager = LocalFocusManager.current
 
-    var expanded by rememberSaveable { mutableStateOf(false) }
+    var expanded by rememberSaveable { mutableStateOf(true) }
 
-    val query = textFieldState.text.toString()
-    val isShowingRecents = query.isBlank() && recentSearches.isNotEmpty()
-    val displayResults = if (isShowingRecents) recentSearches else searchResults
+    val isShowingRecents = searchState.query.isBlank()
+    val displayResults = if (isShowingRecents) searchState.recentSearches else searchState.searchResults
     val isNorwegian = LocalConfiguration.current.locales[0].language in listOf("no", "nb", "nn")
 
     DockedSearchBar(
@@ -89,13 +91,12 @@ fun SearchSection(
                         contentDescription = stringResource(R.string.open_search)
                     )
                 },
-                query = textFieldState.text.toString(),
+                query = searchState.query,
                 onQueryChange = {
-                    textFieldState.edit { replace(0, length, it.take(50)) }
-                    expanded = true
+                    onQueryChange(it)
                 },
                 onSearch = {
-                    searchResults.firstOrNull()?.let { location ->
+                    searchState.searchResults.firstOrNull()?.let { location ->
                         onSelectResult(location)
                         onNavigateToMap(location.coordinate)
                     }
@@ -134,7 +135,6 @@ fun SearchSection(
                                 .clickable {
                                     onNavigateToMap(result.coordinate)
                                     onSelectResult(result)
-                                    textFieldState.edit { replace(0, length, "") }
                                     expanded = false
                                     focusManager.clearFocus()
                                 }

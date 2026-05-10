@@ -83,6 +83,10 @@ fun HomeScreen(
 
     val favorites = searchState.favorites
 
+    LaunchedEffect(Unit) {
+        searchViewModel.clearQuery()
+    }
+
     LaunchedEffect(favorites) {
         riskViewModel.refreshFavoriteRisks(favorites)
     }
@@ -117,11 +121,10 @@ fun HomeScreen(
                 SearchSection(
                     //get states from the viewmodel
                     modifier = Modifier,
-                    textFieldState = searchState.searchTextFieldState,
-                    searchResults = searchState.searchResults,
+                    searchState = searchState,
                     onNavigateToMap = onNavigateToMap,
-                    onSelectResult = searchViewModel::addRecentSearch,
-                    recentSearches = searchState.recentSearches,
+                    onQueryChange = searchViewModel::onQueryChange,
+                    onSelectResult = searchViewModel::selectSearchResult,
                     onActiveChange = searchViewModel::setSearchActive
                 )
             }

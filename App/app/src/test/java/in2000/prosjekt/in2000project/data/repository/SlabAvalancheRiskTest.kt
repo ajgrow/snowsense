@@ -9,6 +9,7 @@ import in2000.prosjekt.in2000project.data.model.exceptions.NoObservationsExcepti
 import in2000.prosjekt.in2000project.data.model.exceptions.NoStationFoundException
 import in2000.prosjekt.in2000project.domain.SlabAvalancheRiskAssessor
 import in2000.prosjekt.in2000project.domain.model.enums.DangerLevel
+import in2000.prosjekt.in2000project.domain.repository.WeatherRepository
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
