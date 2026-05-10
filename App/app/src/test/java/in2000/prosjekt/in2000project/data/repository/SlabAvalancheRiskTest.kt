@@ -8,6 +8,7 @@ import in2000.prosjekt.in2000project.domain.model.Coordinate
 import in2000.prosjekt.in2000project.domain.model.enums.DangerLevel
 import in2000.prosjekt.in2000project.data.model.exceptions.NoObservationsException
 import in2000.prosjekt.in2000project.data.model.exceptions.NoStationFoundException
+import in2000.prosjekt.in2000project.domain.SlabAvalancheRiskAssessor
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
@@ -17,12 +18,14 @@ import java.io.IOException
 class SlabAvalancheRiskTest {
 
     private lateinit var fakeDataSource: FakeFrostV0DataSource
-    private lateinit var repository: AvalancheRiskRepository
+    private lateinit var repository: WeatherRepository
+    private lateinit var slabAvalancheRiskAssessor: SlabAvalancheRiskAssessor
 
     @Before
     fun setUp() {
         fakeDataSource = FakeFrostV0DataSource()
-        repository = FrostAvalancheRiskRepository(fakeDataSource)
+        repository = FrostWeatherRepository(fakeDataSource)
+        slabAvalancheRiskAssessor = SlabAvalancheRiskAssessor()
     }
 
     @Test
@@ -35,8 +38,9 @@ class SlabAvalancheRiskTest {
 
         val result = repository.getWeatherRecordsForLocation(
             Coordinate(59.9, 10.7),
+            lookBackDays = SlabAvalancheRiskAssessor.LOOKBACK_DAYS
         )
-        assertEquals(DangerLevel.LOW, result.dangerLevel)
+        assertEquals(DangerLevel.LOW, slabAvalancheRiskAssessor.assess(result))
     }
 
     @Test
@@ -49,8 +53,9 @@ class SlabAvalancheRiskTest {
 
         val result = repository.getWeatherRecordsForLocation(
             Coordinate(59.9, 10.7),
+            lookBackDays = SlabAvalancheRiskAssessor.LOOKBACK_DAYS
         )
-        assertEquals(DangerLevel.LOW, result.dangerLevel)
+        assertEquals(DangerLevel.LOW, slabAvalancheRiskAssessor.assess(result))
     }
 
     @Test
@@ -63,8 +68,9 @@ class SlabAvalancheRiskTest {
 
         val result = repository.getWeatherRecordsForLocation(
             Coordinate(59.9, 10.7),
+            lookBackDays = SlabAvalancheRiskAssessor.LOOKBACK_DAYS
         )
-        assertEquals(DangerLevel.LOW, result.dangerLevel)
+        assertEquals(DangerLevel.LOW, slabAvalancheRiskAssessor.assess(result))
     }
 
     @Test
@@ -78,8 +84,9 @@ class SlabAvalancheRiskTest {
 
         val result = repository.getWeatherRecordsForLocation(
             Coordinate(59.9, 10.7),
+            lookBackDays = SlabAvalancheRiskAssessor.LOOKBACK_DAYS
         )
-        assertEquals(DangerLevel.LOW, result.dangerLevel)
+        assertEquals(DangerLevel.LOW, slabAvalancheRiskAssessor.assess(result))
     }
 
     @Test
@@ -95,8 +102,10 @@ class SlabAvalancheRiskTest {
 
         val result = repository.getWeatherRecordsForLocation(
             Coordinate(59.9, 10.7),
+            lookBackDays = SlabAvalancheRiskAssessor.LOOKBACK_DAYS
         )
-        assertEquals(DangerLevel.HIGH, result.dangerLevel)
+
+        assertEquals(DangerLevel.HIGH, slabAvalancheRiskAssessor.assess(result))
     }
 
     @Test
@@ -112,8 +121,9 @@ class SlabAvalancheRiskTest {
 
         val result = repository.getWeatherRecordsForLocation(
             Coordinate(59.9, 10.7),
+            lookBackDays = SlabAvalancheRiskAssessor.LOOKBACK_DAYS
         )
-        assertEquals(DangerLevel.VERY_HIGH, result.dangerLevel)
+        assertEquals(DangerLevel.VERY_HIGH, slabAvalancheRiskAssessor.assess(result))
     }
 
     @Test
@@ -131,8 +141,9 @@ class SlabAvalancheRiskTest {
 
         val result = repository.getWeatherRecordsForLocation(
             Coordinate(59.9, 10.7),
+            lookBackDays = SlabAvalancheRiskAssessor.LOOKBACK_DAYS
         )
-        assertEquals(DangerLevel.VERY_HIGH, result.dangerLevel)
+        assertEquals(DangerLevel.VERY_HIGH, slabAvalancheRiskAssessor.assess(result))
     }
 
     // Missing data
@@ -145,8 +156,9 @@ class SlabAvalancheRiskTest {
 
         val result = repository.getWeatherRecordsForLocation(
             Coordinate(59.9, 10.7),
+            lookBackDays = SlabAvalancheRiskAssessor.LOOKBACK_DAYS
         )
-        assertEquals(DangerLevel.UNKNOWN, result.dangerLevel)
+        assertEquals(DangerLevel.UNKNOWN, slabAvalancheRiskAssessor.assess(result))
     }
 
     @Test
@@ -159,8 +171,9 @@ class SlabAvalancheRiskTest {
 
         val result = repository.getWeatherRecordsForLocation(
             Coordinate(59.9, 10.7),
+            lookBackDays = SlabAvalancheRiskAssessor.LOOKBACK_DAYS
         )
-        assertEquals(DangerLevel.UNKNOWN, result.dangerLevel)
+        assertEquals(DangerLevel.UNKNOWN, slabAvalancheRiskAssessor.assess(result))
     }
 
     // Exception handling
@@ -175,10 +188,10 @@ class SlabAvalancheRiskTest {
             makeDay("2026-03-27T00:00:00Z", temp = null, precip = 10.0),
         )
 
-        val result = repository.getWeatherRecordsForLocation(
+        repository.getWeatherRecordsForLocation(
             Coordinate(59.9, 10.7),
+            lookBackDays = SlabAvalancheRiskAssessor.LOOKBACK_DAYS
         )
-        assertEquals(DangerLevel.UNKNOWN, result.dangerLevel)
     }
 
     @Test(expected = NoStationFoundException::class)
@@ -186,6 +199,7 @@ class SlabAvalancheRiskTest {
         fakeDataSource.sourceResponse = makeSourceResponse()
         repository.getWeatherRecordsForLocation(
             Coordinate(59.9, 10.7),
+            lookBackDays = SlabAvalancheRiskAssessor.LOOKBACK_DAYS
         )
     }
 
@@ -194,6 +208,7 @@ class SlabAvalancheRiskTest {
         fakeDataSource.observationResponse = makeObsResponse()
         repository.getWeatherRecordsForLocation(
             Coordinate(59.9, 10.7),
+            lookBackDays = SlabAvalancheRiskAssessor.LOOKBACK_DAYS
         )
     }
 
@@ -202,6 +217,7 @@ class SlabAvalancheRiskTest {
         fakeDataSource.shouldThrow = true
         repository.getWeatherRecordsForLocation(
             Coordinate(59.9, 10.7),
+            lookBackDays = SlabAvalancheRiskAssessor.LOOKBACK_DAYS
         )
     }
 }

@@ -4,8 +4,8 @@ import in2000.prosjekt.in2000project.data.datasource.FrostV0DataSource
 import in2000.prosjekt.in2000project.data.datasource.KtorFrostV0DataSource
 import in2000.prosjekt.in2000project.data.datasource.LocationDataSource
 import in2000.prosjekt.in2000project.data.datasource.NveDataSource
-import in2000.prosjekt.in2000project.data.repository.AvalancheRiskRepository
-import in2000.prosjekt.in2000project.data.repository.FrostAvalancheRiskRepository
+import in2000.prosjekt.in2000project.data.repository.WeatherRepository
+import in2000.prosjekt.in2000project.data.repository.FrostWeatherRepository
 import in2000.prosjekt.in2000project.data.repository.FrostClimateRepository
 import in2000.prosjekt.in2000project.data.repository.LocationRepository
 import in2000.prosjekt.in2000project.data.repository.NveRepository
@@ -27,7 +27,7 @@ val appModule = module {
     single { NveDataSource(client = get()) }
     single { LocationDataSource(client = get()) }
     single { FrostClimateRepository(get()) }
-    single<AvalancheRiskRepository> { FrostAvalancheRiskRepository(get()) }
+    single<WeatherRepository> { FrostWeatherRepository(get()) }
     single { NveRepository(get()) }
     single { SearchRepository(get()) }
     single { LocationRepository(get()) }

@@ -10,9 +10,9 @@ import in2000.prosjekt.in2000project.data.model.exceptions.NoStationFoundExcepti
 import in2000.prosjekt.in2000project.domain.model.enums.ElementType
 import java.time.LocalDate
 
-class FrostAvalancheRiskRepository(
+class FrostWeatherRepository(
     private val frostV0DataSource: FrostV0DataSource,
-): AvalancheRiskRepository {
+): WeatherRepository {
 
     override suspend fun getWeatherRecordsForLocation(
         coordinate: Coordinate,

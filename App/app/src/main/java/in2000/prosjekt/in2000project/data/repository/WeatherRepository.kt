@@ -6,8 +6,8 @@ import in2000.prosjekt.in2000project.data.model.exceptions.NoObservationsExcepti
 import in2000.prosjekt.in2000project.data.model.exceptions.NoStationFoundException
 import java.time.LocalDate
 
-/** Repository for avalanche risk assessments based on recent climate data. */
-interface AvalancheRiskRepository {
+/** Repository for recent weather records, used for slab avalanche risk assessment. */
+interface WeatherRepository {
     /**
      * Constructs a list of weather records based on recent
      * weather observations from the nearest station.
