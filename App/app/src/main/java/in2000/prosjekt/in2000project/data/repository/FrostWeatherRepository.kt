@@ -29,14 +29,18 @@ class FrostWeatherRepository(
             endDate = currentDate,
         )
 
-        val records = getDailyWeatherRecords(dataSource, repeatingTimeRange)
+        val records = getDailyWeatherRecords(
+            dataSource,
+            repeatingTimeRange,
+            currentDate)
 
         return records
     }
 
     private suspend fun getDailyWeatherRecords(
         source: FrostV0SourceDto,
-        repeatingTimeRange: FrostReferenceTime
+        repeatingTimeRange: FrostReferenceTime,
+        currentDate: LocalDate,
     ) : List<DailyWeatherRecord> {
         val requiredElements = listOf(
             ElementType.TEMPERATURE_MEAN_P1D.frostElementId,
@@ -59,15 +63,14 @@ class FrostWeatherRepository(
         val observations = observationResponse.data
 
 
-        // filter out today's observations which are incomplete,
+        // filter out current date's observations which are incomplete,
         // since we want to base the risk on complete data
 
-        val today = LocalDate.now()
         val completeObservations = observations
             .filter { atRefTime ->
                 LocalDate.parse(
                     atRefTime.referenceTime.substringBefore("T")
-                ) < today
+                ) < currentDate
             }
 
         val records = completeObservations

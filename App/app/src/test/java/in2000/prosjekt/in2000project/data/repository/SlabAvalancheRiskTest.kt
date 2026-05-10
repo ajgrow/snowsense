@@ -5,17 +5,18 @@ import in2000.prosjekt.in2000project.data.datasource.makeDay
 import in2000.prosjekt.in2000project.data.datasource.makeObsResponse
 import in2000.prosjekt.in2000project.data.datasource.makeSourceResponse
 import in2000.prosjekt.in2000project.domain.model.Coordinate
-import in2000.prosjekt.in2000project.domain.model.enums.DangerLevel
 import in2000.prosjekt.in2000project.data.model.exceptions.NoObservationsException
 import in2000.prosjekt.in2000project.data.model.exceptions.NoStationFoundException
 import in2000.prosjekt.in2000project.domain.SlabAvalancheRiskAssessor
+import in2000.prosjekt.in2000project.domain.model.enums.DangerLevel
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import java.io.IOException
+import java.time.LocalDate
 
-class SlabAvalancheRiskTest {
+class FrostAvalancheRiskRepositoryTest {
 
     private lateinit var fakeDataSource: FakeFrostV0DataSource
     private lateinit var repository: WeatherRepository
@@ -29,26 +30,31 @@ class SlabAvalancheRiskTest {
     }
 
     @Test
-    fun stableTemperatureAndNoSnow_shouldGiveLow() = runTest {
+    fun getWeatherRecordsForLocation_returnsDailyRecords_forCompleteObservations() = runTest {
         fakeDataSource.observationResponse = makeObsResponse(
             makeDay("2026-04-01T00:00:00Z", temp = 0.0, precip = 0.0),
-            makeDay("2026-03-31T00:00:00Z", temp = 0.0, precip = 0.0),
-            makeDay("2026-03-30T00:00:00Z", temp = 0.0, precip = 0.0),
+            makeDay("2026-03-31T00:00:00Z", temp = 1.0, precip = 2.0),
+            makeDay("2026-03-30T00:00:00Z", temp = -1.0, precip = 5.0),
         )
 
         val result = repository.getWeatherRecordsForLocation(
             Coordinate(59.9, 10.7),
+            currentDate = LocalDate.of(2026, 4, 2),
             lookBackDays = SlabAvalancheRiskAssessor.LOOKBACK_DAYS
         )
-        assertEquals(DangerLevel.LOW, slabAvalancheRiskAssessor.assess(result))
+
+        assertEquals(3, result.size)
+        assertEquals(LocalDate.of(2026, 4, 1), result[0].date)
+        assertEquals(1.0, result[1].tempC)
+        assertEquals(5.0, result[2].precipMm)
     }
 
     @Test
-    fun lightSnowfallAndColdWeather_shouldGiveLow() = runTest {
+    fun getWeatherRecordsForLocation_excludesCurrentDateObservations() = runTest {
         fakeDataSource.observationResponse = makeObsResponse(
-            makeDay("2026-04-01T00:00:00Z", temp = -5.0, precip = 5.0),
-            makeDay("2026-03-31T00:00:00Z", temp = -5.0, precip = 5.0),
-            makeDay("2026-03-30T00:00:00Z", temp = -5.0, precip = 5.0),
+            makeDay("2026-04-02T00:00:00Z", temp = 2.0, precip = 10.0),
+            makeDay("2026-04-01T00:00:00Z", temp = -1.0, precip = 4.0),
+            makeDay("2026-03-31T00:00:00Z", temp = -2.0, precip = 3.0),
         )
 
         val result = repository.getWeatherRecordsForLocation(
@@ -177,46 +183,50 @@ class SlabAvalancheRiskTest {
     }
 
     // Exception handling
-
     @Test(expected = NoObservationsException::class)
-    fun missingTemperatureOnAllDays_shouldGiveUnknown() = runTest {
+    fun getWeatherRecordsForLocation_throwsWhenNoValidRecords() = runTest {
         fakeDataSource.observationResponse = makeObsResponse(
-            makeDay("2026-04-01T00:00:00Z", temp = null, precip = 10.0),
-            makeDay("2026-03-30T00:00:00Z", temp = null, precip = 10.0),
-            makeDay("2026-03-29T00:00:00Z", temp = null, precip = 10.0),
-            makeDay("2026-03-28T00:00:00Z", temp = null, precip = 10.0),
-            makeDay("2026-03-27T00:00:00Z", temp = null, precip = 10.0),
+            makeDay("2026-04-01T00:00:00Z", temp = -5.0, precip = null),
+            makeDay("2026-03-31T00:00:00Z", temp = null, precip = 5.0),
+            makeDay("2026-03-30T00:00:00Z", temp = null, precip = null),
         )
 
         repository.getWeatherRecordsForLocation(
             Coordinate(59.9, 10.7),
+            currentDate = LocalDate.of(2026, 4, 2),
             lookBackDays = SlabAvalancheRiskAssessor.LOOKBACK_DAYS
         )
     }
 
     @Test(expected = NoStationFoundException::class)
-    fun noWeatherStationNearby_shouldThrowException() = runTest {
+    fun getWeatherRecordsForLocation_throwsWhenNoStationFound() = runTest {
         fakeDataSource.sourceResponse = makeSourceResponse()
+
         repository.getWeatherRecordsForLocation(
             Coordinate(59.9, 10.7),
+            currentDate = LocalDate.of(2026, 4, 2),
             lookBackDays = SlabAvalancheRiskAssessor.LOOKBACK_DAYS
         )
     }
 
     @Test(expected = NoObservationsException::class)
-    fun noObservations_shouldThrowNoObservationsException() = runTest {
+    fun getWeatherRecordsForLocation_throwsWhenObservationsAreEmpty() = runTest {
         fakeDataSource.observationResponse = makeObsResponse()
+
         repository.getWeatherRecordsForLocation(
             Coordinate(59.9, 10.7),
+            currentDate = LocalDate.of(2026, 4, 2),
             lookBackDays = SlabAvalancheRiskAssessor.LOOKBACK_DAYS
         )
     }
 
     @Test(expected = IOException::class)
-    fun networkFailure_shouldThrowIOException() = runTest {
+    fun getWeatherRecordsForLocation_throwsOnNetworkFailure() = runTest {
         fakeDataSource.shouldThrow = true
+
         repository.getWeatherRecordsForLocation(
             Coordinate(59.9, 10.7),
+            currentDate = LocalDate.of(2026, 4, 2),
             lookBackDays = SlabAvalancheRiskAssessor.LOOKBACK_DAYS
         )
     }

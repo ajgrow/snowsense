@@ -6,11 +6,13 @@ import in2000.prosjekt.in2000project.data.datasource.LocationDataSource
 import in2000.prosjekt.in2000project.data.datasource.NveDataSource
 import in2000.prosjekt.in2000project.data.repository.WeatherRepository
 import in2000.prosjekt.in2000project.data.repository.FrostWeatherRepository
+import in2000.prosjekt.in2000project.data.repository.ClimateRepository
 import in2000.prosjekt.in2000project.data.repository.FrostClimateRepository
 import in2000.prosjekt.in2000project.data.repository.LocationRepository
 import in2000.prosjekt.in2000project.data.repository.NveRepository
 import in2000.prosjekt.in2000project.data.repository.SearchRepository
 import in2000.prosjekt.in2000project.domain.SlabAvalancheRiskAssessor
+import in2000.prosjekt.in2000project.domain.usecase.GetAvalancheDangerUseCase
 import in2000.prosjekt.in2000project.network.KtorClient
 import in2000.prosjekt.in2000project.ui.screens.information.InfoViewModel
 import in2000.prosjekt.in2000project.ui.screens.map.MapStateHolder
@@ -27,14 +29,16 @@ val appModule = module {
     single { NveDataSource(client = get()) }
     single { LocationDataSource(client = get()) }
     single { FrostClimateRepository(get()) }
+    single { SlabAvalancheRiskAssessor() }
     single<WeatherRepository> { FrostWeatherRepository(get()) }
+    single<ClimateRepository> { FrostClimateRepository(get()) }
     single { NveRepository(get()) }
     single { SearchRepository(get()) }
     single { LocationRepository(get()) }
-    single { SlabAvalancheRiskAssessor() }
     single { MapStateHolder() }
+    single { GetAvalancheDangerUseCase(get(), get(), get()) }
     viewModel { MapViewModel(get()) }
-    viewModel { RiskViewModel(get(), get(), get()) }
+    viewModel { RiskViewModel(get()) }
     viewModel { SearchViewModel(get(), get()) }
     viewModel { SettingsViewModel(get()) }
     viewModel { InfoViewModel(get()) }
