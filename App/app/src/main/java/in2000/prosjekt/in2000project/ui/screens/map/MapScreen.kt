@@ -106,11 +106,10 @@ fun MapRoute(
     searchViewModel: SearchViewModel,
     mapViewModel: MapViewModel = koinViewModel(),
     riskViewModel: RiskViewModel = koinViewModel(),
+    mapStateHolder: MapStateHolder = koinInject()
 ) {
-    val mapStateHolder: MapStateHolder = koinInject()
-
-    val screenState by mapViewModel.screenState.collectAsState()
-    val riskState by riskViewModel.riskState.collectAsState()
+    val screenState by mapViewModel.screenState.collectAsStateWithLifecycle()
+    val riskState by riskViewModel.riskState.collectAsStateWithLifecycle()
     val searchState by searchViewModel.searchState.collectAsStateWithLifecycle()
     val overlayState by mapStateHolder.overlayState.collectAsStateWithLifecycle()
     val pin by mapStateHolder.pinnedPoint.collectAsStateWithLifecycle()
