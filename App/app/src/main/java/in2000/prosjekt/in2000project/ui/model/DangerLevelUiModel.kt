@@ -3,7 +3,7 @@ package in2000.prosjekt.in2000project.ui.model
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
-import in2000.prosjekt.in2000project.data.model.enums.DangerLevel
+import in2000.prosjekt.in2000project.domain.model.enums.DangerLevel
 import in2000.prosjekt.in2000project.R
 import in2000.prosjekt.in2000project.ui.theme.*
 

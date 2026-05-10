@@ -10,7 +10,7 @@ fun makeObservation(
     unit: String = "degC",
     timeOffset: String = "PT0H",
     timeResolution: String = "P1D",
-) = FrostV0Observation(elementId, value, unit, timeOffset, timeResolution)
+) = FrostV0ObservationDto(elementId, value, unit, timeOffset, timeResolution)
 
 fun makeDay(
     refTime: String = "2026-04-01T00:00:00Z",
@@ -19,8 +19,8 @@ fun makeDay(
     wind: Double? = null,
     snow: Double? = null,
     sourceId: String = "SN18700",
-): FrostV0ObservationsAtRefTime {
-    val obs = mutableListOf<FrostV0Observation>()
+): FrostV0ObservationsAtRefTimeDto {
+    val obs = mutableListOf<FrostV0ObservationDto>()
     if (temp != null) obs += makeObservation(
         elementId = "mean(air_temperature P1D)", value = temp,
     )
@@ -33,7 +33,7 @@ fun makeDay(
     if (snow != null) obs += makeObservation(
         elementId = "max(surface_snow_thickness P1D)", value = snow, unit = "cm",
     )
-    return FrostV0ObservationsAtRefTime(
+    return FrostV0ObservationsAtRefTimeDto(
         sourceId = sourceId,
         referenceTime = refTime,
         observations = obs,
@@ -41,8 +41,8 @@ fun makeDay(
 }
 
 fun makeObsResponse(
-    vararg days: FrostV0ObservationsAtRefTime,
-) = FrostV0ObservationResponse(
+    vararg days: FrostV0ObservationsAtRefTimeDto,
+) = FrostV0ObservationResponseDto(
     currentItemCount = days.size,
     totalItemCount = days.size,
     data = days.toList(),
@@ -52,7 +52,7 @@ fun makeSource(
     id: String = "SN18700",
     name: String = "Blindern",
     shortName: String = "Blindern",
-    geometry: FrostV0Point = FrostV0Point(
+    geometry: FrostV0PointDto = FrostV0PointDto(
         type = "Point",
         coordinates = listOf(59.94, 10.72),
     ),
@@ -61,8 +61,8 @@ fun makeSource(
     validFrom: String? = "1937-01-01",
     county: String? = "Oslo",
     municipality: String? = "Oslo",
-) = FrostV0Source(id, name, shortName, geometry, distance, masl, validFrom, county, municipality)
+) = FrostV0SourceDto(id, name, shortName, geometry, distance, masl, validFrom, county, municipality)
 
 fun makeSourceResponse(
-    vararg sources: FrostV0Source,
-) = FrostV0SourceResponse(data = sources.toList())
+    vararg sources: FrostV0SourceDto,
+) = FrostV0SourceResponseDto(data = sources.toList())

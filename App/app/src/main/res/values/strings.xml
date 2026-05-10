@@ -197,6 +197,8 @@
 
     <string name="language">language</string>
     <string name="favorite_button_desc">Add to favorites</string>
+    <string name="selected_area">Selected Area</string>
+    <string name="missing_station_name">Missing station name</string>
 
 
 </resources>
