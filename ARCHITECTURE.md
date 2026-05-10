@@ -54,8 +54,8 @@ ViewModels only depend on repository interfaces, never on datasource implementat
 
 Binding takes place in `AppModule.kt` via **Koin**
 ```kotlin
-    single<FrostV0DataSource> { KtorFrostV0DataSource(client = get()) }
-    single { FrostClimateRepository(get()) }
+    single<FrostV0DataSource> { KtorFrostV0DataSource(get()) }
+    single<ClimateRepository> { FrostClimateRepository(get()) }
     viewModel { MapViewModel(get()) }
 ```
 The reason this is important is because it means that it is rather trivial to replace for example Ktor with another HTTP library due to only the implementation class and AppModule being affected.
@@ -66,16 +66,19 @@ It also makes it easy to test the repository layer with one `FakeFrostV0DataSour
 Every Package has one clear responsability
 | package | Responsability |
 | --- | --- |
-| `datasource`| Raw communication with an external source |
-| `datasource/dto`| Data objects that mirror API-contract |
-| `repository` | Logic and aggregating |
-| `data/model` | Internal app domain objects |
-| `di` | Dependenies graph |
-| `navigation` | route definition and navigation logic |
+| `data.datasource`| Raw communication with an external source |
+| `data.datasource.dto`| Data transfer objects that mirror API-contract |
+| `data.repository` | Data transformation into domain models |
+| `data.model.exceptions` | Exceptions thrown by DataSources |
+| `navigation` | Route definition and navigation logic |
+| `domain.model` | Domain models |
+| `ui.screens.<screen_name>` | Screens and their dedicated ViewModels and components |
+| `ui.components` | Reusable, stateless composables for use on any screen |
+| `ui.model` | UI models, mapping from domain data to UI content |
+| `ui.viewmodels` | Shared ViewModels used by multiple screens |
 | `network` | HTTP-client configuration |
-| `ui/<screen>` | Everything that belongs to a screen: State, Screen, Viewmodel, ect...|
-| `ui/reusables` | Reusable, stateless composables |
-| `ui/model` | UI-specific maps/models |
+| `di` | Dependency injection |
+
 
 ### MVVM & Unidirectional Data Flow (UDF)
 
@@ -158,7 +161,7 @@ The **UI layer** consists of the screens and UI components the app uses to displ
 in2000.prosjekt.in2000project/
 |
 |--- data/
-|    |--- model/                                #Domain objects
+|    |--- model/                                
 |    |    |---exceptions
 |    |    |    |--- NoObservationException.kt
 |    |    |    |--- NoStationFoundException 
@@ -174,19 +177,18 @@ in2000.prosjekt.in2000project/
 |    |    |--- LocationDataSource
 |    |    |--- LocationQueryBuilder.kt
 |    |    
-|    |--- repository/                           # Logic and aggregation of data
+|    |--- repository/                           # Transformation and aggregation of data
 |    |    |--- ClimateRepository.kt             # Interface
 |    |    |--- FrostClimateRepository.kt        # Implementation
-|    |    |--- AvalancheRiskRepository.kt       # Interface
-|    |    |--- FrostAvalancheRiskRepository.kt  # Implementation
-|    |    |--- SlabAvalancheRiskRepository.kt   # Domain logic and objects
+|    |    |--- WeatherRepository.kt             # Interface
+|    |    |--- FrostWeatherRepository.kt        # Implementation
 |    |    |--- NveRepository.kt 
 |    |    |--- SearchRepository.kt
 |    |    |--- FrostReferenceTime.kt            # Helper object
 |    |    |--- LocationRepository
 |    
-|--- domain /
-|    |--- model /
+|--- domain/
+|    |--- model/                               # Domain models
 |    |    |---enums/
 |    |    |    |--- DangerLevel
 |    |    |    |--- ElementType
@@ -199,7 +201,7 @@ in2000.prosjekt.in2000project/
 |    |    |--- GeoJson
 |    |    |--- LocationClimateDataPoint
 |    |    |--- NamedLocation 
-|    |--- SlabAvalancheRiskAssessor.kt
+|    |--- SlabAvalancheRiskAssessor.kt          
 |    
 |--- di/
 |    |--- AppModule.kt
@@ -214,14 +216,19 @@ in2000.prosjekt.in2000project/
 |    
 |---ui/
 |    |--- approot/                             
-|    |    |---AppRoot.kt
+|    |    |--- AppRoot.kt
 |    |--- components/                           # Reusable Composables
 |    |--- screens/                            
 |    |    |--- home/                            # HomeScreen
 |    |    |--- map/                             # MapScreen relevant
 |    |    |--- information/                     # InfoScreen relevant
 |    |    |--- settings/                        # SettingScreen relevant
-|    |--- model/                                # UI-models
+|    |--- model/ 
+|    |    |--- DangerLevelUiModel.kt     
+|    |--- viewmodels/                           # Shared ViewModels
+|    |    |--- RiskViewModel.kt        
+|    |    |--- SearchViewModel.kt    
+|    |    |--- SettingsViewModel.kt                         
 │    
 |--- MainActivity.kt
 |----SnowSenseApplication.kt
