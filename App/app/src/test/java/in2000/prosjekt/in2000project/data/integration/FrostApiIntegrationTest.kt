@@ -1,11 +1,15 @@
 package in2000.prosjekt.in2000project.data.integration
 
 import in2000.prosjekt.in2000project.data.datasource.KtorFrostV0DataSource
+import in2000.prosjekt.in2000project.data.datasource.NveDataSource
 import in2000.prosjekt.in2000project.domain.model.Coordinate
 import in2000.prosjekt.in2000project.domain.model.enums.ElementType
 import in2000.prosjekt.in2000project.data.repository.FrostWeatherRepository
 import in2000.prosjekt.in2000project.data.repository.FrostClimateRepository
 import in2000.prosjekt.in2000project.domain.SlabAvalancheRiskAssessor
+import in2000.prosjekt.in2000project.data.repository.NveRepository
+import in2000.prosjekt.in2000project.domain.model.enums.DangerLevel
+import in2000.prosjekt.in2000project.domain.usecase.GetAvalancheDangerUseCase
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.auth.Auth
@@ -35,6 +39,7 @@ class FrostApiIntegrationTest {
     private lateinit var client: HttpClient
     private lateinit var climateRepository: FrostClimateRepository
     private lateinit var weatherRepository: FrostWeatherRepository
+    private lateinit var nveRepository: NveRepository
 
     @Before
     fun setUp() {
@@ -64,6 +69,9 @@ class FrostApiIntegrationTest {
         val dataSource = KtorFrostV0DataSource(client)
         climateRepository = FrostClimateRepository(dataSource)
         weatherRepository = FrostWeatherRepository(dataSource)
+
+        val nveDataSource = NveDataSource(client)
+        nveRepository = NveRepository(nveDataSource)
     }
 
     @After
@@ -123,12 +131,15 @@ class FrostApiIntegrationTest {
     }
 
     @Test
-    fun froystul_avalancheRisk_smokeTest() = runTest {
-        val result = weatherRepository.getWeatherRecordsForLocation(
-            coordinate = FROYSTUL,
-            lookBackDays = SlabAvalancheRiskAssessor.LOOKBACK_DAYS
+    fun froystul_avalancheDangerLevel_integrationTest() = runTest {
+        val getAvalancheDangerUseCase = GetAvalancheDangerUseCase(
+            weatherRepository = weatherRepository,
+            avalancheRiskRepository = nveRepository,
+            slabAvalancheRiskAssessor = SlabAvalancheRiskAssessor()
         )
 
-        assertTrue(result.isNotEmpty())
+        val dangerLevel = getAvalancheDangerUseCase(FROYSTUL)
+
+        assertContains(DangerLevel.entries, dangerLevel, "Danger level should be valid")
     }
 }

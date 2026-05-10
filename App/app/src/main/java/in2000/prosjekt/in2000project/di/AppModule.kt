@@ -2,13 +2,14 @@ package in2000.prosjekt.in2000project.di
 
 import in2000.prosjekt.in2000project.data.datasource.KtorAvalancheRiskDataSource
 import in2000.prosjekt.in2000project.data.datasource.KtorFrostV0DataSource
+import in2000.prosjekt.in2000project.data.repository.FrostWeatherRepository
 import in2000.prosjekt.in2000project.data.datasource.KtorLocationDataSource
 import in2000.prosjekt.in2000project.data.repository.FrostClimateRepository
-import in2000.prosjekt.in2000project.data.repository.FrostWeatherRepository
 import in2000.prosjekt.in2000project.data.repository.KartverketLocationRepository
 import in2000.prosjekt.in2000project.data.repository.NveAvalancheRiskRepository
 import in2000.prosjekt.in2000project.data.repository.SharedPreferencesSearchRepository
 import in2000.prosjekt.in2000project.domain.SlabAvalancheRiskAssessor
+import in2000.prosjekt.in2000project.domain.usecase.GetAvalancheDangerUseCase
 import in2000.prosjekt.in2000project.domain.datasource.AvalancheRiskDataSource
 import in2000.prosjekt.in2000project.domain.datasource.FrostV0DataSource
 import in2000.prosjekt.in2000project.domain.datasource.LocationDataSource
@@ -39,8 +40,9 @@ val appModule = module {
     single<LocationRepository> { KartverketLocationRepository(get()) }
     single { SlabAvalancheRiskAssessor() }
     single { MapStateHolder() }
+    single { GetAvalancheDangerUseCase(get(), get(), get()) }
     viewModel { MapViewModel(get()) }
-    viewModel { RiskViewModel(get(), get(), get()) }
+    viewModel { RiskViewModel(get()) }
     viewModel { SearchViewModel(get(), get()) }
     viewModel { SettingsViewModel(get()) }
     viewModel { InfoViewModel(get()) }
