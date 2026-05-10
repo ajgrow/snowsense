@@ -6,17 +6,19 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import in2000.prosjekt.in2000project.domain.model.Coordinate
 import in2000.prosjekt.in2000project.domain.model.NamedLocation
-import in2000.prosjekt.in2000project.data.repository.LocationRepository
-import in2000.prosjekt.in2000project.data.repository.SearchRepository
+import in2000.prosjekt.in2000project.domain.repository.LocationRepository
+import in2000.prosjekt.in2000project.domain.repository.SearchRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 data class SearchUiState (
-    val searchTextFieldState: TextFieldState = TextFieldState(),
+    val query: String = "",
     val searchResults: List<NamedLocation> = emptyList(),
     val favorites: List<NamedLocation> = emptyList(),
     val recentSearches: List<NamedLocation> = emptyList(),
@@ -37,8 +39,12 @@ class SearchViewModel(
     init{
         // Update search results as user types
         viewModelScope.launch {
-            snapshotFlow { _searchState.value.searchTextFieldState.text.toString() }
-                .debounce(300) //wait 300ms after user stops typing
+            _searchState
+                .map {
+                    it.query
+                }
+                .distinctUntilChanged()
+                .debounce(300)
                 .collect { query ->
                     if (query.isNotBlank()) {
                         val results = locationRepository.getNamedLocations(query)
@@ -50,9 +56,21 @@ class SearchViewModel(
         }
     }
 
-    fun updateSearchTextFieldState(textFieldState: TextFieldState){
-        //make a copy of the current state and change the searchQuery to the new query
-        _searchState.update { it.copy(searchTextFieldState = textFieldState) }
+    fun onQueryChange(query: String){
+        _searchState.update { it.copy(query = query.take(50)) }
+    }
+
+    fun clearQuery() {
+        _searchState.update { it.copy(query = "", searchResults = emptyList()) }
+    }
+
+    fun selectSearchResult(location: NamedLocation) {
+        _searchState.update {
+            it.copy(
+                query = ""
+            )
+        }
+        addRecentSearch(location)
     }
 
     fun addRecentSearch(location: NamedLocation) {
