@@ -1,33 +1,34 @@
-package in2000.prosjekt.in2000project.data.repository
+package in2000.prosjekt.in2000project.domain
 
 import in2000.prosjekt.in2000project.domain.model.DailyWeatherRecord
 import in2000.prosjekt.in2000project.domain.model.enums.DangerLevel
 import kotlin.math.sqrt
 
 // Estimates slab avalanche danger from daily weather observations.
-object SlabAvalancheRiskAssessor {
+class SlabAvalancheRiskAssessor {
+    companion object {
+        const val LOOKBACK_DAYS = 30
+        private const val RECENT_DAYS = 3
 
-    const val LOOKBACK_DAYS = 30
-    private const val RECENT_DAYS = 3
+        private const val RECENT_LOADING_LOW = 10.0
+        private const val RECENT_LOADING_HIGH = 60.0
 
-    private const val RECENT_LOADING_LOW = 10.0
-    private const val RECENT_LOADING_HIGH = 60.0
+        private const val RAPID_WARMING_LOW = 2.0
+        private const val RAPID_WARMING_HIGH = 10.0
 
-    private const val RAPID_WARMING_LOW = 2.0
-    private const val RAPID_WARMING_HIGH = 10.0
+        private const val WEAK_LAYER_LOW = 0.5
+        private const val WEAK_LAYER_HIGH = 2.0
 
-    private const val WEAK_LAYER_LOW = 0.5
-    private const val WEAK_LAYER_HIGH = 2.0
+        private const val SLAB_BACKBONE_MIN_LWE = 10.0
+        private const val SLAB_LOAD_LOW = 10.0
+        private const val SLAB_LOAD_HIGH = 50.0
 
-    private const val SLAB_BACKBONE_MIN_LWE = 10.0
-    private const val SLAB_LOAD_LOW = 10.0
-    private const val SLAB_LOAD_HIGH = 50.0
-
-    private const val STRUCTURAL_BASELINE = 0.24 // structure gives Moderate
-    private const val THRESHOLD_MODERATE = 0.10
-    private const val THRESHOLD_CONSIDERABLE = 0.25
-    private const val THRESHOLD_HIGH = 0.50
-    private const val THRESHOLD_VERY_HIGH = 0.75
+        private const val STRUCTURAL_BASELINE = 0.24 // structure gives Moderate
+        private const val THRESHOLD_MODERATE = 0.10
+        private const val THRESHOLD_CONSIDERABLE = 0.25
+        private const val THRESHOLD_HIGH = 0.50
+        private const val THRESHOLD_VERY_HIGH = 0.75
+    }
 
     fun assess(days: List<DailyWeatherRecord>): DangerLevel {
         if (days.isEmpty() || days.size < RECENT_DAYS)

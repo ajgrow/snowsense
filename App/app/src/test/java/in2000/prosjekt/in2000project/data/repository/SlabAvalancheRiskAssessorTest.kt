@@ -2,12 +2,13 @@ package in2000.prosjekt.in2000project.data.repository
 
 import in2000.prosjekt.in2000project.domain.model.DailyWeatherRecord
 import in2000.prosjekt.in2000project.domain.model.enums.DangerLevel
+import in2000.prosjekt.in2000project.domain.SlabAvalancheRiskAssessor
 import org.junit.Assert.*
 import org.junit.Test
 import java.time.LocalDate
 
 class SlabAvalancheRiskAssessorTest {
-
+    val slabAvalancheRiskAssessor = SlabAvalancheRiskAssessor()
     private fun record(
         daysAgo: Int,
         temp: Double? = null,
@@ -21,7 +22,7 @@ class SlabAvalancheRiskAssessorTest {
 
     @Test
     fun normalize_atLow_returnsZero() {
-        val result = SlabAvalancheRiskAssessor.normalize(
+        val result = slabAvalancheRiskAssessor.normalize(
             10.0, 10.0, 60.0,
         )
         assertEquals(0.0, result, 0.001)
@@ -29,7 +30,7 @@ class SlabAvalancheRiskAssessorTest {
 
     @Test
     fun normalize_midpoint_returnsHalf() {
-        val result = SlabAvalancheRiskAssessor.normalize(
+        val result = slabAvalancheRiskAssessor.normalize(
             35.0, 10.0, 60.0,
         )
         assertEquals(0.5, result, 0.001)
@@ -37,7 +38,7 @@ class SlabAvalancheRiskAssessorTest {
 
     @Test
     fun normalize_aboveHigh_clampedToOne() {
-        val result = SlabAvalancheRiskAssessor.normalize(
+        val result = slabAvalancheRiskAssessor.normalize(
             100.0, 10.0, 60.0,
         )
         assertEquals(1.0, result, 0.001)
@@ -51,7 +52,7 @@ class SlabAvalancheRiskAssessorTest {
             record(0, temp = 2.0, precip = 30.0),
         )
         val result =
-            SlabAvalancheRiskAssessor.calcRecentLoading(days)
+            slabAvalancheRiskAssessor.calcRecentLoading(days)
         assertEquals(0.0, result, 0.001)
     }
 
@@ -63,7 +64,7 @@ class SlabAvalancheRiskAssessorTest {
             record(0, temp = -1.0, precip = 12.0),
         )
         val result =
-            SlabAvalancheRiskAssessor.calcRecentLoading(days)
+            slabAvalancheRiskAssessor.calcRecentLoading(days)
         assertEquals(0.52, result, 0.001)
     }
 
@@ -76,7 +77,7 @@ class SlabAvalancheRiskAssessorTest {
             record(0, temp = -1.0, precip = 30.0),
         )
         val result =
-            SlabAvalancheRiskAssessor.calcRecentLoading(days)
+            slabAvalancheRiskAssessor.calcRecentLoading(days)
         assertEquals(1.0, result, 0.001)
     }
 
@@ -88,7 +89,7 @@ class SlabAvalancheRiskAssessorTest {
             record(0, temp = -2.0),
         )
         val result =
-            SlabAvalancheRiskAssessor.calcRapidWarming(days)
+            slabAvalancheRiskAssessor.calcRapidWarming(days)
         assertEquals(0.0, result, 0.001)
     }
 
@@ -100,7 +101,7 @@ class SlabAvalancheRiskAssessorTest {
             record(0, temp = 5.0),
         )
         val result =
-            SlabAvalancheRiskAssessor.calcRapidWarming(days)
+            slabAvalancheRiskAssessor.calcRapidWarming(days)
         assertEquals(0.875, result, 0.001)
     }
 
@@ -112,7 +113,7 @@ class SlabAvalancheRiskAssessorTest {
             record(0, temp = 5.0, precip = 20.0),
         )
         val result =
-            SlabAvalancheRiskAssessor.calcStructural(days)
+            slabAvalancheRiskAssessor.calcStructural(days)
         assertEquals(0.0, result, 0.001)
     }
 
@@ -124,7 +125,7 @@ class SlabAvalancheRiskAssessorTest {
             record(0, temp = -8.0, precip = 5.0),
         )
         val result =
-            SlabAvalancheRiskAssessor.calcStructural(days)
+            slabAvalancheRiskAssessor.calcStructural(days)
         assertEquals(0.0, result, 0.001)
     }
 
@@ -136,7 +137,7 @@ class SlabAvalancheRiskAssessorTest {
             record(0, temp = 0.0, precip = 20.0),
         )
         val result =
-            SlabAvalancheRiskAssessor.calcStructural(days)
+            slabAvalancheRiskAssessor.calcStructural(days)
         assertEquals(0.0, result, 0.001)
     }
 
@@ -148,7 +149,7 @@ class SlabAvalancheRiskAssessorTest {
             record(5, temp = -2.0, precip = 25.0),
         )
         val result =
-            SlabAvalancheRiskAssessor.calcStructural(days)
+            slabAvalancheRiskAssessor.calcStructural(days)
         assertEquals(0.822, result, 0.01)
     }
 
@@ -160,7 +161,7 @@ class SlabAvalancheRiskAssessorTest {
             record(10, temp = -6.0, precip = 3.0),
         )
         val result =
-            SlabAvalancheRiskAssessor.calcStructural(days)
+            slabAvalancheRiskAssessor.calcStructural(days)
         assertEquals(0.0, result, 0.001)
     }
 
@@ -173,7 +174,7 @@ class SlabAvalancheRiskAssessorTest {
             record(5, temp = -2.0, precip = 20.0),
         )
         val result =
-            SlabAvalancheRiskAssessor.calcStructural(days)
+            slabAvalancheRiskAssessor.calcStructural(days)
         assertEquals(0.742, result, 0.01)
     }
 
@@ -181,7 +182,7 @@ class SlabAvalancheRiskAssessorTest {
     fun assess_emptyInput_returnsUnknown() {
         assertEquals(
             DangerLevel.UNKNOWN,
-            SlabAvalancheRiskAssessor.assess(emptyList()),
+            slabAvalancheRiskAssessor.assess(emptyList()),
         )
     }
 
@@ -194,7 +195,7 @@ class SlabAvalancheRiskAssessorTest {
         )
         assertEquals(
             DangerLevel.LOW,
-            SlabAvalancheRiskAssessor.assess(days),
+            slabAvalancheRiskAssessor.assess(days),
         )
     }
 
@@ -210,7 +211,7 @@ class SlabAvalancheRiskAssessorTest {
         )
         assertEquals(
             DangerLevel.MODERATE,
-            SlabAvalancheRiskAssessor.assess(days),
+            slabAvalancheRiskAssessor.assess(days),
         )
     }
 
@@ -226,7 +227,7 @@ class SlabAvalancheRiskAssessorTest {
         )
         assertEquals(
             DangerLevel.CONSIDERABLE,
-            SlabAvalancheRiskAssessor.assess(days),
+            slabAvalancheRiskAssessor.assess(days),
         )
     }
 
@@ -242,7 +243,7 @@ class SlabAvalancheRiskAssessorTest {
         )
         assertEquals(
             DangerLevel.HIGH,
-            SlabAvalancheRiskAssessor.assess(days),
+            slabAvalancheRiskAssessor.assess(days),
         )
     }
 
@@ -258,7 +259,7 @@ class SlabAvalancheRiskAssessorTest {
         )
         assertEquals(
             DangerLevel.VERY_HIGH,
-            SlabAvalancheRiskAssessor.assess(days),
+            slabAvalancheRiskAssessor.assess(days),
         )
     }
 
@@ -274,8 +275,8 @@ class SlabAvalancheRiskAssessorTest {
         )
         val shuffled = sorted.shuffled()
         assertEquals(
-            SlabAvalancheRiskAssessor.assess(sorted),
-            SlabAvalancheRiskAssessor.assess(shuffled),
+            slabAvalancheRiskAssessor.assess(sorted),
+            slabAvalancheRiskAssessor.assess(shuffled),
         )
     }
 }

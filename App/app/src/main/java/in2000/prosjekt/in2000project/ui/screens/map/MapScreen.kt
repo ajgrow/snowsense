@@ -118,7 +118,7 @@ fun MapRoute(
     LaunchedEffect(pin) {
         pin?.let {
             mapViewModel.onMapClick(it.latitude(), it.longitude())
-            riskViewModel.avalancheChecker(it.latitude(), it.longitude())
+            riskViewModel.updateDangerLevel(it.latitude(), it.longitude())
         }
     }
 

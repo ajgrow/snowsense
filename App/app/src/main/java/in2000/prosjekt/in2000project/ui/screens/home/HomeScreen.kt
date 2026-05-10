@@ -79,18 +79,12 @@ fun HomeScreen(
 ) {
     val focusManager = LocalFocusManager.current
     val searchState by searchViewModel.searchState.collectAsStateWithLifecycle()
-    val riskState by riskViewModel.riskState.collectAsState()
+    val riskState by riskViewModel.riskState.collectAsStateWithLifecycle()
 
     val favorites = searchState.favorites
 
     LaunchedEffect(favorites) {
-        favorites.forEach { location ->
-            riskViewModel.avalancheChecker(
-                lat = location.coordinate.latitude,
-                lon = location.coordinate.longitude,
-                isFavorite = true
-            )
-        }
+        riskViewModel.refreshFavoriteRisks(favorites)
     }
 
     Surface(
