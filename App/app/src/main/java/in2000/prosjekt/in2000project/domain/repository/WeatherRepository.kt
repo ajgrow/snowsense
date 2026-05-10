@@ -1,9 +1,7 @@
-package in2000.prosjekt.in2000project.data.repository
+package in2000.prosjekt.in2000project.domain.repository
 
 import in2000.prosjekt.in2000project.domain.model.Coordinate
 import in2000.prosjekt.in2000project.domain.model.DailyWeatherRecord
-import in2000.prosjekt.in2000project.data.model.exceptions.NoObservationsException
-import in2000.prosjekt.in2000project.data.model.exceptions.NoStationFoundException
 import java.time.LocalDate
 
 /** Repository for recent weather records, used for slab avalanche risk assessment. */
@@ -19,8 +17,8 @@ interface WeatherRepository {
      * @return [List<DailyWeatherRecord>] consisting of daily weather records
      * for the selected range.
      * @throws java.io.IOException on network failures.
-     * @throws NoObservationsException if the station has no data for the requested period.
-     * @throws NoStationFoundException if no station is found for the requested coordinate.
+     * @throws in2000.prosjekt.in2000project.data.model.exceptions.NoObservationsException if the station has no data for the requested period.
+     * @throws in2000.prosjekt.in2000project.data.model.exceptions.NoStationFoundException if no station is found for the requested coordinate.
      */
     suspend fun getWeatherRecordsForLocation(
         coordinate: Coordinate,

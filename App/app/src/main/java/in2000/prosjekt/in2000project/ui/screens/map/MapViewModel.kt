@@ -3,9 +3,9 @@ package in2000.prosjekt.in2000project.ui.screens.map
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import in2000.prosjekt.in2000project.domain.model.Coordinate
 import in2000.prosjekt.in2000project.data.model.exceptions.NoObservationsException
-import in2000.prosjekt.in2000project.data.repository.FrostClimateRepository
+import in2000.prosjekt.in2000project.domain.model.Coordinate
+import in2000.prosjekt.in2000project.domain.repository.ClimateRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -14,7 +14,7 @@ import java.time.MonthDay
 import java.time.Year
 
 class MapViewModel(
-    private val frostClimateRepository: FrostClimateRepository
+    private val climateRepository: ClimateRepository
 ) : ViewModel() {
 
     //Using MapScreenState() instead of <MapScreenState>(MapScreenState.Loading) because
@@ -62,7 +62,7 @@ class MapViewModel(
 
             try {
                 val current = _screenState.value
-                val climateData = frostClimateRepository.getClimateDataForLocation(
+                val climateData = climateRepository.getClimateDataForLocation(
                     coordinate = Coordinate(lat, lon),
                     periodStart = current.startDate,
                     periodEnd = current.endDate,

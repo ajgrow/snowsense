@@ -1,8 +1,8 @@
 package in2000.prosjekt.in2000project.data.datasource
 
-import in2000.prosjekt.in2000project.data.datasource.dto.LocationResponseDto
 import in2000.prosjekt.in2000project.data.datasource.dto.LocationDto
-import in2000.prosjekt.in2000project.network.KtorClient
+import in2000.prosjekt.in2000project.data.datasource.dto.LocationResponseDto
+import in2000.prosjekt.in2000project.domain.datasource.LocationDataSource
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
@@ -12,10 +12,10 @@ private const val BASE_URL = "https://api.kartverket.no/stedsnavn/v1/navn"
 private const val RESULTS_PER_PAGE = 10
 private const val FILTER = "navn.representasjonspunkt,navn.skrivemåte,navn.navneobjekttype"
 
-class LocationDataSource(
+class KtorLocationDataSource(
     private val client: HttpClient
-) {
-    suspend fun getNamesResponse(query: String) : List<LocationDto>? {
+) : LocationDataSource {
+    override suspend fun getNamesResponse(query: String) : List<LocationDto>? {
         val fullQuery = buildLocationQuery(query)
         return try {
             val httpResponse: LocationResponseDto = client.get(fullQuery).body()

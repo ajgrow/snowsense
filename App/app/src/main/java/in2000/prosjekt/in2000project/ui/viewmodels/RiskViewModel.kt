@@ -2,11 +2,11 @@ package in2000.prosjekt.in2000project.ui.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import in2000.prosjekt.in2000project.data.repository.WeatherRepository
+import in2000.prosjekt.in2000project.domain.SlabAvalancheRiskAssessor
 import in2000.prosjekt.in2000project.domain.model.Coordinate
 import in2000.prosjekt.in2000project.domain.model.enums.DangerLevel
-import in2000.prosjekt.in2000project.data.repository.NveRepository
-import in2000.prosjekt.in2000project.domain.SlabAvalancheRiskAssessor
+import in2000.prosjekt.in2000project.domain.repository.AvalancheRiskRepository
+import in2000.prosjekt.in2000project.domain.repository.WeatherRepository
 import in2000.prosjekt.in2000project.ui.model.DangerLevelUiModel
 import in2000.prosjekt.in2000project.ui.model.toUiModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,7 +27,7 @@ data class RiskUiState(
     val locationRisks: Map<Coordinate, LocationRiskState> = emptyMap()
 )
 class RiskViewModel(
-    private val nveRepository: NveRepository,
+    private val avalancheRiskRepository: AvalancheRiskRepository,
     private val weatherRepository: WeatherRepository,
     private val slabAvalancheRiskAssessor: SlabAvalancheRiskAssessor
 ): ViewModel() {
@@ -45,7 +45,7 @@ class RiskViewModel(
             }
         }
         viewModelScope.launch {
-            val isDangerZone = nveRepository.getGeoJsonStatus(lat, lon, 10)
+            val isDangerZone = avalancheRiskRepository.getGeoJsonStatus(lat, lon, 10)
 
             val records = try {
                 weatherRepository.getWeatherRecordsForLocation(

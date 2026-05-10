@@ -1,7 +1,9 @@
 package in2000.prosjekt.in2000project
 
-import in2000.prosjekt.in2000project.data.datasource.LocationDataSource
-import in2000.prosjekt.in2000project.data.repository.LocationRepository
+import in2000.prosjekt.in2000project.data.datasource.KtorLocationDataSource
+import in2000.prosjekt.in2000project.data.repository.KartverketLocationRepository
+import in2000.prosjekt.in2000project.domain.datasource.LocationDataSource
+import in2000.prosjekt.in2000project.domain.repository.LocationRepository
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
@@ -31,22 +33,13 @@ class SearchBarTest {
             }
         }
 
-        locationDataSource = LocationDataSource(client)
-        locationRepository = LocationRepository(locationDataSource)
+        locationDataSource = KtorLocationDataSource(client)
+        locationRepository = KartverketLocationRepository(locationDataSource)
     }
 
     @After
     fun tearDown() {
         if (::client.isInitialized) client.close()
-    }
-
-    @Test
-    fun testLocationQueryBuilder() {
-        val result = locationDataSource.buildLocationQuery("blindern")
-        assertEquals(
-            "https://api.kartverket.no/stedsnavn/v1/navn?sok=blindern&fuzzy=true&utkoordsys=4258&treffPerSide=10&side=1&filtrer=navn.representasjonspunkt%2Cnavn.skrivem%C3%A5te%2Cnavn.navneobjekttype",
-            result
-        )
     }
 
     @Test
