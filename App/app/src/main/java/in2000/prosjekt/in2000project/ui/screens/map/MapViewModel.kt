@@ -140,7 +140,6 @@ class MapViewModel(
     fun onSheetDismissed() {
         _screenState.value = _screenState.value.copy(
             isSheetVisible = false
-
         )
     }
 }
