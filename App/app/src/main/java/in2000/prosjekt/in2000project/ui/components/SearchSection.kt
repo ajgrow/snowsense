@@ -53,7 +53,7 @@ fun SearchSection(
 ) {
     val focusManager = LocalFocusManager.current
 
-    var expanded by rememberSaveable { mutableStateOf(false) }
+    var expanded by rememberSaveable { mutableStateOf(true) }
 
     val isShowingRecents = searchState.query.isBlank()
     val displayResults = if (isShowingRecents) searchState.recentSearches else searchState.searchResults

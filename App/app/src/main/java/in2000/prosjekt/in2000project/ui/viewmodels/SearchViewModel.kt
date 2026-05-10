@@ -35,8 +35,6 @@ class SearchViewModel(
     ))
     val searchState: StateFlow<SearchUiState> = _searchState.asStateFlow()
 
-    init {
-
     //initialize with mock data for the MVP:
     init{
         // Update search results as user types
@@ -60,6 +58,10 @@ class SearchViewModel(
 
     fun onQueryChange(query: String){
         _searchState.update { it.copy(query = query.take(50)) }
+    }
+
+    fun clearQuery() {
+        _searchState.update { it.copy(query = "", searchResults = emptyList()) }
     }
 
     fun selectSearchResult(location: NamedLocation) {

@@ -83,6 +83,10 @@ fun HomeScreen(
 
     val favorites = searchState.favorites
 
+    LaunchedEffect(Unit) {
+        searchViewModel.clearQuery()
+    }
+
     LaunchedEffect(favorites) {
         favorites.forEach { location ->
             riskViewModel.avalancheChecker(
