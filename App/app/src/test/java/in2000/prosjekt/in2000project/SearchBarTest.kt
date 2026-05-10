@@ -2,7 +2,7 @@ package in2000.prosjekt.in2000project
 
 import in2000.prosjekt.in2000project.data.datasource.KtorLocationDataSource
 import in2000.prosjekt.in2000project.data.repository.KartverketLocationRepository
-import in2000.prosjekt.in2000project.domain.datasource.LocationDataSource
+import in2000.prosjekt.in2000project.data.datasource.LocationDataSource
 import in2000.prosjekt.in2000project.domain.repository.LocationRepository
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp

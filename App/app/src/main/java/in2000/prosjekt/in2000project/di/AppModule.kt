@@ -10,9 +10,9 @@ import in2000.prosjekt.in2000project.data.repository.NveAvalancheRiskRepository
 import in2000.prosjekt.in2000project.data.repository.SharedPreferencesSearchRepository
 import in2000.prosjekt.in2000project.domain.SlabAvalancheRiskAssessor
 import in2000.prosjekt.in2000project.domain.usecase.GetAvalancheDangerUseCase
-import in2000.prosjekt.in2000project.domain.datasource.AvalancheRiskDataSource
-import in2000.prosjekt.in2000project.domain.datasource.FrostV0DataSource
-import in2000.prosjekt.in2000project.domain.datasource.LocationDataSource
+import in2000.prosjekt.in2000project.data.datasource.AvalancheRiskDataSource
+import in2000.prosjekt.in2000project.data.datasource.FrostV0DataSource
+import in2000.prosjekt.in2000project.data.datasource.LocationDataSource
 import in2000.prosjekt.in2000project.domain.repository.AvalancheRiskRepository
 import in2000.prosjekt.in2000project.domain.repository.ClimateRepository
 import in2000.prosjekt.in2000project.domain.repository.LocationRepository

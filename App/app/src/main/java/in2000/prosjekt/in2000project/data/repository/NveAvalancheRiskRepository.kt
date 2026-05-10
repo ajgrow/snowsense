@@ -1,6 +1,6 @@
 package in2000.prosjekt.in2000project.data.repository
 
-import in2000.prosjekt.in2000project.domain.datasource.AvalancheRiskDataSource
+import in2000.prosjekt.in2000project.data.datasource.AvalancheRiskDataSource
 import in2000.prosjekt.in2000project.domain.repository.AvalancheRiskRepository
 
 class NveAvalancheRiskRepository (

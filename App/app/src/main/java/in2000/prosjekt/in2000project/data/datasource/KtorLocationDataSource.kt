@@ -2,7 +2,7 @@ package in2000.prosjekt.in2000project.data.datasource
 
 import in2000.prosjekt.in2000project.data.datasource.dto.LocationDto
 import in2000.prosjekt.in2000project.data.datasource.dto.LocationResponseDto
-import in2000.prosjekt.in2000project.domain.datasource.LocationDataSource
+import in2000.prosjekt.in2000project.data.datasource.LocationDataSource
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get

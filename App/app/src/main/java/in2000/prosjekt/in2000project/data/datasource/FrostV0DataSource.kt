@@ -1,4 +1,4 @@
-package in2000.prosjekt.in2000project.domain.datasource
+package in2000.prosjekt.in2000project.data.datasource
 
 import in2000.prosjekt.in2000project.data.datasource.dto.FrostV0ObservationResponseDto
 import in2000.prosjekt.in2000project.data.datasource.dto.FrostV0SourceDto
