@@ -1,20 +1,20 @@
 package in2000.prosjekt.in2000project.domain.usecase
 
-import in2000.prosjekt.in2000project.data.repository.NveRepository
-import in2000.prosjekt.in2000project.data.repository.WeatherRepository
 import in2000.prosjekt.in2000project.domain.SlabAvalancheRiskAssessor
 import in2000.prosjekt.in2000project.domain.model.Coordinate
 import in2000.prosjekt.in2000project.domain.model.enums.DangerLevel
+import in2000.prosjekt.in2000project.domain.repository.AvalancheRiskRepository
+import in2000.prosjekt.in2000project.domain.repository.WeatherRepository
 
 class GetAvalancheDangerUseCase(
     private val weatherRepository: WeatherRepository,
-    private val nveRepository: NveRepository,
+    private val avalancheRiskRepository: AvalancheRiskRepository,
     private val slabAvalancheRiskAssessor: SlabAvalancheRiskAssessor
 ) {
     suspend operator fun invoke(
         coordinate: Coordinate
     ): DangerLevel {
-        val isDangerZone = nveRepository
+        val isDangerZone = avalancheRiskRepository
             .getGeoJsonStatus(
                 coordinate.latitude,
                 coordinate.longitude,

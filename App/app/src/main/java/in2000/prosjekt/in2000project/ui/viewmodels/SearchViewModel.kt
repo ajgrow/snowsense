@@ -6,8 +6,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import in2000.prosjekt.in2000project.domain.model.Coordinate
 import in2000.prosjekt.in2000project.domain.model.NamedLocation
-import in2000.prosjekt.in2000project.data.repository.LocationRepository
-import in2000.prosjekt.in2000project.data.repository.SearchRepository
+import in2000.prosjekt.in2000project.domain.repository.LocationRepository
+import in2000.prosjekt.in2000project.domain.repository.SearchRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

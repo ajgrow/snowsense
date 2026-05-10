@@ -1,14 +1,15 @@
 package in2000.prosjekt.in2000project.data.integration
 
+import in2000.prosjekt.in2000project.data.datasource.KtorAvalancheRiskDataSource
 import in2000.prosjekt.in2000project.data.datasource.KtorFrostV0DataSource
-import in2000.prosjekt.in2000project.data.datasource.NveDataSource
 import in2000.prosjekt.in2000project.domain.model.Coordinate
 import in2000.prosjekt.in2000project.domain.model.enums.ElementType
 import in2000.prosjekt.in2000project.data.repository.FrostWeatherRepository
 import in2000.prosjekt.in2000project.data.repository.FrostClimateRepository
+import in2000.prosjekt.in2000project.data.repository.NveAvalancheRiskRepository
 import in2000.prosjekt.in2000project.domain.SlabAvalancheRiskAssessor
-import in2000.prosjekt.in2000project.data.repository.NveRepository
 import in2000.prosjekt.in2000project.domain.model.enums.DangerLevel
+import in2000.prosjekt.in2000project.domain.repository.AvalancheRiskRepository
 import in2000.prosjekt.in2000project.domain.usecase.GetAvalancheDangerUseCase
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
@@ -39,7 +40,7 @@ class FrostApiIntegrationTest {
     private lateinit var client: HttpClient
     private lateinit var climateRepository: FrostClimateRepository
     private lateinit var weatherRepository: FrostWeatherRepository
-    private lateinit var nveRepository: NveRepository
+    private lateinit var avalancheRiskRepository: AvalancheRiskRepository
 
     @Before
     fun setUp() {
@@ -70,8 +71,8 @@ class FrostApiIntegrationTest {
         climateRepository = FrostClimateRepository(dataSource)
         weatherRepository = FrostWeatherRepository(dataSource)
 
-        val nveDataSource = NveDataSource(client)
-        nveRepository = NveRepository(nveDataSource)
+        val nveDataSource = KtorAvalancheRiskDataSource(client)
+        avalancheRiskRepository = NveAvalancheRiskRepository(nveDataSource)
     }
 
     @After
@@ -134,7 +135,7 @@ class FrostApiIntegrationTest {
     fun froystul_avalancheDangerLevel_integrationTest() = runTest {
         val getAvalancheDangerUseCase = GetAvalancheDangerUseCase(
             weatherRepository = weatherRepository,
-            nveRepository = nveRepository,
+            avalancheRiskRepository = avalancheRiskRepository,
             slabAvalancheRiskAssessor = SlabAvalancheRiskAssessor()
         )
 
