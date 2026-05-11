@@ -94,27 +94,13 @@ class MapViewModel(
     }
 
     fun onStartDateChange(start: MonthDay) {
-        val current = _screenState.value
-        val end = setTimeBoundary(start, current.endDate)
-
-        _screenState.value = _screenState.value.copy(
-            startDate = start
-            //TIME BOUNDARY NOT IMPLEMENTED YET
-            //periodEnd = end
-        )
+         _screenState.value = _screenState.value.copy(startDate = start)
 
         refetchIfLocationKnown()
     }
 
     fun onEndDateChange(end: MonthDay) {
-        val current = _screenState.value
-        val start = setTimeBoundary(current.startDate, end)
-
-        _screenState.value = _screenState.value.copy(
-            //TIME BOUNDARY NOT IMPLEMENTED YET
-            //periodStart = start,
-            endDate = end
-        )
+        _screenState.value = _screenState.value.copy(endDate = end)
 
         refetchIfLocationKnown()
     }
@@ -130,11 +116,6 @@ class MapViewModel(
     private fun refetchIfLocationKnown() {
         val coordinate = _screenState.value.climateCoordinate ?: return
         fetchClimateData(coordinate.latitude, coordinate.longitude)
-    }
-
-    private fun setTimeBoundary(start: MonthDay, end: MonthDay): MonthDay {
-        // TO DO - enforce max 1 month range
-        return end
     }
 
     fun onSheetDismissed() {
