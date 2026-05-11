@@ -15,7 +15,7 @@ android {
 
     defaultConfig {
         applicationId = "in2000.prosjekt.in2000project"
-        minSdk = 26
+        minSdk = 25
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
@@ -33,6 +33,7 @@ android {
         }
     }
     compileOptions {
+        isCoreLibraryDesugaringEnabled = true
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
@@ -73,7 +74,7 @@ dependencies {
     implementation(libs.foundation)
     implementation(libs.androidx.compose.runtime)
     implementation(libs.androidx.appcompat)
-    implementation(libs.androidx.compose.material.core)
+    implementation(libs.androidx.compose.material3)
     testImplementation(libs.junit)
     testImplementation(libs.kotlin.test)
     androidTestImplementation(libs.androidx.junit)
@@ -114,6 +115,9 @@ dependencies {
 
     //Design: Extra icons
     implementation("androidx.compose.material:material-icons-extended")
+
+    //Desugaring
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
 }
 
 // Read local.properties to pass secrets to JVM test processes as system properties.

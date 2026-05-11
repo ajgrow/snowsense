@@ -1,6 +1,8 @@
 package in2000.prosjekt.in2000project.ui.search
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -20,21 +22,18 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import in2000.prosjekt.in2000project.R
 import in2000.prosjekt.in2000project.domain.model.Coordinate
 import in2000.prosjekt.in2000project.domain.model.NamedLocation
-import kotlin.collections.forEach
-import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalWindowInfo
+import in2000.prosjekt.in2000project.ui.search.SearchUiState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -48,8 +47,14 @@ fun SearchSection(
 ) {
     val focusManager = LocalFocusManager.current
 
-    var expanded by rememberSaveable { mutableStateOf(true) }
+    val interactionSource = remember { MutableInteractionSource() }
+    LaunchedEffect(interactionSource) {
+        interactionSource.interactions.collect { interaction ->
+            if (interaction is PressInteraction.Release) onActiveChange(true)
+        }
+    }
 
+    val expanded = searchState.isSearchActive
     val isShowingRecents = searchState.query.isBlank()
     val displayResults = if (isShowingRecents) searchState.recentSearches else searchState.searchResults
     val isNorwegian = LocalConfiguration.current.locales[0].language in listOf("no", "nb", "nn")
@@ -59,19 +64,8 @@ fun SearchSection(
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp)
-            //set the height of the container when expanded
-            .heightIn(min = if (expanded) LocalWindowInfo.current.containerDpSize.height * 0.4f else 0.dp)
-            .onFocusChanged { focusState ->
-                if (!focusState.hasFocus) {
-                    expanded = false
-                    onActiveChange(false)
-                } else {
-                    onActiveChange(true)
-                }
-            },
-        onExpandedChange = {
-            expanded = it
-        },
+            .heightIn(min = if (expanded) LocalWindowInfo.current.containerDpSize.height * 0.4f else 0.dp),
+        onExpandedChange = { if (!it) onActiveChange(false) },
         inputField = {
             SearchBarDefaults.InputField(
                 leadingIcon = {
@@ -97,7 +91,8 @@ fun SearchSection(
                     }
                 },
                 expanded = expanded,
-                onExpandedChange = { expanded = it },
+                onExpandedChange = { if (!it) onActiveChange(false) },
+                interactionSource = interactionSource,
                 placeholder = {
                     Text(stringResource(R.string.search_placeholder))
                 }
@@ -130,7 +125,7 @@ fun SearchSection(
                                 .clickable {
                                     onNavigateToMap(result.coordinate)
                                     onSelectResult(result)
-                                    expanded = false
+                                    onActiveChange(false)
                                     focusManager.clearFocus()
                                 }
                                 .fillMaxWidth()

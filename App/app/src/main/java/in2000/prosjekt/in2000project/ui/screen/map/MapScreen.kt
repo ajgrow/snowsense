@@ -2,9 +2,7 @@ package in2000.prosjekt.in2000project.ui.screen.map
 
 import android.util.Log
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.animateScrollBy
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -78,6 +76,7 @@ import com.mapbox.geojson.Point
 import in2000.prosjekt.in2000project.domain.model.NamedLocation
 import in2000.prosjekt.in2000project.ui.search.SearchViewModel
 import in2000.prosjekt.in2000project.domain.model.enums.DangerLevel
+import in2000.prosjekt.in2000project.ui.search.SearchDismissScrim
 import in2000.prosjekt.in2000project.ui.model.DangerLevelUiModel
 import in2000.prosjekt.in2000project.ui.model.toUiModel
 import in2000.prosjekt.in2000project.ui.search.SearchSection
@@ -395,40 +394,6 @@ fun MapScreen(
 
         }
 
-        if (isSearchActive) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .clickable(
-                        indication = null,
-                        interactionSource = remember { MutableInteractionSource() }
-                    ) {
-                        onSearchActiveChange(false)
-                        focusManager.clearFocus()
-                    }
-            )
-
-            SearchSection(
-                modifier = Modifier
-                    .focusRequester(focusRequester)
-                    .padding(top = 120.dp),
-                searchState = searchState,
-                onNavigateToMap = { coordinate ->
-                    onSearchLocationRequested(
-                        Point.fromLngLat(
-                            coordinate.longitude,
-                            coordinate.latitude
-                        )
-                    )
-                    onSearchActiveChange(false)
-                    focusManager.clearFocus()
-                },
-                onSelectResult = onSelectResult,
-                onActiveChange = onSearchActiveChange,
-                onQueryChange = onQueryChange
-            )
-        }
-
         BottomSheetScaffold(
             containerColor = Color.Transparent,
             scaffoldState = scaffoldState,
@@ -495,6 +460,35 @@ fun MapScreen(
                     contentDescription = stringResource(R.string.scroll_down)
                 )
             }
+        }
+
+        // Rendered last so it sits above the map, side buttons, BottomSheetScaffold, and scroll
+        // button — any tap outside the search bar's bounds reaches the scrim and dismisses.
+        SearchDismissScrim(
+            isActive = isSearchActive,
+            onDismiss = { onSearchActiveChange(false) }
+        )
+
+        if (isSearchActive) {
+            SearchSection(
+                modifier = Modifier
+                    .focusRequester(focusRequester)
+                    .padding(top = 120.dp),
+                searchState = searchState,
+                onNavigateToMap = { coordinate ->
+                    onSearchLocationRequested(
+                        Point.fromLngLat(
+                            coordinate.longitude,
+                            coordinate.latitude
+                        )
+                    )
+                    onSearchActiveChange(false)
+                    focusManager.clearFocus()
+                },
+                onSelectResult = onSelectResult,
+                onActiveChange = onSearchActiveChange,
+                onQueryChange = onQueryChange
+            )
         }
     }
 }

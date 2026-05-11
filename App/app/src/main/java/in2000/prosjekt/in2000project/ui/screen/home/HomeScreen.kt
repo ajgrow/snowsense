@@ -82,6 +82,18 @@ fun HomeScreen(
 
     val favorites = searchState.favorites
 
+    val dismissSearch = {
+        if (searchState.isSearchActive) {
+            searchViewModel.setSearchActive(false)
+        }
+        focusManager.clearFocus()
+    }
+
+    val onNavigateToMapDismissing: (Coordinate) -> Unit = { coordinate ->
+        dismissSearch()
+        onNavigateToMap(coordinate)
+    }
+
     LaunchedEffect(Unit) {
         searchViewModel.clearQuery()
     }
@@ -100,7 +112,7 @@ fun HomeScreen(
                     indication = null,
                     interactionSource = remember { MutableInteractionSource() }
                 ) {
-                   focusManager.clearFocus()
+                    dismissSearch()
                 },
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -121,7 +133,7 @@ fun HomeScreen(
                     //get states from the viewmodel
                     modifier = Modifier,
                     searchState = searchState,
-                    onNavigateToMap = onNavigateToMap,
+                    onNavigateToMap = onNavigateToMapDismissing,
                     onQueryChange = searchViewModel::onQueryChange,
                     onSelectResult = searchViewModel::selectSearchResult,
                     onActiveChange = searchViewModel::setSearchActive
@@ -143,7 +155,7 @@ fun HomeScreen(
                     FavoriteSection(
                         items = searchState.favorites,
                         modifier = Modifier,
-                        onNavigateToMap = onNavigateToMap,
+                        onNavigateToMap = onNavigateToMapDismissing,
                         onRemoveLocation = searchViewModel::removeFavoriteLocation,
                         riskState = riskState
                     )
@@ -153,7 +165,7 @@ fun HomeScreen(
                     RecentSection(
                         items = searchState.recentSearches,
                         modifier = Modifier,
-                        onNavigateToMap = onNavigateToMap,
+                        onNavigateToMap = onNavigateToMapDismissing,
                         onRemoveLocation = searchViewModel::removeRecentSearch
                     )
                 }
