@@ -122,15 +122,15 @@ The app follows MVVM pattern combined with UDF resulting in the following patter
 
 | Configuration | Value | Reason |
 | --- | --- | --- |
-| `minSdk` | API 27 | Issues with race conditions on older API-levels\* |
+| `minSdk` | API 25 | Minimum SDK which works with MET Frost v0 API* |
 | `targetSdk` | API 36 | Latest stable release, necessary for future proofing and required by Google Play Store policy. |
 | `compileSdk` | API 36 | Compiles with the same SDK version as target to avoid warnings. |
 
 \*Initially we set the minSdk to API 24, but quickly realized we wanted to use `java.time` which was only supported from API 26 and onward. We could either upgrade to 26 (which we did for a while, though it could exclude a small portion of users), or use desugaring to backport `java.time` to API 24. 
 
-However, when we tried to test the project with API 24, we ran into issues fetching data from FROST due to certificate problems on older Android versions. When we tried to move up to API 25, we ran into more bugs related to race conditions with FocusRequesters. Finally we figured out that API 27 was the minimum SDK we could use without spending a lot of time working on a workaround, and we decided that the tradeoff was not worth it.
+However, when we tried to test the project with API 24, we ran into issues fetching data from FROST due to certificate problems on older Android versions. We discovered that API 24 was not compatible with the Frost API (at least not without major workarounds). This was most likely due to a TLS/SSL issue, and we did not see it as worthwhile to troubleshoot this further. Instead we landed on API 25, where this issue was not present.
 
-The number of users on API 27 or above is about 97.5%, and we deemed this to be acceptable.
+The number of users on API 25 or above is about 98.7%, and we deemed this to be acceptable.
 
 ## 4. Package Structure
 ```
