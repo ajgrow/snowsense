@@ -254,6 +254,7 @@ The number of users on API 27 or above is about 97.5%, and we deemed this to be 
     ├───search
     │       SearchSection.kt
     │       SearchViewModel.kt
+    |       SearchDismissScrim.kt
     │
     └───theme
             Color.kt
