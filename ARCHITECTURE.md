@@ -1,7 +1,4 @@
-# Architecture
-
->This document is here to assist developers that are interested in familiarizing themselves with, maintaining or further developing the SnowSense-app. it describes the project's architectural choices, packages structure, and which design patterns and principles are followed.
-
+# Architecture - SnowSense
 
 ## Table of Contents
 
@@ -30,7 +27,7 @@ This is the structure we ended up with:
 
 Furthermore, we have omitted some standard components which were not required for our scope and would have introduced unneccessary boilerplate:
 - Dedicated Mapper classes (Repositories handle mapping DTOs to domain models instead)
-- Use Case interfaces (we only use implementations directly, partly due to time constraints)
+- Use Case interfaces (we only use Use Case implementations directly, partly due to time constraints)
 
 
 ## 2. Object-Oriented Principles
@@ -123,10 +120,10 @@ The app follows MVVM pattern combined with UDF resulting in the following patter
 | Configuration | Value | Reason |
 | --- | --- | --- |
 | `minSdk` | API 25 | Minimum SDK which works with MET Frost v0 API* |
-| `targetSdk` | API 36 | Latest stable release, necessary for future proofing and required by Google Play Store policy. |
+| `targetSdk` | API 36 | Latest stable release, necessary for future-proofing and required by Google Play Store policy. |
 | `compileSdk` | API 36 | Compiles with the same SDK version as target to avoid warnings. |
 
-\*Initially we set the minSdk to API 24, but quickly realized we wanted to use `java.time` which was only supported from API 26 and onward. We could either upgrade to 26 (which we did for a while, though it could exclude a small portion of users), or use desugaring to backport `java.time` to API 24. 
+\*Initially we set the minSdk to API 24, but quickly realized we wanted to use `java.time` which was only natively supported from API 26 and onward. We could either upgrade to 26 (which we did for a while, though it could exclude a small portion of users), or use desugaring to backport `java.time` to API 24. 
 
 However, when we tried to test the project with API 24, we ran into issues fetching data from FROST due to certificate problems on older Android versions. We discovered that API 24 was not compatible with the Frost API (at least not without major workarounds). This was most likely due to a TLS/SSL issue, and we did not see it as worthwhile to troubleshoot this further. Instead we landed on API 25, where this issue was not present.
 
