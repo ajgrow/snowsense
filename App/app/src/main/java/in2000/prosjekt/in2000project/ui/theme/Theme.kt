@@ -16,7 +16,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.platform.LocalContext
-import in2000.prosjekt.in2000project.ui.screens.settings.ThemeMode
+import in2000.prosjekt.in2000project.ui.screen.settings.ThemeMode
 
 /*Global provider for the Dark Mode state, so components can access it without
 passing it as a parameter everywhere.*/

@@ -19,12 +19,12 @@ import in2000.prosjekt.in2000project.domain.repository.LocationRepository
 import in2000.prosjekt.in2000project.domain.repository.SearchRepository
 import in2000.prosjekt.in2000project.domain.repository.WeatherRepository
 import in2000.prosjekt.in2000project.network.KtorClient
-import in2000.prosjekt.in2000project.ui.screens.information.InfoViewModel
-import in2000.prosjekt.in2000project.ui.screens.map.MapStateHolder
-import in2000.prosjekt.in2000project.ui.screens.map.MapViewModel
-import in2000.prosjekt.in2000project.ui.viewmodels.RiskViewModel
-import in2000.prosjekt.in2000project.ui.viewmodels.SearchViewModel
-import in2000.prosjekt.in2000project.ui.viewmodels.SettingsViewModel
+import in2000.prosjekt.in2000project.ui.screen.information.InfoViewModel
+import in2000.prosjekt.in2000project.ui.screen.map.MapStateHolder
+import in2000.prosjekt.in2000project.ui.screen.map.MapViewModel
+import in2000.prosjekt.in2000project.ui.risk.RiskViewModel
+import in2000.prosjekt.in2000project.ui.search.SearchViewModel
+import in2000.prosjekt.in2000project.ui.screen.settings.SettingsViewModel
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
