@@ -242,9 +242,17 @@ fun MapScreen(
 
     val navigationBarHeight = WindowInsets.navigationBars.getBottom(density)
 
+    //the distance from the top of the sheet to the top of the screen
     var sheetOffsetPx by remember { mutableFloatStateOf(0f) }
-    var sheetHiddenOffsetPx by remember { mutableFloatStateOf(0f) }
-    val sheetCoveredPx = (sheetHiddenOffsetPx - sheetOffsetPx).coerceAtLeast(0f)
+    //what sheetOffsetPx would be when the sheet is hidden
+    var sheetHiddenOffsetPx by remember { mutableStateOf<Float?>(null) }
+    //how many pixels above hidden position the sheet is
+    //used for accurate padding accounting for the navigation bar
+    val sheetCoveredPx =
+        if (sheetHiddenOffsetPx == null)
+            0f
+        else
+            (sheetHiddenOffsetPx!! - sheetOffsetPx).coerceAtLeast(0f)
 
     val bottomPaddingDp = with(density) {
         sheetCoveredPx.toDp()
@@ -312,7 +320,7 @@ fun MapScreen(
         }.collect { offset ->
             if (offset != null) {
                 sheetOffsetPx = offset
-                if (sheetState.currentValue == SheetValue.Hidden) {
+                if (sheetHiddenOffsetPx == null) {
                     sheetHiddenOffsetPx = offset
                 }
             }
