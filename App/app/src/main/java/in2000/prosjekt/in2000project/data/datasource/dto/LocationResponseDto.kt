@@ -1,0 +1,21 @@
+package in2000.prosjekt.in2000project.data.datasource.dto
+
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class LocationResponseDto (
+    val navn : List<LocationDto>
+)
+
+@Serializable
+data class LocationDto (
+    val representasjonspunkt: CoordinateDto,
+    val navneobjekttype: String,
+    val skrivemåte: String
+)
+
+@Serializable
+data class CoordinateDto (
+    val nord: Double,
+    val øst: Double
+)

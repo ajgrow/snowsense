@@ -1,5 +1,7 @@
 package in2000.prosjekt.in2000project.data.repository
 
+import in2000.prosjekt.in2000project.data.repository.FrostReferenceTime.Companion.fromMonthDayRange
+import in2000.prosjekt.in2000project.data.repository.FrostReferenceTime.Companion.of
 import java.time.LocalDate
 import java.time.MonthDay
 

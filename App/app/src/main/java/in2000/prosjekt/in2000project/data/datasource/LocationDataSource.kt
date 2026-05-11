@@ -1,19 +1,17 @@
 package in2000.prosjekt.in2000project.data.datasource
 
-import in2000.prosjekt.in2000project.data.datasource.dto.LocationResponse
 import in2000.prosjekt.in2000project.data.datasource.dto.LocationDto
-import in2000.prosjekt.in2000project.network.KtorClient
-import io.ktor.client.call.body
-import io.ktor.client.request.get
 
-class LocationDataSource {
-    suspend fun getNamesResponse(query: String) : List<LocationDto>? {
-        return try {
-            val httpResponse: LocationResponse = KtorClient.client.get(query).body()
-            httpResponse.navn
-        } catch (e: Exception) {
-            e.printStackTrace()
-            emptyList()
-        }
-    }
+/**
+ * Data source for location search data from Kartverket Stedsnavn.
+ */
+interface LocationDataSource {
+
+    /**
+     * Fetches a list of locations matching the given search query.
+     *
+     * @param query The search string to look up place names for.
+     * @return A list of [in2000.prosjekt.in2000project.data.datasource.dto.LocationDto] matching the query, or an empty list if the request fails.
+     */
+    suspend fun getNamesResponse(query: String): List<LocationDto>?
 }

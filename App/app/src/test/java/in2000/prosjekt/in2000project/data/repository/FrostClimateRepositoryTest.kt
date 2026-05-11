@@ -2,10 +2,10 @@ package in2000.prosjekt.in2000project.data.repository
 
 import in2000.prosjekt.in2000project.data.datasource.*
 import in2000.prosjekt.in2000project.data.datasource.dto.*
-import in2000.prosjekt.in2000project.data.model.Coordinate
-import in2000.prosjekt.in2000project.data.model.NoObservationsException
-import in2000.prosjekt.in2000project.data.model.NoStationFoundException
-import in2000.prosjekt.in2000project.data.model.enums.ElementType
+import in2000.prosjekt.in2000project.domain.model.Coordinate
+import in2000.prosjekt.in2000project.data.model.exceptions.NoObservationsException
+import in2000.prosjekt.in2000project.data.model.exceptions.NoStationFoundException
+import in2000.prosjekt.in2000project.domain.model.enums.ElementType
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
@@ -92,7 +92,7 @@ class FrostClimateRepositoryTest {
                 id = "SN99999",
                 name = "Mystery Station",
                 shortName = "Mystery",
-                geometry = FrostV0Point(
+                geometry = FrostV0PointDto(
                     type = "Point", coordinates = listOf(70.0, 25.0),
                 ),
                 distance = null,

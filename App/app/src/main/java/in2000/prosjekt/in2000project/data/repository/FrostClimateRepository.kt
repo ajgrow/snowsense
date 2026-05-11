@@ -1,18 +1,17 @@
 package in2000.prosjekt.in2000project.data.repository
 
 
+import in2000.prosjekt.in2000project.data.datasource.dto.FrostV0ObservationDto
+import in2000.prosjekt.in2000project.data.datasource.dto.FrostV0ObservationResponseDto
+import in2000.prosjekt.in2000project.data.model.exceptions.NoObservationsException
+import in2000.prosjekt.in2000project.data.model.exceptions.NoStationFoundException
 import in2000.prosjekt.in2000project.data.datasource.FrostV0DataSource
-import in2000.prosjekt.in2000project.data.datasource.dto.FrostV0Observation
-import in2000.prosjekt.in2000project.data.datasource.dto.FrostV0ObservationResponse
-import in2000.prosjekt.in2000project.data.model.Coordinate
-import in2000.prosjekt.in2000project.data.model.LocationClimateData
-import in2000.prosjekt.in2000project.data.model.LocationClimateDataPoint
-import in2000.prosjekt.in2000project.data.model.NoObservationsException
-import in2000.prosjekt.in2000project.data.model.NoStationFoundException
+import in2000.prosjekt.in2000project.domain.model.Coordinate
+import in2000.prosjekt.in2000project.domain.model.LocationClimateData
+import in2000.prosjekt.in2000project.domain.model.LocationClimateDataPoint
+import in2000.prosjekt.in2000project.domain.model.enums.ElementType
+import in2000.prosjekt.in2000project.domain.repository.ClimateRepository
 import java.time.MonthDay
-import in2000.prosjekt.in2000project.data.model.enums.ElementType
-import in2000.prosjekt.in2000project.data.model.enums.MeasurementUnit
-import kotlin.collections.groupBy
 
 class FrostClimateRepository(
     private val frostV0DataSource: FrostV0DataSource,
@@ -82,7 +81,7 @@ class FrostClimateRepository(
     }
 }
 
-private fun FrostV0ObservationResponse.getYearlyDataPoints(
+private fun FrostV0ObservationResponseDto.getYearlyDataPoints(
 ): List<LocationClimateDataPoint> = this
     .groupObservationsByYear()
     .mapValues { it.value.averageByElement() }
@@ -91,8 +90,8 @@ private fun FrostV0ObservationResponse.getYearlyDataPoints(
     }
     .flatten()
 
-private fun FrostV0ObservationResponse.groupObservationsByYear(
-): Map<Int, List<FrostV0Observation>> = this
+private fun FrostV0ObservationResponseDto.groupObservationsByYear(
+): Map<Int, List<FrostV0ObservationDto>> = this
     .data
     .groupBy(
         { it.referenceTime.take(4).toIntOrNull() ?: 0 },
@@ -101,7 +100,7 @@ private fun FrostV0ObservationResponse.groupObservationsByYear(
     .mapValues { it.value.flatten() }
 
 /** Mean observation value per Frost elementId. */
-internal fun List<FrostV0Observation>.averageByElement(
+internal fun List<FrostV0ObservationDto>.averageByElement(
 ): Map<String, Double> = this.groupBy { it.elementId }
     .mapValues { groupedObservations ->
         groupedObservations.value

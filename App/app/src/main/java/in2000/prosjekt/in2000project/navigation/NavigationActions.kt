@@ -2,7 +2,6 @@ package in2000.prosjekt.in2000project.navigation
 
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
-import in2000.prosjekt.in2000project.data.model.Coordinate
 
 class NavigationActions(
     private val navController: NavController

@@ -1,7 +1,8 @@
 package in2000.prosjekt.in2000project.data.datasource
 
 import in2000.prosjekt.in2000project.data.datasource.dto.*
-import in2000.prosjekt.in2000project.data.model.Coordinate
+import in2000.prosjekt.in2000project.data.datasource.FrostV0DataSource
+import in2000.prosjekt.in2000project.domain.model.Coordinate
 
 /** Fake that returns preset data and records arguments for verification. */
 class FakeFrostV0DataSource : FrostV0DataSource {
@@ -39,7 +40,7 @@ class FakeFrostV0DataSource : FrostV0DataSource {
 
     override suspend fun getNearestSource(
         coordinate: Coordinate,
-    ): FrostV0Source? {
+    ): FrostV0SourceDto? {
         if (shouldThrow) throw java.io.IOException("Fake network error")
         lastCoordinate = coordinate
         return sourceResponse.data.firstOrNull()
@@ -49,7 +50,7 @@ class FakeFrostV0DataSource : FrostV0DataSource {
         sourceId: String,
         elementsCsv: String,
         referenceTime: String,
-    ): FrostV0ObservationResponse {
+    ): FrostV0ObservationResponseDto {
         if (shouldThrow) throw java.io.IOException("Fake network error")
         lastSourceId = sourceId
         lastElements = elementsCsv
