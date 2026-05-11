@@ -15,7 +15,7 @@ android {
 
     defaultConfig {
         applicationId = "in2000.prosjekt.in2000project"
-        minSdk = 24
+        minSdk = 25
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
