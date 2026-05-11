@@ -1,4 +1,4 @@
-package in2000.prosjekt.in2000project.ui.common
+package in2000.prosjekt.in2000project.ui.emergency
 
 import android.content.Intent
 import androidx.compose.foundation.BorderStroke

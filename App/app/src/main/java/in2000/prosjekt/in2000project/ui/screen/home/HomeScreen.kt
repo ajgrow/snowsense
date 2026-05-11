@@ -62,7 +62,7 @@ package in2000.prosjekt.in2000project.ui.screen.home
     import in2000.prosjekt.in2000project.domain.model.NamedLocation
     import in2000.prosjekt.in2000project.ui.risk.RiskUiState
     import in2000.prosjekt.in2000project.ui.risk.RiskViewModel
-    import in2000.prosjekt.in2000project.ui.common.EmergencySection
+    import in2000.prosjekt.in2000project.ui.emergency.EmergencySection
     import in2000.prosjekt.in2000project.ui.model.DangerLevelUiModel
     import in2000.prosjekt.in2000project.ui.search.SearchSection
     import in2000.prosjekt.in2000project.ui.search.SearchViewModel

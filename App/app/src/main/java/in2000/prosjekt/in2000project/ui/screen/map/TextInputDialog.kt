@@ -1,4 +1,4 @@
-package in2000.prosjekt.in2000project.ui.common
+package in2000.prosjekt.in2000project.ui.screen.map
 
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text

@@ -81,7 +81,6 @@ import in2000.prosjekt.in2000project.domain.model.enums.DangerLevel
 import in2000.prosjekt.in2000project.ui.model.DangerLevelUiModel
 import in2000.prosjekt.in2000project.ui.model.toUiModel
 import in2000.prosjekt.in2000project.ui.search.SearchSection
-import in2000.prosjekt.in2000project.ui.common.TextInputDialog
 import in2000.prosjekt.in2000project.ui.risk.RiskUiState
 import in2000.prosjekt.in2000project.ui.risk.RiskViewModel
 import in2000.prosjekt.in2000project.ui.search.SearchUiState
