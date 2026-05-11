@@ -255,7 +255,9 @@ fun YearDropdown(
     ) {
         Box(
             modifier = Modifier
-                .menuAnchor()
+                .menuAnchor(
+                    type = ExposedDropdownMenuAnchorType.PrimaryNotEditable,
+                )
                 .heightIn(min = 56.dp)
                 .fillMaxWidth()
                 .clip(MaterialTheme.shapes.extraSmall)
