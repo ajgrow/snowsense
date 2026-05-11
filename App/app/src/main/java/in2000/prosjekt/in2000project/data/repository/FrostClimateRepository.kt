@@ -3,8 +3,8 @@ package in2000.prosjekt.in2000project.data.repository
 
 import in2000.prosjekt.in2000project.data.datasource.dto.FrostV0ObservationDto
 import in2000.prosjekt.in2000project.data.datasource.dto.FrostV0ObservationResponseDto
-import in2000.prosjekt.in2000project.data.model.exceptions.NoObservationsException
-import in2000.prosjekt.in2000project.data.model.exceptions.NoStationFoundException
+import in2000.prosjekt.in2000project.domain.model.exceptions.NoObservationsException
+import in2000.prosjekt.in2000project.domain.model.exceptions.NoStationFoundException
 import in2000.prosjekt.in2000project.data.datasource.FrostV0DataSource
 import in2000.prosjekt.in2000project.domain.model.Coordinate
 import in2000.prosjekt.in2000project.domain.model.LocationClimateData
