@@ -60,6 +60,10 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.paneTitle
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -332,8 +336,14 @@ fun MapScreen(
         }
     }
 
+    val mapDesc = stringResource(R.string.map_title)
+
     Box(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
+            .semantics {
+                paneTitle = mapDesc
+            }
     ) {
         when (overlayState) {
             is OverlayState.Loading
@@ -370,23 +380,35 @@ fun MapScreen(
 
             Spacer(Modifier.height(8.dp))
 
+            val zoomInDesc = stringResource(R.string.zoom_in_btn_desc)
+
             Button(
-                modifier = mapButtonModifier,
-                onClick = onZoomIn
+                modifier = mapButtonModifier
+                    .semantics {
+                        contentDescription = zoomInDesc
+                    },
+                onClick = onZoomIn,
             ) {
                 Text(
+                    modifier = Modifier.clearAndSetSemantics { },
                     text = "+",
-                    textAlign = TextAlign.Center
+                    textAlign = TextAlign.Center,
                 )
             }
 
             Spacer(Modifier.height(8.dp))
 
+            val zoomOutDesc = stringResource(R.string.zoom_out_btn_desc)
+
             Button(
-                modifier = mapButtonModifier,
+                modifier = mapButtonModifier
+                    .semantics {
+                        contentDescription = zoomOutDesc
+                    },
                 onClick = onZoomOut
             ) {
                 Text(
+                    modifier = Modifier.clearAndSetSemantics { },
                     text = "-",
                     textAlign = TextAlign.Center
                 )
@@ -532,6 +554,11 @@ fun BottomSheetContent(
                     when (climateState) {
                         is ClimateState.Loading -> {
                             CircularProgressIndicator(modifier = Modifier.size(26.dp))
+                            Text(
+                                text = stringResource(R.string.loading),
+                                color = MaterialTheme.colorScheme.primary,
+                                style = MaterialTheme.typography.bodyMedium
+                            )
                         }
 
                         is ClimateState.Error -> {
@@ -543,7 +570,9 @@ fun BottomSheetContent(
                         }
 
                         else -> {
-                            Column {
+                            Column(
+                                modifier = Modifier.semantics(mergeDescendants = true) { }
+                            ) {
                                 Text(
                                     text = stringResource(R.string.weather_station_desc),
                                     style = MaterialTheme.typography.labelSmall

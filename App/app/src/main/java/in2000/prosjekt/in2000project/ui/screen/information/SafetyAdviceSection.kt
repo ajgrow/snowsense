@@ -22,6 +22,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.unit.dp
 import in2000.prosjekt.in2000project.R
@@ -35,12 +39,16 @@ fun SafetyAdvice(
 ) {
     var expanded by rememberSaveable { mutableStateOf(false) }
     val expandedText = stringResource(if (expanded) R.string.hide_info else R.string.show_info)
+    val expandedDescription = stringResource(if (expanded) R.string.is_expanded else R.string.is_not_expanded)
 
     Column(modifier = modifier.fillMaxWidth()) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable { expanded = !expanded }
+                .clickable(role = Role.Button) { expanded = !expanded }
+                .semantics {
+                    stateDescription = expandedDescription
+                }
                 .padding(12.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
@@ -114,7 +122,8 @@ fun SafetyAdviceSection(modifier: Modifier = Modifier) {
                 Text(
                     text = stringResource(R.string.safety_advice_title),
                     style = MaterialTheme.typography.titleMedium,
-                    fontWeight = Bold
+                    fontWeight = Bold,
+                    modifier = Modifier.semantics { heading() }
                 )
 
                 Text(

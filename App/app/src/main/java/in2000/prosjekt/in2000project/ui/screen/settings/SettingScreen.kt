@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -41,6 +42,9 @@ import androidx.lifecycle.compose.LifecycleEventEffect
 import in2000.prosjekt.in2000project.R
 import androidx.compose.material.icons.filled.*
 import in2000.prosjekt.in2000project.ui.common.TopBar
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
 
 
 @Composable
@@ -89,7 +93,9 @@ fun SettingScreen(
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(4.dp)
+                        modifier = Modifier.padding(4.dp).semantics{
+                            heading()
+                        }
                     )
                     Surface(
                         shape = RoundedCornerShape(16.dp),
@@ -131,7 +137,9 @@ fun SettingScreen(
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(4.dp)
+                        modifier = Modifier.padding(4.dp).semantics{
+                            heading()
+                        }
                     )
                     Surface(
                         shape = RoundedCornerShape(16.dp),
@@ -201,7 +209,9 @@ fun SettingScreen(
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(4.dp)
+                        modifier = Modifier.padding(4.dp).semantics{
+                            heading()
+                        }
                     )
                     Surface(
                         shape = RoundedCornerShape(16.dp),
@@ -273,7 +283,7 @@ private fun LanguageControl(
                     .weight(1f)
                     .clip(RoundedCornerShape(50))
                     .background(bgColor)
-                    .clickable {onSelect(mode)}
+                    .selectable(selected = selected, role = Role.RadioButton, onClick =  {onSelect(mode)})
                     .padding(vertical = 12.dp),
             ) {
                 Text(
@@ -306,7 +316,7 @@ private fun ThemeSettingRow(
         modifier = Modifier
             .fillMaxWidth()
             .background(bgColor)
-            .clickable(onClick = onClick)
+            .selectable(selected = selected, role = Role.RadioButton, onClick = onClick)
             .padding(
                 horizontal = 16.dp,
                 vertical = 16.dp),
@@ -334,7 +344,7 @@ private fun ThemeSettingRow(
 
         RadioButton(
             selected = selected,
-            onClick = onClick,
+            onClick = null,
             colors = RadioButtonDefaults.colors(
                 selectedColor = MaterialTheme.colorScheme.primary,
                 unselectedColor = MaterialTheme.colorScheme.onSurfaceVariant

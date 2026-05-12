@@ -12,6 +12,10 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -23,6 +27,7 @@ import in2000.prosjekt.in2000project.ui.model.DangerLevelUiModel
 import in2000.prosjekt.in2000project.ui.model.toUiModel
 import in2000.prosjekt.in2000project.ui.risk.DangerLevelItem
 import org.koin.compose.viewmodel.koinViewModel
+import kotlin.math.exp
 
 @Composable
 fun InfoScreen(
@@ -110,7 +115,8 @@ fun DangerLevelsSection(
         Text(
             text = stringResource(R.string.danger_levels_title),
             style = MaterialTheme.typography.titleMedium,
-            fontWeight = Bold
+            fontWeight = Bold,
+            modifier = Modifier.semantics { heading() }
         )
 
         dangerLevels.forEach { uiModel ->
@@ -128,6 +134,7 @@ fun InfoBox(
 ) {
     var expanded by rememberSaveable { mutableStateOf(false) }
     val expandedText = stringResource(if (expanded) R.string.hide_info else R.string.show_info)
+    val expandedDescription = stringResource(if (expanded) R.string.is_expanded else R.string.is_not_expanded)
 
     Surface(
         modifier = modifier
@@ -138,7 +145,13 @@ fun InfoBox(
                 color = MaterialTheme.colorScheme.outline,
                 shape = RoundedCornerShape(16.dp)
             )
-            .clickable { expanded = !expanded },
+            .clickable(
+                role = Role.Button
+            ) {
+                expanded = !expanded
+            }.semantics {
+                stateDescription = expandedDescription
+            },
         shape = RoundedCornerShape(16.dp),
         color = MaterialTheme.colorScheme.surface
     ) {
@@ -153,7 +166,11 @@ fun InfoBox(
                     text = stringResource(titleRes),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = Bold,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier
+                        .weight(1f)
+                        .semantics {
+                            heading()
+                        }
                 )
 
                 Text(

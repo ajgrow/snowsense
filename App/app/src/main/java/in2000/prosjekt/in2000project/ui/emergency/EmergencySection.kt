@@ -16,6 +16,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -52,7 +55,7 @@ fun EmergencySection(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Phone,
-                        contentDescription = stringResource(R.string.call_icon),
+                        contentDescription = null,
                         tint = MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier
                             .padding(end = 4.dp)
@@ -61,6 +64,7 @@ fun EmergencySection(
 
                     Text(
                         text = stringResource(R.string.emergency_title),
+                        modifier = Modifier.semantics { heading() },
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = Bold
                     )
@@ -118,7 +122,10 @@ fun EmergencyRow(
         Spacer(modifier = Modifier.weight(1f))
 
         Surface(
-            modifier = Modifier.clickable { showDialog = true },
+            modifier = Modifier.clickable(
+                role = Role.Button,
+                onClickLabel = stringResource(R.string.emergency_call_desc, number))
+            { showDialog = true},
             shape = RoundedCornerShape(10.dp),
             color = MaterialTheme.colorScheme.error,
             tonalElevation = 2.dp
@@ -130,13 +137,13 @@ fun EmergencyRow(
             ) {
                 Icon(
                     imageVector = Icons.Default.Call,
-                    contentDescription = stringResource(R.string.call_icon),
+                    contentDescription = null,
                     tint = MaterialTheme.colorScheme.onError,
                     modifier = Modifier.size(14.dp)
                 )
 
                 Text(
-                    text = number,
+                    text = stringResource(R.string.emergency_call_desc, number),
                     color = MaterialTheme.colorScheme.onError,
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = Bold
@@ -151,7 +158,7 @@ fun EmergencyRow(
             title = {
                 Text(
                     text = stringResource(
-                        R.string.call_dialog_title,
+                        R.string.emergency_call_confirm_desc,
                         number
                     )
                 )
@@ -166,14 +173,14 @@ fun EmergencyRow(
                         context.startActivity(intent)
                     }
                 ) {
-                    Text(stringResource(R.string.dialog_yes))
+                    Text(stringResource(R.string.dialog_ok))
                 }
             },
             dismissButton = {
                 TextButton(
                     onClick = { showDialog = false }
                 ) {
-                    Text(stringResource(R.string.dialog_no))
+                    Text(stringResource(R.string.dialog_cancel))
                 }
             }
         )

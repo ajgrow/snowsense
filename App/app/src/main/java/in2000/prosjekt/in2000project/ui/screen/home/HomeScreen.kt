@@ -53,6 +53,8 @@ package in2000.prosjekt.in2000project.ui.screen.home
     import androidx.compose.ui.draw.clip
     import androidx.compose.ui.graphics.Color
     import androidx.compose.ui.layout.ContentScale
+    import androidx.compose.ui.semantics.heading
+    import androidx.compose.ui.semantics.semantics
     import androidx.compose.ui.text.font.FontWeight
     import androidx.compose.ui.text.font.FontWeight.Companion.Bold
     import androidx.compose.ui.text.style.TextOverflow
@@ -218,7 +220,7 @@ fun FavoriteSection(
             text = stringResource(R.string.favorites_title),
             style = MaterialTheme.typography.titleMedium,
             fontWeight = Bold,
-            modifier = Modifier.padding(horizontal = 16.dp)
+            modifier = Modifier.padding(horizontal = 16.dp).semantics { heading() }
         )
         LazyRow(
             contentPadding = PaddingValues(horizontal = 8.dp),
@@ -255,7 +257,7 @@ fun RecentSection(
             text = stringResource(R.string.recent_searches_title),
             style = MaterialTheme.typography.titleMedium,
             fontWeight = Bold,
-            modifier = Modifier.padding(horizontal = 16.dp)
+            modifier = Modifier.padding(horizontal = 16.dp).semantics { heading() }
         )
 
         LazyRow(
@@ -328,8 +330,9 @@ fun LocationCard(
                         if (isLoading) {
                             CircularProgressIndicator(
                                 modifier = Modifier.size(12.dp),
-                                strokeWidth = 2.dp
+                                strokeWidth = 2.dp,
                             )
+                            Text(stringResource(R.string.loading))
                         } else {
                             Text(
                                 text = label,
@@ -392,14 +395,4 @@ fun HomeTopBar(
                 contentDescription = stringResource(R.string.open_settings))
         }
     }
-}
-
-@Preview
-@Composable
-fun HomeScreenPreview(){
-    HomeScreen(
-        onNavigateToMap = {},
-        onSettingsClick = {},
-        searchViewModel = viewModel()
-    )
 }

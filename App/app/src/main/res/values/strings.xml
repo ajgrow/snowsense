@@ -53,17 +53,12 @@
 
     <string name="emergency_title">Emergency Numbers</string>
     <string name="emergency_desc">In case of an emergency, call any of these numbers</string>
-    <string name="emergency_call_desc">Call</string>
     <string name="police_rescue_service">Police / rescue</string>
     <string name="police_rescue_number">112</string>
     <string name="medical_service">Medical</string>
     <string name="medical_number">113</string>
 
-    <string name="call_dialog_title">Call %1$s?</string>
-    <string name="dialog_yes">Yes</string>
-    <string name="dialog_no">No</string>
-
-
+    <string name="emergency_call_desc">Call %1$s</string>
 
     <string name="map_title">Map</string>
     <string name="map_instruction">Select an area to view historical climate details.</string>
@@ -199,6 +194,11 @@
     <string name="favorite_button_desc">Add to favorites</string>
     <string name="selected_area">Selected Area</string>
     <string name="missing_station_name">Missing station name</string>
-
+    <string name="zoom_in_btn_desc">Zoom in</string>
+    <string name="zoom_out_btn_desc">Zoom out</string>
+    <string name="is_expanded">Is expanded</string>
+    <string name="is_not_expanded">Is not expanded</string>
+    <string name="enter_value_desc">Enter value</string>
+    <string name="emergency_call_confirm_desc">Call %1$s?</string>>
 
 </resources>

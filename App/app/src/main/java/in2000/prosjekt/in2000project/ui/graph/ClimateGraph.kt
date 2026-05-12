@@ -11,6 +11,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import in2000.prosjekt.in2000project.R
 import com.patrykandpatrick.vico.compose.axis.horizontal.rememberBottomAxis
@@ -35,7 +37,10 @@ fun ClimateGraph(
     }
 
     Column(modifier = Modifier.padding(vertical = 8.dp)) {
-        Text(text = "$title (${startDate.display()} - ${endDate.display()})")
+        Text(
+            text = "$title (${startDate.display()} - ${endDate.display()})",
+            modifier = Modifier.semantics{ heading() }
+        )
 
         if (!entries.isEmpty()) {
             Chart(
