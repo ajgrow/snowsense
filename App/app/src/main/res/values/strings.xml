@@ -203,5 +203,6 @@
     <string name="zoom_out_btn_desc">Zoom out</string>
     <string name="is_expanded">Is expanded</string>
     <string name="is_not_expanded">Is not expanded</string>
+    <string name="enter_value_desc">Enter value</string>
 
 </resources>

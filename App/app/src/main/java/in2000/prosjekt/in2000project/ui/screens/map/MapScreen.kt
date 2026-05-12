@@ -62,6 +62,7 @@ import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.paneTitle
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -336,8 +337,14 @@ fun MapScreen(
         }
     }
 
+    val mapDesc = stringResource(R.string.map_title)
+
     Box(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
+            .semantics {
+                paneTitle = mapDesc
+            }
     ) {
         when (overlayState) {
             is OverlayState.Loading
@@ -548,6 +555,11 @@ fun BottomSheetContent(
                     when (climateState) {
                         is ClimateState.Loading -> {
                             CircularProgressIndicator(modifier = Modifier.size(26.dp))
+                            Text(
+                                text = stringResource(R.string.loading),
+                                color = MaterialTheme.colorScheme.primary,
+                                style = MaterialTheme.typography.bodyMedium
+                            )
                         }
 
                         is ClimateState.Error -> {
@@ -559,7 +571,9 @@ fun BottomSheetContent(
                         }
 
                         else -> {
-                            Column {
+                            Column(
+                                modifier = Modifier.semantics(mergeDescendants = true) { }
+                            ) {
                                 Text(
                                     text = stringResource(R.string.weather_station_desc),
                                     style = MaterialTheme.typography.labelSmall

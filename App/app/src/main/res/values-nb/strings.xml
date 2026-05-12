@@ -198,6 +198,7 @@
     <string name="zoom_out_btn_desc">Zoom ut</string>
     <string name="is_expanded">Er utvidet</string>
     <string name="is_not_expanded">Er ikke utvidet</string>
+    <string name="enter_value_desc">Skriv inn verdi</string>
 
 
 </resources>

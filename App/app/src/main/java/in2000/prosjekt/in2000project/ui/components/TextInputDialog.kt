@@ -28,7 +28,8 @@ fun TextInputDialog(
             TextField(
                 value = input,
                 onValueChange = { input = it },
-                singleLine = true
+                singleLine = true,
+                label = { Text(stringResource(R.string.enter_value_desc)) }
             )
         },
         confirmButton = {

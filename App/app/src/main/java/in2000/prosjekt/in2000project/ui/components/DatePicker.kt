@@ -24,6 +24,8 @@ import java.time.format.TextStyle
 import java.util.Calendar
 import androidx.compose.ui.platform.LocalLocale
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.font.FontWeight
 import in2000.prosjekt.in2000project.R
 @Composable
 fun DatePicker(
@@ -96,7 +98,7 @@ fun DateField(
         modifier = modifier
             .heightIn(min = 56.dp)
             .clip(MaterialTheme.shapes.extraSmall)
-            .clickable(onClick = onClick)
+            .clickable(onClick = onClick, role = Role.Button)
             .border(1.dp, MaterialTheme.colorScheme.outline, MaterialTheme.shapes.extraSmall)
             .padding(horizontal = 16.dp),
         contentAlignment = Alignment.CenterStart
@@ -219,12 +221,14 @@ private fun DayGrid(
                     .padding(2.dp)
                     .clip(CircleShape)
                     .background(if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent)
-                    .then(if (isValid) Modifier.clickable { onDaySelected(day) } else Modifier),
+                    .then(if (isValid) Modifier.clickable(role = Role.Button) { onDaySelected(day) } else Modifier),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
                     text = day.toString(),
-                    style = MaterialTheme.typography.bodySmall,
+                    style = MaterialTheme.typography.bodySmall.copy(
+                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
+                    ),
                     color = when {
                         isSelected -> MaterialTheme.colorScheme.onPrimary
                         !isValid -> MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)

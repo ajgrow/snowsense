@@ -16,6 +16,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -61,6 +64,7 @@ fun EmergencySection(
 
                     Text(
                         text = stringResource(R.string.emergency_title),
+                        modifier = Modifier.semantics { heading() },
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = Bold
                     )
@@ -106,7 +110,8 @@ fun EmergencyRow(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 10.dp, vertical = 8.dp),
+            .padding(horizontal = 10.dp, vertical = 8.dp)
+            .semantics(mergeDescendants = true) { },
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
@@ -118,7 +123,7 @@ fun EmergencyRow(
         Spacer(modifier = Modifier.weight(1f))
 
         Surface(
-            modifier = Modifier.clickable { showDialog = true },
+            modifier = Modifier.clickable(role = Role.Button){ showDialog = true},
             shape = RoundedCornerShape(10.dp),
             color = MaterialTheme.colorScheme.error,
             tonalElevation = 2.dp
@@ -130,7 +135,7 @@ fun EmergencyRow(
             ) {
                 Icon(
                     imageVector = Icons.Default.Call,
-                    contentDescription = stringResource(R.string.call_icon),
+                    contentDescription = null,
                     tint = MaterialTheme.colorScheme.onError,
                     modifier = Modifier.size(14.dp)
                 )

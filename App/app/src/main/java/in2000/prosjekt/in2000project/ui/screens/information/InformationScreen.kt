@@ -113,7 +113,8 @@ fun DangerLevelsSection(
         Text(
             text = stringResource(R.string.danger_levels_title),
             style = MaterialTheme.typography.titleMedium,
-            fontWeight = Bold
+            fontWeight = Bold,
+            modifier = Modifier.semantics { heading() }
         )
 
         dangerLevels.forEach { uiModel ->
@@ -146,7 +147,9 @@ fun InfoBox(
                 role = Role.Button
             ) {
                 expanded = !expanded
-           },
+            }.semantics {
+                stateDescription = expandedDescription
+            },
         shape = RoundedCornerShape(16.dp),
         color = MaterialTheme.colorScheme.surface
     ) {
@@ -165,7 +168,6 @@ fun InfoBox(
                         .weight(1f)
                         .semantics {
                             heading()
-                            stateDescription = expandedDescription
                         }
                 )
 
