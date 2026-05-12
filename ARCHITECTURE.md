@@ -120,7 +120,7 @@ The app follows MVVM pattern combined with UDF resulting in the following patter
 | Configuration | Value | Reason |
 | --- | --- | --- |
 | `minSdk` | API 25 | Minimum SDK which works with MET Frost v0 API* |
-| `targetSdk` | API 36 | Latest stable release, necessary for future-proofing and required by Google Play Store policy. |
+| `targetSdk` | API 36 | Android recommends targeting the newest API level to ensure users get the latest security and performance updates. |
 | `compileSdk` | API 36 | Compiles with the same SDK version as target to avoid warnings. |
 
 \*Initially we set the minSdk to API 24, but quickly realized we wanted to use `java.time` which was only natively supported from API 26 and onward. We could either upgrade to 26 (which we did for a while, though it could exclude a small portion of users), or use desugaring to backport `java.time` to API 24. 
