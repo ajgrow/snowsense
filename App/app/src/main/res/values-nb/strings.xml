@@ -194,6 +194,10 @@
     <string name="favorite_button_desc">Legg til som favoritt</string>
     <string name="selected_area">Valgt område</string>
     <string name="missing_station_name">Målestasjon uten navn</string>
+    <string name="zoom_in_btn_desc">Zoom inn</string>
+    <string name="zoom_out_btn_desc">Zoom ut</string>
+    <string name="is_expanded">Er utvidet</string>
+    <string name="is_not_expanded">Er ikke utvidet</string>
 
 
 </resources>

@@ -43,7 +43,6 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -61,6 +60,9 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -372,23 +374,35 @@ fun MapScreen(
 
             Spacer(Modifier.height(8.dp))
 
+            val zoomInDesc = stringResource(R.string.zoom_in_btn_desc)
+
             Button(
-                modifier = mapButtonModifier,
-                onClick = onZoomIn
+                modifier = mapButtonModifier
+                    .semantics {
+                        contentDescription = zoomInDesc
+                    },
+                onClick = onZoomIn,
             ) {
                 Text(
+                    modifier = Modifier.clearAndSetSemantics { },
                     text = "+",
-                    textAlign = TextAlign.Center
+                    textAlign = TextAlign.Center,
                 )
             }
 
             Spacer(Modifier.height(8.dp))
 
+            val zoomOutDesc = stringResource(R.string.zoom_out_btn_desc)
+
             Button(
-                modifier = mapButtonModifier,
+                modifier = mapButtonModifier
+                    .semantics {
+                        contentDescription = zoomOutDesc
+                    },
                 onClick = onZoomOut
             ) {
                 Text(
+                    modifier = Modifier.clearAndSetSemantics { },
                     text = "-",
                     textAlign = TextAlign.Center
                 )
