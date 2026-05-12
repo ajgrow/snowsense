@@ -1,6 +1,5 @@
 package in2000.prosjekt.in2000project.network
 
-import in2000.prosjekt.in2000project.util.ApiKeys
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.auth.Auth
@@ -31,7 +30,7 @@ object KtorClient {
             basic {
                 credentials {
                     BasicAuthCredentials(
-                        username = ApiKeys.frostClientId,
+                        username = FrostClientId.value,
                         password = ""
                     )
                 }
