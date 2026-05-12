@@ -32,42 +32,55 @@
 > Document the activity and/or state diagrams here, capturing the flow of control and state transitions within the app.
 
 ```mermaid
-stateDiagram-v2
-  direction TB
-  [*] --> Idle
-
-  Idle --> SearchActive : setSearchActive(true)
-  SearchActive --> SearchActive : searchResults updated
-  SearchActive --> LocationSelected : addRecentSearch(NamedLocation)
-
-  state "Location selected" as LocationSelected
-
-  state "Danger level check" as DangerLevelCheck {
-    [*] --> FetchingNveGeoJson
-    FetchingNveGeoJson --> AssessingSlabAvalancheRisk : isDangerZone resolved
-    AssessingSlabAvalancheRisk --> DangerLevelResolved : DangerLevelUiModel set\n(LOW / MODERATE /\nCONSIDERABLE / HIGH / VERY_HIGH)
-  }
-
-  LocationSelected --> DangerLevelCheck : avalancheChecker(lat, lon)
-  DangerLevelCheck --> LocationSelected : go back
-
-  state "Historical climate data" as HistoricalClimateData {
-    [*] --> ClimateIdle
-    ClimateIdle --> ClimateLoading : fetchClimateData()\nstartDate / endDate set
-    ClimateLoading --> ClimateSuccess : LocationClimateData received
-    ClimateLoading --> ClimateError : NoObservationsException
-    ClimateSuccess --> ClimateLoading : onStartDateChange /\nonEndDateChange / onYearChange
-  }
-
-  LocationSelected --> HistoricalClimateData : onMapClick → isSheetVisible = true
-  HistoricalClimateData --> LocationSelected : onSheetDismissed
-
-  state "Favoriting location" as FavoritingLocation {
-    [*] --> AwaitingFavoriteName : addPendingFavorite(coordinate)
-    AwaitingFavoriteName --> FavoriteSaved : nameFavorite(name)\n→ addFavoriteLocation(NamedLocation)
-    AwaitingFavoriteName --> [*] : cancelPendingFavorite()
-  }
-
-  LocationSelected --> FavoritingLocation : addPendingFavorite(coordinate)
-  FavoritingLocation --> LocationSelected : favorite saved / cancelled
+flowchart
+    A[User selects search bar on HomeScreen]
+    A --> B[Keyboard opens, user types query]
+    B --> C[Fetch location results via Kartverket API]
+    C --> D[Show results list]
+    D --> E[User selects a result]
+    E --> F[Clear search results list]
+    E --> X[Save location as recent search]
+    F --> Y[Navigate to map screen with the selected coordinate]
+    Y --> Z[Map opens, camera flies to location]
 ```
+
+### Risk assessment
+
+> This reflects the second part of Use Case #1, after a location has been selected and the map has been opened.
+
+```mermaid
+flowchart
+    A[Receive selected coordinates]
+    A --> B[Fetch GeoJSON risk areas]
+    B --> C{Inside danger zone polygon?}
+    C -->|No| LOW[Return DangerLevel.LOW]
+    C -->|Yes| D0[Fetch daily weather records]
+    D0 --> WF{Weather data available?}
+    WF -->|No| E[Return DangerLevel.UNKNOWN]
+    WF -->|Yes| D1[Assess slab avalanche risk]
+    D1 --> F[Return calculated DangerLevel]
+    
+    F --> G[Show DangerLevel to user]
+    E --> G
+    LOW --> G
+```
+
+### Historical climate data
+
+> This reflects Use Case #2. The user starts from the map screen and taps the map to see an overview of historical climate data.
+
+```mermaid
+flowchart
+    A[User taps a location on the map]
+    A --> B[Fetch nearest weather station via Frost API]
+    B --> C{Station found?}
+    C -->|No| ERR[Display error to user: no station available]
+    C -->|Yes| D[Fetch observations at station via Frost API]
+    D --> E{Observations found?}
+    E -->|No| ERR2[Display error to user: no observations]
+    E -->|Yes| F[Return LocationClimateData]
+    F --> G[Update MapScreenState.climateState to Success]
+    G --> H[MapScreen displays climate data]
+ 
+```
+
