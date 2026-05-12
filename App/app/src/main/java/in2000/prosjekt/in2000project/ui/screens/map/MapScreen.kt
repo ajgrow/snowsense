@@ -545,22 +545,24 @@ fun BottomSheetContent(
                         }
 
                         else -> {
+                            Column {
+                                Text(
+                                    text = stringResource(R.string.weather_station_desc),
+                                    style = MaterialTheme.typography.labelSmall
+                                )
+                                Text(
+                                    text = area.stationName
+                                        ?: stringResource(R.string.missing_station_name),
+                                    style = MaterialTheme.typography.titleLarge,
+                                )
+                            }
+
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.SpaceBetween,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Column {
-                                    Text(
-                                        text = stringResource(R.string.weather_station_desc),
-                                        style = MaterialTheme.typography.labelSmall
-                                    )
-                                    Text(
-                                        text = area.stationName
-                                            ?: stringResource(R.string.missing_station_name),
-                                        style = MaterialTheme.typography.titleLarge,
-                                    )
-                                }
+                                DangerLevelCard(uiModel = dangerLevel)
                                 IconButton(
                                     enabled = canAddFavorite(),
                                     modifier = Modifier,
@@ -575,8 +577,6 @@ fun BottomSheetContent(
                                     )
                                 }
                             }
-
-                            DangerLevelCard(uiModel = dangerLevel)
                         }
                     }
                 }
