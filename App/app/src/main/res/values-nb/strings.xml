@@ -53,15 +53,12 @@
 
     <string name="emergency_title">Nødnummer</string>
     <string name="emergency_desc">Ved nødsituasjon, ring et av disse numrene</string>
-    <string name="emergency_call_desc">Ring</string>
     <string name="police_rescue_service">Politi / redning</string>
     <string name="police_rescue_number">112</string>
     <string name="medical_service">Medisinsk</string>
     <string name="medical_number">113</string>
 
-    <string name="call_dialog_title">Ring %1$s?</string>
-    <string name="dialog_yes">Ja</string>
-    <string name="dialog_no">Nei</string>
+    <string name="emergency_call_desc">Ring %1$s</string>
 
     <string name="map_title">Kart</string>
     <string name="map_instruction">Velg et område for å se historiske klimadata.</string>
@@ -199,6 +196,7 @@
     <string name="is_expanded">Er utvidet</string>
     <string name="is_not_expanded">Er ikke utvidet</string>
     <string name="enter_value_desc">Skriv inn verdi</string>
+    <string name="emergency_call_confirm_desc">Ring %1$s?</string>>
 
 
 </resources>

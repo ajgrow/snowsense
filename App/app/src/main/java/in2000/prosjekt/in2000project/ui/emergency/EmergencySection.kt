@@ -55,7 +55,7 @@ fun EmergencySection(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Phone,
-                        contentDescription = stringResource(R.string.call_icon),
+                        contentDescription = null,
                         tint = MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier
                             .padding(end = 4.dp)
@@ -110,8 +110,7 @@ fun EmergencyRow(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 10.dp, vertical = 8.dp)
-            .semantics(mergeDescendants = true) { },
+            .padding(horizontal = 10.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
@@ -123,7 +122,10 @@ fun EmergencyRow(
         Spacer(modifier = Modifier.weight(1f))
 
         Surface(
-            modifier = Modifier.clickable(role = Role.Button){ showDialog = true},
+            modifier = Modifier.clickable(
+                role = Role.Button,
+                onClickLabel = stringResource(R.string.emergency_call_desc, number))
+            { showDialog = true},
             shape = RoundedCornerShape(10.dp),
             color = MaterialTheme.colorScheme.error,
             tonalElevation = 2.dp
@@ -141,7 +143,7 @@ fun EmergencyRow(
                 )
 
                 Text(
-                    text = number,
+                    text = stringResource(R.string.emergency_call_desc, number),
                     color = MaterialTheme.colorScheme.onError,
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = Bold
@@ -156,7 +158,7 @@ fun EmergencyRow(
             title = {
                 Text(
                     text = stringResource(
-                        R.string.call_dialog_title,
+                        R.string.emergency_call_confirm_desc,
                         number
                     )
                 )
@@ -171,14 +173,14 @@ fun EmergencyRow(
                         context.startActivity(intent)
                     }
                 ) {
-                    Text(stringResource(R.string.dialog_yes))
+                    Text(stringResource(R.string.dialog_ok))
                 }
             },
             dismissButton = {
                 TextButton(
                     onClick = { showDialog = false }
                 ) {
-                    Text(stringResource(R.string.dialog_no))
+                    Text(stringResource(R.string.dialog_cancel))
                 }
             }
         )
