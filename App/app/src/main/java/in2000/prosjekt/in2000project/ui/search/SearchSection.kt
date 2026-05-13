@@ -33,7 +33,6 @@ import androidx.compose.ui.unit.dp
 import in2000.prosjekt.in2000project.R
 import in2000.prosjekt.in2000project.domain.model.Coordinate
 import in2000.prosjekt.in2000project.domain.model.NamedLocation
-import in2000.prosjekt.in2000project.ui.search.SearchUiState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

@@ -3,8 +3,8 @@ package in2000.prosjekt.in2000project.ui.screen.map
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import in2000.prosjekt.in2000project.domain.model.exceptions.NoObservationsException
 import in2000.prosjekt.in2000project.domain.model.Coordinate
+import in2000.prosjekt.in2000project.domain.model.exceptions.NoObservationsException
 import in2000.prosjekt.in2000project.domain.repository.ClimateRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

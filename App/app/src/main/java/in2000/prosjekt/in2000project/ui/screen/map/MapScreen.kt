@@ -27,8 +27,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material3.Button
 import androidx.compose.material3.BottomSheetScaffold
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -66,25 +66,25 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.mapbox.geojson.Point
 import in2000.prosjekt.in2000project.R
 import in2000.prosjekt.in2000project.domain.model.ClimateArea
-import in2000.prosjekt.in2000project.domain.model.toClimateArea
-import in2000.prosjekt.in2000project.ui.graph.ClimateGraph
-import in2000.prosjekt.in2000project.ui.risk.DangerLevelCard
-import in2000.prosjekt.in2000project.ui.graph.DatePicker
-import java.time.MonthDay
-import com.mapbox.geojson.Point
 import in2000.prosjekt.in2000project.domain.model.NamedLocation
 import in2000.prosjekt.in2000project.domain.model.enums.DangerLevel
-import in2000.prosjekt.in2000project.ui.search.SearchDismissScrim
+import in2000.prosjekt.in2000project.domain.model.toClimateArea
+import in2000.prosjekt.in2000project.ui.graph.ClimateGraph
+import in2000.prosjekt.in2000project.ui.graph.DatePicker
 import in2000.prosjekt.in2000project.ui.model.DangerLevelUiModel
 import in2000.prosjekt.in2000project.ui.model.toUiModel
-import in2000.prosjekt.in2000project.ui.search.SearchSection
+import in2000.prosjekt.in2000project.ui.risk.DangerLevelCard
 import in2000.prosjekt.in2000project.ui.risk.RiskUiState
+import in2000.prosjekt.in2000project.ui.search.SearchDismissScrim
+import in2000.prosjekt.in2000project.ui.search.SearchSection
 import in2000.prosjekt.in2000project.ui.search.SearchUiState
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import java.time.MonthDay
 import java.time.Year
 
 private val previewClimateArea = ClimateArea(

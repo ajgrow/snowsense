@@ -6,14 +6,14 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.mapbox.geojson.Point
+import in2000.prosjekt.in2000project.ui.risk.RiskViewModel
 import in2000.prosjekt.in2000project.ui.screen.home.HomeScreen
 import in2000.prosjekt.in2000project.ui.screen.information.InfoScreen
 import in2000.prosjekt.in2000project.ui.screen.map.MapRoute
 import in2000.prosjekt.in2000project.ui.screen.map.MapStateHolder
-import in2000.prosjekt.in2000project.ui.risk.RiskViewModel
-import in2000.prosjekt.in2000project.ui.search.SearchViewModel
 import in2000.prosjekt.in2000project.ui.screen.settings.SettingScreen
 import in2000.prosjekt.in2000project.ui.screen.settings.SettingsViewModel
+import in2000.prosjekt.in2000project.ui.search.SearchViewModel
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 
