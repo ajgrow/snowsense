@@ -126,7 +126,7 @@ fun MapScreen(
         if (isSearchActive) focusRequester.requestFocus()
     }
 
-    val skiArea = remember(screenState.climateState) {
+    val climateArea = remember(screenState.climateState) {
         val state = screenState.climateState
         if (state is ClimateState.Success) {
             state.data.toClimateArea()
@@ -320,7 +320,7 @@ fun MapScreen(
             sheetPeekHeight = peekHeight,
             sheetContent = {
                 BottomSheetContent(
-                    area = skiArea,
+                    area = climateArea,
                     climateState = screenState.climateState,
                     dangerLevel = riskState.dangerLevel,
                     modifier = Modifier
