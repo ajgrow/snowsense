@@ -71,8 +71,6 @@ foundation = { group = "androidx.compose.foundation", name = "foundation", versi
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 androidx-compose-runtime = { group = "androidx.compose.runtime", name = "runtime", version.ref = "runtime" }
 koin-compose-viewmodel = { module = "io.insert-koin:koin-compose-viewmodel", version = "4.2.1" }
-androidx-compose-material-core = { group = "androidx.wear.compose", name = "compose-material-core", version.ref = "composeMaterialCore" }
-
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

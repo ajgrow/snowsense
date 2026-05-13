@@ -22,8 +22,8 @@ interface ClimateRepository {
      * @param yearsBack Number of additional years to include periods from (e.g. 9 → queries 2017–2026 if current year is 2026).
      * @return [in2000.prosjekt.in2000project.domain.model.LocationClimateData] with averaged daily values and metadata.
      * @throws java.io.IOException on network failures.
-     * @throws in2000.prosjekt.in2000project.data.model.exceptions.NoObservationsException if the station has no data for the requested period.
-     * @throws in2000.prosjekt.in2000project.data.model.exceptions.NoStationFoundException if no station is found for the requested coordinate.
+     * @throws in2000.prosjekt.in2000project.domain.model.exceptions.NoObservationsException if the station has no data for the requested period.
+     * @throws in2000.prosjekt.in2000project.domain.model.exceptions.NoStationFoundException if no station is found for the requested coordinate.
      */
     suspend fun getClimateDataForLocation(
         coordinate: Coordinate,

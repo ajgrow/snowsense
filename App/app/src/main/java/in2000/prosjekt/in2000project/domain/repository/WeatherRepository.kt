@@ -17,8 +17,8 @@ interface WeatherRepository {
      * @return [List<DailyWeatherRecord>] consisting of daily weather records
      * for the selected range.
      * @throws java.io.IOException on network failures.
-     * @throws in2000.prosjekt.in2000project.data.model.exceptions.NoObservationsException if the station has no data for the requested period.
-     * @throws in2000.prosjekt.in2000project.data.model.exceptions.NoStationFoundException if no station is found for the requested coordinate.
+     * @throws in2000.prosjekt.in2000project.domain.model.exceptions.NoObservationsException if the station has no data for the requested period.
+     * @throws in2000.prosjekt.in2000project.domain.model.exceptions.NoStationFoundException if no station is found for the requested coordinate.
      */
     suspend fun getWeatherRecordsForLocation(
         coordinate: Coordinate,
