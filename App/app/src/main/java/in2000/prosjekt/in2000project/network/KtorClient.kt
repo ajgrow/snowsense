@@ -17,15 +17,6 @@ object KtorClient {
                 ignoreUnknownKeys = true
             })
         }
-    }
-
-    val frostClient = HttpClient(OkHttp) {
-        install(ContentNegotiation) {
-            json(Json {
-                isLenient = true
-                ignoreUnknownKeys = true
-            })
-        }
         install(Auth) {
             basic {
                 credentials {

@@ -29,7 +29,7 @@ import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
 val appModule = module {
-    single { KtorClient.frostClient }
+    single { KtorClient.client }
     single<FrostV0DataSource> { KtorFrostV0DataSource(client = get()) }
     single<AvalancheRiskDataSource> { KtorAvalancheRiskDataSource(client = get()) }
     single<LocationDataSource> { KtorLocationDataSource(client = get()) }
