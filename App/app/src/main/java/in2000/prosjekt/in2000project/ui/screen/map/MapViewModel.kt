@@ -34,23 +34,6 @@ class MapViewModel(
     //just mutate the existing object in place and the UI won't update. However, if you create a copy(),
     //the old value is replaced with a new one which triggers recomposition
 
-    fun onOverlayLoading() {
-        _screenState.value = _screenState.value.copy(
-            overlayState = OverlayState.Loading
-        )
-    }
-
-    fun onOverlayLoaded() {
-        _screenState.value = _screenState.value.copy(
-            overlayState = OverlayState.Success
-        )
-    }
-
-    fun onOverlayError() {
-        _screenState.value = _screenState.value.copy(
-            overlayState = OverlayState.Error
-        )
-    }
 
     //set climateState to Loading until success.
     //use coordinates from UI to call getClimateDataForLocation() using coordinates and time period

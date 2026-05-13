@@ -89,7 +89,7 @@ fun DangerLevelItem(
     uiModel: DangerLevelUiModel
 ) {
     var expanded by rememberSaveable { mutableStateOf(false) }
-    var expandedDescription = stringResource(if (expanded) R.string.hide_info else R.string.show_info)
+    val expandedDescription = stringResource(if (expanded) R.string.hide_info else R.string.show_info)
 
     Surface(
         modifier = modifier

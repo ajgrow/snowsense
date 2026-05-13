@@ -63,7 +63,6 @@ class MapStateHolder {
     }
 
     fun onOverlayLoading() { _overlayState.value = OverlayState.Loading }
-    fun onOverlayLoaded()  { _overlayState.value = OverlayState.Success }
     fun onOverlayError()   { _overlayState.value = OverlayState.Error }
 
     fun onZoomIn()  { _commands.tryEmit(MapCommand.ZoomBy(+1.0)) }

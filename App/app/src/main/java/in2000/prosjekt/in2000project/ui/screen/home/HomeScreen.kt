@@ -276,7 +276,6 @@ fun RecentSection(
 @Composable
 fun LocationCard(
     location: NamedLocation,
-    modifier: Modifier = Modifier,
     onNavigateToMap: (coordinate: Coordinate) -> Unit,
     onRemoveLocation: (NamedLocation) -> Unit,
     showDangerLevel: Boolean = false,

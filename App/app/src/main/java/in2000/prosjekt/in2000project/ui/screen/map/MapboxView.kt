@@ -130,9 +130,6 @@ fun MapboxView(
     val statusBarHeightPx = with(density) {
         contentPadding.calculateTopPadding().toPx()
     }
-    val bottomPaddingPx = with(density) {
-        contentPadding.calculateBottomPadding().toPx()
-    }
 
     LaunchedEffect(Unit) {
         mapStateHolder.commands.collect { cmd ->

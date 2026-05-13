@@ -6,6 +6,7 @@ import in2000.prosjekt.in2000project.domain.model.Coordinate
 import in2000.prosjekt.in2000project.domain.model.NamedLocation
 import in2000.prosjekt.in2000project.domain.repository.LocationRepository
 import in2000.prosjekt.in2000project.domain.repository.SearchRepository
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -23,6 +24,7 @@ data class SearchUiState (
     val awaitingFavoriteName: Coordinate? = null,
     val isSearchActive: Boolean = false
 )
+@OptIn(FlowPreview::class)
 class SearchViewModel(
     private val searchRepository: SearchRepository,
     private val locationRepository: LocationRepository
