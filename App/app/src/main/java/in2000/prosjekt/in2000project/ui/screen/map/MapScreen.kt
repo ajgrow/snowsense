@@ -73,22 +73,17 @@ import in2000.prosjekt.in2000project.domain.model.toClimateArea
 import in2000.prosjekt.in2000project.ui.graph.ClimateGraph
 import in2000.prosjekt.in2000project.ui.risk.DangerLevelCard
 import in2000.prosjekt.in2000project.ui.graph.DatePicker
-import org.koin.compose.viewmodel.koinViewModel
 import java.time.MonthDay
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mapbox.geojson.Point
 import in2000.prosjekt.in2000project.domain.model.NamedLocation
-import in2000.prosjekt.in2000project.ui.search.SearchViewModel
 import in2000.prosjekt.in2000project.domain.model.enums.DangerLevel
 import in2000.prosjekt.in2000project.ui.search.SearchDismissScrim
 import in2000.prosjekt.in2000project.ui.model.DangerLevelUiModel
 import in2000.prosjekt.in2000project.ui.model.toUiModel
 import in2000.prosjekt.in2000project.ui.search.SearchSection
 import in2000.prosjekt.in2000project.ui.risk.RiskUiState
-import in2000.prosjekt.in2000project.ui.risk.RiskViewModel
 import in2000.prosjekt.in2000project.ui.search.SearchUiState
 import kotlinx.coroutines.flow.drop
-import org.koin.compose.koinInject
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.time.Year
@@ -100,102 +95,6 @@ private val previewClimateArea = ClimateArea(
     windSpeedData = emptyList(),
     snowDepthData = emptyList()
 )
-
-//for use when the VM is ready
-@Composable
-fun MapRoute(
-    searchViewModel: SearchViewModel,
-    mapViewModel: MapViewModel = koinViewModel(),
-    riskViewModel: RiskViewModel = koinViewModel(),
-    mapStateHolder: MapStateHolder = koinInject()
-) {
-    val screenState by mapViewModel.screenState.collectAsStateWithLifecycle()
-    val riskState by riskViewModel.riskState.collectAsStateWithLifecycle()
-    val searchState by searchViewModel.searchState.collectAsStateWithLifecycle()
-    val overlayState by mapStateHolder.overlayState.collectAsStateWithLifecycle()
-    val pin by mapStateHolder.pinnedPoint.collectAsStateWithLifecycle()
-
-    LaunchedEffect(pin) {
-        pin?.let {
-            mapViewModel.onMapClick(it.latitude(), it.longitude())
-            riskViewModel.updateDangerLevel(it.latitude(), it.longitude())
-        }
-    }
-
-    var showFavoriteDialog by remember { mutableStateOf(false) }
-
-    val climateArea = remember(screenState.climateState) {
-        val state = screenState.climateState
-        if (state is ClimateState.Success) {
-            state.data.toClimateArea()
-        } else {
-            null
-        }
-    } ?: previewClimateArea
-
-    if (showFavoriteDialog) {
-        TextInputDialog(
-            title = stringResource(R.string.name_favorite_prompt),
-            defaultValue = when (screenState.climateState) {
-                is ClimateState.Success -> {
-                    climateArea.stationName ?: stringResource(R.string.missing_station_name)
-                }
-
-                else -> {
-                    ""
-                }
-            },
-            onConfirm = { name ->
-                if (name.isNotBlank()) {
-                    searchViewModel.nameFavorite(name)
-                    showFavoriteDialog = false
-                }
-            },
-            onDismiss = { showFavoriteDialog = false }
-        )
-    }
-
-    LaunchedEffect(Unit) {
-        searchViewModel.clearQuery()
-    }
-
-    MapScreen(
-        screenState = screenState,
-        riskState = riskState,
-        overlayState = overlayState,
-        searchState = searchState,
-        onSearchLocationRequested = mapStateHolder::flyToSearch,
-        onZoomIn = mapStateHolder::onZoomIn,
-        onZoomOut = mapStateHolder::onZoomOut,
-        onOverlayRetry = mapStateHolder::onOverlayLoading,
-        onSheetDismiss = {
-            mapViewModel.onSheetDismissed()
-            mapStateHolder.clearPin()
-        },
-        onStartDateChange = { it?.let(mapViewModel::onStartDateChange) },
-        onEndDateChange = { it?.let(mapViewModel::onEndDateChange) },
-        onYearChange = { it?.let(mapViewModel::onYearChange) },
-        onQueryChange = searchViewModel::onQueryChange,
-        onSelectResult = searchViewModel::selectSearchResult,
-        onAddFavorite = {
-            screenState.climateCoordinate?.let { coordinate ->
-                searchViewModel.addPendingFavorite(coordinate)
-                showFavoriteDialog = true
-            }
-        },
-        onBottomPaddingChanged = mapStateHolder::setBottomPadding,
-        canAddFavorite = {
-            val coordinate = screenState.climateCoordinate
-            if (coordinate != null) {
-                !searchState.favorites.any { it.coordinate == coordinate }
-            } else {
-                false
-            }
-        },
-        onSearchActiveChange = searchViewModel::setSearchActive
-    )
-}
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -732,10 +631,6 @@ fun MapScreenErrorPreview() {
 @Preview(showBackground = true)
 @Composable
 fun BottomSheetPreview() {
-    val sheetState = rememberModalBottomSheetState(
-        skipPartiallyExpanded = false
-    )
-
     BottomSheetContent(
         area = previewClimateArea,
         climateState = ClimateState.Idle,
