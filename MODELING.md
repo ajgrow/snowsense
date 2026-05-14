@@ -25,65 +25,60 @@
 
 #### Main Flow:
 
-1. User begins typing location into the search bar
+1. User starts typing location into the search bar
 2. `SearchSection` calls `onQueryChange(query)`
-3. `SearchViewModel` updates the `SearchUiState` with the new query
-4. `SearchViewModel` watches for query changes, debounces them, and waits for the input to settle before searching
-5. `SearchViewModel` calls `LocationRepository.getNamedLocations(query)`, i.e. sends the query to LocationRepository 
-6. `LocationRepository` calls `LocationDataSource.getNamesResponse(query)`, i.e. sends the query to `LocationDataSource`. 
-7. `LocationsDataSource` queries Kartverket API
-8. `Kartverket` returns raw JSON response to `LocationDataSource`
-9. `LocationDataSource` deserializes the response into a `List<LocationDto>`
-10. `LocationRepository` transforms location DTOs to a `List<NamedLocations>`
-11. `SearchViewModel` updates the search results in the `SearchUiState`
-12. `SearchSection` displays the results to user (as a dropdown list)
-13. User selects a location from the list 
-14. `SearchSection` triggers `SearchViewModel` to handle the selected result with `SearchViewModel.selectSearchResult(location)`
-15. `SearchViewModel` clears query and updates recent searches list
-16. `SearchViewModel` saves the updated list through `SearchRepository` with saveRecentSearches. 
-17. `SearchSection` triggers navigation to the map with the selected coordinate by calling `onNavigateToMap(coordinate)`
-18. `AppNavigation` converts the coordinate to a Mapbox `Point` and calls `flyToSearch(Point)`, which tells the `MapStateHolder` to “fly” there. 
-19. `MapStateHolder` updates the pinned point on the map
-20. `MapStateHolder` sends the selected point with a camera-move command (FlyTo) to MapboxView
-21. `MapboxView` moves the camera and displays the pin on the map
-22. `MapRoute` observes the selected point
-23. `MapRoute` tells `MapViewModel` to update the climate and location data for the map screen
-24. `MapRoute` calls `RiskViewModel.updateDangerLevel(lat, lon)`, telling `RiskViewModel` to calculate the danger level for the coordinate
-25. `RiskViewModel` invokes `GetAvalancheDangerUseCase` with the coordinate
-26. `GetAvalancheDangerUseCase` calls `AvalancheRiskRepository.getGeoJsonStatus(lat, lon, buffer)`, to check if whether the location is in a danger zone 
-27. `AvalancheRiskRepository` calls `AvalancheRiskDataSource.getGeoJson(lat, lon, buffer)`
-28. `AvalancheRiskDataSource` queries NVE API.
-29. NVE API returns GeoJSON/JSON response.
-30. `AvalancheRiskDataSource` deserializes the response to a `GeoJsonResponseDto`, and returns this to `AvalancheRiskRepository`
-31. `AvalancheRiskRepository` returns true/false, depending on whether the response was empty or not, to `GetAvalancheDangerUseCase`.
-32. If the location is within a danger zone, then  `GetAvalancheDangerUseCase` calls `WeatherRepository.getWeatherRecordsForLocation(coordinate)`, asking the `WeatherRepository` for weather records at that location
-33. `WeatherRepository` calls `FrostV0DataSource.getNearestSource(coordinate)`, i.e. asking it to fetch the nearest weather station 
-34. `FrostV0DataSource` queries Frost API 
-35. Frost API returns station data as JSON, an error or empty response
-36. `FrostV0DataSource` returns `FrostV0SourceDto` or null to `WeatherRepository`.
-37. If a station is found, `WeatherRepository` calls `FrostV0DataSource.getObservations(…)`.
-38. `FrostV0DataSource` queries Frost API for weather observations
-39. Frost API returns observation data as JSON, an error or empty response
-40. `FrostV0DataSource` returns `FrostV0ObservationResponseDto` or null to WeatherRepository
-41. WeatherRepository transforms the observations into DailyWeatherRecords and returns `List<DailyWeatherRecord>` to `GetAvalancheDangerUseCase`
-42. `GetAvalancheDangerUseCase` calls `SlabAvalancheRiskAssessor.assess(records)`, i.e. passing the records to `SlabAvalancheRiskAssessor` for evaluation
-43. `SlabAvalancheRiskAssessor` returns a `DangerLevel` to `GetAvalancheDangerUseCase`.
-44. `GetAvalancheDangerUseCase` returns that `DangerLevel` to `RiskViewModel`
-45. `RiskViewModel` updates `RiskUiState`
-46. `MapScreen` observes `RiskUiState`
-47. `MapScreen` displays `DangerLevel` to the user
+3. `SearchViewModel` watches for query changes, debounces them, and waits for the input to settle before searching
+4. `SearchViewModel` calls `LocationRepository.getNamedLocations(query)`, i.e. sends the query to LocationRepository 
+5. `LocationRepository` calls `LocationDataSource.getNamesResponse(query)`, i.e. sends the query to `LocationDataSource`. 
+6. `LocationsDataSource` queries Kartverket API
+7. `Kartverket` returns raw JSON response to `LocationDataSource`
+8. `LocationDataSource` deserializes the response into a `List<LocationDto>`
+9. `LocationRepository` transforms location DTOs to a `List<NamedLocations>`
+10. `SearchViewModel` updates the search results in the `SearchUiState`
+11. `SearchSection` displays the results to user (as a dropdown list)
+12. User selects a location from the list 
+13. `SearchSection` triggers navigation to the map with the selected coordinate by calling `onNavigateToMap(coordinate)`
+14. `AppNavigation` converts the coordinate to a Mapbox `Point` and calls `flyToSearch(Point)`, which tells the `MapStateHolder` to “fly” there. 
+15. `MapStateHolder` updates the pinned point on the map
+16. `MapStateHolder` sends the selected point with a camera-move command (FlyTo) to MapboxView
+17. `MapboxView` moves the camera and displays the pin on the map
+18. `MapRoute` observes the selected point
+19. `MapRoute` calls `RiskViewModel.updateDangerLevel(lat, lon)`, telling `RiskViewModel` to calculate the danger level for the coordinate
+20. `RiskViewModel` invokes `GetAvalancheDangerUseCase` with the coordinate
+21. `GetAvalancheDangerUseCase` calls `AvalancheRiskRepository.getGeoJsonStatus(lat, lon, buffer)`, to check if whether the location is in a danger zone 
+22. `AvalancheRiskRepository` calls `AvalancheRiskDataSource.getGeoJson(lat, lon, buffer)`
+23. `AvalancheRiskDataSource` queries NVE API.
+24. NVE API returns GeoJSON/JSON response.
+25. `AvalancheRiskDataSource` deserializes the response to a `GeoJsonResponseDto`, and returns this to `AvalancheRiskRepository`
+26. `AvalancheRiskRepository` returns true/false, depending on whether the response was empty or not, to `GetAvalancheDangerUseCase`.
+27. If the location is within a danger zone, then  `GetAvalancheDangerUseCase` calls `WeatherRepository.getWeatherRecordsForLocation(coordinate)`, asking the `WeatherRepository` for weather records at that location
+28. `WeatherRepository` calls `FrostV0DataSource.getNearestSource(coordinate)`, i.e. asking it to fetch the nearest weather station 
+29. `FrostV0DataSource` queries Frost API 
+30. Frost API returns station data as JSON, an error or empty response
+31. `FrostV0DataSource` returns `FrostV0SourceDto` or `null` to `WeatherRepository`.
+32. If a station is found, `WeatherRepository` calls `FrostV0DataSource.getObservations(…)`.
+33. `FrostV0DataSource` queries Frost API for weather observations
+34. Frost API returns observation data as JSON, an error or empty response
+35. `FrostV0DataSource` returns `FrostV0ObservationResponseDto` or `null` to WeatherRepository
+36. WeatherRepository transforms the observations into DailyWeatherRecords and returns `List<DailyWeatherRecord>` to `GetAvalancheDangerUseCase`
+37. `GetAvalancheDangerUseCase` calls `SlabAvalancheRiskAssessor.assess(records)`, i.e. passing the records to `SlabAvalancheRiskAssessor` for evaluation
+38. `SlabAvalancheRiskAssessor` returns a `DangerLevel` to `GetAvalancheDangerUseCase`.
+39. `GetAvalancheDangerUseCase` returns that `DangerLevel` to `RiskViewModel`
+40. `RiskViewModel` updates `RiskUiState`
+41. `MapScreen` observes `RiskUiState`
+42. `MapScreen` displays `DangerLevel` to the user
 
-#### Alternative Flow for Step 31 **Location is not in an avalanche danger zone**
+#### Alternative Flow for Step 26 **Location is not in an avalanche danger zone**
 
-31.1. `GetAvalancheDangerUseCase` returns `DangerLevel.LOW` to `RiskViewModel`. \
-31.2. Continue from step 45. \
+26.1. `GetAvalancheDangerUseCase` returns `DangerLevel.LOW` to `RiskViewModel`. \
+26.2. Continue from step 40. \
 
-#### Alternative Flow for Step 40: **Weather data is unavailable**
+#### Alternative Flow for Step 35: **Weather data is unavailable**
 
-40.1. `WeatherRepository` throws an exception to `GetAvalancheDangerUseCase` due to missing or unusable weather records \
-40.2. `GetAvalancheDangerUseCase` catches the exception and treats the records as empty \
-40.3. `GetAvalancheDangerUseCase` returns `DangerLevel.UNKNOWN` to `RiskViewModel` \
-40.4. continue from step 45
+35.1. `WeatherRepository` throws an exception to `GetAvalancheDangerUseCase` due to missing or unusable weather records \
+35.2. `GetAvalancheDangerUseCase` catches the exception and treats the records as empty \
+35.3. `GetAvalancheDangerUseCase` returns `DangerLevel.UNKNOWN` to `RiskViewModel` \
+35.4. continue from step 45
 
 
 ### Use Case #2
@@ -207,36 +202,36 @@ sequenceDiagram
     ARR-->>GADUC: 26. isDangerZone: Boolean
 
     alt location not in danger zone
-        GADUC-->>RVM: 27.1 DangerLevel.LOW
+        GADUC-->>RVM: 26.1 DangerLevel.LOW
     end
 
-    GADUC->>WR: 28. getWeatherRecordsForLocation(coordinate)
-    WR->>FDS: 29. getNearestSource(coordinate)
-    FDS->>Frost: 30. query nearest weather station
-    Frost-->>FDS: 31. station JSON / error / empty response
-    FDS-->>WR: 32. source: FrostV0SourceDto?
+    GADUC->>WR: 27. getWeatherRecordsForLocation(coordinate)
+    WR->>FDS: 28. getNearestSource(coordinate)
+    FDS->>Frost: 29. query nearest weather station
+    Frost-->>FDS: 30. station JSON / error / empty response
+    FDS-->>WR: 31. source: FrostV0SourceDto?
 
     opt station found
-        WR->>FDS: 33. getObservations(sourceId, elementsCsv, referenceTime)
-        FDS->>Frost: 34. query weather observations
-        Frost-->>FDS: 35. observation JSON / error / empty response
-        FDS-->>WR: 36. observations: FrostV0ObservationResponseDto?
+        WR->>FDS: 32. getObservations(sourceId, elementsCsv, referenceTime)
+        FDS->>Frost: 33. query weather observations
+        Frost-->>FDS: 34. observation JSON / error / empty response
+        FDS-->>WR: 35. observations: FrostV0ObservationResponseDto?
     end
 
     alt weather data missing or unusable
-        WR-->>GADUC: 37.1 throws exception / no usable records
-        GADUC->>GADUC: 37.2 catch exception or detect too few records
-        GADUC-->>RVM: 37.3 DangerLevel.UNKNOWN
+        WR-->>GADUC: 35.1 throws exception / no usable records
+        GADUC->>GADUC: 35.2 catch exception or detect too few records
+        GADUC-->>RVM: 35.3 DangerLevel.UNKNOWN
     end
 
-    WR-->>GADUC: 38. records: List<DailyWeatherRecord>
-    GADUC->>SARA: 39. assess(records)
-    SARA-->>GADUC: 40. DangerLevel
-    GADUC-->>RVM: 41. DangerLevel
+    WR-->>GADUC: 36. records: List<DailyWeatherRecord>
+    GADUC->>SARA: 37. assess(records)
+    SARA-->>GADUC: 38. DangerLevel
+    GADUC-->>RVM: 39. DangerLevel
 
-    RVM->>RVM: 42. update RiskUiState
-    RVM-->>MS: 43. observe riskState
-    MS->>User: 44. display DangerLevel
+    RVM->>RVM: 40. update RiskUiState
+    RVM-->>MS: 41. observe riskState
+    MS->>User: 42. display DangerLevel
 
 ```
 
@@ -244,6 +239,7 @@ sequenceDiagram
 
 ```mermaid
 sequenceDiagram
+
 actor User
 
 participant MS as MapScreen
@@ -257,41 +253,44 @@ participant FAPI as FrostV0 API
 
 User ->> MV: Tap location on map
 MV ->> MSH: placePin(point)
-MSH -->> MR: observes pinnedPoint
+MSH ->> MSH: updates pinnedPoint
+MR ->> MR: observes pinnedPoint
 MR ->> MVM: onMapClick(lat,lon)
 MVM ->> CR: getClimateDataForLocation(..)
 CR ->> FDS: getNearestDataSource(coordinate)
 FDS ->> FAPI: query
 
-alt No station found
+alt Station found
+    FAPI-->>FDS: JSON objects
+    FDS-->>CR: FrostV0SourceDto
+    CR->>FDS: getObservations(..)
+    FDS->>FAPI: query
+
+    alt Observations found
+        FAPI-->>FDS: JSON objects
+        FDS-->>CR: FrostV0ObservationResponseDto
+        CR-->>MVM: LocationClimateData
+        MVM->>MVM: climateState = Success
+        MR->>MS: observes climateState as Success
+        MS->>User: displays results
+
+    else No observations found
+        FAPI-->>FDS: null
+        FDS-->>CR: null
+        CR->>MVM: throws NoObservationsException
+        MVM->>MVM: climateState = Error
+        MR->>MS: observes climateState as Error
+        MS->>User: displays error
+    end
+
+else No station found
     FAPI-->>FDS: null
     FDS-->>CR: null
-    CR-->>MVM: throws NoStationFoundException
-    MVM-->>MR: observes climateState as Error
-    MR-->>MS: observes climateArea as null
+    CR->>MVM: throws NoStationFoundException
+    MVM->>MVM: climateState = Error
+    MR->>MS: observes climateState as Error
     MS->>User: displays error
 end
-
-FAPI-->>FDS: JSON objects
-FDS-->>CR: FrostV0SourceDto
-CR->>FDS: getObservations(..)
-FDS->>FAPI: query
-
-alt No observations found
-    FAPI-->>FDS: null
-    FDS-->>CR: null
-    CR-->>MVM: throws NoObservationsException
-    MVM-->>MR: observes climateState as Error
-    MR-->>MS: observes climateArea as null
-    MS->>User: displays error
-end
-
-FAPI-->>FDS: JSON objects
-FDS-->>CR: FrostV0ObservationResponseDto
-CR-->>MVM: LocationClimateData
-MVM-->>MR: observes climateState as Success
-MR-->>MS: observes climateArea
-MS->>User: displays results
 ```
 
 ---
