@@ -11,15 +11,147 @@
 
 ---
 
+## Use Cases
+
+### Use Case #1
+
+#### Description
+
+**Name:** User wants to check Danger Level for a location \
+**Primary Actor:** App user (skier) \
+**Secondary Actor:** NVE API, Frost API, Mapbox, Kartverket API \
+**Precondition:** User starts from search bar on HomeScreen \
+**Postcondition:** The user can see the calculated danger level for the chosen location, or sees dangerlevel unknown. 
+
+#### Main Flow:
+
+1. User begins typing location into the search bar
+2. `SearchSection` calls `onQueryChange(query)`
+3. `SearchViewModel` updates the `SearchUiState` with the new query
+4. `SearchViewModel` watches for query changes, debounces them, and waits for the input to settle before searching
+5. `SearchViewModel` calls `LocationRepository.getNamedLocations(query)`, i.e. sends the query to LocationRepository 
+6. `LocationRepository` calls `LocationDataSource.getNamesResponse(query)`, i.e. sends the query to `LocationDataSource`. 
+7. `LocationsDataSource` queries Kartverket API
+8. `Kartverket` returns raw JSON response to `LocationDataSource`
+9. `LocationDataSource` deserializes the response into a `List<LocationDto>`
+10. `LocationRepository` transforms location DTOs to a `List<NamedLocations>`
+11. `SearchViewModel` updates the search results in the `SearchUiState`
+12. `SearchSection` displays the results to user (as a dropdown list)
+13. User selects a location from the list 
+14. `SearchSection` triggers `SearchViewModel` to handle the selected result with `SearchViewModel.selectSearchResult(location)`
+15. `SearchViewModel` clears query and updates recent searches list
+16. `SearchViewModel` saves the updated list through `SearchRepository` with saveRecentSearches. 
+17. `SearchSection` triggers navigation to the map with the selected coordinate by calling `onNavigateToMap(coordinate)`
+18. `AppNavigation` converts the coordinate to a Mapbox `Point` and calls `flyToSearch(Point)`, which tells the `MapStateHolder` to “fly” there. 
+19. `MapStateHolder` updates the pinned point on the map
+20. `MapStateHolder` sends the selected point with a camera-move command (FlyTo) to MapboxView
+21. `MapboxView` moves the camera and displays the pin on the map
+22. `MapRoute` observes the selected point
+23. `MapRoute` tells `MapViewModel` to update the climate and location data for the map screen
+24. `MapRoute` calls `RiskViewModel.updateDangerLevel(lat, lon)`, telling `RiskViewModel` to calculate the danger level for the coordinate
+25. `RiskViewModel` invokes `GetAvalancheDangerUseCase` with the coordinate
+26. `GetAvalancheDangerUseCase` calls `AvalancheRiskRepository.getGeoJsonStatus(lat, lon, buffer)`, to check if whether the location is in a danger zone 
+27. `AvalancheRiskRepository` calls `AvalancheRiskDataSource.getGeoJson(lat, lon, buffer)`
+28. `AvalancheRiskDataSource` queries NVE API.
+29. NVE API returns GeoJSON/JSON response.
+30. `AvalancheRiskDataSource` deserializes the response to a `GeoJsonResponseDto`, and returns this to `AvalancheRiskRepository`
+31. `AvalancheRiskRepository` returns true/false, depending on whether the response was empty or not, to `GetAvalancheDangerUseCase`.
+32. If the location is within a danger zone, then  `GetAvalancheDangerUseCase` calls `WeatherRepository.getWeatherRecordsForLocation(coordinate)`, asking the `WeatherRepository` for weather records at that location
+33. `WeatherRepository` calls `FrostV0DataSource.getNearestSource(coordinate)`, i.e. asking it to fetch the nearest weather station 
+34. `FrostV0DataSource` queries Frost API 
+35. Frost API returns station data as JSON, an error or empty response
+36. `FrostV0DataSource` returns `FrostV0SourceDto` or null to `WeatherRepository`.
+37. If a station is found, `WeatherRepository` calls `FrostV0DataSource.getObservations(…)`.
+38. `FrostV0DataSource` queries Frost API for weather observations
+39. Frost API returns observation data as JSON, an error or empty response
+40. `FrostV0DataSource` returns `FrostV0ObservationResponseDto` or null to WeatherRepository
+41. WeatherRepository transforms the observations into DailyWeatherRecords and returns `List<DailyWeatherRecord>` to `GetAvalancheDangerUseCase`
+42. `GetAvalancheDangerUseCase` calls `SlabAvalancheRiskAssessor.assess(records)`, i.e. passing the records to `SlabAvalancheRiskAssessor` for evaluation
+43. `SlabAvalancheRiskAssessor` returns a `DangerLevel` to `GetAvalancheDangerUseCase`.
+44. `GetAvalancheDangerUseCase` returns that `DangerLevel` to `RiskViewModel`
+45. `RiskViewModel` updates `RiskUiState`
+46. `MapScreen` observes `RiskUiState`
+47. `MapScreen` displays `DangerLevel` to the user
+
+#### Alternative Flow for Step 31 **Location is not in an avalanche danger zone**
+
+31.1. `GetAvalancheDangerUseCase` returns `DangerLevel.LOW` to `RiskViewModel`. \
+31.2. Continue from step 45. \
+
+#### Alternative Flow for Step 40: **Weather data is unavailable**
+
+40.1. `WeatherRepository` throws an exception to `GetAvalancheDangerUseCase` due to missing or unusable weather records \
+40.2. `GetAvalancheDangerUseCase` catches the exception and treats the records as empty \
+40.3. `GetAvalancheDangerUseCase` returns `DangerLevel.UNKNOWN` to `RiskViewModel` \
+40.4. continue from step 45
+
+
+### Use Case #2
+
+#### Description
+
+**Name:** Tour guide wants to view historical climate data for a manually selected location \
+**Primary Actor:** App user (Ski Tour Guide) \
+**Secondary Actor:** Mapbox, Frost V0 API \
+**Precondition:** User starts on MapScreen \
+**Postcondition:** Historical climate data is displayed to the user, or an error message is shown if no station or observations were found.
+
+#### Main Flow:
+
+1. User manually taps a location on the map
+2. `MapboxView` calls `mapStateHolder.placePin(point)`
+3. `MapStateHolder` updates `pinnedPoint`
+4. `MapRoute` observes `pinnedPoint`
+5. `MapRoute` calls `mapViewModel.onMapClick(lat, lon)`
+6. `MapViewModel` calls `climateRepository.getClimateDataForLocation(..)`
+7. `ClimateRepository` calls `frostV0DataSource.getNearestSource(coordinate)`
+8. `FrostV0DataSource` queries Frost API
+9.  Frost API returns JSON objects to `FrostV0DataSource`
+10. `FrostV0DataSource` returns `FrostV0SourceDto` to `ClimateRepository`
+11. `ClimateRepository` calls `frostV0DataSource.getObservations(..)`
+12. `FrostV0DataSource` queries Frost API
+13. Frost API returns JSON objects to `FrostV0DataSource`
+14. `FrostV0DataSource` returns `FrostV0ObservationResponse` to `ClimateRepository`
+15. `ClimateRepository` returns `LocationClimateData` to `MapViewModel`
+16. `MapViewModel` updates `MapScreenState.climateState` to `ClimateState.Success`
+17. `MapScreen` observes `MapScreenState.climateState`
+18. `MapScreen` displays results to the user
+
+#### Alternative Flow for Step 8:
+
+8.1 Frost API returns `null` to `FrostV0DataSource` \
+8.2 `FrostV0DataSource` returns `null` to `ClimateRepository` \
+8.3 `ClimateRepository` throws `NoStationFoundException(coordinate)` \
+8.4 `MapViewModel` catches `NoStationFoundException(coordinate)` from `ClimateRepository` \
+8.5 `MapViewModel` updates `MapScreenState.climateState` to `ClimateState.Error` \
+8.6 `MapScreen` observes `MapScreenState.climateState` \
+8.7 Return to main flow point 16.
+
+#### Alternative Flow for Step 12:
+
+12.1 Frost API returns `null` to `FrostV0DataSource` \
+12.2 `FrostV0DataSource` returns `null` to `ClimateRepository` \
+12.3 `ClimateRepository` throws `NoObservationsException(..)` \
+12.4 `MapViewModel` catches `NoObservationsException(..)` from `ClimateRepository` \
+12.5 `MapViewModel` updates `MapScreenState.climateState` to `ClimateState.Error` \
+12.6 `MapScreen` observes `MapScreenState.climateState` \
+12.7 Return to main flow point 16.
+
 ## Use Case Diagrams
 
-> Document the use case diagrams here, illustrating the interactions between actors and the system.
+### Use case #1
+
+<img src="docs/use_case_1.svg">
+
+### Use case #2
+
+<img src="docs/use_case_2.svg">
 
 ---
 
 ## Sequence Diagrams
 
-> Document the sequence diagrams here, showing how objects and components interact over time for key flows.
+> Sequence diagram representing Use Case #1
 
 ```mermaid
 sequenceDiagram
@@ -108,9 +240,10 @@ sequenceDiagram
 
 ```
 
+> Sequence diagram representing Use Case #2
+
 ```mermaid
 sequenceDiagram
-
 actor User
 
 participant MS as MapScreen
@@ -164,8 +297,6 @@ MS->>User: displays results
 ---
 
 ## Class Diagrams
-
-> Document the class diagrams here, depicting the structure of the codebase including classes, attributes, methods, and relationships.
 
 Class diagram representing the relevant data layer classes:
 1. DataSources used to query Frost v0, NVE SnøskredAktsomhet and Kartverket Stedsnavn. 
@@ -333,7 +464,7 @@ classDiagram
 
 ## Activity & State Diagrams
 
-> Document the activity and/or state diagrams here, capturing the flow of control and state transitions within the app.
+> This reflects the first part of Use Case #1, where the user searches for a location.
 
 ```mermaid
 flowchart
