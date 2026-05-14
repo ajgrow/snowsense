@@ -91,8 +91,8 @@ The app does not use your device's GPS or location data. All location choices ha
 | API | Source | usecase |
 | --- | --- | --- |
 | [Frost API v0](https://frost.met.no/index.html) | MET Norway | Historical climate observations from nearest measuring station: requires Client-ID |
-| [NVE Skredaktomshet] (https://kart.nve.no/enterprise/rest/services/SnoskredAktsomhet/MapServer) | NVE | GeoJSON-data about avalanche prone areas for chosen location |
-| [Kartverket Stedsnvan](https://www.kartverket.no/api-og-data/stedsnavndata) | kartverket | Geocoding and location searching - converts location names to coordinates |
+| [NVE Skredaktomshet](https://kart.nve.no/enterprise/rest/services/SnoskredAktsomhet/MapServer) | NVE | GeoJSON-data about avalanche prone areas for chosen location. WMS map layer that shows avalanche risk zones on the map through a raster layer. More details are shown the closer you zoom |
+| [Kartverket Stedsnvan](https://www.kartverket.no/api-og-data/stedsnavndata) | Kartverket | Geocoding and location searching - converts location names to coordinates |
 
 ## Testing
 
@@ -102,7 +102,7 @@ The project includes Unit tests and integration tests.
   ```
   ./gradlew test
   ```
-  - **Integrasjonstesting:** done through Frost API therefore requires that the 'FROST_CLIENT_ID' is set up in 'local.properties'), you can run this directly or through the terminal:
+  - **Integration testing:** done through Frost API therefore requires that the 'FROST_CLIENT_ID' is set up in 'local.properties'), you can run this directly or through the terminal:
     ```
     ./gradlew test --tests "*.FrostApiIntegrationTest"
     ```
