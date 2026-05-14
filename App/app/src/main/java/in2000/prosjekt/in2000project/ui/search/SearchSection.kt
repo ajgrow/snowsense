@@ -5,6 +5,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -19,12 +20,16 @@ import androidx.compose.material3.DockedSearchBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SearchBarDefaults
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalWindowInfo
@@ -59,80 +64,109 @@ fun SearchSection(
     val displayResults = if (isShowingRecents) searchState.recentSearches else searchState.searchResults
     val isNorwegian = LocalConfiguration.current.locales[0].language in listOf("no", "nb", "nn")
 
-    DockedSearchBar(
-        shape = RoundedCornerShape(16.dp),
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp)
-            .heightIn(min = if (expanded) LocalWindowInfo.current.containerDpSize.height * 0.4f else 0.dp),
-        onExpandedChange = { if (!it) onActiveChange(false) },
-        inputField = {
-            SearchBarDefaults.InputField(
-                leadingIcon = {
-                    Icon(
-                        imageVector = Icons.Default.Menu,
-                        contentDescription = stringResource(R.string.open_menu)
-                    )
-                },
-                trailingIcon = {
-                    Icon(
-                        imageVector = Icons.Default.Search,
-                        contentDescription = stringResource(R.string.open_search)
-                    )
-                },
-                query = searchState.query,
-                onQueryChange = {
-                    onQueryChange(it)
-                },
-                onSearch = {
-                    searchState.searchResults.firstOrNull()?.let { location ->
-                        onSelectResult(location)
-                        onNavigateToMap(location.coordinate)
-                    }
-                },
-                expanded = expanded,
-                onExpandedChange = { if (!it) onActiveChange(false) },
-                interactionSource = interactionSource,
-                placeholder = {
-                    Text(stringResource(R.string.search_placeholder))
-                }
-            )
-        },
-        expanded = expanded,
-        content = {
-            Box(
-                //make sure the container's height is consistent when recentsearches is empty vs filled
+    if (!expanded) {
+        Surface(
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
+                .clip(RoundedCornerShape(16.dp))
+                .clickable { onActiveChange(true) },
+            shape = RoundedCornerShape(16.dp),
+            color = SearchBarDefaults.colors().containerColor,
+            tonalElevation = 6.dp
+        ) {
+            Row(
                 modifier = Modifier
-                    .height(LocalWindowInfo.current.containerDpSize.height * 0.4f - SearchBarDefaults.InputFieldHeight)
+                    .fillMaxWidth()
+                    .height(SearchBarDefaults.InputFieldHeight),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Column(
-                    Modifier
-                        .verticalScroll(rememberScrollState())
-                ) {
-                    displayResults.forEach { result ->
-                        ListItem(
-                            headlineContent = { Text(result.name) },
-                            trailingContent = {
-                                Text(
-                                    if (isNorwegian) {
-                                        result.locationTypeNo
-                                    } else {
-                                        result.locationTypeEn
-                                    }
-                                )
-                            },
-                            modifier = Modifier
-                                .clickable {
-                                    onNavigateToMap(result.coordinate)
-                                    onSelectResult(result)
-                                    onActiveChange(false)
-                                    focusManager.clearFocus()
-                                }
-                                .fillMaxWidth()
+                Icon(
+                    imageVector = Icons.Default.Menu,
+                    contentDescription = stringResource(R.string.open_menu),
+                    modifier = Modifier.padding(start = 16.dp)
+                )
+                Text(
+                    text = searchState.query.ifBlank { stringResource(R.string.search_placeholder) },
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(horizontal = 8.dp),
+                    color = if (searchState.query.isBlank())
+                        MaterialTheme.colorScheme.onSurfaceVariant
+                    else
+                        MaterialTheme.colorScheme.onSurface
+                )
+                Icon(
+                    imageVector = Icons.Default.Search,
+                    contentDescription = stringResource(R.string.open_search),
+                    modifier = Modifier.padding(end = 16.dp)
+                )
+            }
+        }
+    } else {
+        DockedSearchBar(
+            shape = RoundedCornerShape(16.dp),
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
+                .heightIn(min = LocalWindowInfo.current.containerDpSize.height * 0.4f),
+            onExpandedChange = { if (!it) onActiveChange(false) },
+            inputField = {
+                SearchBarDefaults.InputField(
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.Menu,
+                            contentDescription = stringResource(R.string.open_menu)
                         )
+                    },
+                    trailingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.Search,
+                            contentDescription = stringResource(R.string.open_search)
+                        )
+                    },
+                    query = searchState.query,
+                    onQueryChange = { onQueryChange(it) },
+                    onSearch = {
+                        searchState.searchResults.firstOrNull()?.let { location ->
+                            onSelectResult(location)
+                            onNavigateToMap(location.coordinate)
+                        }
+                    },
+                    expanded = true,
+                    onExpandedChange = { if (!it) onActiveChange(false) },
+                    placeholder = { Text(stringResource(R.string.search_placeholder)) }
+                )
+            },
+            expanded = true,
+            content = {
+                Box(
+                    modifier = Modifier
+                        .height(
+                            LocalWindowInfo.current.containerDpSize.height * 0.4f
+                                    - SearchBarDefaults.InputFieldHeight
+                        )
+                ) {
+                    Column(Modifier.verticalScroll(rememberScrollState())) {
+                        displayResults.forEach { result ->
+                            ListItem(
+                                headlineContent = { Text(result.name) },
+                                trailingContent = {
+                                    Text(if (isNorwegian) result.locationTypeNo else result.locationTypeEn)
+                                },
+                                modifier = Modifier
+                                    .clickable {
+                                        onNavigateToMap(result.coordinate)
+                                        onSelectResult(result)
+                                        onActiveChange(false)
+                                        focusManager.clearFocus()
+                                    }
+                                    .fillMaxWidth()
+                            )
+                        }
                     }
                 }
             }
-        }
-    )
+        )
+    }
 }
