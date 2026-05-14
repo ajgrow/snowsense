@@ -1,0 +1,52 @@
+@startuml
+left to right direction
+
+skinparam usecase {
+  BackgroundColor white
+  BorderColor black
+  ArrowColor black
+}
+skinparam actor {
+  BackgroundColor white
+  BorderColor black
+}
+skinparam nodesep 40
+skinparam ranksep 60
+
+actor Skier
+
+rectangle "SnowSense App" {
+  usecase "Type location in search bar" as UC1
+  usecase "Query location names" as UC2
+  usecase "Select location" as UC3
+  usecase "Show location on map" as UC4
+  usecase "Query NVE zones" as UC5
+  usecase "Fetch climate observations" as UC6
+  usecase "Calculate danger level" as UC7
+  usecase "Display danger level" as UC8
+  usecase "Display no results" as UC_ALT1
+  usecase "Set danger level to unknown" as UC_ALT2
+}
+
+actor "Kartverket API" as Kart
+actor "Mapbox" as Map
+actor "NVE API" as NVE
+actor "Frost API" as Frost
+
+Skier --> UC1
+Skier --> UC3
+
+UC1 .> UC2 : <<include>>
+UC2 .> UC3 : <<include>>
+UC3 .> UC4 : <<include>>
+UC3 .> UC5 : <<include>>
+UC3 .> UC6 : <<include>>
+
+UC_ALT2 .> UC6 : <<extend>>\n[no station found]
+
+Kart --> UC2
+Map --> UC4
+NVE --> UC5
+Frost --> UC6
+
+@enduml
