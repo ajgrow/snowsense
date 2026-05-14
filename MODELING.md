@@ -301,6 +301,7 @@ Class diagram representing the relevant data layer classes:
 1. DataSources used to query Frost v0, NVE SnøskredAktsomhet and Kartverket Stedsnavn. 
 2. Repositories responsible for transforming the data from the DataSources and returning domain objects used by the UI and domain layers, as well as managing preferences stored locally.
 3. The interfaces which the DataSources and Repositories have implemented (where applicable.)
+4. DTOs returned by DataSources to Repositories
 
 ```mermaid
 classDiagram
@@ -378,18 +379,79 @@ classDiagram
         +getNamesResponse(query) List~LocationDto~?
         +buildLocationQuery(searchQuery) String
     }
-    AvalancheRiskRepository <|.. NveAvalancheRiskRepository
-    ClimateRepository <|.. FrostClimateRepository
-    WeatherRepository <|.. FrostWeatherRepository
-    LocationRepository <|.. KartverketLocationRepository
-    SearchRepository <|.. SharedPreferencesSearchRepository
-    AvalancheRiskDataSource <|.. KtorAvalancheRiskDataSource
-    FrostV0DataSource <|.. KtorFrostV0DataSource
-    LocationDataSource <|.. KtorLocationDataSource
-    NveAvalancheRiskRepository --> AvalancheRiskDataSource
-    FrostClimateRepository --> FrostV0DataSource
-    FrostWeatherRepository --> FrostV0DataSource
-    KartverketLocationRepository --> LocationDataSource
+    %% MET Frost DTOs
+    class FrostV0ObservationResponseDto {
+        +currentItemCount: Int
+        +totalItemCount: Int
+    }
+    class FrostV0ObservationsAtRefTimeDto {
+        +sourceId: String
+        +referenceTime: String
+    }
+    class FrostV0ObservationDto {
+        +elementId: String
+        +value: Double
+        +unit: String
+    }
+    class FrostV0SourceResponseDto
+    class FrostV0SourceDto {
+        +id: String?
+        +name: String?
+        +distance: Double?
+        +masl: Double?
+    }
+    class FrostV0PointDto {
+        +type: String
+        +coordinates: List~Double~
+    }
+    class GeoJsonResponseDto {
+        +type: String?
+    }
+    class FeatureDto
+    class GeometryDto {
+        +type: String?
+        +coordinates: List~List~List~Double~~~?
+    }
+    class PropertiesDto {
+        +objekttype: String?
+        +skredtype: Int?
+    }
+
+    class LocationResponseDto
+    class LocationDto {
+        +navneobjekttype: String
+        +skrivemåte: String
+    }
+    class CoordinateDto {
+        +nord: Double
+        +øst: Double
+    }
+
+    NveAvalancheRiskRepository --> AvalancheRiskDataSource : uses
+    FrostWeatherRepository --> FrostV0DataSource : uses
+    FrostClimateRepository --> FrostV0DataSource : uses
+    KartverketLocationRepository --> LocationDataSource : uses
+    GeoJsonResponseDto "1" --> "0..*" FeatureDto : features
+    FeatureDto "1" --> "0..1" GeometryDto : geometry
+    FeatureDto "1" --> "0..1" PropertiesDto : properties
+    FrostV0ObservationResponseDto "1" --> "0..*" FrostV0ObservationsAtRefTimeDto : data
+    FrostV0ObservationsAtRefTimeDto "1" --> "0..*" FrostV0ObservationDto : observations
+    FrostV0SourceResponseDto "1" --> "0..*" FrostV0SourceDto : data
+    FrostV0SourceDto "1" --> "0..1" FrostV0PointDto : geometry
+    LocationResponseDto "1" --> "0..*" LocationDto : navn
+    LocationDto "1" --> "1" CoordinateDto : representasjonspunkt
+    KtorAvalancheRiskDataSource ..> GeoJsonResponseDto : fetches
+    KtorFrostV0DataSource ..> FrostV0ObservationResponseDto : fetches
+    KtorFrostV0DataSource "1" ..> "1" FrostV0SourceResponseDto : fetches
+    KtorLocationDataSource "1" ..> "1" LocationResponseDto : fetches
+    AvalancheRiskRepository "1" <|.. "1" NveAvalancheRiskRepository
+    ClimateRepository "1" <|.. "1" FrostClimateRepository
+    WeatherRepository "1" <|.. "1" FrostWeatherRepository
+    LocationRepository "1" <|.. "1" KartverketLocationRepository
+    SearchRepository "1" <|.. "1" SharedPreferencesSearchRepository
+    AvalancheRiskDataSource "1" <|.. "1" KtorAvalancheRiskDataSource
+    FrostV0DataSource "1" <|.. "1" KtorFrostV0DataSource
+    LocationDataSource "1" <|.. "1" KtorLocationDataSource
     
 ```
 Class diagram representing the relevant domain layer classes:
