@@ -16,6 +16,16 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
+/**
+ * Represents the state of the search screen.
+ *
+ * @property query The current search query.
+ * @property searchResults The list of search results.
+ * @property favorites The list of favorite locations.
+ * @property recentSearches The list of recent searches.
+ * @property awaitingFavoriteName The coordinate of the location being favorited.
+ * @property isSearchActive Whether the search is active.
+ */
 data class SearchUiState (
     val query: String = "",
     val searchResults: List<NamedLocation> = emptyList(),
@@ -25,6 +35,13 @@ data class SearchUiState (
     val isSearchActive: Boolean = false
 )
 @OptIn(FlowPreview::class)
+
+/**
+ * Shared ViewModel for search.
+ *
+ * @param searchRepository The repository for searching locations.
+ * @param locationRepository The repository for getting location information.
+ */
 class SearchViewModel(
     private val searchRepository: SearchRepository,
     private val locationRepository: LocationRepository
@@ -56,14 +73,29 @@ class SearchViewModel(
         }
     }
 
+    /**
+     * Updates the search query.
+     *
+     * @param query The new search query.
+     * @param limit The maximum number of results to return.
+     * @param offset The offset for pagination.
+     */
     fun onQueryChange(query: String){
         _searchState.update { it.copy(query = query.take(50)) }
     }
 
+    /**
+     * Clears the search query.
+     */
     fun clearQuery() {
         _searchState.update { it.copy(query = "", searchResults = emptyList()) }
     }
 
+    /**
+     * Selects a search result.
+     *
+     * @param location The location to select.
+     */
     fun selectSearchResult(location: NamedLocation) {
         _searchState.update {
             it.copy(
@@ -73,6 +105,11 @@ class SearchViewModel(
         addRecentSearch(location)
     }
 
+    /**
+     * Adds a recent search.
+     *
+     * @param location The location to add as a recent search.
+     */
     fun addRecentSearch(location: NamedLocation) {
         _searchState.update {
             val updated = (listOf(location) + it.recentSearches)
@@ -83,6 +120,11 @@ class SearchViewModel(
         searchRepository.saveRecentSearches(_searchState.value.recentSearches)
     }
 
+    /**
+     * Removes a recent search.
+     *
+     * @param location The location to remove from the recent searches.
+     */
     fun removeRecentSearch(location: NamedLocation) {
         _searchState.update {
             it.copy(recentSearches = it.recentSearches - location)
@@ -90,18 +132,31 @@ class SearchViewModel(
         searchRepository.saveRecentSearches(_searchState.value.recentSearches)
     }
 
+    /**
+     * Adds a pending favorite.
+     *
+     * @param coordinate The coordinate of the location to add as a pending favorite.
+     */
     fun addPendingFavorite(coordinate: Coordinate) {
         _searchState.update {
             it.copy(awaitingFavoriteName = coordinate)
         }
     }
 
+    /**
+     * Cancels the pending favorite.
+     */
     fun cancelPendingFavorite() {
         _searchState.update {
             it.copy(awaitingFavoriteName = null)
         }
     }
 
+    /**
+     * Names a favorite location.
+     *
+     * @param name The name to give the favorite location.
+     */
     fun nameFavorite(name: String) {
         _searchState.value.awaitingFavoriteName?.let { favoriteCoordinate ->
             addFavoriteLocation(
@@ -114,6 +169,11 @@ class SearchViewModel(
         }
     }
 
+    /**
+     * Adds a favorite location.
+     *
+     * @param location The location to add as a favorite.
+     */
     private fun addFavoriteLocation(location: NamedLocation) {
         _searchState.update {
             val updated = (listOf(location) + it.favorites)
@@ -124,6 +184,11 @@ class SearchViewModel(
         searchRepository.saveFavorites(_searchState.value.favorites)
     }
 
+    /**
+     * Removes a favorite location.
+     *
+     * @param location The location to remove from the favorites.
+     */
     fun removeFavoriteLocation(location: NamedLocation) {
         _searchState.update {
             it.copy(favorites = it.favorites - location)
@@ -131,6 +196,11 @@ class SearchViewModel(
         searchRepository.saveFavorites(_searchState.value.favorites)
     }
 
+    /**
+     * Sets the search active state.
+     *
+     * @param active The new active state.
+     */
     fun setSearchActive(active: Boolean) {
         _searchState.update { it.copy(isSearchActive = active) }
     }

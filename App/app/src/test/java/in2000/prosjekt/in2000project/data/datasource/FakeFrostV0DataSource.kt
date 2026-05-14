@@ -1,6 +1,7 @@
 package in2000.prosjekt.in2000project.data.datasource
 
-import in2000.prosjekt.in2000project.data.datasource.dto.*
+import in2000.prosjekt.in2000project.data.datasource.dto.FrostV0ObservationResponseDto
+import in2000.prosjekt.in2000project.data.datasource.dto.FrostV0SourceDto
 import in2000.prosjekt.in2000project.domain.model.Coordinate
 
 /** Fake that returns preset data and records arguments for verification. */

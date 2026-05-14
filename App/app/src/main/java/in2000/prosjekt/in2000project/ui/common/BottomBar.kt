@@ -17,6 +17,13 @@ import androidx.navigation.NavDestination
 import in2000.prosjekt.in2000project.R
 import in2000.prosjekt.in2000project.navigation.Screen
 
+/**
+ * Bottom navigation bar for the app.
+ *
+ * @param modifier The modifier to apply to the bottom bar.
+ * @param currentRoute The current route.
+ * @param onClick The callback to invoke when a navigation item is clicked.
+ */
 @Composable
 fun BottomBar(
     modifier: Modifier = Modifier,

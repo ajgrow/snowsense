@@ -46,5 +46,4 @@ val appModule = module {
     viewModel { SearchViewModel(get(), get()) }
     viewModel { SettingsViewModel(get()) }
     viewModel { InfoViewModel(get()) }
-
 }

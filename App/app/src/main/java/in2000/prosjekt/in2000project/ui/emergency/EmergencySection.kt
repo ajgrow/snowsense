@@ -40,6 +40,9 @@ import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import in2000.prosjekt.in2000project.R
 
+/**
+ * Emergency section for the app.
+ */
 @Composable
 fun EmergencySection(
     modifier: Modifier = Modifier,

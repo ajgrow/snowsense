@@ -2,13 +2,13 @@ package in2000.prosjekt.in2000project.data.integration
 
 import in2000.prosjekt.in2000project.data.datasource.KtorAvalancheRiskDataSource
 import in2000.prosjekt.in2000project.data.datasource.KtorFrostV0DataSource
-import in2000.prosjekt.in2000project.domain.model.Coordinate
-import in2000.prosjekt.in2000project.domain.model.enums.ElementType
-import in2000.prosjekt.in2000project.data.repository.FrostWeatherRepository
 import in2000.prosjekt.in2000project.data.repository.FrostClimateRepository
+import in2000.prosjekt.in2000project.data.repository.FrostWeatherRepository
 import in2000.prosjekt.in2000project.data.repository.NveAvalancheRiskRepository
 import in2000.prosjekt.in2000project.domain.SlabAvalancheRiskAssessor
+import in2000.prosjekt.in2000project.domain.model.Coordinate
 import in2000.prosjekt.in2000project.domain.model.enums.DangerLevel
+import in2000.prosjekt.in2000project.domain.model.enums.ElementType
 import in2000.prosjekt.in2000project.domain.repository.AvalancheRiskRepository
 import in2000.prosjekt.in2000project.domain.usecase.GetAvalancheDangerUseCase
 import io.ktor.client.HttpClient
@@ -26,9 +26,9 @@ import org.junit.Before
 import org.junit.Test
 import java.time.MonthDay
 import kotlin.test.assertContains
+import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
-import kotlin.test.assertEquals
 
 class FrostApiIntegrationTest {
 

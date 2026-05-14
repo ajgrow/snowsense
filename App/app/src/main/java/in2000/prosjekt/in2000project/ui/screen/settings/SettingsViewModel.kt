@@ -12,6 +12,11 @@ import androidx.core.os.LocaleListCompat
 import androidx.lifecycle.AndroidViewModel
 import java.util.Locale
 
+/**
+ * ViewModel for the settings screen.
+ *
+ * @param application Application context.
+ */
 class SettingsViewModel(application: Application)
     : AndroidViewModel(application)
 {

@@ -50,6 +50,17 @@ import java.time.MonthDay
 import java.time.format.TextStyle
 import java.util.Calendar
 
+
+/**
+ * Date picker for the app.
+ *
+ * @param startDate The start date.
+ * @param endDate The end date.
+ * @param selectedYear The selected year.
+ * @param onStartDateChange The callback to invoke when the start date changes.
+ * @param onEndDateChange The callback to invoke when the end date changes.
+ * @param onYearChange The callback to invoke when the year changes.
+ */
 @Composable
 fun DatePicker(
     startDate: MonthDay?,

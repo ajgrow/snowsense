@@ -49,9 +49,15 @@ import androidx.lifecycle.compose.LifecycleEventEffect
 import in2000.prosjekt.in2000project.R
 import in2000.prosjekt.in2000project.ui.common.TopBar
 
+/**
+ * Route-level Composable for the Settings screen.
+ *
+ * @param onBackClick Callback for when the back button is clicked
+ * @param settingsViewModel ViewModel for getting settings
+ */
 
 @Composable
-fun SettingScreen(
+fun SettingsRoute(
     modifier: Modifier = Modifier,
     onBackClick: () -> Unit,
     settingsViewModel: SettingsViewModel
@@ -60,9 +66,34 @@ fun SettingScreen(
         settingsViewModel.refreshLanguageMode()
     }
 
-    val themeMode = settingsViewModel.themeMode
-    val textScale = settingsViewModel.textScale
-    val languageMode = settingsViewModel.languageMode
+    SettingsScreen(
+        modifier = modifier,
+        themeMode = settingsViewModel.themeMode,
+        textScale = settingsViewModel.textScale,
+        languageMode = settingsViewModel.languageMode,
+        onBackClick = onBackClick,
+        onThemeChange = settingsViewModel::setTheme,
+        onTextScaleChange = settingsViewModel::updateTextScale,
+        onTextScaleReset = settingsViewModel::resetTextScale,
+        onLanguageChange = settingsViewModel::setLanguage
+    )
+}
+
+@Composable
+private fun SettingsScreen(
+    modifier: Modifier = Modifier,
+    themeMode: ThemeMode,
+    textScale: Float,
+    languageMode: AppLanguageMode,
+    onBackClick: () -> Unit,
+    onThemeChange: (ThemeMode) -> Unit,
+    onTextScaleChange: (Float) -> Unit,
+    onTextScaleReset: () -> Unit,
+    onLanguageChange: (AppLanguageMode) -> Unit,
+) {
+    val themeMode = themeMode
+    val textScale = textScale
+    val languageMode = languageMode
 
     Surface(
         modifier = modifier
@@ -110,21 +141,21 @@ fun SettingScreen(
                                 icon = Icons.Default.PhoneAndroid,
                                 label = stringResource(R.string.settings_theme_system),
                                 selected = themeMode == ThemeMode.SYSTEM,
-                                onClick = { settingsViewModel.setTheme(ThemeMode.SYSTEM) }
+                                onClick = { onThemeChange(ThemeMode.SYSTEM) }
                             )
                             SettingsDivider()
                             ThemeSettingRow(
                                 icon = Icons.Default.LightMode,
                                 label = stringResource(R.string.settings_theme_light),
                                 selected = themeMode == ThemeMode.LIGHT,
-                                onClick = { settingsViewModel.setTheme(ThemeMode.LIGHT) }
+                                onClick = { onThemeChange(ThemeMode.LIGHT) }
                             )
                             SettingsDivider()
                             ThemeSettingRow(
                                 icon = Icons.Default.DarkMode,
                                 label = stringResource(R.string.settings_theme_dark),
                                 selected = themeMode == ThemeMode.DARK,
-                                onClick = { settingsViewModel.setTheme(ThemeMode.DARK) }
+                                onClick = { onThemeChange(ThemeMode.DARK) }
                             )
                         }
                     }
@@ -165,7 +196,7 @@ fun SettingScreen(
                                 )
                                 Slider(
                                     value = textScale,
-                                    onValueChange = { settingsViewModel.updateTextScale(it) },
+                                    onValueChange = { onTextScaleChange(it) },
                                     valueRange = 0.5f..2.0f,
                                     modifier = Modifier.weight(1f),
                                     colors = SliderDefaults.colors(
@@ -174,7 +205,7 @@ fun SettingScreen(
                                     )
                                 )
                                 IconButton(
-                                    onClick = { settingsViewModel.resetTextScale() },
+                                    onClick = { onTextScaleReset() },
                                     modifier = Modifier.size(32.dp)
                                 ) {
                                     Icon(
@@ -244,7 +275,7 @@ fun SettingScreen(
                             }
                             LanguageControl(
                                 selectedLanguage = languageMode,
-                                onSelect = { settingsViewModel.setLanguage(it) }
+                                onSelect = { onLanguageChange(it) }
                             )
                         }
                     }

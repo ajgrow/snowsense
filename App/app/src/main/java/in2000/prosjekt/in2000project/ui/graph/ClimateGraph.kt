@@ -25,6 +25,14 @@ import in2000.prosjekt.in2000project.R
 import in2000.prosjekt.in2000project.domain.model.LocationClimateDataPoint
 import java.time.MonthDay
 
+/**
+ * Climate graph for the app.
+ *
+ * @param dataPoints The data points to display.
+ * @param startDate The start date of the data.
+ * @param endDate The end date of the data.
+ * @param title The title of the graph.
+ */
 @Composable
 fun ClimateGraph(
     dataPoints: List<LocationClimateDataPoint>,

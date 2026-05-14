@@ -1,10 +1,10 @@
 package in2000.prosjekt.in2000project.data.repository
 
 import android.content.Context
+import androidx.core.content.edit
 import in2000.prosjekt.in2000project.domain.model.NamedLocation
 import in2000.prosjekt.in2000project.domain.repository.SearchRepository
 import kotlinx.serialization.json.Json
-import androidx.core.content.edit
 
 class SharedPreferencesSearchRepository(
     context: Context

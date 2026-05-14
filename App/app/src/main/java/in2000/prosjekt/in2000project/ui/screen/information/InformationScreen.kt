@@ -40,15 +40,22 @@ import in2000.prosjekt.in2000project.ui.model.toUiModel
 import in2000.prosjekt.in2000project.ui.risk.DangerLevelItem
 import org.koin.compose.viewmodel.koinViewModel
 
+
+/**
+ * Route-level Composable for the Info screen.
+ *
+ * @param infoViewModel ViewModel for getting info
+ * @param onSettingsClick Callback for when the settings button is clicked
+ */
 @Composable
-fun InfoScreen(
+fun InfoRoute(
     modifier: Modifier = Modifier,
-    onSettingsClick: () -> Unit = {},
-    infoViewModel: InfoViewModel = koinViewModel()
+    infoViewModel: InfoViewModel = koinViewModel(),
+    onSettingsClick: () -> Unit,
 ) {
     val uiState by infoViewModel.infoUiState.collectAsState()
 
-    InfoContent(
+    InfoScreen(
         modifier = modifier,
         state = uiState,
         onSettingsClick = onSettingsClick
@@ -56,7 +63,7 @@ fun InfoScreen(
 }
 
 @Composable
-fun InfoContent(
+private fun InfoScreen(
     modifier: Modifier = Modifier,
     state: InfoUiState,
     onSettingsClick: () -> Unit = {}
@@ -115,7 +122,7 @@ fun InfoContent(
 }
 
 @Composable
-fun DangerLevelsSection(
+private fun DangerLevelsSection(
     dangerLevels: List<DangerLevelUiModel>,
     modifier: Modifier = Modifier
 ) {
@@ -137,7 +144,7 @@ fun DangerLevelsSection(
 }
 
 @Composable
-fun InfoBox(
+private fun InfoBox(
     modifier: Modifier = Modifier,
     titleRes: Int,
     descRes: Int,
@@ -212,7 +219,7 @@ fun InfoBox(
 @Preview(showBackground = true)
 @Composable
 fun PreviewInfoScreen() {
-    InfoContent(
+    InfoScreen(
         state = InfoUiState(
             dangerLevels = DangerLevel.entries.map { it.toUiModel() }
         )

@@ -21,12 +21,23 @@ import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.unit.dp
 import in2000.prosjekt.in2000project.R
 
+/**
+ * External resources data class.
+ *
+ * @param title The title of the external resources.
+ * @param description The description of the external resources.
+ * @param url The URL of the external resources.
+ */
 data class ExternalResource(
     val title: String,
     val description: String,
     val url: String
 )
 
+
+/**
+ * External resources section for the app.
+ */
 @Composable
 fun ExternalResources(modifier: Modifier = Modifier) {
     val uriHandler = LocalUriHandler.current

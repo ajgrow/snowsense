@@ -39,6 +39,7 @@ import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberBottomSheetScaffoldState
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -126,7 +127,7 @@ fun MapScreen(
         if (isSearchActive) focusRequester.requestFocus()
     }
 
-    val climateArea = remember(screenState.climateState) {
+    val skiArea = remember(screenState.climateState) {
         val state = screenState.climateState
         if (state is ClimateState.Success) {
             state.data.toClimateArea()
@@ -237,7 +238,7 @@ fun MapScreen(
     val mapDesc = stringResource(R.string.map_title)
 
     Box(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxSize()
             .semantics {
                 paneTitle = mapDesc
@@ -320,7 +321,7 @@ fun MapScreen(
             sheetPeekHeight = peekHeight,
             sheetContent = {
                 BottomSheetContent(
-                    area = climateArea,
+                    area = skiArea,
                     climateState = screenState.climateState,
                     dangerLevel = riskState.dangerLevel,
                     modifier = Modifier
@@ -630,6 +631,10 @@ fun MapScreenErrorPreview() {
 @Preview(showBackground = true)
 @Composable
 fun BottomSheetPreview() {
+    val sheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = false
+    )
+
     BottomSheetContent(
         area = previewClimateArea,
         climateState = ClimateState.Idle,

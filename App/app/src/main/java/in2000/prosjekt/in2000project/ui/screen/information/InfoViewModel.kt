@@ -9,10 +9,20 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
+/**
+ * UI state for the Info screen.
+ *
+ * @property dangerLevels List of danger levels to display in the UI.
+ */
 data class InfoUiState(
     val dangerLevels: List<DangerLevelUiModel> = emptyList()
 )
 
+/**
+ * ViewModel for the Info screen.
+ *
+ * @param application Application context.
+ */
 class InfoViewModel(application: Application): AndroidViewModel(application){
 
     private val _infoUiState = MutableStateFlow(InfoUiState())

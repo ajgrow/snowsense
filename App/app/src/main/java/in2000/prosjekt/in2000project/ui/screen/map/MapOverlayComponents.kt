@@ -21,6 +21,9 @@ import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.unit.dp
 import in2000.prosjekt.in2000project.R
 
+/**
+ * Overlay status card.
+ */
 @Composable
 fun OverlayStatusCard(message: String) {
     Box(
@@ -46,6 +49,12 @@ fun OverlayStatusCard(message: String) {
     }
 }
 
+/**
+ * Overlay retry card.
+ *
+ * @param message The message to display.
+ * @param onRetry The action to perform when the user clicks the retry button.
+ */
 @Composable
 fun OverlayRetryCard(message: String, onRetry: () -> Unit) {
     Box(

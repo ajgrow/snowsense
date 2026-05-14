@@ -34,6 +34,15 @@ import in2000.prosjekt.in2000project.R
 import in2000.prosjekt.in2000project.domain.model.Coordinate
 import in2000.prosjekt.in2000project.domain.model.NamedLocation
 
+/**
+ * Composable for the search section.
+ *
+ * @param searchState State of the search.
+ * @param onQueryChange Callback for when the query changes.
+ * @param onSelectResult Callback for when a result is selected.
+ * @param onNavigateToMap Callback for when the map is navigated to.
+ * @param onActiveChange Callback for when the search is active.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchSection(

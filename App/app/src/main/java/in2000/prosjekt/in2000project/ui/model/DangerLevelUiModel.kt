@@ -38,7 +38,7 @@ data class DangerLevelUiModel(
     }
 }
 
-/*Mapper extension function to convert a DangerLevel into a UI model.*/
+/**Mapper extension function to convert a DangerLevel into a UI model.**/
 fun DangerLevel.toUiModel(): DangerLevelUiModel {
     return when (this) {
         DangerLevel.UNKNOWN -> DangerLevelUiModel(
