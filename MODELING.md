@@ -70,8 +70,8 @@
 
 #### Alternative Flow for Step 26 **Location is not in an avalanche danger zone**
 
-26.1. `GetAvalancheDangerUseCase` returns `DangerLevel.LOW` to `RiskViewModel`. \
-26.2. Continue from step 40. \
+26.1. `GetAvalancheDangerUseCase` returns `DangerLevel.LOW` to `RiskViewModel` \
+26.2. Continue from step 40
 
 #### Alternative Flow for Step 35: **Weather data is unavailable**
 
@@ -120,7 +120,7 @@
 8.4 `MapViewModel` catches `NoStationFoundException(coordinate)` from `ClimateRepository` \
 8.5 `MapViewModel` updates `MapScreenState.climateState` to `ClimateState.Error` \
 8.6 `MapScreen` observes `MapScreenState.climateState` \
-8.7 Return to main flow point 17.
+8.7 Return to main flow point 17
 
 #### Alternative Flow for Step 12:
 
@@ -130,7 +130,7 @@
 12.4 `MapViewModel` catches `NoObservationsException(..)` from `ClimateRepository` \
 12.5 `MapViewModel` updates `MapScreenState.climateState` to `ClimateState.Error` \
 12.6 `MapScreen` observes `MapScreenState.climateState` \
-12.7 Return to main flow point 17.
+12.7 Return to main flow point 17
 
 ## Use Case Diagrams
 
