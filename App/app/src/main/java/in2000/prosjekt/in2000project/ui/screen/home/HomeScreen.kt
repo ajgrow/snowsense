@@ -1,74 +1,77 @@
 package in2000.prosjekt.in2000project.ui.screen.home
 
-    import androidx.compose.animation.AnimatedVisibility
-    import androidx.compose.animation.expandVertically
-    import androidx.compose.animation.fadeIn
-    import androidx.compose.animation.fadeOut
-    import androidx.compose.animation.shrinkVertically
-    import androidx.compose.foundation.Image
-    import androidx.compose.foundation.background
-    import androidx.compose.foundation.clickable
-    import androidx.compose.foundation.interaction.MutableInteractionSource
-    import androidx.compose.foundation.layout.Arrangement
-    import androidx.compose.foundation.layout.Box
-    import androidx.compose.foundation.layout.BoxWithConstraints
-    import androidx.compose.foundation.layout.Column
-    import androidx.compose.foundation.layout.PaddingValues
-    import androidx.compose.foundation.layout.fillMaxSize
-    import androidx.compose.foundation.layout.fillMaxWidth
-    import androidx.compose.foundation.layout.height
-    import androidx.compose.foundation.layout.offset
-    import androidx.compose.foundation.layout.padding
-    import androidx.compose.foundation.layout.size
-    import androidx.compose.foundation.layout.width
-    import androidx.compose.foundation.layout.wrapContentHeight
-    import androidx.compose.foundation.lazy.LazyColumn
-    import androidx.compose.foundation.lazy.LazyRow
-    import androidx.compose.foundation.lazy.items
-    import androidx.compose.material3.Card
-    import androidx.compose.foundation.shape.RoundedCornerShape
-    import androidx.compose.material.icons.Icons
-    import androidx.compose.material.icons.filled.Settings
-    import androidx.compose.material3.CardDefaults
-    import androidx.compose.material.icons.filled.Close
-    import androidx.compose.material3.CircularProgressIndicator
-    import androidx.compose.material3.Icon
-    import androidx.compose.material3.IconButton
-    import androidx.compose.material3.MaterialTheme
-    import androidx.compose.material3.Surface
-    import androidx.compose.material3.Text
-    import androidx.compose.runtime.Composable
-    import androidx.compose.runtime.LaunchedEffect
-    import androidx.compose.runtime.getValue
-    import androidx.compose.runtime.remember
-    import androidx.compose.ui.Alignment
-    import androidx.compose.ui.Modifier
-    import androidx.compose.ui.platform.LocalFocusManager
-    import androidx.compose.ui.res.painterResource
-    import androidx.compose.ui.res.stringResource
-    import androidx.compose.ui.tooling.preview.Preview
-    import androidx.compose.ui.unit.dp
-    import androidx.lifecycle.compose.collectAsStateWithLifecycle
-    import androidx.lifecycle.viewmodel.compose.viewModel
-    import androidx.compose.ui.draw.clip
-    import androidx.compose.ui.graphics.Color
-    import androidx.compose.ui.layout.ContentScale
-    import androidx.compose.ui.semantics.heading
-    import androidx.compose.ui.semantics.semantics
-    import androidx.compose.ui.text.font.FontWeight
-    import androidx.compose.ui.text.font.FontWeight.Companion.Bold
-    import androidx.compose.ui.text.style.TextOverflow
-    import androidx.compose.ui.unit.sp
-    import in2000.prosjekt.in2000project.R
-    import in2000.prosjekt.in2000project.domain.model.Coordinate
-    import in2000.prosjekt.in2000project.domain.model.NamedLocation
-    import in2000.prosjekt.in2000project.ui.risk.RiskUiState
-    import in2000.prosjekt.in2000project.ui.risk.RiskViewModel
-    import in2000.prosjekt.in2000project.ui.emergency.EmergencySection
-    import in2000.prosjekt.in2000project.ui.model.DangerLevelUiModel
-    import in2000.prosjekt.in2000project.ui.search.SearchSection
-    import in2000.prosjekt.in2000project.ui.search.SearchViewModel
-    import org.koin.compose.viewmodel.koinViewModel
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Card
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.font.FontWeight.Companion.Bold
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.sp
+import in2000.prosjekt.in2000project.R
+import in2000.prosjekt.in2000project.domain.model.Coordinate
+import in2000.prosjekt.in2000project.domain.model.NamedLocation
+import in2000.prosjekt.in2000project.ui.risk.RiskUiState
+import in2000.prosjekt.in2000project.ui.risk.RiskViewModel
+import in2000.prosjekt.in2000project.ui.emergency.EmergencySection
+import in2000.prosjekt.in2000project.ui.model.DangerLevelUiModel
+import in2000.prosjekt.in2000project.ui.search.SearchSection
+import in2000.prosjekt.in2000project.ui.search.SearchViewModel
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun HomeScreen(
@@ -107,7 +110,7 @@ fun HomeScreen(
     Surface(
         modifier = modifier.fillMaxSize(),
     ) {
-        Column(
+        LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
                 .clickable(
@@ -116,67 +119,63 @@ fun HomeScreen(
                 ) {
                     dismissSearch()
                 },
+            contentPadding = PaddingValues(bottom = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            HomeTopBar(onSettingsClick)
-            AnimatedVisibility(
-                visible = !searchState.isSearchActive,
-                enter = expandVertically() + fadeIn(),
-                exit = shrinkVertically() + fadeOut()
-            ) {
-                LogoSection()
+
+            item {
+                HomeTopBar(onSettingsClick)
             }
 
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth(),
-            ){
-                SearchSection(
-                    //get states from the viewmodel
+            item {
+                AnimatedVisibility(
+                    visible = !searchState.isSearchActive,
+                    enter = expandVertically() + fadeIn(),
+                    exit = shrinkVertically() + fadeOut()
+                ) {
+                    LogoSection()
+                }
+            }
+
+            item {
+                Box(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    SearchSection(
+                        modifier = Modifier,
+                        searchState = searchState,
+                        onNavigateToMap = onNavigateToMapDismissing,
+                        onQueryChange = searchViewModel::onQueryChange,
+                        onSelectResult = searchViewModel::selectSearchResult,
+                        onActiveChange = searchViewModel::setSearchActive
+                    )
+                }
+            }
+
+            item {
+                FavoriteSection(
+                    items = searchState.favorites,
                     modifier = Modifier,
-                    searchState = searchState,
                     onNavigateToMap = onNavigateToMapDismissing,
-                    onQueryChange = searchViewModel::onQueryChange,
-                    onSelectResult = searchViewModel::selectSearchResult,
-                    onActiveChange = searchViewModel::setSearchActive
+                    onRemoveLocation = searchViewModel::removeFavoriteLocation,
+                    riskState = riskState
                 )
             }
 
-            LazyColumn(
-                modifier = Modifier.fillMaxWidth(),
-                contentPadding = PaddingValues(
-                    start = 0.dp,
-                    end = 0.dp,
-                    top = 16.dp,
-                    bottom = 0.dp
-                ), //adds padding around content
-                verticalArrangement = Arrangement.spacedBy(24.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                item {
-                    FavoriteSection(
-                        items = searchState.favorites,
-                        modifier = Modifier,
-                        onNavigateToMap = onNavigateToMapDismissing,
-                        onRemoveLocation = searchViewModel::removeFavoriteLocation,
-                        riskState = riskState
-                    )
-                }
+            item {
+                RecentSection(
+                    items = searchState.recentSearches,
+                    modifier = Modifier,
+                    onNavigateToMap = onNavigateToMapDismissing,
+                    onRemoveLocation = searchViewModel::removeRecentSearch
+                )
+            }
 
-                item {
-                    RecentSection(
-                        items = searchState.recentSearches,
-                        modifier = Modifier,
-                        onNavigateToMap = onNavigateToMapDismissing,
-                        onRemoveLocation = searchViewModel::removeRecentSearch
-                    )
-                }
-
-                item {
-                    EmergencySection(
-                        modifier = Modifier.padding(horizontal = 16.dp)
-                    )
-                }
+            item {
+                EmergencySection(
+                    modifier = Modifier.padding(horizontal = 16.dp)
+                )
             }
         }
     }
@@ -368,31 +367,35 @@ fun LocationCard(
 fun HomeTopBar(
     onSettingsClick: () -> Unit,
     modifier: Modifier = Modifier
-){
-    Box(
+) {
+    Row(
         modifier = modifier
             .fillMaxWidth()
             .padding(
                 top = 16.dp,
-                start = 20.dp,
-                end = 20.dp),
+                start = 4.dp,
+                end = 4.dp
+            ),
+        verticalAlignment = Alignment.CenterVertically
     ) {
+        Spacer(modifier = Modifier.size(48.dp))
+
         Text(
             text = stringResource(R.string.app_name),
             style = MaterialTheme.typography.headlineLarge,
             fontWeight = FontWeight.SemiBold,
-            modifier = Modifier
-                .align(Alignment.Center)
+            modifier = Modifier.weight(1f),
+            textAlign = TextAlign.Center
         )
 
         IconButton(
             onClick = onSettingsClick,
-            modifier = Modifier
-                .align(Alignment.CenterEnd)
+            modifier = Modifier.size(48.dp)
         ) {
             Icon(
                 Icons.Default.Settings,
-                contentDescription = stringResource(R.string.open_settings))
+                contentDescription = stringResource(R.string.open_settings)
+            )
         }
     }
 }
