@@ -4,7 +4,9 @@ import in2000.prosjekt.in2000project.domain.model.DailyWeatherRecord
 import in2000.prosjekt.in2000project.domain.model.enums.DangerLevel
 import kotlin.math.sqrt
 
-// Estimates slab avalanche danger from daily weather observations.
+/**
+ * Estimates slab avalanche danger from daily weather observations.
+ */
 class SlabAvalancheRiskAssessor {
     companion object {
         const val LOOKBACK_DAYS = 30
@@ -30,6 +32,11 @@ class SlabAvalancheRiskAssessor {
         private const val THRESHOLD_VERY_HIGH = 0.75
     }
 
+    /**
+     * Estimates the risk of slab avalanche given a list of daily weather records.
+     *
+     * @param days A list of daily weather records.
+     */
     fun assess(days: List<DailyWeatherRecord>): DangerLevel {
         if (days.isEmpty() || days.size < RECENT_DAYS)
             return DangerLevel.UNKNOWN

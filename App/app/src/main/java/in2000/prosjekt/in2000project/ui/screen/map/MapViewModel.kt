@@ -13,6 +13,11 @@ import kotlinx.coroutines.launch
 import java.time.MonthDay
 import java.time.Year
 
+/**
+ * ViewModel for the map screen.
+ *
+ * @param climateRepository The repository for fetching climate data.
+ */
 class MapViewModel(
     private val climateRepository: ClimateRepository
 ) : ViewModel() {
@@ -34,26 +39,13 @@ class MapViewModel(
     //just mutate the existing object in place and the UI won't update. However, if you create a copy(),
     //the old value is replaced with a new one which triggers recomposition
 
-    fun onOverlayLoading() {
-        _screenState.value = _screenState.value.copy(
-            overlayState = OverlayState.Loading
-        )
-    }
-
-    fun onOverlayLoaded() {
-        _screenState.value = _screenState.value.copy(
-            overlayState = OverlayState.Success
-        )
-    }
-
-    fun onOverlayError() {
-        _screenState.value = _screenState.value.copy(
-            overlayState = OverlayState.Error
-        )
-    }
-
-    //set climateState to Loading until success.
-    //use coordinates from UI to call getClimateDataForLocation() using coordinates and time period
+    /**
+     * Fetches climate data for a given location.
+     *
+     * @param lat The latitude of the location.
+     * @param lon The longitude of the location.
+     * @throws NoObservationsException If there are no observations for the given location.
+     */
     fun fetchClimateData(lat: Double, lon: Double) {
         viewModelScope.launch {
             _screenState.value = _screenState.value.copy(
@@ -83,7 +75,12 @@ class MapViewModel(
         }
     }
 
-    //when user taps map, fetches the info with the default date range
+    /**
+     * Called when the map is clicked.
+     *
+     * @param lat The latitude of the clicked location.
+     * @param lon The longitude of the clicked location.
+     */
     fun onMapClick(lat: Double, lon: Double) {
         _screenState.value = _screenState.value.copy(
             climateCoordinate = Coordinate(lat, lon),
@@ -93,6 +90,12 @@ class MapViewModel(
         fetchClimateData(lat, lon)
     }
 
+
+    /**
+     * Called when the start date is changed
+     *
+     * @param start The new start date
+     */
     fun onStartDateChange(start: MonthDay) {
         val current = _screenState.value
         val end = setTimeBoundary(start, current.endDate)
@@ -106,6 +109,11 @@ class MapViewModel(
         refetchIfLocationKnown()
     }
 
+    /**
+     * Called when the end date is changed
+     *
+     * @param end The new end date
+     */
     fun onEndDateChange(end: MonthDay) {
         val current = _screenState.value
         val start = setTimeBoundary(current.startDate, end)
@@ -119,6 +127,11 @@ class MapViewModel(
         refetchIfLocationKnown()
     }
 
+    /**
+     * Called when the year is changed
+     *
+     * @param year The new year
+     */
     fun onYearChange(year: Int) {
         val updated = _screenState.value.copy(selectedYear = year)
         _screenState.value = updated
@@ -137,6 +150,9 @@ class MapViewModel(
         return end
     }
 
+    /**
+     * Called when the sheet is dismissed.
+     */
     fun onSheetDismissed() {
         _screenState.value = _screenState.value.copy(
             isSheetVisible = false

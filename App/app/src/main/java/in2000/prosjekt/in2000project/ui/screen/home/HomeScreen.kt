@@ -46,10 +46,8 @@ package in2000.prosjekt.in2000project.ui.screen.home
     import androidx.compose.ui.platform.LocalFocusManager
     import androidx.compose.ui.res.painterResource
     import androidx.compose.ui.res.stringResource
-    import androidx.compose.ui.tooling.preview.Preview
     import androidx.compose.ui.unit.dp
     import androidx.lifecycle.compose.collectAsStateWithLifecycle
-    import androidx.lifecycle.viewmodel.compose.viewModel
     import androidx.compose.ui.draw.clip
     import androidx.compose.ui.graphics.Color
     import androidx.compose.ui.layout.ContentScale
@@ -67,26 +65,69 @@ package in2000.prosjekt.in2000project.ui.screen.home
     import in2000.prosjekt.in2000project.ui.emergency.EmergencySection
     import in2000.prosjekt.in2000project.ui.model.DangerLevelUiModel
     import in2000.prosjekt.in2000project.ui.search.SearchSection
+    import in2000.prosjekt.in2000project.ui.search.SearchUiState
     import in2000.prosjekt.in2000project.ui.search.SearchViewModel
     import org.koin.compose.viewmodel.koinViewModel
 
+
+/**
+ * Route-level Composable for the Home screen.
+ *
+ * @param onSettingsClick Callback for when the settings button is clicked
+ * @param onNavigateToMap Callback for when the map button is clicked
+ * @param searchViewModel ViewModel for searching for locations
+ * @param riskViewModel ViewModel for getting risk information
+ */
+
 @Composable
-fun HomeScreen(
+fun HomeRoute(
     modifier: Modifier = Modifier,
     onSettingsClick: () -> Unit,
     onNavigateToMap: (coordinate: Coordinate) -> Unit,
     searchViewModel: SearchViewModel = koinViewModel(),
     riskViewModel: RiskViewModel = koinViewModel()
 ) {
-    val focusManager = LocalFocusManager.current
     val searchState by searchViewModel.searchState.collectAsStateWithLifecycle()
     val riskState by riskViewModel.riskState.collectAsStateWithLifecycle()
+
+    HomeScreen(
+        modifier = modifier,
+        onSettingsClick = onSettingsClick,
+        onNavigateToMap = onNavigateToMap,
+        searchState = searchState,
+        riskState = riskState,
+        onRefreshFavoriteRisks = riskViewModel::refreshFavoriteRisks,
+        onQueryChange = searchViewModel::onQueryChange,
+        onSelectResult = searchViewModel::selectSearchResult,
+        onSearchActiveChange = searchViewModel::setSearchActive,
+        onRemoveFavorite = searchViewModel::removeFavoriteLocation,
+        onRemoveRecentSearch = searchViewModel::removeRecentSearch,
+        onClearQuery = searchViewModel::clearQuery
+    )
+}
+
+@Composable
+private fun HomeScreen(
+    modifier: Modifier = Modifier,
+    searchState: SearchUiState,
+    riskState: RiskUiState,
+    onSettingsClick: () -> Unit,
+    onNavigateToMap: (coordinate: Coordinate) -> Unit,
+    onSearchActiveChange: (Boolean) -> Unit,
+    onClearQuery: () -> Unit,
+    onRefreshFavoriteRisks: (List<NamedLocation>) -> Unit,
+    onQueryChange: (String) -> Unit,
+    onSelectResult: (NamedLocation) -> Unit,
+    onRemoveFavorite: (NamedLocation) -> Unit,
+    onRemoveRecentSearch: (NamedLocation) -> Unit
+) {
+    val focusManager = LocalFocusManager.current
 
     val favorites = searchState.favorites
 
     val dismissSearch = {
         if (searchState.isSearchActive) {
-            searchViewModel.setSearchActive(false)
+            onSearchActiveChange(false)
         }
         focusManager.clearFocus()
     }
@@ -97,11 +138,11 @@ fun HomeScreen(
     }
 
     LaunchedEffect(Unit) {
-        searchViewModel.clearQuery()
+        onClearQuery()
     }
 
     LaunchedEffect(favorites) {
-        riskViewModel.refreshFavoriteRisks(favorites)
+        onRefreshFavoriteRisks(favorites)
     }
 
     Surface(
@@ -118,7 +159,7 @@ fun HomeScreen(
                 },
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            HomeTopBar(onSettingsClick)
+            HomeTopBar(onSettingsClick = onSettingsClick)
             AnimatedVisibility(
                 visible = !searchState.isSearchActive,
                 enter = expandVertically() + fadeIn(),
@@ -132,13 +173,12 @@ fun HomeScreen(
                     .fillMaxWidth(),
             ){
                 SearchSection(
-                    //get states from the viewmodel
                     modifier = Modifier,
                     searchState = searchState,
                     onNavigateToMap = onNavigateToMapDismissing,
-                    onQueryChange = searchViewModel::onQueryChange,
-                    onSelectResult = searchViewModel::selectSearchResult,
-                    onActiveChange = searchViewModel::setSearchActive
+                    onQueryChange = onQueryChange,
+                    onSelectResult = onSelectResult,
+                    onActiveChange = onSearchActiveChange
                 )
             }
 
@@ -149,7 +189,7 @@ fun HomeScreen(
                     end = 0.dp,
                     top = 16.dp,
                     bottom = 0.dp
-                ), //adds padding around content
+                ),
                 verticalArrangement = Arrangement.spacedBy(24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -158,7 +198,7 @@ fun HomeScreen(
                         items = searchState.favorites,
                         modifier = Modifier,
                         onNavigateToMap = onNavigateToMapDismissing,
-                        onRemoveLocation = searchViewModel::removeFavoriteLocation,
+                        onRemoveLocation = onRemoveFavorite,
                         riskState = riskState
                     )
                 }
@@ -168,7 +208,7 @@ fun HomeScreen(
                         items = searchState.recentSearches,
                         modifier = Modifier,
                         onNavigateToMap = onNavigateToMapDismissing,
-                        onRemoveLocation = searchViewModel::removeRecentSearch
+                        onRemoveLocation = onRemoveRecentSearch
                     )
                 }
 
@@ -183,7 +223,7 @@ fun HomeScreen(
 }
 
 @Composable
-fun LogoSection(
+private fun LogoSection(
     modifier: Modifier = Modifier
 ) {
     BoxWithConstraints(
@@ -205,12 +245,12 @@ fun LogoSection(
 }
 
 @Composable
-fun FavoriteSection(
-    items: List<NamedLocation>,
+private fun FavoriteSection(
     modifier: Modifier = Modifier,
+    items: List<NamedLocation>,
+    riskState: RiskUiState,
     onNavigateToMap: (coordinate: Coordinate) -> Unit,
-    onRemoveLocation: (NamedLocation) -> Unit,
-    riskState: RiskUiState
+    onRemoveLocation: (NamedLocation) -> Unit
 ) {
     Column(
         modifier = modifier.fillMaxWidth(),
@@ -243,7 +283,7 @@ fun FavoriteSection(
 }
 
 @Composable
-fun RecentSection(
+private fun RecentSection(
     items: List<NamedLocation>,
     modifier: Modifier = Modifier,
     onNavigateToMap: (coordinate: Coordinate) -> Unit,
@@ -276,7 +316,7 @@ fun RecentSection(
 }
 
 @Composable
-fun LocationCard(
+private fun LocationCard(
     location: NamedLocation,
     modifier: Modifier = Modifier,
     onNavigateToMap: (coordinate: Coordinate) -> Unit,
@@ -365,9 +405,9 @@ fun LocationCard(
 }
 
 @Composable
-fun HomeTopBar(
-    onSettingsClick: () -> Unit,
-    modifier: Modifier = Modifier
+private fun HomeTopBar(
+    modifier: Modifier = Modifier,
+    onSettingsClick: () -> Unit
 ){
     Box(
         modifier = modifier

@@ -2,6 +2,9 @@ package in2000.prosjekt.in2000project.network
 
 import in2000.prosjekt.in2000project.BuildConfig
 
+/**
+ * Singleton holder for the Frost client ID.
+ */
 object FrostClientId {
     private const val MISSING_MSG = "FROST_CLIENT_ID missing. Add it to local.properties (see local.defaults.properties)"
 
