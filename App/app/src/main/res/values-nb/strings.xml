@@ -196,7 +196,7 @@
     <string name="is_expanded">Er utvidet</string>
     <string name="is_not_expanded">Er ikke utvidet</string>
     <string name="enter_value_desc">Skriv inn verdi</string>
-    <string name="emergency_call_confirm_desc">Ring %1$s?</string>>
-
+    <string name="emergency_call_confirm_desc">Ring %1$s?</string>
+    <string name="close_search">Lukk søk</string>
 
 </resources>

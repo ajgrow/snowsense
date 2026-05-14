@@ -199,6 +199,7 @@
     <string name="is_expanded">Is expanded</string>
     <string name="is_not_expanded">Is not expanded</string>
     <string name="enter_value_desc">Enter value</string>
-    <string name="emergency_call_confirm_desc">Call %1$s?</string>>
+    <string name="emergency_call_confirm_desc">Call %1$s?</string>
+    <string name="close_search">Close search</string>>
 
 </resources>
