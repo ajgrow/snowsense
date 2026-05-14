@@ -1,6 +1,6 @@
 # IN2000 – Android app project
 
-SnowSense is an Android-app designed to help user evaluate avalanche risk and climate conditions for locations around Norway. The app allows users to search for locations, see historical climate data, gives evaluation for danger based on Frost and NVE data, and save locations as favourites for quicker access.
+SnowSense is an Android-app designed to help users evaluate avalanche risk and climate conditions for locations around Norway. The app allows users to search for locations, see historical climate data, gives evaluation for danger based on Frost and NVE data, and save locations as favourites for quicker access.
 
 ---
 # Team-members.
@@ -15,20 +15,20 @@ SnowSense is an Android-app designed to help user evaluate avalanche risk and cl
 ---
 
 ## App requirements
-- **Minimum SDK:** API 25 (Andoird 8.0)
+- **Minimum SDK:** API 25 (Android 8.0)
 - **Target SDK:** API 36 (Android 15)
 - **Recommended emulator:** Resizable emulator with API 36
-- Internetaccess is required to retrieve data from our different APIs, Frostv0, NVE and Kartverket
-- Mapox map requires a legitimate Mapbox access token (more information below)
+- Internet access is required to retrieve data from our different APIs, Frostv0, NVE and Kartverket
+- Mapbox map requires a legitimate Mapbox access token (more information below)
 
 ---
 
 ## Setup
 
 ### 1. Download or copy the project
-After having either dowloaded or copied the project, open it through "Android Studio". 
+After having either downloaded or copied the project, open it through "Android Studio". 
 
-### 2. Sett up API-keys in 'local.properties'
+### 2. Set up API-keys in 'local.properties'
 
 Since the app requires private keys that are not included in the github, you'll have to add them yourself.
 Navigate to 'Gradle Scripts/local.properties', before you can click run to launch the app write the following in the local.properties file:
@@ -43,13 +43,13 @@ MAPBOX_ACCESS_TOKEN=>your Mapbox access token>
 
 
 ### 3. Running the App
-Click **Run App** in Anrdoid Studio. An Android Virtual Device will start up, and the app wil both instals and run automatically from there.
+Click **Run App** in Android Studio. An Android Virtual Device will start up, and the app will both install and run automatically from there.
 
 ## Dependencies and permissions
 The app requires:
 - **Internet access** ('android.permission.INTERNET') - to retrieve data from external APIs
 
-The app does not use your device's GPS or location data. All location choices happens through the app
+The app does not use your device's GPS or location data. All location choices happen through the app
 
 ---
 
@@ -68,16 +68,16 @@ The app does not use your device's GPS or location data. All location choices ha
 | [ViewModel](https://developer.android.com/topic/libraries/architecture/viewmodel) | Handles the logic behind presentation and communication between the UI-layer and the data-layer |
 | [Lifecycle](https://developer.android.com/topic/libraries/architecture/lifecycle) | Handles Lifecycle dependent Composables and coroutines |
 | [Navigation Compose](https://developer.android.com/develop/ui/compose/navigation) | Handles Navigation between the different screens |
-| [Ktor](https://ktor.io/) | Asynchronus HTTP-client to retrieve data from Frost, NVE and Kartverket |
+| [Ktor](https://ktor.io/) | Asynchronous HTTP-client to retrieve data from Frost, NVE and Kartverket |
 | [Kotlinx Serialization](https://kotlinlang.org/docs/serialization.html#formats) | Handles the JSON-deserialization of the dataclass API responses |
-| [Kotlinx Coroutines](https://developer.android.com/kotlin/coroutines) | Handles Asynchronus and reactive data retrieving |
+| [Kotlinx Coroutines](https://developer.android.com/kotlin/coroutines) | Handles Asynchronous and reactive data retrieving |
 
 ### Not used in IN2000
 
 | Library | how it's used |
 | ---- | ---- |
 | [Mapbox Compose maps](https://docs.mapbox.com/android/maps/guides/using-jetpack-compose/) | An interactive map that lets users choose locations visually |
-| [Koin](https://insert-koin.io/) | Kotlin dependency. Used to connect datasources, repositoried and ViewModels |
+| [Koin](https://insert-koin.io/) | Kotlin dependency. Used to connect datasources, repositories and ViewModels |
 | [Vico graphs](https://guide.vico.patrykandpatrick.com/) | A graph library used for visualization of historical climate data. We use Vico 1x since newer version breaks the rendering |
 | [DataStore Preferences](https://developer.android.com/topic/libraries/architecture/datastore) | Easy and reactive local storage. Used to save the users favourite locations | 
 | [Desugar](https://developer.android.com/studio/write/java8-support-table) | Makes it possible to use older Java APIs on older Android versions (such as 'java.time') |
@@ -88,7 +88,7 @@ The app does not use your device's GPS or location data. All location choices ha
 
 ## API usage
 
-| API | Source | usecase |
+| API | Source | use case |
 | --- | --- | --- |
 | [Frost API v0](https://frost.met.no/index.html) | MET Norway | Historical climate observations from nearest measuring station: requires Client-ID |
 | [NVE Skredaktomshet](https://kart.nve.no/enterprise/rest/services/SnoskredAktsomhet/MapServer) | NVE | GeoJSON-data about avalanche prone areas for chosen location. WMS map layer that shows avalanche risk zones on the map through a raster layer. More details are shown the closer you zoom |
@@ -98,7 +98,7 @@ The app does not use your device's GPS or location data. All location choices ha
 
 The project includes Unit tests and integration tests.
 
-- **Running unit tests:** You can run the Unit tests directly in Android Studio på rightlicking the test-folder and choosing *Run Tests*, or alternatively you can do it through the terminal:
+- **Running unit tests:** You can run the Unit tests directly in Android Studio by right-clicking the test-folder and choosing *Run Tests*, or alternatively you can do it through the terminal:
   ```
   ./gradlew test
   ```
@@ -111,10 +111,10 @@ The project includes Unit tests and integration tests.
 
 ## Accessibility Features
 
-The app was designed with WCAG 2.1 in mind and have the following features:
+The app was designed with WCAG 2.1 in mind and has the following features:
 - Theme adjustment: The app supports a full system-wide dark mode and light mode through the use of Material 3
 - Text size adjustment: The app supports a text adjustment range of 50% original size all the way to 200% original size. The chosen standard is 150%
-- Screen Reader: The app supports androids built in screen reader through content descriptions and no hardcoded strings
+- Screen Reader: The app supports Android's built-in screen reader through content descriptions and no hardcoded strings
 
 ---
 
