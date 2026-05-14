@@ -19,7 +19,7 @@ class MapViewModel(
 
     //Using MapScreenState() instead of <MapScreenState>(MapScreenState.Loading) because
     //it's a data class rather than just one sealed interface. This is because two things can fail instead
-    //of just one. Both the WMS overlay can fail as well as the climate data. This means that
+    //of just one. Both the WMS overlay can fail and the climate data. This means that
     //we base this off the MapScreenState() data class rather than just one sealed interface.
     private val _screenState = MutableStateFlow(MapScreenState(
         startDate = MonthDay.now().with(MonthDay.now().month.minus(1)),

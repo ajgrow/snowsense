@@ -62,7 +62,7 @@
 
     <string name="map_title">Map</string>
 
-    <string name="overlay_loading">Loading avalanche overlay...</string>
+    <string name="overlay_loading">Loading avalanche overlay…</string>
     <string name="overlay_error">Could not load avalanche overlay.</string>
 
     <string name="retry">Retry</string>
@@ -75,7 +75,7 @@
     <string name="nav_map_desc">Go to map screen</string>
     <string name="nav_info_desc">Go to information screen</string>
 
-    <string name="loading">Loading...</string>
+    <string name="loading">Loading…</string>
 
     <string name="topbar_settings">Settings</string>
 
