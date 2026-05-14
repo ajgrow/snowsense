@@ -77,7 +77,7 @@ The app does not use your device's GPS or location data. All location choices ha
 | Library | how it's used |
 | ---- | ---- |
 | [Mapbox Compose maps](https://docs.mapbox.com/android/maps/guides/using-jetpack-compose/) | An interactive map that lets users choose locations visually |
-| [Koin](https://insert-koin.io/) | Depmdemcu in kotlin. Used to connect datasources, repositoried and ViewModels |
+| [Koin](https://insert-koin.io/) | Kotlin dependency. Used to connect datasources, repositoried and ViewModels |
 | [Vico graphs](https://guide.vico.patrykandpatrick.com/) | A graph library used for visualization of historical climate data. We use Vico 1x since newer version breaks the rendering |
 | [DataStore Preferences](https://developer.android.com/topic/libraries/architecture/datastore) | Easy and reactive local storage. Used to save the users favourite locations | 
 | [Desugar](https://developer.android.com/studio/write/java8-support-table) | Makes it possible to use older Java APIs on older Android versions (such as 'java.time') |
