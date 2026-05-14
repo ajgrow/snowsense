@@ -71,7 +71,6 @@ dependencies {
     implementation(libs.androidx.foundation.layout)
     implementation(libs.androidx.compose.ui.text)
     implementation(libs.androidx.foundation)
-    implementation(libs.foundation)
     implementation(libs.androidx.compose.runtime)
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.compose.material3)
@@ -107,17 +106,16 @@ dependencies {
     testImplementation(libs.kotlinx.coroutines.test)
 
     //DataStore
-    implementation("androidx.datastore:datastore-preferences:1.1.1")
+    implementation(libs.androidx.datastore.preferences)
 
     //Graph
-    implementation("com.patrykandpatrick.vico:compose:1.13.1")
-    implementation("androidx.compose.foundation:foundation:1.6.0")
+    implementation(libs.vico.compose)
 
     //Design: Extra icons
-    implementation("androidx.compose.material:material-icons-extended")
+    implementation(libs.androidx.compose.material.icons.extended)
 
     //Desugaring
-    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
+    coreLibraryDesugaring(libs.desugar.jdk.libs)
 }
 
 // Read local.properties to pass secrets to JVM test processes as system properties.

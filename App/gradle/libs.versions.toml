@@ -1,30 +1,30 @@
 [versions]
-agp = "9.0.1"
-coreKtx = "1.17.0"
+agp = "9.1.1"
+coreKtx = "1.18.0"
 junit = "4.13.2"
 junitVersion = "1.3.0"
 espressoCore = "3.7.0"
 koinAndroid = "4.2.1"
 lifecycleRuntimeKtx = "2.10.0"
-activityCompose = "1.12.4"
-kotlin = "2.2.10"
-composeBom = "2025.05.00"
-navigationCompose = "2.9.7"
-navigationRuntimeKtx = "2.9.7"
-ktor = "3.4.0"
-kotlinxSerializationJson = "1.9.0"
-kotlinxCoroutinesTest = "1.10.2"
+activityCompose = "1.13.0"
+kotlin = "2.3.21"
+composeBom = "2026.05.00"
+navigationCompose = "2.9.8"
+navigationRuntimeKtx = "2.9.8"
+ktor = "3.4.3"
+kotlinxSerializationJson = "1.11.0"
+kotlinxCoroutinesTest = "1.11.0"
 mapbox = "11.19.0"
-runtime = "1.10.6"
-foundation = "1.11.0"
-uiGraphics = "1.11.0"
+runtime = "1.11.1"
+foundation = "1.11.1"
 material3 = "1.4.0"
-ui = "1.10.6"
-foundationLayout = "1.10.6"
-uiText = "1.10.6"
-foundationVersion = "1.11.0"
+ui = "1.11.1"
+foundationLayout = "1.11.1"
+uiText = "1.11.1"
 appcompat = "1.7.1"
-composeMaterialCore = "1.6.1"
+datastore = "1.2.1"
+vico = "1.13.1"
+desugarJdkLibs = "2.1.5"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -61,16 +61,18 @@ kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-cor
 mapbox-maps-android = { module = "com.mapbox.maps:android-ndk27", version.ref = "mapbox" }
 mapbox-maps-compose = { module = "com.mapbox.extension:maps-compose-ndk27", version.ref = "mapbox" }
 androidx-foundation = { group = "androidx.compose.foundation", name = "foundation", version.ref = "foundation" }
-androidx-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics", version.ref = "uiGraphics" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3" }
 androidx-compose-material-icons-core = { group = "androidx.compose.material", name = "material-icons-core" }
 androidx-ui = { group = "androidx.compose.ui", name = "ui", version.ref = "ui" }
 androidx-foundation-layout = { group = "androidx.compose.foundation", name = "foundation-layout", version.ref = "foundationLayout" }
 androidx-compose-ui-text = { group = "androidx.compose.ui", name = "ui-text", version.ref = "uiText" }
-foundation = { group = "androidx.compose.foundation", name = "foundation", version.ref = "foundationVersion" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 androidx-compose-runtime = { group = "androidx.compose.runtime", name = "runtime", version.ref = "runtime" }
 koin-compose-viewmodel = { module = "io.insert-koin:koin-compose-viewmodel", version = "4.2.1" }
+androidx-datastore-preferences = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "datastore" }
+vico-compose = { group = "com.patrykandpatrick.vico", name = "compose", version.ref = "vico" }
+androidx-compose-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended" }
+desugar-jdk-libs = { group = "com.android.tools", name = "desugar_jdk_libs", version.ref = "desugarJdkLibs" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
