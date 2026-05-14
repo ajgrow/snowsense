@@ -59,6 +59,13 @@ private const val WMS_DETAIL =
             "&LAYERS=S2_snoskred_m_skogeffekt_Aktsomhetsomrade" +
             "&STYLES=&FORMAT=image/png&TRANSPARENT=TRUE"
 
+/**
+ * Mapbox wrapper Composable for displaying the map.
+ *
+ * @param mapStateHolder The state holder for the map.
+ * @param modifier The modifier to apply to the map.
+ * @param contentPadding The content padding to apply to the map.
+ */
 @Composable
 fun MapboxView(
     mapStateHolder: MapStateHolder,

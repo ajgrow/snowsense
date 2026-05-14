@@ -9,11 +9,21 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import in2000.prosjekt.in2000project.R
 
+/**
+ * A dialog that allows the user to enter a string.
+ *
+ * @param title The title of the dialog.
+ * @param defaultValue The default value of the input.
+ * @param onConfirm The callback that is called when the user confirms the input.
+ * @param onDismiss The callback that is called when the user dismisses the dialog.
+ */
 @Composable
 fun TextInputDialog(
+    modifier: Modifier = Modifier,
     title: String,
     defaultValue: String = "",
     onConfirm: (String) -> Unit,

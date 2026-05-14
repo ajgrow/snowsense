@@ -10,6 +10,12 @@ import java.time.MonthDay
  * 10 years of data."
  *
  * All climate values are nullable — null means the station doesn't measure that element.
+ *
+ * @param coordinate The coordinate of the location.
+ * @param stationName The name of the nearest weather station.
+ * @param stationDistanceKm The distance to the nearest weather station in kilometers.
+ * @param stationElevationMasl The elevation of the nearest weather station in meters above
+ * sea level
  */
 data class LocationClimateData(
     // Location

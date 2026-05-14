@@ -23,6 +23,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import in2000.prosjekt.in2000project.R
 
+/**
+ * Top bar for the app.
+ *
+ * @param title The title to display.
+ * @param onSettingsClick The callback to invoke when the settings button is clicked.
+ * @param onBackClick The callback to invoke when the back button is clicked.
+ */
 @Composable
 fun TopBar(
     modifier: Modifier = Modifier,

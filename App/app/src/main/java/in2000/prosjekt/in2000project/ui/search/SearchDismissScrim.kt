@@ -9,6 +9,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
 
+/**
+ * Composable for the search dismiss scrim.
+ *
+ * @param isActive Whether the scrim is active.
+ * @param onDismiss Callback for when the scrim is dismissed.
+ */
 @Composable
 fun SearchDismissScrim(
     isActive: Boolean,

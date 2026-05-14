@@ -101,13 +101,20 @@ private val previewClimateArea = ClimateArea(
     snowDepthData = emptyList()
 )
 
-//for use when the VM is ready
+/**
+ * Route-level Composable for the Map screen.
+ *
+ * @param searchViewModel ViewModel for searching for locations
+ * @param riskViewModel ViewModel for getting risk information
+ * @param mapStateHolder State holder for the map
+ * @param mapViewModel ViewModel for the map
+ */
 @Composable
 fun MapRoute(
     searchViewModel: SearchViewModel,
+    riskViewModel: RiskViewModel,
+    mapStateHolder: MapStateHolder,
     mapViewModel: MapViewModel = koinViewModel(),
-    riskViewModel: RiskViewModel = koinViewModel(),
-    mapStateHolder: MapStateHolder = koinInject()
 ) {
     val screenState by mapViewModel.screenState.collectAsStateWithLifecycle()
     val riskState by riskViewModel.riskState.collectAsStateWithLifecycle()
@@ -199,7 +206,7 @@ fun MapRoute(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MapScreen(
+private fun MapScreen(
     modifier: Modifier = Modifier,
     screenState: MapScreenState,
     riskState: RiskUiState,
@@ -517,7 +524,7 @@ fun MapScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BottomSheetContent(
+private fun BottomSheetContent(
     area: ClimateArea,
     climateState: ClimateState,
     dangerLevel: DangerLevelUiModel?,
@@ -696,7 +703,7 @@ fun BottomSheetContent(
 
 @Preview
 @Composable
-fun MapScreenErrorPreview() {
+private fun MapScreenErrorPreview() {
     MapScreen(
         screenState = MapScreenState(
             overlayState = OverlayState.Error,
@@ -731,7 +738,7 @@ fun MapScreenErrorPreview() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview(showBackground = true)
 @Composable
-fun BottomSheetPreview() {
+private fun BottomSheetPreview() {
     val sheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = false
     )
