@@ -49,6 +49,14 @@ android {
     }
 }
 
+kotlin {
+    compilerOptions {
+        freeCompilerArgs.add(
+            "-XXLanguage:+PropertyParamAnnotationDefaultTargetMode"
+        )
+    }
+}
+
 dependencies {
     // Default
     implementation(libs.androidx.core.ktx)
