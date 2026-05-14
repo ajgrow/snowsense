@@ -61,19 +61,12 @@
     <string name="emergency_call_desc">Call %1$s</string>
 
     <string name="map_title">Map</string>
-    <string name="map_instruction">Select an area to view historical climate details.</string>
 
     <string name="overlay_loading">Loading avalanche overlay...</string>
     <string name="overlay_error">Could not load avalanche overlay.</string>
 
     <string name="retry">Retry</string>
 
-    <string name="historical_climate_title">Historical Climate Summary</string>
-
-    <string name="label_avalanche_danger">Avalanche danger</string>
-    <string name="label_average_snowfall">Average snowfall</string>
-    <string name="label_average_precipitation">Average precipitation</string>
-    <string name="label_average_temperature">Average temperature</string>
     <string name="open_search">Open Search</string>
 
 
@@ -82,12 +75,7 @@
     <string name="nav_map_desc">Go to map screen</string>
     <string name="nav_info_desc">Go to information screen</string>
 
-    <string name="settings_desc">Settings</string>
-
     <string name="loading">Loading...</string>
-
-    <string name="error_title">Error</string>
-    <string name="no_internet">No internet connection</string>
 
     <string name="topbar_settings">Settings</string>
 
@@ -113,15 +101,10 @@
     <string name="settings_theme_light">Light Mode</string>
     <string name="settings_theme_dark">Dark Mode</string>
 
-    <string name="settings_text_size_title">Text Size %1$d%%</string>
     <string name="settings_text_size_title_formatted">Text Size: %1$d%%</string>
     <string name="settings_reset_default">Reset to Default</string>
     <string name="preview_text_size">Preview text  Aa</string>
-    
-    
-    <string name="settings_text_small">Small</string>
-    <string name="settings_text_medium">Medium</string>
-    <string name="settings_text_large">Large</string>
+
 
     <string name="settings_language_title">Language</string>
 
@@ -132,7 +115,6 @@
 
     <string name="mean_temp_desc">Mean temperature</string>
     <string name="mean_precip_desc">Mean precipitation</string>
-    <string name="mean_snow_desc">Mean snow depth</string>
     <string name="mean_wind_desc">Mean wind speed</string>
 
     <string name="climate_error_desc">Failed to load climate data, please try again.</string>
@@ -141,7 +123,6 @@
     <string name="no_graph_data">No data to show.</string>
     <string name="not_checked">Not checked</string>
 
-    <string name="call_icon">Call Icon</string>
     <string name="remove">Remove</string>
 
     <string name="other_resources_title">Other useful resources</string>
@@ -192,7 +173,6 @@
 
     <string name="language">language</string>
     <string name="favorite_button_desc">Add to favorites</string>
-    <string name="selected_area">Selected Area</string>
     <string name="missing_station_name">Missing station name</string>
     <string name="zoom_in_btn_desc">Zoom in</string>
     <string name="zoom_out_btn_desc">Zoom out</string>
