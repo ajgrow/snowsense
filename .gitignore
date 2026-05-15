@@ -12,3 +12,27 @@ Thumbs.db
 
 # Build artifacts
 */build/
+# Gradle
+.gradle/
+build/
+
+# Local config (SDK path, API keys)
+local.properties
+
+# Android build artifacts
+*.apk
+*.aab
+output-metadata.json
+
+# Signing keys
+*.jks
+*.keystore
+
+# Profiling & logs
+*.hprof
+*.log
+captures/
+
+# Native build (template default, not used)
+.externalNativeBuild/
+.cxx/
