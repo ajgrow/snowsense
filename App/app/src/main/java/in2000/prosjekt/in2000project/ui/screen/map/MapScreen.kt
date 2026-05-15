@@ -331,6 +331,7 @@ private fun MapScreen(
             .collect { value ->
                 if (value == SheetValue.Hidden) {
                     onSheetDismiss()
+                    listState.scrollToItem(0)
                 }
             }
     }
