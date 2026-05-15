@@ -2,7 +2,6 @@
 
 SnowSense is an Android-app designed to help users evaluate avalanche risk and climate conditions for locations around Norway. The app allows users to search for locations, see historical climate data, gives evaluation for danger based on Frost and NVE data, and save locations as favourites for quicker access.
 
----
 # Team-members.
 
 - Alex
@@ -12,7 +11,6 @@ SnowSense is an Android-app designed to help users evaluate avalanche risk and c
 - Rukman
 - Sondre
 
----
 
 ## App requirements
 - **Minimum SDK:** API 25 (Android 8.0)
@@ -23,7 +21,6 @@ SnowSense is an Android-app designed to help users evaluate avalanche risk and c
 - Frost data requires a legitimate Frost client ID (more information below)
 - Android Studio Panda 4 | 2025.3.4 Patch 1 (earlier versions or later versions may not work with the app)
 
----
 
 ## Setup
 
@@ -53,7 +50,6 @@ The app requires:
 
 The app does not use your device's GPS or location data. All location choices happen through the app
 
----
 
 ## Project Documentation
 
@@ -86,8 +82,6 @@ The app does not use your device's GPS or location data. All location choices ha
 | [AppCompat](https://developer.android.com/jetpack/androidx/releases/appcompat) | Gives assistance to the language changing through different Android versions |
 | [Material Icon Extension](https://developer.android.com/jetpack/androidx/releases/compose-material) | Extension of the icon library from material design. Used for icons not available in the standard version |
 
----
-
 ## API usage
 
 | API | Source | use case |
@@ -112,16 +106,12 @@ The project includes Unit tests and integration tests.
   ./gradlew test --tests "*.FrostApiIntegrationTest"
   ```
 
----
-
 ## Accessibility Features
 
 The app was designed with WCAG 2.1 in mind and has the following features:
 - Theme adjustment: The app supports a full system-wide dark mode and light mode through the use of Material 3
 - Text size adjustment: The app supports a text adjustment range of 50% original size all the way to 200% original size. The chosen standard is 150%
 - Screen Reader: The app supports Android's built-in screen reader through content descriptions and no hardcoded strings
-
----
 
 ## Known warnings and restrictions
 
