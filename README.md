@@ -20,6 +20,8 @@ SnowSense is an Android-app designed to help users evaluate avalanche risk and c
 - **Recommended emulator:** Resizable emulator with API 36
 - Internet access is required to retrieve data from our different APIs, Frostv0, NVE and Kartverket
 - Mapbox map requires a legitimate Mapbox access token (more information below)
+- Frost data requires a legitimate Frost client ID (more information below)
+- Android Studio Panda 4 | 2025.3.4 Patch 1 (earlier versions or later versions may not work with the app)
 
 ---
 
@@ -119,3 +121,22 @@ The app was designed with WCAG 2.1 in mind and has the following features:
 ---
 
 ## Known warnings and restrictions
+
+### Vico not on the latest version
+
+'libs.version.toml' -  We deliberately chose to use Vico '1.x' instead of '3.x' as upgrading to '3.x' causes critical failure in 'MapScreen.kt' that breaks map rendering and causes erros
+
+### targetSdk not the latest version
+'build.gradle.kts' - We target SDK 36 (the latest stable release) rather than 37, as SDK 37 introduces incomaptibilites with several of our dependencies and composables
+
+### Non-ASCII characters / Letter-digit mix 
+'LocationResponseDto' - The upstream API requires these exact character sequences. They cannot be renamed without breaking deserialization.
+
+### Unstable API usage
+'settings.gradle.kts', 'build.gradle.kts' - A small number of Gradle APIs flagged as @incubating are used intentionally. These APIs are stable enough for our use case and do not affect the expected user base
+
+### Assigned value is never read 
+'DatePicker.kt', 'MapScreen.kt' 'EmergencySection.kt' -  The Android Studio IDE gives false positive warnings. These assignments are intentional
+
+### Spelling / Typos
+Android Studio automatically flags Norwegian words and abbreviated variable names as typos. These are all intentional. These warnings can be found throughout multiple files
