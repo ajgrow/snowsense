@@ -26,12 +26,14 @@ class MapViewModel(
     //it's a data class rather than just one sealed interface. This is because two things can fail instead
     //of just one. Both the WMS overlay can fail and the climate data. This means that
     //we base this off the MapScreenState() data class rather than just one sealed interface.
-    private val _screenState = MutableStateFlow(MapScreenState(
-        startDate = MonthDay.now().with(MonthDay.now().month.minus(1)),
-        endDate = MonthDay.now(),
-        currentYear = Year.now().value,
-        selectedYear = Year.now().value - 3
-    ))
+    private val _screenState = MutableStateFlow(
+        MapScreenState(
+            startDate = MonthDay.now().with(MonthDay.now().month.minus(1)),
+            endDate = MonthDay.now(),
+            currentYear = Year.now().value,
+            selectedYear = Year.now().value - 3
+        )
+    )
     val screenState: StateFlow<MapScreenState> = _screenState.asStateFlow()
 
     //.copy() creates a new instance of the data class with a few of the properties changed while
@@ -59,7 +61,7 @@ class MapViewModel(
                     periodStart = current.startDate,
                     periodEnd = current.endDate,
                     yearsBack = current.currentYear - current.selectedYear
-                ) ?: throw NoObservationsException("","","")
+                ) ?: throw NoObservationsException("", "", "")
 
                 _screenState.value = _screenState.value.copy(
                     climateState = ClimateState.Success(climateData)
@@ -97,7 +99,7 @@ class MapViewModel(
      * @param start The new start date
      */
     fun onStartDateChange(start: MonthDay) {
-         _screenState.value = _screenState.value.copy(startDate = start)
+        _screenState.value = _screenState.value.copy(startDate = start)
 
         refetchIfLocationKnown()
     }

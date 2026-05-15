@@ -8,7 +8,7 @@ import in2000.prosjekt.in2000project.domain.repository.LocationRepository
 class KartverketLocationRepository(
     private val dataSource: LocationDataSource
 ) : LocationRepository {
-    override suspend fun getNamedLocations(query:String) : List<NamedLocation> {
+    override suspend fun getNamedLocations(query: String): List<NamedLocation> {
         return dataSource.getNamesResponse(query)?.map {
             NamedLocation(
                 name = it.skrivemåte,
@@ -17,7 +17,8 @@ class KartverketLocationRepository(
                     it.representasjonspunkt.øst
                 ),
                 locationTypeNo = it.navneobjekttype,
-                locationTypeEn = LocationTypeTranslations.translations[it.navneobjekttype] ?: it.navneobjekttype
+                locationTypeEn = LocationTypeTranslations.translations[it.navneobjekttype]
+                    ?: it.navneobjekttype
             )
         } ?: emptyList()
     }

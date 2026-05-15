@@ -28,7 +28,7 @@ fun AppNavigation(
     navController: NavHostController,
     settingsViewModel: SettingsViewModel,
     modifier: Modifier = Modifier
-){
+) {
     val navigationActions = NavigationActions(navController)
     val mapStateHolder: MapStateHolder = koinInject()
 
@@ -42,16 +42,22 @@ fun AppNavigation(
     ) {
         composable(Screen.Home.route) {
             HomeRoute(
-                onSettingsClick = { navController
-                    .navigate(Screen
-                        .Settings.route) },
+                onSettingsClick = {
+                    navController
+                        .navigate(
+                            Screen
+                                .Settings.route
+                        )
+                },
                 onNavigateToMap = { coordinate ->
                     mapStateHolder.flyToSearch(
                         Point.fromLngLat(
                             coordinate.longitude,
-                            coordinate.latitude)
+                            coordinate.latitude
+                        )
                     )
-                    navigationActions.navigateToTab(Screen.Map.route) },
+                    navigationActions.navigateToTab(Screen.Map.route)
+                },
                 searchViewModel = searchViewModel,
                 riskViewModel = riskViewModel
             )
@@ -67,9 +73,13 @@ fun AppNavigation(
 
         composable(Screen.Info.route) {
             InfoRoute(
-                onSettingsClick = { navController
-                    .navigate(Screen
-                        .Settings.route) })
+                onSettingsClick = {
+                    navController
+                        .navigate(
+                            Screen
+                                .Settings.route
+                        )
+                })
         }
 
         composable(Screen.Settings.route) {

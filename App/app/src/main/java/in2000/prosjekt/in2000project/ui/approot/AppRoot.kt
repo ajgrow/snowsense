@@ -92,7 +92,9 @@ fun AppRoot(
                 AppNavigation(
                     navController = navController,
                     settingsViewModel = settingsViewModel,
-                    modifier = Modifier.fillMaxSize().padding(innerPadding),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding),
                 )
             }
         }

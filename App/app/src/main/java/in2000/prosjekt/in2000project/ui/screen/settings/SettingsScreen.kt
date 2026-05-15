@@ -99,7 +99,8 @@ private fun SettingsScreen(
         modifier = modifier
             .fillMaxSize()
     ) {
-        Column(modifier = Modifier
+        Column(
+            modifier = Modifier
                 .fillMaxSize()
                 .windowInsetsPadding(WindowInsets.statusBars)
         ) {
@@ -127,9 +128,11 @@ private fun SettingsScreen(
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(4.dp).semantics{
-                            heading()
-                        }
+                        modifier = Modifier
+                            .padding(4.dp)
+                            .semantics {
+                                heading()
+                            }
                     )
                     Surface(
                         shape = RoundedCornerShape(16.dp),
@@ -171,9 +174,11 @@ private fun SettingsScreen(
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(4.dp).semantics{
-                            heading()
-                        }
+                        modifier = Modifier
+                            .padding(4.dp)
+                            .semantics {
+                                heading()
+                            }
                     )
                     Surface(
                         shape = RoundedCornerShape(16.dp),
@@ -243,9 +248,11 @@ private fun SettingsScreen(
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(4.dp).semantics{
-                            heading()
-                        }
+                        modifier = Modifier
+                            .padding(4.dp)
+                            .semantics {
+                                heading()
+                            }
                     )
                     Surface(
                         shape = RoundedCornerShape(16.dp),
@@ -290,7 +297,7 @@ private fun SettingsScreen(
 private fun LanguageControl(
     selectedLanguage: AppLanguageMode,
     onSelect: (AppLanguageMode) -> Unit
-){
+) {
 
     val options = listOf(
         AppLanguageMode.ENGLISH to "English",
@@ -307,9 +314,9 @@ private fun LanguageControl(
         options.forEach { (mode, label) ->
             val selected = selectedLanguage == mode
             val bgColor = if (selected) MaterialTheme.colorScheme.primary
-                            else MaterialTheme.colorScheme.surfaceVariant
+            else MaterialTheme.colorScheme.surfaceVariant
             val textColor = if (selected) MaterialTheme.colorScheme.onPrimary
-                            else MaterialTheme.colorScheme.onSurfaceVariant
+            else MaterialTheme.colorScheme.onSurfaceVariant
 
             Box(
                 contentAlignment = Alignment.Center,
@@ -317,23 +324,23 @@ private fun LanguageControl(
                     .weight(1f)
                     .clip(RoundedCornerShape(50))
                     .background(bgColor)
-                    .selectable(selected = selected, role = Role.RadioButton, onClick =  {onSelect(mode)})
+                    .selectable(
+                        selected = selected,
+                        role = Role.RadioButton,
+                        onClick = { onSelect(mode) })
                     .padding(vertical = 12.dp),
             ) {
                 Text(
                     text = label,
                     style = MaterialTheme.typography.labelLarge,
                     fontWeight = if (selected) FontWeight.SemiBold
-                                else FontWeight.Normal,
+                    else FontWeight.Normal,
                     color = textColor
                 )
             }
         }
     }
 }
-
-
-
 
 
 @Composable
@@ -344,7 +351,7 @@ private fun ThemeSettingRow(
     onClick: () -> Unit
 ) {
     val bgColor = if (selected) MaterialTheme.colorScheme.primaryContainer
-                    else MaterialTheme.colorScheme.surfaceContainer
+    else MaterialTheme.colorScheme.surfaceContainer
 
     Row(
         modifier = Modifier
@@ -353,7 +360,8 @@ private fun ThemeSettingRow(
             .selectable(selected = selected, role = Role.RadioButton, onClick = onClick)
             .padding(
                 horizontal = 16.dp,
-                vertical = 16.dp),
+                vertical = 16.dp
+            ),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
@@ -362,7 +370,7 @@ private fun ThemeSettingRow(
             imageVector = icon,
             contentDescription = label,
             tint = if (selected) MaterialTheme.colorScheme.onPrimaryContainer
-                    else MaterialTheme.colorScheme.onSurfaceVariant,
+            else MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier
                 .size(20.dp),
         )
@@ -371,7 +379,7 @@ private fun ThemeSettingRow(
             text = label,
             style = MaterialTheme.typography.bodyLarge,
             color = if (selected) MaterialTheme.colorScheme.onPrimaryContainer
-                    else MaterialTheme.colorScheme.onSurfaceVariant,
+            else MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier
                 .weight(1f)
         )
@@ -388,7 +396,7 @@ private fun ThemeSettingRow(
 }
 
 @Composable
-private fun SettingsDivider(){
+private fun SettingsDivider() {
     HorizontalDivider(
         modifier = Modifier
             .padding(start = 52.dp),

@@ -69,6 +69,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mapbox.geojson.Point
 import in2000.prosjekt.in2000project.R
 import in2000.prosjekt.in2000project.domain.model.ClimateArea
@@ -81,18 +82,17 @@ import in2000.prosjekt.in2000project.ui.model.DangerLevelUiModel
 import in2000.prosjekt.in2000project.ui.model.toUiModel
 import in2000.prosjekt.in2000project.ui.risk.DangerLevelCard
 import in2000.prosjekt.in2000project.ui.risk.RiskUiState
+import in2000.prosjekt.in2000project.ui.risk.RiskViewModel
 import in2000.prosjekt.in2000project.ui.search.SearchDismissScrim
 import in2000.prosjekt.in2000project.ui.search.SearchSection
 import in2000.prosjekt.in2000project.ui.search.SearchUiState
+import in2000.prosjekt.in2000project.ui.search.SearchViewModel
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import org.koin.compose.viewmodel.koinViewModel
 import java.time.MonthDay
 import java.time.Year
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import in2000.prosjekt.in2000project.ui.risk.RiskViewModel
-import in2000.prosjekt.in2000project.ui.search.SearchViewModel
-import org.koin.compose.viewmodel.koinViewModel
 
 private val previewClimateArea = ClimateArea(
     stationName = "",
@@ -358,7 +358,6 @@ private fun MapScreen(
     }
 
 
-
     val mapDesc = stringResource(R.string.map_title)
 
     Box(
@@ -371,11 +370,15 @@ private fun MapScreen(
         when (overlayState) {
             is OverlayState.Loading
                 -> OverlayStatusCard(
-                stringResource(R.string.overlay_loading))
+                stringResource(R.string.overlay_loading)
+            )
+
             is OverlayState.Error
                 -> OverlayRetryCard(
                 stringResource(R.string.overlay_error),
-                onOverlayRetry)
+                onOverlayRetry
+            )
+
             is OverlayState.Success
                 -> Unit
         }

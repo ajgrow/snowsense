@@ -13,7 +13,7 @@ import java.time.LocalDate
 
 class FrostWeatherRepository(
     private val frostV0DataSource: FrostV0DataSource,
-): WeatherRepository {
+) : WeatherRepository {
 
     override suspend fun getWeatherRecordsForLocation(
         coordinate: Coordinate,
@@ -33,7 +33,8 @@ class FrostWeatherRepository(
         val records = getDailyWeatherRecords(
             dataSource,
             repeatingTimeRange,
-            currentDate)
+            currentDate
+        )
 
         return records
     }
@@ -42,7 +43,7 @@ class FrostWeatherRepository(
         source: FrostV0SourceDto,
         repeatingTimeRange: FrostReferenceTime,
         currentDate: LocalDate,
-    ) : List<DailyWeatherRecord> {
+    ): List<DailyWeatherRecord> {
         val requiredElements = listOf(
             ElementType.TEMPERATURE_MEAN_P1D.frostElementId,
             ElementType.PRECIPITATION_SUM_P1D.frostElementId
@@ -53,7 +54,8 @@ class FrostWeatherRepository(
         val observationResponse = frostV0DataSource.getObservations(
             source.id ?: "",
             elementsCsv,
-            repeatingTimeRange.value)
+            repeatingTimeRange.value
+        )
 
         if (observationResponse == null) {
             throw NoObservationsException(
@@ -95,10 +97,12 @@ class FrostWeatherRepository(
         LocalDate
             .parse(referenceTime.substringBefore("T")),
         observations.firstOrNull {
-            it.elementId == ElementType.TEMPERATURE_MEAN_P1D.frostElementId }
+            it.elementId == ElementType.TEMPERATURE_MEAN_P1D.frostElementId
+        }
             ?.value,
         observations.firstOrNull {
-            it.elementId == ElementType.PRECIPITATION_SUM_P1D.frostElementId }
+            it.elementId == ElementType.PRECIPITATION_SUM_P1D.frostElementId
+        }
             ?.value,
     )
 }

@@ -15,8 +15,7 @@ enum class AppLanguageMode(val tag: String) {
     NORWEGIAN("nb");
 
     companion object {
-        fun fromTag(tag: String)
-        = entries.find { it.tag == forLanguageTag(tag).language }
+        fun fromTag(tag: String) = entries.find { it.tag == forLanguageTag(tag).language }
             ?: ENGLISH
     }
 }

@@ -50,6 +50,7 @@ fun DangerLevel.toUiModel(): DangerLevelUiModel {
             lightColor = DangerColorLevel0,
             darkColor = DangerColorLevel0Dark
         )
+
         DangerLevel.LOW -> DangerLevelUiModel(
             level = this,
             numberRes = R.string.danger_level_1_number,
@@ -59,14 +60,17 @@ fun DangerLevel.toUiModel(): DangerLevelUiModel {
             lightColor = DangerColorLevel1,
             darkColor = DangerColorLevel1Dark
         )
+
         DangerLevel.MODERATE -> DangerLevelUiModel(
             level = this,
             numberRes = R.string.danger_level_2_number,
             titleRes = R.string.danger_level_2_title,
-            badgeLabelRes = R.string.danger_level_2_badge,            descriptionRes = R.string.danger_level_2_description,
+            badgeLabelRes = R.string.danger_level_2_badge,
+            descriptionRes = R.string.danger_level_2_description,
             lightColor = DangerColorLevel2,
             darkColor = DangerColorLevel2Dark
         )
+
         DangerLevel.CONSIDERABLE -> DangerLevelUiModel(
             level = this,
             numberRes = R.string.danger_level_3_number,
@@ -76,6 +80,7 @@ fun DangerLevel.toUiModel(): DangerLevelUiModel {
             lightColor = DangerColorLevel3,
             darkColor = DangerColorLevel3Dark
         )
+
         DangerLevel.HIGH -> DangerLevelUiModel(
             level = this,
             numberRes = R.string.danger_level_4_number,
@@ -85,6 +90,7 @@ fun DangerLevel.toUiModel(): DangerLevelUiModel {
             lightColor = DangerColorLevel4,
             darkColor = DangerColorLevel4Dark
         )
+
         DangerLevel.VERY_HIGH -> DangerLevelUiModel(
             level = this,
             numberRes = R.string.danger_level_5_number,

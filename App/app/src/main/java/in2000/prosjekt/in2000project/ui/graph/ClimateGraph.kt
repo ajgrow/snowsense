@@ -47,7 +47,7 @@ fun ClimateGraph(
     Column(modifier = Modifier.padding(vertical = 8.dp)) {
         Text(
             text = "$title (${startDate.display()} - ${endDate.display()})",
-            modifier = Modifier.semantics{ heading() }
+            modifier = Modifier.semantics { heading() }
         )
 
         if (!entries.isEmpty()) {
@@ -70,10 +70,15 @@ fun ClimateGraph(
             )
         } else {
             Box(
-                modifier = Modifier.fillMaxWidth().height(180.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(180.dp),
                 contentAlignment = Alignment.Center
             ) {
-                Text(stringResource(R.string.no_graph_data), style = MaterialTheme.typography.bodySmall)
+                Text(
+                    stringResource(R.string.no_graph_data),
+                    style = MaterialTheme.typography.bodySmall
+                )
             }
         }
     }

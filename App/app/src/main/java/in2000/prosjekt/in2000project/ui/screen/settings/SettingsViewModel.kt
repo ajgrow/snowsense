@@ -17,9 +17,7 @@ import java.util.Locale
  *
  * @param application Application context.
  */
-class SettingsViewModel(application: Application)
-    : AndroidViewModel(application)
-{
+class SettingsViewModel(application: Application) : AndroidViewModel(application) {
     private val prefs = application
         .getSharedPreferences("settings", Context.MODE_PRIVATE)
 
@@ -39,7 +37,7 @@ class SettingsViewModel(application: Application)
     var languageMode by mutableStateOf(currentLanguageMode())
         private set
 
-    fun setTheme(mode: ThemeMode){
+    fun setTheme(mode: ThemeMode) {
         themeMode = mode
         prefs.edit {
             putString(
@@ -48,7 +46,7 @@ class SettingsViewModel(application: Application)
         }
     }
 
-    fun updateTextScale(scale: Float){
+    fun updateTextScale(scale: Float) {
         textScale = scale
         prefs.edit {
             putFloat(
@@ -57,7 +55,7 @@ class SettingsViewModel(application: Application)
         }
     }
 
-    fun resetTextScale(){
+    fun resetTextScale() {
         updateTextScale(1.5f)
     }
 
@@ -65,13 +63,13 @@ class SettingsViewModel(application: Application)
         languageMode = mode
         AppCompatDelegate
             .setApplicationLocales(
-                LocaleListCompat.forLanguageTags(mode.tag))
+                LocaleListCompat.forLanguageTags(mode.tag)
+            )
     }
 
 
     private fun currentLanguageMode(
-    ): AppLanguageMode
-    = AppCompatDelegate
+    ): AppLanguageMode = AppCompatDelegate
         .getApplicationLocales()
         .toLanguageTags()
         .split(",")
@@ -81,7 +79,8 @@ class SettingsViewModel(application: Application)
         ?: AppLanguageMode
             .fromTag(
                 Locale
-                .getDefault().language)
+                    .getDefault().language
+            )
 
     fun refreshLanguageMode() {
         languageMode = currentLanguageMode()

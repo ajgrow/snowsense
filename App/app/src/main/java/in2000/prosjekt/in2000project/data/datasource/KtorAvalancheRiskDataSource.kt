@@ -12,7 +12,7 @@ class KtorAvalancheRiskDataSource(
     override suspend fun getGeoJson(lat: Double, lon: Double, buffer: Int): GeoJsonResponseDto {
         return try {
             client
-                .get("https://kart.nve.no/enterprise/rest/services/SnoskredAktsomhet/MapServer/3/query"){
+                .get("https://kart.nve.no/enterprise/rest/services/SnoskredAktsomhet/MapServer/3/query") {
                     parameter("where", "1=1")
 
                     parameter(
@@ -33,11 +33,12 @@ class KtorAvalancheRiskDataSource(
                     parameter("f", "geojson")
                 }
                 .body<GeoJsonResponseDto>()
-        } catch (e: Exception){
+        } catch (e: Exception) {
             e.printStackTrace()
             GeoJsonResponseDto(
                 features = emptyList(),
-                type = "FeatureCollection")
+                type = "FeatureCollection"
+            )
         }
     }
 }

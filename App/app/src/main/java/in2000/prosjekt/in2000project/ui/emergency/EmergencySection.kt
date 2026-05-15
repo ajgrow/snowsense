@@ -142,8 +142,9 @@ fun EmergencyRow(
         Surface(
             modifier = Modifier.clickable(
                 role = Role.Button,
-                onClickLabel = stringResource(R.string.emergency_call_desc, number))
-            { showDialog = true},
+                onClickLabel = stringResource(R.string.emergency_call_desc, number)
+            )
+            { showDialog = true },
             shape = RoundedCornerShape(10.dp),
             color = MaterialTheme.colorScheme.error,
             tonalElevation = 2.dp

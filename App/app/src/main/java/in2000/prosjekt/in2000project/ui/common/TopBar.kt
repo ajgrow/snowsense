@@ -34,7 +34,7 @@ fun TopBar(
     title: String? = null,
     onSettingsClick: () -> Unit = {},
     onBackClick: (() -> Unit)? = null,
-    ){
+) {
 
     Box(
         modifier = Modifier
@@ -42,8 +42,8 @@ fun TopBar(
             .background(MaterialTheme.colorScheme.surface)
             .padding(vertical = 4.dp),
         contentAlignment = Alignment.Center
-    ){
-        title?.let{
+    ) {
+        title?.let {
             Text(
                 text = it,
                 style = MaterialTheme.typography.headlineMedium,

@@ -46,7 +46,8 @@ fun SafetyAdvice(
 ) {
     var expanded by rememberSaveable { mutableStateOf(false) }
     val expandedText = stringResource(if (expanded) R.string.hide_info else R.string.show_info)
-    val expandedDescription = stringResource(if (expanded) R.string.is_expanded else R.string.is_not_expanded)
+    val expandedDescription =
+        stringResource(if (expanded) R.string.is_expanded else R.string.is_not_expanded)
 
     Column(modifier = modifier.fillMaxWidth()) {
         Row(

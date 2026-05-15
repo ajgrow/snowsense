@@ -69,7 +69,8 @@ fun SearchSection(
 
     val expanded = searchState.isSearchActive
     val isShowingRecents = searchState.query.isBlank()
-    val displayResults = if (isShowingRecents) searchState.recentSearches else searchState.searchResults
+    val displayResults =
+        if (isShowingRecents) searchState.recentSearches else searchState.searchResults
     val isNorwegian = LocalConfiguration.current.locales[0].language in listOf("no", "nb", "nn")
 
     DockedSearchBar(

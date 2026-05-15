@@ -74,7 +74,9 @@ fun DatePicker(
     val currentYear = Calendar.getInstance().get(Calendar.YEAR)
 
     Row(
-        modifier = Modifier.fillMaxWidth().padding(16.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -106,6 +108,7 @@ fun DatePicker(
             onDismiss = { showingPicker = null },
             onConfirm = { onStartDateChange(it); showingPicker = null }
         )
+
         "end" -> CalendarPickerDialog(
             initial = endDate,
             minDate = startDate,
@@ -222,14 +225,21 @@ private fun MonthNavHeader(month: Int, onPrevious: () -> Unit, onNext: () -> Uni
         verticalAlignment = Alignment.CenterVertically
     ) {
         IconButton(onClick = onPrevious) {
-            Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, contentDescription = stringResource(R.string.previous_month))
+            Icon(
+                Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+                contentDescription = stringResource(R.string.previous_month)
+            )
         }
         Text(
-            text = Month.of(month).getDisplayName(TextStyle.FULL, LocalLocale.current.platformLocale),
+            text = Month.of(month)
+                .getDisplayName(TextStyle.FULL, LocalLocale.current.platformLocale),
             style = MaterialTheme.typography.titleMedium
         )
         IconButton(onClick = onNext) {
-            Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = stringResource(R.string.next_month))
+            Icon(
+                Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                contentDescription = stringResource(R.string.next_month)
+            )
         }
     }
 }

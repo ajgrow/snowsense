@@ -48,8 +48,8 @@ class SlabAvalancheRiskAssessor {
         val trigger = calcTrigger(recent)
         val score = (structural
                 * (STRUCTURAL_BASELINE
-                    + (1.0 - STRUCTURAL_BASELINE)
-                        * trigger))
+                + (1.0 - STRUCTURAL_BASELINE)
+                * trigger))
 
         return when {
             score >= THRESHOLD_VERY_HIGH -> DangerLevel.VERY_HIGH
@@ -95,18 +95,20 @@ class SlabAvalancheRiskAssessor {
             }
         }
 
-        if (!weakLayerConfirmed || slabLwe < SLAB_BACKBONE_MIN_LWE )
+        if (!weakLayerConfirmed || slabLwe < SLAB_BACKBONE_MIN_LWE)
             return 0.0
 
         val weakLayerFactor = normalize(
             weakLayerLwe,
             WEAK_LAYER_LOW,
-            WEAK_LAYER_HIGH)
+            WEAK_LAYER_HIGH
+        )
 
         val slabFactor = normalize(
             slabLwe,
             SLAB_LOAD_LOW,
-            SLAB_LOAD_HIGH)
+            SLAB_LOAD_HIGH
+        )
 
         return sqrt(weakLayerFactor * slabFactor)
     }
@@ -132,10 +134,12 @@ class SlabAvalancheRiskAssessor {
         return normalize(
             recentColdLwe,
             RECENT_LOADING_LOW,
-            RECENT_LOADING_HIGH)
+            RECENT_LOADING_HIGH
+        )
     }
 
-    internal fun calcRapidWarming(recentDays: List<DailyWeatherRecord>
+    internal fun calcRapidWarming(
+        recentDays: List<DailyWeatherRecord>
     ): Double {
         val temps = recentDays.mapNotNull { it.tempC }
 
@@ -148,7 +152,8 @@ class SlabAvalancheRiskAssessor {
         return normalize(
             warmingDelta,
             RAPID_WARMING_LOW,
-            RAPID_WARMING_HIGH)
+            RAPID_WARMING_HIGH
+        )
     }
 
     // Clamps value into [0, 1] between low and high.
