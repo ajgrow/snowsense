@@ -20,10 +20,10 @@ import androidx.navigation.compose.rememberNavController
 import in2000.prosjekt.in2000project.navigation.AppNavigation
 import in2000.prosjekt.in2000project.navigation.NavigationActions
 import in2000.prosjekt.in2000project.navigation.Screen
-import in2000.prosjekt.in2000project.ui.screen.map.MapStateHolder
-import in2000.prosjekt.in2000project.ui.screen.map.MapboxView
 import in2000.prosjekt.in2000project.ui.common.BottomBar
 import in2000.prosjekt.in2000project.ui.common.isBottomBarScreen
+import in2000.prosjekt.in2000project.ui.screen.map.MapStateHolder
+import in2000.prosjekt.in2000project.ui.screen.map.MapboxView
 import in2000.prosjekt.in2000project.ui.screen.settings.SettingsViewModel
 import in2000.prosjekt.in2000project.ui.theme.In2000projectTheme
 import org.koin.compose.koinInject

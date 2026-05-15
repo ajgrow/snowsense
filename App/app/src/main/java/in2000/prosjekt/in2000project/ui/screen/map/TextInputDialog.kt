@@ -9,7 +9,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import in2000.prosjekt.in2000project.R
 
@@ -23,7 +22,6 @@ import in2000.prosjekt.in2000project.R
  */
 @Composable
 fun TextInputDialog(
-    modifier: Modifier = Modifier,
     title: String,
     defaultValue: String = "",
     onConfirm: (String) -> Unit,

@@ -1,6 +1,7 @@
 package in2000.prosjekt.in2000project.data.repository
 
 import android.content.Context
+import androidx.core.content.edit
 import in2000.prosjekt.in2000project.domain.model.NamedLocation
 import in2000.prosjekt.in2000project.domain.repository.SearchRepository
 import kotlinx.serialization.json.Json
@@ -11,7 +12,7 @@ class SharedPreferencesSearchRepository(
     private val prefs = context.getSharedPreferences("search_prefs", Context.MODE_PRIVATE)
 
     override fun saveFavorites(list: List<NamedLocation>) =
-        prefs.edit().putString("favorites", Json.encodeToString(list)).apply()
+        prefs.edit { putString("favorites", Json.encodeToString(list)) }
 
     override fun loadFavorites(): List<NamedLocation> {
         val json = prefs.getString("favorites", null) ?: return emptyList()
@@ -19,7 +20,7 @@ class SharedPreferencesSearchRepository(
     }
 
     override fun saveRecentSearches(list: List<NamedLocation>) =
-        prefs.edit().putString("recent_searches", Json.encodeToString(list)).apply()
+        prefs.edit { putString("recent_searches", Json.encodeToString(list)) }
 
     override fun loadRecentSearches(): List<NamedLocation> {
         val json = prefs.getString("recent_searches", null) ?: return emptyList()

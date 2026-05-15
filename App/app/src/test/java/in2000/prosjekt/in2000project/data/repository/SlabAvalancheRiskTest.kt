@@ -4,14 +4,14 @@ import in2000.prosjekt.in2000project.data.datasource.FakeFrostV0DataSource
 import in2000.prosjekt.in2000project.data.datasource.makeDay
 import in2000.prosjekt.in2000project.data.datasource.makeObsResponse
 import in2000.prosjekt.in2000project.data.datasource.makeSourceResponse
+import in2000.prosjekt.in2000project.domain.SlabAvalancheRiskAssessor
 import in2000.prosjekt.in2000project.domain.model.Coordinate
+import in2000.prosjekt.in2000project.domain.model.enums.DangerLevel
 import in2000.prosjekt.in2000project.domain.model.exceptions.NoObservationsException
 import in2000.prosjekt.in2000project.domain.model.exceptions.NoStationFoundException
-import in2000.prosjekt.in2000project.domain.SlabAvalancheRiskAssessor
-import in2000.prosjekt.in2000project.domain.model.enums.DangerLevel
 import in2000.prosjekt.in2000project.domain.repository.WeatherRepository
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import java.io.IOException

@@ -1,9 +1,9 @@
 package in2000.prosjekt.in2000project.data.repository
 
+import in2000.prosjekt.in2000project.domain.SlabAvalancheRiskAssessor
 import in2000.prosjekt.in2000project.domain.model.DailyWeatherRecord
 import in2000.prosjekt.in2000project.domain.model.enums.DangerLevel
-import in2000.prosjekt.in2000project.domain.SlabAvalancheRiskAssessor
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
 import org.junit.Test
 import java.time.LocalDate
 

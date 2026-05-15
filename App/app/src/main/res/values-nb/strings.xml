@@ -24,19 +24,19 @@
 
     <string name="danger_level_1_number">1</string>
     <string name="danger_level_1_title">- Lav</string>
-    <string name="danger_level_1_description">Generelt stabile forhold.\n\nUtløsning er vanligvis kun mulig ved stor tilleggsbelastning i isolerte områder med svært bratt terreng. Kun små og middels store naturlige skred er mulig.\n\nTypiske faresignaler:\nSjelden noen faresignaler.\n\nVarslet rundt 20% av vintersesongen. Rundt 5% av skredulykker.</string>
+    <string name="danger_level_1_description" formatted="false">Generelt stabile forhold.\n\nUtløsning er vanligvis kun mulig ved stor tilleggsbelastning i isolerte områder med svært bratt terreng. Kun små og middels store naturlige skred er mulig.\n\nTypiske faresignaler:\nSjelden noen faresignaler.\n\nVarslet rundt 20% av vintersesongen. Rundt 5% av skredulykker.</string>
 
     <string name="danger_level_2_number">2</string>
     <string name="danger_level_2_title">- Moderat</string>
-    <string name="danger_level_2_description">Økte skredforhold i enkelte terrengformasjoner.\n\nUtløsning er mulig, hovedsakelig ved stor tilleggsbelastning, spesielt i bratte heng som er angitt. Svært store naturlige skred er lite sannsynlig.\n\nTypiske faresignaler:\nOfte ingen faresignaler, men det betyr ikke nødvendigvis at det er trygt. Vær ekstra oppmerksom dersom vedvarende svakt lag er et av skredproblemene.\n\nVarslet rundt 50% av vintersesongen. Rundt 30% av skredulykker.</string>
+    <string name="danger_level_2_description" formatted="false">Økte skredforhold i enkelte terrengformasjoner.\n\nUtløsning er mulig, hovedsakelig ved stor tilleggsbelastning, spesielt i bratte heng som er angitt. Svært store naturlige skred er lite sannsynlig.\n\nTypiske faresignaler:\nOfte ingen faresignaler, men det betyr ikke nødvendigvis at det er trygt. Vær ekstra oppmerksom dersom vedvarende svakt lag er et av skredproblemene.\n\nVarslet rundt 50% av vintersesongen. Rundt 30% av skredulykker.</string>
 
     <string name="danger_level_3_number">3</string>
     <string name="danger_level_3_title">- Betydelig</string>
-    <string name="danger_level_3_description">Farlige skredforhold.\n\nUtløsning er mulig, selv ved liten tilleggsbelastning, spesielt i bratte heng som er angitt. I enkelte situasjoner kan noen store, og i isolerte tilfeller svært store naturlige skred forekomme.\n\nTypiske faresignaler:\nFersk skredaktivitet, sprekker og \'drønn\' i snøen. Fjernutløsning er typisk, spesielt dersom vedvarende svakt lag er et av skredproblemene.\n\nVarslet rundt 30% av vintersesongen. Rundt 50% av skredulykker.</string>
+    <string name="danger_level_3_description" formatted="false">Farlige skredforhold.\n\nUtløsning er mulig, selv ved liten tilleggsbelastning, spesielt i bratte heng som er angitt. I enkelte situasjoner kan noen store, og i isolerte tilfeller svært store naturlige skred forekomme.\n\nTypiske faresignaler:\nFersk skredaktivitet, sprekker og \'drønn\' i snøen. Fjernutløsning er typisk, spesielt dersom vedvarende svakt lag er et av skredproblemene.\n\nVarslet rundt 30% av vintersesongen. Rundt 50% av skredulykker.</string>
 
     <string name="danger_level_4_number">4</string>
     <string name="danger_level_4_title">- Høy</string>
-    <string name="danger_level_4_description">Svært farlige skredforhold.\n\nUtløsning er sannsynlig, selv ved liten tilleggsbelastning, i mange bratte heng. I noen tilfeller kan mange store og ofte svært store naturlige skred forventes.\n\nTypiske faresignaler:\nUtbredt fersk skredaktivitet, sprekker og \'drønn\' i snøen. Fjernutløsning er typisk.\n\nVarsles kun noen få dager i løpet av vinteren. Rundt 10% av skredulykker.</string>
+    <string name="danger_level_4_description" formatted="false">Svært farlige skredforhold.\n\nUtløsning er sannsynlig, selv ved liten tilleggsbelastning, i mange bratte heng. I noen tilfeller kan mange store og ofte svært store naturlige skred forventes.\n\nTypiske faresignaler:\nUtbredt fersk skredaktivitet, sprekker og \'drønn\' i snøen. Fjernutløsning er typisk.\n\nVarsles kun noen få dager i løpet av vinteren. Rundt 10% av skredulykker.</string>
 
     <string name="danger_level_5_number">5</string>
     <string name="danger_level_5_title">- Svært høy</string>
@@ -61,38 +61,26 @@
     <string name="emergency_call_desc">Ring %1$s</string>
 
     <string name="map_title">Kart</string>
-    <string name="map_instruction">Velg et område for å se historiske klimadata.</string>
 
-    <string name="overlay_loading">Laster skredkartlag...</string>
+    <string name="overlay_loading">Laster skredkartlag…</string>
     <string name="overlay_error">Kunne ikke laste skredkartlag.</string>
 
     <string name="retry">Prøv igjen</string>
 
-    <string name="historical_climate_title">Historisk klimasammendrag</string>
-
-    <string name="label_avalanche_danger">Skredfare</string>
-    <string name="label_average_snowfall">Gjennomsnittlig snøfall</string>
-    <string name="label_average_precipitation">Gjennomsnittlig nedbør</string>
-    <string name="label_average_temperature">Gjennomsnittstemperatur</string>
-    <string name="open_search">Åpen Søk</string>
+    <string name="open_search">Åpne Søk</string>
 
 
     <string name="nav_home_desc">Gå til hjemskjerm</string>
     <string name="nav_map_desc">Gå til kartskjerm</string>
     <string name="nav_info_desc">Gå til informasjonsskjerm</string>
 
-    <string name="settings_desc">Innstillinger</string>
-
-    <string name="loading">Laster...</string>
-
-    <string name="error_title">Feil</string>
-    <string name="no_internet">Ingen internettforbindelse</string>
+    <string name="loading">Laster…</string>
 
     <string name="topbar_settings">Innstillinger</string>
 
-    <string name="date_start">Startdato</string>
-    <string name="date_end">Sluttdato</string>
-    <string name="since_year">Siden år</string>
+    <string name="date_start">Start</string>
+    <string name="date_end">Slutt</string>
+    <string name="since_year">Siden</string>
 
     <string name="dialog_ok">OK</string>
     <string name="dialog_save">Lagre</string>
@@ -112,13 +100,9 @@
     <string name="settings_theme_light">Lys modus</string>
     <string name="settings_theme_dark">Mørk modus</string>
 
-    <string name="settings_text_size_title">Tekststørrelse: %1$d%%</string>
     <string name="settings_text_size_title_formatted">Tekststørrelse: %1$d%%</string>
     <string name="settings_reset_default">tilbakestille til standard</string>
 
-    <string name="settings_text_small">Liten</string>
-    <string name="settings_text_medium">Middels</string>
-    <string name="settings_text_large">Stor</string>
     <string name="preview_text_size">Forhåndsvis tekst Aa</string>
 
     <string name="settings_language_title">Språk</string>
@@ -130,7 +114,6 @@
 
     <string name="mean_temp_desc">Gjennomsnittlig temperatur</string>
     <string name="mean_precip_desc">Gjennomsnittlig nedbør</string>
-    <string name="mean_snow_desc">Gjennomsnittlig snødybde</string>
     <string name="mean_wind_desc">Gjennomsnittlig vindhastighet</string>
 
     <string name="climate_error_desc">Klarte ikke å laste data, vennligst forsøk på nytt.</string>
@@ -138,7 +121,6 @@
 
     <string name="no_graph_data">Ingen data å vise.</string>
     <string name="not_checked">Ikke sjekket</string>
-    <string name="call_icon">Ringe-ikon</string>
     <string name="remove">Fjern</string>
 
     <string name="other_resources_title">Andre nyttige kilder</string>
@@ -189,14 +171,14 @@
 
     <string name="language">Språk</string>
     <string name="favorite_button_desc">Legg til som favoritt</string>
-    <string name="selected_area">Valgt område</string>
     <string name="missing_station_name">Målestasjon uten navn</string>
     <string name="zoom_in_btn_desc">Zoom inn</string>
     <string name="zoom_out_btn_desc">Zoom ut</string>
     <string name="is_expanded">Er utvidet</string>
     <string name="is_not_expanded">Er ikke utvidet</string>
     <string name="enter_value_desc">Skriv inn verdi</string>
-    <string name="emergency_call_confirm_desc">Ring %1$s?</string>>
+    <string name="emergency_call_confirm_desc">Ring %1$s?</string>
+    <string name="mean_snow_desc">Gjennomsnittlig snødybde</string>>
 
 
 </resources>

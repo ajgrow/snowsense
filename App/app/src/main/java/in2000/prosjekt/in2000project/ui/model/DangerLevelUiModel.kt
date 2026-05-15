@@ -3,9 +3,21 @@ package in2000.prosjekt.in2000project.ui.model
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
-import in2000.prosjekt.in2000project.domain.model.enums.DangerLevel
 import in2000.prosjekt.in2000project.R
-import in2000.prosjekt.in2000project.ui.theme.*
+import in2000.prosjekt.in2000project.domain.model.enums.DangerLevel
+import in2000.prosjekt.in2000project.ui.theme.DangerColorLevel0
+import in2000.prosjekt.in2000project.ui.theme.DangerColorLevel0Dark
+import in2000.prosjekt.in2000project.ui.theme.DangerColorLevel1
+import in2000.prosjekt.in2000project.ui.theme.DangerColorLevel1Dark
+import in2000.prosjekt.in2000project.ui.theme.DangerColorLevel2
+import in2000.prosjekt.in2000project.ui.theme.DangerColorLevel2Dark
+import in2000.prosjekt.in2000project.ui.theme.DangerColorLevel3
+import in2000.prosjekt.in2000project.ui.theme.DangerColorLevel3Dark
+import in2000.prosjekt.in2000project.ui.theme.DangerColorLevel4
+import in2000.prosjekt.in2000project.ui.theme.DangerColorLevel4Dark
+import in2000.prosjekt.in2000project.ui.theme.DangerColorLevel5
+import in2000.prosjekt.in2000project.ui.theme.DangerColorLevel5Dark
+import in2000.prosjekt.in2000project.ui.theme.LocalIsDarkTheme
 
 /* Since danger level is shown on both the Map and Info screen, this model
 provides a single source of truth for the composables that use them

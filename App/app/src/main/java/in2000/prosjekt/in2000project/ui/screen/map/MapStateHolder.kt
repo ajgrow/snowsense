@@ -104,9 +104,6 @@ class MapStateHolder {
         _cameraOptions.value = cameraOptions
     }
 
-    /**
-     * Called when the overlay is loading.
-     */
     fun onOverlayLoading() { _overlayState.value = OverlayState.Loading }
 
     /**

@@ -3,8 +3,8 @@ package in2000.prosjekt.in2000project.ui.screen.map
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import in2000.prosjekt.in2000project.domain.model.exceptions.NoObservationsException
 import in2000.prosjekt.in2000project.domain.model.Coordinate
+import in2000.prosjekt.in2000project.domain.model.exceptions.NoObservationsException
 import in2000.prosjekt.in2000project.domain.repository.ClimateRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -24,7 +24,7 @@ class MapViewModel(
 
     //Using MapScreenState() instead of <MapScreenState>(MapScreenState.Loading) because
     //it's a data class rather than just one sealed interface. This is because two things can fail instead
-    //of just one. Both the WMS overlay can fail as well as the climate data. This means that
+    //of just one. Both the WMS overlay can fail and the climate data. This means that
     //we base this off the MapScreenState() data class rather than just one sealed interface.
     private val _screenState = MutableStateFlow(MapScreenState(
         startDate = MonthDay.now().with(MonthDay.now().month.minus(1)),
@@ -97,14 +97,7 @@ class MapViewModel(
      * @param start The new start date
      */
     fun onStartDateChange(start: MonthDay) {
-        val current = _screenState.value
-        val end = setTimeBoundary(start, current.endDate)
-
-        _screenState.value = _screenState.value.copy(
-            startDate = start
-            //TIME BOUNDARY NOT IMPLEMENTED YET
-            //periodEnd = end
-        )
+         _screenState.value = _screenState.value.copy(startDate = start)
 
         refetchIfLocationKnown()
     }
@@ -115,14 +108,7 @@ class MapViewModel(
      * @param end The new end date
      */
     fun onEndDateChange(end: MonthDay) {
-        val current = _screenState.value
-        val start = setTimeBoundary(current.startDate, end)
-
-        _screenState.value = _screenState.value.copy(
-            //TIME BOUNDARY NOT IMPLEMENTED YET
-            //periodStart = start,
-            endDate = end
-        )
+        _screenState.value = _screenState.value.copy(endDate = end)
 
         refetchIfLocationKnown()
     }
@@ -143,11 +129,6 @@ class MapViewModel(
     private fun refetchIfLocationKnown() {
         val coordinate = _screenState.value.climateCoordinate ?: return
         fetchClimateData(coordinate.latitude, coordinate.longitude)
-    }
-
-    private fun setTimeBoundary(start: MonthDay, end: MonthDay): MonthDay {
-        // TO DO - enforce max 1 month range
-        return end
     }
 
     /**

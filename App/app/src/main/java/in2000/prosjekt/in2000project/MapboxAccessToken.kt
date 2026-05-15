@@ -1,5 +1,8 @@
 package in2000.prosjekt.in2000project
 
+import in2000.prosjekt.in2000project.MapboxAccessToken.value
+
+
 /**
  * Singleton holder for the Mapbox access token.
  *

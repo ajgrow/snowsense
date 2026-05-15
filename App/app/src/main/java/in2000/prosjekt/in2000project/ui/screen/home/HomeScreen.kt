@@ -25,12 +25,12 @@ package in2000.prosjekt.in2000project.ui.screen.home
     import androidx.compose.foundation.lazy.LazyColumn
     import androidx.compose.foundation.lazy.LazyRow
     import androidx.compose.foundation.lazy.items
-    import androidx.compose.material3.Card
     import androidx.compose.foundation.shape.RoundedCornerShape
     import androidx.compose.material.icons.Icons
-    import androidx.compose.material.icons.filled.Settings
-    import androidx.compose.material3.CardDefaults
     import androidx.compose.material.icons.filled.Close
+    import androidx.compose.material.icons.filled.Settings
+    import androidx.compose.material3.Card
+    import androidx.compose.material3.CardDefaults
     import androidx.compose.material3.CircularProgressIndicator
     import androidx.compose.material3.Icon
     import androidx.compose.material3.IconButton
@@ -43,27 +43,27 @@ package in2000.prosjekt.in2000project.ui.screen.home
     import androidx.compose.runtime.remember
     import androidx.compose.ui.Alignment
     import androidx.compose.ui.Modifier
-    import androidx.compose.ui.platform.LocalFocusManager
-    import androidx.compose.ui.res.painterResource
-    import androidx.compose.ui.res.stringResource
-    import androidx.compose.ui.unit.dp
-    import androidx.lifecycle.compose.collectAsStateWithLifecycle
     import androidx.compose.ui.draw.clip
     import androidx.compose.ui.graphics.Color
     import androidx.compose.ui.layout.ContentScale
+    import androidx.compose.ui.platform.LocalFocusManager
+    import androidx.compose.ui.res.painterResource
+    import androidx.compose.ui.res.stringResource
     import androidx.compose.ui.semantics.heading
     import androidx.compose.ui.semantics.semantics
     import androidx.compose.ui.text.font.FontWeight
     import androidx.compose.ui.text.font.FontWeight.Companion.Bold
     import androidx.compose.ui.text.style.TextOverflow
+    import androidx.compose.ui.unit.dp
     import androidx.compose.ui.unit.sp
+    import androidx.lifecycle.compose.collectAsStateWithLifecycle
     import in2000.prosjekt.in2000project.R
     import in2000.prosjekt.in2000project.domain.model.Coordinate
     import in2000.prosjekt.in2000project.domain.model.NamedLocation
-    import in2000.prosjekt.in2000project.ui.risk.RiskUiState
-    import in2000.prosjekt.in2000project.ui.risk.RiskViewModel
     import in2000.prosjekt.in2000project.ui.emergency.EmergencySection
     import in2000.prosjekt.in2000project.ui.model.DangerLevelUiModel
+    import in2000.prosjekt.in2000project.ui.risk.RiskUiState
+    import in2000.prosjekt.in2000project.ui.risk.RiskViewModel
     import in2000.prosjekt.in2000project.ui.search.SearchSection
     import in2000.prosjekt.in2000project.ui.search.SearchUiState
     import in2000.prosjekt.in2000project.ui.search.SearchViewModel
@@ -263,13 +263,14 @@ private fun FavoriteSection(
             modifier = Modifier.padding(horizontal = 16.dp).semantics { heading() }
         )
         LazyRow(
-            contentPadding = PaddingValues(horizontal = 8.dp),
+            contentPadding = PaddingValues(horizontal = 16.dp),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             items(items) { location ->
                 val locationRiskState = riskState.locationRisks[location.coordinate]
                 LocationCard(
-                    location,
+                    modifier = modifier,
+                    location = location,
                     onNavigateToMap = onNavigateToMap,
                     dangerLevel = locationRiskState?.dangerLevel,
                     isLoading = locationRiskState?.isLoading == true,
@@ -301,12 +302,13 @@ private fun RecentSection(
         )
 
         LazyRow(
-            contentPadding = PaddingValues(horizontal = 8.dp),
+            contentPadding = PaddingValues(horizontal = 16.dp),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             items(items) { location ->
                 LocationCard(
-                    location,
+                    modifier = modifier,
+                    location = location,
                     onNavigateToMap = onNavigateToMap,
                     onRemoveLocation = onRemoveLocation,
                 )
@@ -317,8 +319,8 @@ private fun RecentSection(
 
 @Composable
 private fun LocationCard(
-    location: NamedLocation,
     modifier: Modifier = Modifier,
+    location: NamedLocation,
     onNavigateToMap: (coordinate: Coordinate) -> Unit,
     onRemoveLocation: (NamedLocation) -> Unit,
     showDangerLevel: Boolean = false,
@@ -327,7 +329,7 @@ private fun LocationCard(
     removeButtonAtBottom: Boolean = false,
 ) {
     Box(
-        modifier = Modifier
+        modifier = modifier
             .width(160.dp)
             .wrapContentHeight()
     ) {
@@ -349,7 +351,7 @@ private fun LocationCard(
             ) {
                 Text(
                     text = location.name,
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth(0.8f),
                     fontWeight = Bold,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 1,
@@ -377,6 +379,7 @@ private fun LocationCard(
                             Text(
                                 text = label,
                                 fontSize = 12.sp,
+                                lineHeight = 12.sp,
                                 fontWeight = Bold,
                                 color = Color.White,
                                 letterSpacing = 0.5.sp,

@@ -1,8 +1,8 @@
 package in2000.prosjekt.in2000project.ui.screen.map
 
+import in2000.prosjekt.in2000project.domain.model.Coordinate
 import in2000.prosjekt.in2000project.domain.model.LocationClimateData
 import java.time.MonthDay
-import in2000.prosjekt.in2000project.domain.model.Coordinate
 
 /**
  * UI state for the map screen.

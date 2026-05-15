@@ -1,8 +1,8 @@
 package in2000.prosjekt.in2000project
 
 import in2000.prosjekt.in2000project.data.datasource.KtorLocationDataSource
-import in2000.prosjekt.in2000project.data.repository.KartverketLocationRepository
 import in2000.prosjekt.in2000project.data.datasource.LocationDataSource
+import in2000.prosjekt.in2000project.data.repository.KartverketLocationRepository
 import in2000.prosjekt.in2000project.domain.repository.LocationRepository
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
@@ -11,9 +11,10 @@ import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 import org.junit.After
-import org.junit.Test
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
 import org.junit.Before
+import org.junit.Test
 
 class SearchBarTest {
 

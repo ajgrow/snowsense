@@ -1,13 +1,19 @@
 package in2000.prosjekt.in2000project.data.repository
 
-import in2000.prosjekt.in2000project.data.datasource.*
-import in2000.prosjekt.in2000project.data.datasource.dto.*
+import in2000.prosjekt.in2000project.data.datasource.FakeFrostV0DataSource
+import in2000.prosjekt.in2000project.data.datasource.dto.FrostV0PointDto
+import in2000.prosjekt.in2000project.data.datasource.makeDay
+import in2000.prosjekt.in2000project.data.datasource.makeObsResponse
+import in2000.prosjekt.in2000project.data.datasource.makeSource
+import in2000.prosjekt.in2000project.data.datasource.makeSourceResponse
 import in2000.prosjekt.in2000project.domain.model.Coordinate
+import in2000.prosjekt.in2000project.domain.model.enums.ElementType
 import in2000.prosjekt.in2000project.domain.model.exceptions.NoObservationsException
 import in2000.prosjekt.in2000project.domain.model.exceptions.NoStationFoundException
-import in2000.prosjekt.in2000project.domain.model.enums.ElementType
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import java.io.IOException
