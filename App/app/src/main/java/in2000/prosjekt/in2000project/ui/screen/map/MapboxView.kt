@@ -270,7 +270,7 @@ fun MapboxView(
                     .create(PointAnnotationOptions()
                         .withPoint(point)
                         .withIconImage(bitmap)
-                        .withIconSize(0.3)
+                        .withIconSize(1.0)
                     )
             } else {
                 existing.point = point

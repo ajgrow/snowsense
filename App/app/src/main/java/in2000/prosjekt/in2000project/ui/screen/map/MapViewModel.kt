@@ -131,11 +131,6 @@ class MapViewModel(
         fetchClimateData(coordinate.latitude, coordinate.longitude)
     }
 
-    private fun setTimeBoundary(start: MonthDay, end: MonthDay): MonthDay {
-        // TO DO - enforce max 1 month range
-        return end
-    }
-
     /**
      * Called when the sheet is dismissed.
      */
