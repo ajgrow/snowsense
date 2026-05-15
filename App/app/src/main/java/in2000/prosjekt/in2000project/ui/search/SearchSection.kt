@@ -82,7 +82,7 @@ fun SearchSection(
         onExpandedChange = { if (!it) onActiveChange(false) },
         inputField = {
             SearchBarDefaults.InputField(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().heightIn(max = 64.dp),
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.Default.Menu,

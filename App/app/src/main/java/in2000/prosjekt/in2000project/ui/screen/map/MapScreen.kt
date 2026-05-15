@@ -518,10 +518,14 @@ private fun MapScreen(
         )
 
         if (isSearchActive) {
+            val windowInfo = LocalWindowInfo.current
+            val searchTopPadding = (windowInfo.containerDpSize.height * 0.05f)
+                .coerceIn(24.dp, 120.dp)
+
             SearchSection(
                 modifier = Modifier
                     .focusRequester(focusRequester)
-                    .padding(top = 120.dp),
+                    .padding(top = searchTopPadding),
                 searchState = searchState,
                 onNavigateToMap = { coordinate ->
                     onSearchLocationRequested(
