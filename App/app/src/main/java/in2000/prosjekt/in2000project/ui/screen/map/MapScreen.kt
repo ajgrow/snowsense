@@ -39,7 +39,6 @@ import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberBottomSheetScaffoldState
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -87,6 +86,10 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.time.MonthDay
 import java.time.Year
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import in2000.prosjekt.in2000project.ui.risk.RiskViewModel
+import in2000.prosjekt.in2000project.ui.search.SearchViewModel
+import org.koin.compose.viewmodel.koinViewModel
 
 private val previewClimateArea = ClimateArea(
     stationName = "",
@@ -96,9 +99,111 @@ private val previewClimateArea = ClimateArea(
     snowDepthData = emptyList()
 )
 
+/**
+ * Route-level Composable for the Map screen.
+ *
+ * @param searchViewModel ViewModel for searching for locations
+ * @param riskViewModel ViewModel for getting risk information
+ * @param mapStateHolder State holder for the map
+ * @param mapViewModel ViewModel for the map
+ */
+@Composable
+fun MapRoute(
+    searchViewModel: SearchViewModel,
+    riskViewModel: RiskViewModel,
+    mapStateHolder: MapStateHolder,
+    mapViewModel: MapViewModel = koinViewModel()
+) {
+    val screenState by mapViewModel.screenState.collectAsStateWithLifecycle()
+    val riskState by riskViewModel.riskState.collectAsStateWithLifecycle()
+    val searchState by searchViewModel.searchState.collectAsStateWithLifecycle()
+    val overlayState by mapStateHolder.overlayState.collectAsStateWithLifecycle()
+    val pin by mapStateHolder.pinnedPoint.collectAsStateWithLifecycle()
+
+    LaunchedEffect(pin) {
+        pin?.let {
+            mapViewModel.onMapClick(it.latitude(), it.longitude())
+            riskViewModel.updateDangerLevel(it.latitude(), it.longitude())
+        }
+    }
+
+    var showFavoriteDialog by remember { mutableStateOf(false) }
+
+    val climateArea = remember(screenState.climateState) {
+        val state = screenState.climateState
+        if (state is ClimateState.Success) {
+            state.data.toClimateArea()
+        } else {
+            null
+        }
+    } ?: previewClimateArea
+
+    if (showFavoriteDialog) {
+        TextInputDialog(
+            title = stringResource(R.string.name_favorite_prompt),
+            defaultValue = when (screenState.climateState) {
+                is ClimateState.Success -> {
+                    climateArea.stationName ?: stringResource(R.string.missing_station_name)
+                }
+
+                else -> {
+                    ""
+                }
+            },
+            onConfirm = { name ->
+                if (name.isNotBlank()) {
+                    searchViewModel.nameFavorite(name)
+                    showFavoriteDialog = false
+                }
+            },
+            onDismiss = { showFavoriteDialog = false }
+        )
+    }
+
+    LaunchedEffect(Unit) {
+        searchViewModel.clearQuery()
+    }
+
+    MapScreen(
+        screenState = screenState,
+        riskState = riskState,
+        overlayState = overlayState,
+        searchState = searchState,
+        onSearchLocationRequested = mapStateHolder::flyToSearch,
+        onZoomIn = mapStateHolder::onZoomIn,
+        onZoomOut = mapStateHolder::onZoomOut,
+        onOverlayRetry = mapStateHolder::onOverlayLoading,
+        onSheetDismiss = {
+            mapViewModel.onSheetDismissed()
+            mapStateHolder.clearPin()
+        },
+        onStartDateChange = { it?.let(mapViewModel::onStartDateChange) },
+        onEndDateChange = { it?.let(mapViewModel::onEndDateChange) },
+        onYearChange = { it?.let(mapViewModel::onYearChange) },
+        onQueryChange = searchViewModel::onQueryChange,
+        onSelectResult = searchViewModel::selectSearchResult,
+        onAddFavorite = {
+            screenState.climateCoordinate?.let { coordinate ->
+                searchViewModel.addPendingFavorite(coordinate)
+                showFavoriteDialog = true
+            }
+        },
+        onBottomPaddingChanged = mapStateHolder::setBottomPadding,
+        canAddFavorite = {
+            val coordinate = screenState.climateCoordinate
+            if (coordinate != null) {
+                !searchState.favorites.any { it.coordinate == coordinate }
+            } else {
+                false
+            }
+        },
+        onSearchActiveChange = searchViewModel::setSearchActive
+    )
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MapScreen(
+private fun MapScreen(
     modifier: Modifier = Modifier,
     screenState: MapScreenState,
     riskState: RiskUiState,
@@ -238,7 +343,7 @@ fun MapScreen(
     val mapDesc = stringResource(R.string.map_title)
 
     Box(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .semantics {
                 paneTitle = mapDesc
@@ -416,7 +521,7 @@ fun MapScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BottomSheetContent(
+private fun BottomSheetContent(
     area: ClimateArea,
     climateState: ClimateState,
     dangerLevel: DangerLevelUiModel?,
@@ -586,6 +691,15 @@ fun BottomSheetContent(
                             endDate = endDate,
                             title = stringResource(R.string.mean_wind_desc)
                         )
+
+                        HorizontalDivider()
+
+                        ClimateGraph(
+                            dataPoints = area.snowDepthData,
+                            startDate = startDate,
+                            endDate = endDate,
+                            title = stringResource(R.string.mean_snow_desc)
+                        )
                     }
                 }
             }
@@ -631,10 +745,6 @@ fun MapScreenErrorPreview() {
 @Preview(showBackground = true)
 @Composable
 fun BottomSheetPreview() {
-    val sheetState = rememberModalBottomSheetState(
-        skipPartiallyExpanded = false
-    )
-
     BottomSheetContent(
         area = previewClimateArea,
         climateState = ClimateState.Idle,

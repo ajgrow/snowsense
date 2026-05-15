@@ -263,7 +263,7 @@ private fun FavoriteSection(
             modifier = Modifier.padding(horizontal = 16.dp).semantics { heading() }
         )
         LazyRow(
-            contentPadding = PaddingValues(horizontal = 8.dp),
+            contentPadding = PaddingValues(horizontal = 16.dp),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             items(items) { location ->
@@ -301,7 +301,7 @@ private fun RecentSection(
         )
 
         LazyRow(
-            contentPadding = PaddingValues(horizontal = 8.dp),
+            contentPadding = PaddingValues(horizontal = 16.dp),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             items(items) { location ->

@@ -67,7 +67,7 @@
 
     <string name="retry">Prøv igjen</string>
 
-    <string name="open_search">Åpen Søk</string>
+    <string name="open_search">Åpne Søk</string>
 
 
     <string name="nav_home_desc">Gå til hjemskjerm</string>
@@ -78,9 +78,9 @@
 
     <string name="topbar_settings">Innstillinger</string>
 
-    <string name="date_start">Startdato</string>
-    <string name="date_end">Sluttdato</string>
-    <string name="since_year">Siden år</string>
+    <string name="date_start">Start</string>
+    <string name="date_end">Slutt</string>
+    <string name="since_year">Siden</string>
 
     <string name="dialog_ok">OK</string>
     <string name="dialog_save">Lagre</string>
@@ -177,7 +177,8 @@
     <string name="is_expanded">Er utvidet</string>
     <string name="is_not_expanded">Er ikke utvidet</string>
     <string name="enter_value_desc">Skriv inn verdi</string>
-    <string name="emergency_call_confirm_desc">Ring %1$s?</string>>
+    <string name="emergency_call_confirm_desc">Ring %1$s?</string>
+    <string name="mean_snow_desc">Gjennomsnittlig snødybde</string>>
 
 
 </resources>
