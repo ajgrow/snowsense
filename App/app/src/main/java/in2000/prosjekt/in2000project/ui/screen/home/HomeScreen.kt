@@ -269,7 +269,8 @@ private fun FavoriteSection(
             items(items) { location ->
                 val locationRiskState = riskState.locationRisks[location.coordinate]
                 LocationCard(
-                    location,
+                    modifier = modifier,
+                    location = location,
                     onNavigateToMap = onNavigateToMap,
                     dangerLevel = locationRiskState?.dangerLevel,
                     isLoading = locationRiskState?.isLoading == true,
@@ -306,7 +307,8 @@ private fun RecentSection(
         ) {
             items(items) { location ->
                 LocationCard(
-                    location,
+                    modifier = modifier,
+                    location = location,
                     onNavigateToMap = onNavigateToMap,
                     onRemoveLocation = onRemoveLocation,
                 )
@@ -317,6 +319,7 @@ private fun RecentSection(
 
 @Composable
 private fun LocationCard(
+    modifier: Modifier = Modifier,
     location: NamedLocation,
     onNavigateToMap: (coordinate: Coordinate) -> Unit,
     onRemoveLocation: (NamedLocation) -> Unit,
@@ -326,7 +329,7 @@ private fun LocationCard(
     removeButtonAtBottom: Boolean = false,
 ) {
     Box(
-        modifier = Modifier
+        modifier = modifier
             .width(160.dp)
             .wrapContentHeight()
     ) {
@@ -348,7 +351,7 @@ private fun LocationCard(
             ) {
                 Text(
                     text = location.name,
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth(0.8f),
                     fontWeight = Bold,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 1,

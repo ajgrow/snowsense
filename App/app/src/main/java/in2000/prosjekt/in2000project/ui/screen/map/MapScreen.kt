@@ -54,10 +54,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalWindowInfo
+import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
@@ -279,6 +284,26 @@ private fun MapScreen(
 
     val scope = rememberCoroutineScope()
 
+    val atTop by remember {
+        derivedStateOf {
+            listState.firstVisibleItemIndex == 0 &&
+                    listState.firstVisibleItemScrollOffset == 0
+        }
+    }
+
+    // used to prevent dragging the sheet when it should be scrolled
+    val nestedScrollConnection = remember(atTop) {
+        object : NestedScrollConnection {
+            override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+                return if (available.y > 0 && atTop) {
+                    Offset.Zero
+                } else {
+                    Offset.Zero
+                }
+            }
+        }
+    }
+
     val showScrollButton by remember {
         derivedStateOf {
             val layoutInfo = listState.layoutInfo
@@ -339,6 +364,8 @@ private fun MapScreen(
             sheetState.hide()
         }
     }
+
+
 
     val mapDesc = stringResource(R.string.map_title)
 
@@ -424,6 +451,7 @@ private fun MapScreen(
             containerColor = Color.Transparent,
             scaffoldState = scaffoldState,
             sheetPeekHeight = peekHeight,
+            sheetSwipeEnabled = atTop,
             sheetContent = {
                 BottomSheetContent(
                     area = skiArea,
@@ -431,9 +459,7 @@ private fun MapScreen(
                     dangerLevel = riskState.dangerLevel,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .heightIn(min = 320.dp)
-                        .navigationBarsPadding()
-                        .padding(bottom = 12.dp),
+                        .heightIn(min = 320.dp),
                     startDate = screenState.startDate,
                     endDate = screenState.endDate,
                     selectedYear = screenState.selectedYear,
@@ -443,6 +469,7 @@ private fun MapScreen(
                     onAddFavorite = onAddFavorite,
                     canAddFavorite = canAddFavorite,
                     listState = listState,
+                    nestedScrollConnection = nestedScrollConnection
                 )
             }
         ) { innerPadding ->
@@ -535,17 +562,20 @@ private fun BottomSheetContent(
     canAddFavorite: () -> Boolean,
     onAddFavorite: () -> Unit,
     listState: LazyListState,
+    nestedScrollConnection: NestedScrollConnection
 ) {
     Box(
         modifier = modifier
             .fillMaxWidth()
             .fillMaxHeight()
     ) {
+
         LazyColumn(
             state = listState,
-            modifier = modifier
+            modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 20.dp, vertical = 8.dp),
+                .padding(horizontal = 20.dp)
+                .nestedScroll(nestedScrollConnection),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             item {
@@ -758,5 +788,6 @@ fun BottomSheetPreview() {
         onAddFavorite = { },
         canAddFavorite = { false },
         listState = rememberLazyListState(),
+        nestedScrollConnection = rememberNestedScrollInteropConnection()
     )
 }
