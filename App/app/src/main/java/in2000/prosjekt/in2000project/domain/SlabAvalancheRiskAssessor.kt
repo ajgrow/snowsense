@@ -4,7 +4,9 @@ import in2000.prosjekt.in2000project.domain.model.DailyWeatherRecord
 import in2000.prosjekt.in2000project.domain.model.enums.DangerLevel
 import kotlin.math.sqrt
 
-// Estimates slab avalanche danger from daily weather observations.
+/**
+ * Estimates slab avalanche danger from daily weather observations.
+ */
 class SlabAvalancheRiskAssessor {
     companion object {
         const val LOOKBACK_DAYS = 30
@@ -30,6 +32,11 @@ class SlabAvalancheRiskAssessor {
         private const val THRESHOLD_VERY_HIGH = 0.75
     }
 
+    /**
+     * Estimates the risk of slab avalanche given a list of daily weather records.
+     *
+     * @param days A list of daily weather records.
+     */
     fun assess(days: List<DailyWeatherRecord>): DangerLevel {
         if (days.isEmpty() || days.size < RECENT_DAYS)
             return DangerLevel.UNKNOWN
@@ -41,8 +48,8 @@ class SlabAvalancheRiskAssessor {
         val trigger = calcTrigger(recent)
         val score = (structural
                 * (STRUCTURAL_BASELINE
-                    + (1.0 - STRUCTURAL_BASELINE)
-                        * trigger))
+                + (1.0 - STRUCTURAL_BASELINE)
+                * trigger))
 
         return when {
             score >= THRESHOLD_VERY_HIGH -> DangerLevel.VERY_HIGH
@@ -88,18 +95,20 @@ class SlabAvalancheRiskAssessor {
             }
         }
 
-        if (!weakLayerConfirmed || slabLwe < SLAB_BACKBONE_MIN_LWE )
+        if (!weakLayerConfirmed || slabLwe < SLAB_BACKBONE_MIN_LWE)
             return 0.0
 
         val weakLayerFactor = normalize(
             weakLayerLwe,
             WEAK_LAYER_LOW,
-            WEAK_LAYER_HIGH)
+            WEAK_LAYER_HIGH
+        )
 
         val slabFactor = normalize(
             slabLwe,
             SLAB_LOAD_LOW,
-            SLAB_LOAD_HIGH)
+            SLAB_LOAD_HIGH
+        )
 
         return sqrt(weakLayerFactor * slabFactor)
     }
@@ -125,10 +134,12 @@ class SlabAvalancheRiskAssessor {
         return normalize(
             recentColdLwe,
             RECENT_LOADING_LOW,
-            RECENT_LOADING_HIGH)
+            RECENT_LOADING_HIGH
+        )
     }
 
-    internal fun calcRapidWarming(recentDays: List<DailyWeatherRecord>
+    internal fun calcRapidWarming(
+        recentDays: List<DailyWeatherRecord>
     ): Double {
         val temps = recentDays.mapNotNull { it.tempC }
 
@@ -141,7 +152,8 @@ class SlabAvalancheRiskAssessor {
         return normalize(
             warmingDelta,
             RAPID_WARMING_LOW,
-            RAPID_WARMING_HIGH)
+            RAPID_WARMING_HIGH
+        )
     }
 
     // Clamps value into [0, 1] between low and high.

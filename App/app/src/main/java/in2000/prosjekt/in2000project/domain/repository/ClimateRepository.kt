@@ -2,6 +2,8 @@ package in2000.prosjekt.in2000project.domain.repository
 
 import in2000.prosjekt.in2000project.domain.model.Coordinate
 import in2000.prosjekt.in2000project.domain.model.LocationClimateData
+import in2000.prosjekt.in2000project.domain.model.exceptions.NoObservationsException
+import in2000.prosjekt.in2000project.domain.model.exceptions.NoStationFoundException
 import java.time.MonthDay
 
 /**
@@ -20,10 +22,10 @@ interface ClimateRepository {
      * @param periodStart First day of the period (inclusive), e.g. March 23.
      * @param periodEnd Last day of the period (inclusive), e.g. April 22.
      * @param yearsBack Number of additional years to include periods from (e.g. 9 → queries 2017–2026 if current year is 2026).
-     * @return [in2000.prosjekt.in2000project.domain.model.LocationClimateData] with averaged daily values and metadata.
+     * @return [LocationClimateData] with averaged daily values and metadata.
      * @throws java.io.IOException on network failures.
-     * @throws in2000.prosjekt.in2000project.domain.model.exceptions.NoObservationsException if the station has no data for the requested period.
-     * @throws in2000.prosjekt.in2000project.domain.model.exceptions.NoStationFoundException if no station is found for the requested coordinate.
+     * @throws NoObservationsException if the station has no data for the requested period.
+     * @throws NoStationFoundException if no station is found for the requested coordinate.
      */
     suspend fun getClimateDataForLocation(
         coordinate: Coordinate,

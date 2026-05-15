@@ -53,7 +53,7 @@ fun In2000projectTheme(
     content: @Composable () -> Unit
 ) {
     // Calculate if the theme should be dark based on in-app settings or system default
-    val isDarkTheme = when (themeMode){
+    val isDarkTheme = when (themeMode) {
         ThemeMode.SYSTEM -> isSystemInDarkTheme()
         ThemeMode.DARK -> true
         ThemeMode.LIGHT -> false
@@ -66,11 +66,11 @@ fun In2000projectTheme(
                 statusBarStyle = SystemBarStyle.auto(
                     android.graphics.Color.TRANSPARENT,
                     android.graphics.Color.TRANSPARENT
-                    ) { isDarkTheme },
+                ) { isDarkTheme },
                 navigationBarStyle = SystemBarStyle.auto(
                     android.graphics.Color.TRANSPARENT,
                     android.graphics.Color.TRANSPARENT
-                    ) { isDarkTheme },
+                ) { isDarkTheme },
             )
             onDispose { }
         }
@@ -81,6 +81,7 @@ fun In2000projectTheme(
             val context = LocalContext.current
             if (isDarkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
+
         isDarkTheme -> DarkColorScheme
         else -> LightColorScheme
     }

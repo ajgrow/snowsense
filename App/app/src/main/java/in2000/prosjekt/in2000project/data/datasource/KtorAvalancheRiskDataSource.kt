@@ -1,7 +1,6 @@
 package in2000.prosjekt.in2000project.data.datasource
 
 import in2000.prosjekt.in2000project.data.datasource.dto.GeoJsonResponseDto
-import in2000.prosjekt.in2000project.data.datasource.AvalancheRiskDataSource
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
@@ -13,7 +12,7 @@ class KtorAvalancheRiskDataSource(
     override suspend fun getGeoJson(lat: Double, lon: Double, buffer: Int): GeoJsonResponseDto {
         return try {
             client
-                .get("https://kart.nve.no/enterprise/rest/services/SnoskredAktsomhet/MapServer/3/query"){
+                .get("https://kart.nve.no/enterprise/rest/services/SnoskredAktsomhet/MapServer/3/query") {
                     parameter("where", "1=1")
 
                     parameter(
@@ -34,11 +33,12 @@ class KtorAvalancheRiskDataSource(
                     parameter("f", "geojson")
                 }
                 .body<GeoJsonResponseDto>()
-        } catch (e: Exception){
+        } catch (e: Exception) {
             e.printStackTrace()
             GeoJsonResponseDto(
                 features = emptyList(),
-                type = "FeatureCollection")
+                type = "FeatureCollection"
+            )
         }
     }
 }

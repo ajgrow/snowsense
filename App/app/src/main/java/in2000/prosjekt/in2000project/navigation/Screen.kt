@@ -1,7 +1,5 @@
 package in2000.prosjekt.in2000project.navigation
 
-import androidx.navigation.NavDestination
-
 sealed class Screen(
     val route: String
 ) {

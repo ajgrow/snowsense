@@ -2,7 +2,6 @@ package in2000.prosjekt.in2000project.data.datasource
 
 import in2000.prosjekt.in2000project.data.datasource.dto.LocationDto
 import in2000.prosjekt.in2000project.data.datasource.dto.LocationResponseDto
-import in2000.prosjekt.in2000project.data.datasource.LocationDataSource
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
@@ -15,7 +14,7 @@ private const val FILTER = "navn.representasjonspunkt,navn.skrivemåte,navn.navn
 class KtorLocationDataSource(
     private val client: HttpClient
 ) : LocationDataSource {
-    override suspend fun getNamesResponse(query: String) : List<LocationDto>? {
+    override suspend fun getNamesResponse(query: String): List<LocationDto>? {
         val fullQuery = buildLocationQuery(query)
         return try {
             val httpResponse: LocationResponseDto = client.get(fullQuery).body()

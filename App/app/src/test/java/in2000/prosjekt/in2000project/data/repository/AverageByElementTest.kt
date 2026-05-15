@@ -2,7 +2,8 @@ package in2000.prosjekt.in2000project.data.repository
 
 import in2000.prosjekt.in2000project.data.datasource.dto.FrostV0ObservationDto
 import in2000.prosjekt.in2000project.data.datasource.makeObservation
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class AverageByElementTest {
@@ -54,7 +55,11 @@ class AverageByElementTest {
             makeObservation(value = -2.0),
             makeObservation(elementId = "sum(precipitation_amount P1D)", value = 4.0, unit = "mm"),
             makeObservation(elementId = "mean(wind_speed P1D)", value = 3.0, unit = "m/s"),
-            makeObservation(elementId = "max(surface_snow_thickness P1D)", value = 50.0, unit = "cm"),
+            makeObservation(
+                elementId = "max(surface_snow_thickness P1D)",
+                value = 50.0,
+                unit = "cm"
+            ),
         )
         val result = obs.averageByElement()
         assertEquals(4, result.size)

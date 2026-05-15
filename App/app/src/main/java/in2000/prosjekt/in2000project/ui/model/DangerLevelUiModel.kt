@@ -3,9 +3,21 @@ package in2000.prosjekt.in2000project.ui.model
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
-import in2000.prosjekt.in2000project.domain.model.enums.DangerLevel
 import in2000.prosjekt.in2000project.R
-import in2000.prosjekt.in2000project.ui.theme.*
+import in2000.prosjekt.in2000project.domain.model.enums.DangerLevel
+import in2000.prosjekt.in2000project.ui.theme.DangerColorLevel0
+import in2000.prosjekt.in2000project.ui.theme.DangerColorLevel0Dark
+import in2000.prosjekt.in2000project.ui.theme.DangerColorLevel1
+import in2000.prosjekt.in2000project.ui.theme.DangerColorLevel1Dark
+import in2000.prosjekt.in2000project.ui.theme.DangerColorLevel2
+import in2000.prosjekt.in2000project.ui.theme.DangerColorLevel2Dark
+import in2000.prosjekt.in2000project.ui.theme.DangerColorLevel3
+import in2000.prosjekt.in2000project.ui.theme.DangerColorLevel3Dark
+import in2000.prosjekt.in2000project.ui.theme.DangerColorLevel4
+import in2000.prosjekt.in2000project.ui.theme.DangerColorLevel4Dark
+import in2000.prosjekt.in2000project.ui.theme.DangerColorLevel5
+import in2000.prosjekt.in2000project.ui.theme.DangerColorLevel5Dark
+import in2000.prosjekt.in2000project.ui.theme.LocalIsDarkTheme
 
 /* Since danger level is shown on both the Map and Info screen, this model
 provides a single source of truth for the composables that use them
@@ -26,7 +38,7 @@ data class DangerLevelUiModel(
     }
 }
 
-/*Mapper extension function to convert a DangerLevel into a UI model.*/
+/**Mapper extension function to convert a DangerLevel into a UI model.**/
 fun DangerLevel.toUiModel(): DangerLevelUiModel {
     return when (this) {
         DangerLevel.UNKNOWN -> DangerLevelUiModel(
@@ -38,6 +50,7 @@ fun DangerLevel.toUiModel(): DangerLevelUiModel {
             lightColor = DangerColorLevel0,
             darkColor = DangerColorLevel0Dark
         )
+
         DangerLevel.LOW -> DangerLevelUiModel(
             level = this,
             numberRes = R.string.danger_level_1_number,
@@ -47,14 +60,17 @@ fun DangerLevel.toUiModel(): DangerLevelUiModel {
             lightColor = DangerColorLevel1,
             darkColor = DangerColorLevel1Dark
         )
+
         DangerLevel.MODERATE -> DangerLevelUiModel(
             level = this,
             numberRes = R.string.danger_level_2_number,
             titleRes = R.string.danger_level_2_title,
-            badgeLabelRes = R.string.danger_level_2_badge,            descriptionRes = R.string.danger_level_2_description,
+            badgeLabelRes = R.string.danger_level_2_badge,
+            descriptionRes = R.string.danger_level_2_description,
             lightColor = DangerColorLevel2,
             darkColor = DangerColorLevel2Dark
         )
+
         DangerLevel.CONSIDERABLE -> DangerLevelUiModel(
             level = this,
             numberRes = R.string.danger_level_3_number,
@@ -64,6 +80,7 @@ fun DangerLevel.toUiModel(): DangerLevelUiModel {
             lightColor = DangerColorLevel3,
             darkColor = DangerColorLevel3Dark
         )
+
         DangerLevel.HIGH -> DangerLevelUiModel(
             level = this,
             numberRes = R.string.danger_level_4_number,
@@ -73,6 +90,7 @@ fun DangerLevel.toUiModel(): DangerLevelUiModel {
             lightColor = DangerColorLevel4,
             darkColor = DangerColorLevel4Dark
         )
+
         DangerLevel.VERY_HIGH -> DangerLevelUiModel(
             level = this,
             numberRes = R.string.danger_level_5_number,

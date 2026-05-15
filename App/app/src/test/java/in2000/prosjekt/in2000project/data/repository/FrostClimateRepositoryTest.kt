@@ -1,13 +1,19 @@
 package in2000.prosjekt.in2000project.data.repository
 
-import in2000.prosjekt.in2000project.data.datasource.*
-import in2000.prosjekt.in2000project.data.datasource.dto.*
+import in2000.prosjekt.in2000project.data.datasource.FakeFrostV0DataSource
+import in2000.prosjekt.in2000project.data.datasource.dto.FrostV0PointDto
+import in2000.prosjekt.in2000project.data.datasource.makeDay
+import in2000.prosjekt.in2000project.data.datasource.makeObsResponse
+import in2000.prosjekt.in2000project.data.datasource.makeSource
+import in2000.prosjekt.in2000project.data.datasource.makeSourceResponse
 import in2000.prosjekt.in2000project.domain.model.Coordinate
+import in2000.prosjekt.in2000project.domain.model.enums.ElementType
 import in2000.prosjekt.in2000project.domain.model.exceptions.NoObservationsException
 import in2000.prosjekt.in2000project.domain.model.exceptions.NoStationFoundException
-import in2000.prosjekt.in2000project.domain.model.enums.ElementType
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import java.io.IOException
@@ -128,10 +134,14 @@ class FrostClimateRepositoryTest {
             10,
         )
 
-        val temp2024 = result.yearlyAverages.find { it.year == 2024 && it.type == ElementType.TEMPERATURE_MEAN_P1D }!!.avgValue
-        val temp2025 = result.yearlyAverages.find { it.year == 2025 && it.type == ElementType.TEMPERATURE_MEAN_P1D }!!.avgValue
-        val precip2024 = result.yearlyAverages.find { it.year == 2024 && it.type == ElementType.PRECIPITATION_SUM_P1D }!!.avgValue
-        val wind2025 = result.yearlyAverages.find { it.year == 2025 && it.type == ElementType.WIND_SPEED_MEAN_P1D }!!.avgValue
+        val temp2024 =
+            result.yearlyAverages.find { it.year == 2024 && it.type == ElementType.TEMPERATURE_MEAN_P1D }!!.avgValue
+        val temp2025 =
+            result.yearlyAverages.find { it.year == 2025 && it.type == ElementType.TEMPERATURE_MEAN_P1D }!!.avgValue
+        val precip2024 =
+            result.yearlyAverages.find { it.year == 2024 && it.type == ElementType.PRECIPITATION_SUM_P1D }!!.avgValue
+        val wind2025 =
+            result.yearlyAverages.find { it.year == 2025 && it.type == ElementType.WIND_SPEED_MEAN_P1D }!!.avgValue
 
         assertEquals(-2.0, temp2024, 0.001)
         assertEquals(-4.0, temp2025, 0.001)
@@ -152,7 +162,8 @@ class FrostClimateRepositoryTest {
             10,
         )
 
-        val snow = result.yearlyAverages.find { it.year == 2024 && it.type == ElementType.SNOW_DEPTH_MAX_P1D }
+        val snow =
+            result.yearlyAverages.find { it.year == 2024 && it.type == ElementType.SNOW_DEPTH_MAX_P1D }
 
         assertNull(snow)
     }

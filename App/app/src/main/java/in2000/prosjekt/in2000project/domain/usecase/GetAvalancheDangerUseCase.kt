@@ -6,6 +6,9 @@ import in2000.prosjekt.in2000project.domain.model.enums.DangerLevel
 import in2000.prosjekt.in2000project.domain.repository.AvalancheRiskRepository
 import in2000.prosjekt.in2000project.domain.repository.WeatherRepository
 
+/**
+ * Use case for getting the avalanche danger level for a location.
+ */
 class GetAvalancheDangerUseCase(
     private val weatherRepository: WeatherRepository,
     private val avalancheRiskRepository: AvalancheRiskRepository,
@@ -18,7 +21,8 @@ class GetAvalancheDangerUseCase(
             .getGeoJsonStatus(
                 coordinate.latitude,
                 coordinate.longitude,
-                10)
+                10
+            )
 
         if (!isDangerZone)
             return DangerLevel.LOW
@@ -28,13 +32,14 @@ class GetAvalancheDangerUseCase(
                 coordinate,
                 lookBackDays = SlabAvalancheRiskAssessor.LOOKBACK_DAYS
             )
-        } catch(e: Exception) {
+        } catch (e: Exception) {
             emptyList()
         }
 
         // -1 days to account for current date data missing
         if (records.isEmpty()
-            || records.size < (SlabAvalancheRiskAssessor.LOOKBACK_DAYS - 1))
+            || records.size < (SlabAvalancheRiskAssessor.LOOKBACK_DAYS - 1)
+        )
             return DangerLevel.UNKNOWN
 
         return slabAvalancheRiskAssessor.assess(records)

@@ -34,15 +34,13 @@ import in2000.prosjekt.in2000project.domain.model.enums.DangerLevel
 import in2000.prosjekt.in2000project.ui.model.DangerLevelUiModel
 import in2000.prosjekt.in2000project.ui.model.toUiModel
 
-/*
-These components now accept DangerLevelUiModel instead of the DangerLevel enum.
-The [uiModel] is nullable. If null, a neutral "Not checked" card is displayed.
+/**
+ * Danger level header for the app.
+ *
+ * @param modifier The modifier to apply to the header.
+ * @param uiModel The danger level to display.
+ * @param highlightNumberOnly Whether to highlight only the number.
  */
-
-/*
-  * highlightNumberOnly:  Show number as colored chip (DangerLevelItem)
-  * or plain text (used in DangerLevelCard)
-*/
 @Composable
 fun DangerLevelHeader(
     modifier: Modifier = Modifier,
@@ -89,7 +87,8 @@ fun DangerLevelItem(
     uiModel: DangerLevelUiModel
 ) {
     var expanded by rememberSaveable { mutableStateOf(false) }
-    var expandedDescription = stringResource(if (expanded) R.string.hide_info else R.string.show_info)
+    val expandedDescription =
+        stringResource(if (expanded) R.string.hide_info else R.string.show_info)
 
     Surface(
         modifier = modifier

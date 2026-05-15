@@ -30,6 +30,13 @@ import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.unit.dp
 import in2000.prosjekt.in2000project.R
 
+/**
+ * Safety advice section for the app.
+ *
+ * @param title The title of the section.
+ * @param bullets The list of bullets to display.
+ * @param showDivider Whether to show a divider between the section and the next section.
+ */
 @Composable
 fun SafetyAdvice(
     modifier: Modifier = Modifier,
@@ -39,7 +46,8 @@ fun SafetyAdvice(
 ) {
     var expanded by rememberSaveable { mutableStateOf(false) }
     val expandedText = stringResource(if (expanded) R.string.hide_info else R.string.show_info)
-    val expandedDescription = stringResource(if (expanded) R.string.is_expanded else R.string.is_not_expanded)
+    val expandedDescription =
+        stringResource(if (expanded) R.string.is_expanded else R.string.is_not_expanded)
 
     Column(modifier = modifier.fillMaxWidth()) {
         Row(

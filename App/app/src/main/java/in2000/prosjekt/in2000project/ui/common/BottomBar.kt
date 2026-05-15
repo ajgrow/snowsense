@@ -16,8 +16,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavDestination
 import in2000.prosjekt.in2000project.R
 import in2000.prosjekt.in2000project.navigation.Screen
-import kotlin.collections.contains
 
+/**
+ * Bottom navigation bar for the app.
+ *
+ * @param modifier The modifier to apply to the bottom bar.
+ * @param currentRoute The current route.
+ * @param onClick The callback to invoke when a navigation item is clicked.
+ */
 @Composable
 fun BottomBar(
     modifier: Modifier = Modifier,
@@ -30,27 +36,33 @@ fun BottomBar(
     ) {
         NavigationBarItem(
             selected = currentRoute == Screen.Home.route,
-            onClick = { onClick(Screen.Home.route) } ,
-            icon = { Icon(
-                imageVector = Icons.Default.Home,
-                contentDescription = stringResource(R.string.nav_home_desc),
-                ) }
+            onClick = { onClick(Screen.Home.route) },
+            icon = {
+                Icon(
+                    imageVector = Icons.Default.Home,
+                    contentDescription = stringResource(R.string.nav_home_desc),
+                )
+            }
         )
         NavigationBarItem(
             selected = currentRoute == Screen.Map.route,
             onClick = { onClick(Screen.Map.route) },
-            icon = { Icon(
-                imageVector = Icons.Default.Place,
-                contentDescription = stringResource(R.string.nav_map_desc),
-                ) }
+            icon = {
+                Icon(
+                    imageVector = Icons.Default.Place,
+                    contentDescription = stringResource(R.string.nav_map_desc),
+                )
+            }
         )
         NavigationBarItem(
             selected = currentRoute == Screen.Info.route,
             onClick = { onClick(Screen.Info.route) },
-            icon = { Icon(
-                imageVector = Icons.Default.Info,
-                contentDescription = stringResource(R.string.nav_info_desc),
-                ) }
+            icon = {
+                Icon(
+                    imageVector = Icons.Default.Info,
+                    contentDescription = stringResource(R.string.nav_info_desc),
+                )
+            }
         )
     }
 }
@@ -59,7 +71,7 @@ fun BottomBar(
 @Composable
 fun BottomBarPreview(
     modifier: Modifier = Modifier,
-){
+) {
     BottomBar(
         modifier,
         currentRoute = Screen.Home.route,
@@ -67,8 +79,7 @@ fun BottomBarPreview(
     )
 }
 
-internal fun NavDestination?.isBottomBarScreen()
-    = this?.route in setOf(
+internal fun NavDestination?.isBottomBarScreen() = this?.route in setOf(
     Screen.Home.route,
     Screen.Map.route,
     Screen.Info.route,

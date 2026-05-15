@@ -4,15 +4,20 @@ import android.app.Application
 import android.content.Context
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.core.content.edit
 import androidx.core.os.LocaleListCompat
 import androidx.lifecycle.AndroidViewModel
 import java.util.Locale
 
-class SettingsViewModel(application: Application)
-    : AndroidViewModel(application)
-{
+/**
+ * ViewModel for the settings screen.
+ *
+ * @param application Application context.
+ */
+class SettingsViewModel(application: Application) : AndroidViewModel(application) {
     private val prefs = application
         .getSharedPreferences("settings", Context.MODE_PRIVATE)
 
@@ -24,7 +29,7 @@ class SettingsViewModel(application: Application)
         )
     )
 
-    var textScale by mutableStateOf(
+    var textScale by mutableFloatStateOf(
         prefs.getFloat("text_scale", 1.5f)
     )
         private set
@@ -32,19 +37,25 @@ class SettingsViewModel(application: Application)
     var languageMode by mutableStateOf(currentLanguageMode())
         private set
 
-    fun setTheme(mode: ThemeMode){
+    fun setTheme(mode: ThemeMode) {
         themeMode = mode
-        prefs.edit().putString(
-            "theme_mode", mode.name).apply()
+        prefs.edit {
+            putString(
+                "theme_mode", mode.name
+            )
+        }
     }
 
-    fun updateTextScale(scale: Float){
+    fun updateTextScale(scale: Float) {
         textScale = scale
-        prefs.edit().putFloat(
-            "text_scale", scale).apply()
+        prefs.edit {
+            putFloat(
+                "text_scale", scale
+            )
+        }
     }
 
-    fun resetTextScale(){
+    fun resetTextScale() {
         updateTextScale(1.5f)
     }
 
@@ -52,23 +63,24 @@ class SettingsViewModel(application: Application)
         languageMode = mode
         AppCompatDelegate
             .setApplicationLocales(
-                LocaleListCompat.forLanguageTags(mode.tag))
+                LocaleListCompat.forLanguageTags(mode.tag)
+            )
     }
 
 
     private fun currentLanguageMode(
-    ): AppLanguageMode
-    = AppCompatDelegate
+    ): AppLanguageMode = AppCompatDelegate
         .getApplicationLocales()
         .toLanguageTags()
         .split(",")
         .firstOrNull()
         ?.takeIf { it.isNotEmpty() }
-        ?.let { AppLanguageMode.Companion.fromTag(it) }
-        ?: AppLanguageMode.Companion
+        ?.let { AppLanguageMode.fromTag(it) }
+        ?: AppLanguageMode
             .fromTag(
                 Locale
-                .getDefault().language)
+                    .getDefault().language
+            )
 
     fun refreshLanguageMode() {
         languageMode = currentLanguageMode()

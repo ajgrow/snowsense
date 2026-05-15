@@ -4,12 +4,12 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class FrostV0SourceResponseDto (
+data class FrostV0SourceResponseDto(
     val data: List<FrostV0SourceDto>
 )
 
 @Serializable
-data class FrostV0SourceDto (
+data class FrostV0SourceDto(
     val id: String? = null,
     val name: String? = null,
     val shortName: String? = null,
@@ -22,7 +22,7 @@ data class FrostV0SourceDto (
 )
 
 @Serializable
-data class FrostV0PointDto (
+data class FrostV0PointDto(
     @SerialName("@type") val type: String,
     val coordinates: List<Double>
 )

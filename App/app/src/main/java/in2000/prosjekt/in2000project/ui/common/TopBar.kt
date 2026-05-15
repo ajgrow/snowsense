@@ -19,17 +19,22 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import in2000.prosjekt.in2000project.R
 
+/**
+ * Top bar for the app.
+ *
+ * @param title The title to display.
+ * @param onSettingsClick The callback to invoke when the settings button is clicked.
+ * @param onBackClick The callback to invoke when the back button is clicked.
+ */
 @Composable
 fun TopBar(
-    modifier: Modifier = Modifier,
     title: String? = null,
     onSettingsClick: () -> Unit = {},
     onBackClick: (() -> Unit)? = null,
-    ){
+) {
 
     Box(
         modifier = Modifier
@@ -37,8 +42,8 @@ fun TopBar(
             .background(MaterialTheme.colorScheme.surface)
             .padding(vertical = 4.dp),
         contentAlignment = Alignment.Center
-    ){
-        title?.let{
+    ) {
+        title?.let {
             Text(
                 text = it,
                 style = MaterialTheme.typography.headlineMedium,
@@ -75,13 +80,4 @@ fun TopBar(
             }
         }
     }
-}
-
-
-@Preview
-@Composable
-fun TopBarPreview(
-    modifier: Modifier = Modifier
-){
-    TopBar(modifier, "**title**")
 }

@@ -14,6 +14,7 @@ data class FeatureDto(
     val geometry: GeometryDto?,
     val properties: PropertiesDto?,
 )
+
 @Serializable
 data class GeometryDto(
     val coordinates: List<List<List<Double>>>?,

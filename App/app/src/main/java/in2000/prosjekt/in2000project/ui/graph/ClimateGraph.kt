@@ -14,7 +14,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
-import in2000.prosjekt.in2000project.R
 import com.patrykandpatrick.vico.compose.axis.horizontal.rememberBottomAxis
 import com.patrykandpatrick.vico.compose.axis.vertical.rememberStartAxis
 import com.patrykandpatrick.vico.compose.chart.Chart
@@ -22,9 +21,18 @@ import com.patrykandpatrick.vico.compose.chart.line.lineChart
 import com.patrykandpatrick.vico.compose.component.textComponent
 import com.patrykandpatrick.vico.core.entry.entryModelOf
 import com.patrykandpatrick.vico.core.entry.entryOf
+import in2000.prosjekt.in2000project.R
 import in2000.prosjekt.in2000project.domain.model.LocationClimateDataPoint
 import java.time.MonthDay
 
+/**
+ * Climate graph for the app.
+ *
+ * @param dataPoints The data points to display.
+ * @param startDate The start date of the data.
+ * @param endDate The end date of the data.
+ * @param title The title of the graph.
+ */
 @Composable
 fun ClimateGraph(
     dataPoints: List<LocationClimateDataPoint>,
@@ -39,7 +47,7 @@ fun ClimateGraph(
     Column(modifier = Modifier.padding(vertical = 8.dp)) {
         Text(
             text = "$title (${startDate.display()} - ${endDate.display()})",
-            modifier = Modifier.semantics{ heading() }
+            modifier = Modifier.semantics { heading() }
         )
 
         if (!entries.isEmpty()) {
@@ -62,10 +70,15 @@ fun ClimateGraph(
             )
         } else {
             Box(
-                modifier = Modifier.fillMaxWidth().height(180.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(180.dp),
                 contentAlignment = Alignment.Center
             ) {
-                Text(stringResource(R.string.no_graph_data), style = MaterialTheme.typography.bodySmall)
+                Text(
+                    stringResource(R.string.no_graph_data),
+                    style = MaterialTheme.typography.bodySmall
+                )
             }
         }
     }

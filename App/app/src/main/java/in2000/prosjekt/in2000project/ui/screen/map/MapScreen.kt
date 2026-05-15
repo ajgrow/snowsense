@@ -27,8 +27,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material3.Button
 import androidx.compose.material3.BottomSheetScaffold
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -39,7 +39,6 @@ import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberBottomSheetScaffoldState
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -56,9 +55,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalWindowInfo
+import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
@@ -67,30 +69,29 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import in2000.prosjekt.in2000project.R
-import in2000.prosjekt.in2000project.domain.model.ClimateArea
-import in2000.prosjekt.in2000project.domain.model.toClimateArea
-import in2000.prosjekt.in2000project.ui.graph.ClimateGraph
-import in2000.prosjekt.in2000project.ui.risk.DangerLevelCard
-import in2000.prosjekt.in2000project.ui.graph.DatePicker
-import org.koin.compose.viewmodel.koinViewModel
-import java.time.MonthDay
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mapbox.geojson.Point
+import in2000.prosjekt.in2000project.R
+import in2000.prosjekt.in2000project.domain.model.ClimateArea
 import in2000.prosjekt.in2000project.domain.model.NamedLocation
-import in2000.prosjekt.in2000project.ui.search.SearchViewModel
 import in2000.prosjekt.in2000project.domain.model.enums.DangerLevel
-import in2000.prosjekt.in2000project.ui.search.SearchDismissScrim
+import in2000.prosjekt.in2000project.domain.model.toClimateArea
+import in2000.prosjekt.in2000project.ui.graph.ClimateGraph
+import in2000.prosjekt.in2000project.ui.graph.DatePicker
 import in2000.prosjekt.in2000project.ui.model.DangerLevelUiModel
 import in2000.prosjekt.in2000project.ui.model.toUiModel
-import in2000.prosjekt.in2000project.ui.search.SearchSection
+import in2000.prosjekt.in2000project.ui.risk.DangerLevelCard
 import in2000.prosjekt.in2000project.ui.risk.RiskUiState
 import in2000.prosjekt.in2000project.ui.risk.RiskViewModel
+import in2000.prosjekt.in2000project.ui.search.SearchDismissScrim
+import in2000.prosjekt.in2000project.ui.search.SearchSection
 import in2000.prosjekt.in2000project.ui.search.SearchUiState
+import in2000.prosjekt.in2000project.ui.search.SearchViewModel
 import kotlinx.coroutines.flow.drop
-import org.koin.compose.koinInject
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import org.koin.compose.viewmodel.koinViewModel
+import java.time.MonthDay
 import java.time.Year
 
 private val previewClimateArea = ClimateArea(
@@ -101,13 +102,20 @@ private val previewClimateArea = ClimateArea(
     snowDepthData = emptyList()
 )
 
-//for use when the VM is ready
+/**
+ * Route-level Composable for the Map screen.
+ *
+ * @param searchViewModel ViewModel for searching for locations
+ * @param riskViewModel ViewModel for getting risk information
+ * @param mapStateHolder State holder for the map
+ * @param mapViewModel ViewModel for the map
+ */
 @Composable
 fun MapRoute(
     searchViewModel: SearchViewModel,
-    mapViewModel: MapViewModel = koinViewModel(),
-    riskViewModel: RiskViewModel = koinViewModel(),
-    mapStateHolder: MapStateHolder = koinInject()
+    riskViewModel: RiskViewModel,
+    mapStateHolder: MapStateHolder,
+    mapViewModel: MapViewModel = koinViewModel()
 ) {
     val screenState by mapViewModel.screenState.collectAsStateWithLifecycle()
     val riskState by riskViewModel.riskState.collectAsStateWithLifecycle()
@@ -196,10 +204,9 @@ fun MapRoute(
     )
 }
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MapScreen(
+private fun MapScreen(
     modifier: Modifier = Modifier,
     screenState: MapScreenState,
     riskState: RiskUiState,
@@ -275,6 +282,19 @@ fun MapScreen(
 
     val scope = rememberCoroutineScope()
 
+    val atTop by remember {
+        derivedStateOf {
+            listState.firstVisibleItemIndex == 0 &&
+                    listState.firstVisibleItemScrollOffset == 0
+        }
+    }
+
+    // used to prevent dragging the sheet when it should be scrolled
+    val nestedScrollConnection = remember(atTop) {
+        object : NestedScrollConnection {
+        }
+    }
+
     val showScrollButton by remember {
         derivedStateOf {
             val layoutInfo = listState.layoutInfo
@@ -311,6 +331,7 @@ fun MapScreen(
             .collect { value ->
                 if (value == SheetValue.Hidden) {
                     onSheetDismiss()
+                    listState.scrollToItem(0)
                 }
             }
     }
@@ -336,10 +357,11 @@ fun MapScreen(
         }
     }
 
+
     val mapDesc = stringResource(R.string.map_title)
 
     Box(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .semantics {
                 paneTitle = mapDesc
@@ -348,11 +370,15 @@ fun MapScreen(
         when (overlayState) {
             is OverlayState.Loading
                 -> OverlayStatusCard(
-                stringResource(R.string.overlay_loading))
+                stringResource(R.string.overlay_loading)
+            )
+
             is OverlayState.Error
                 -> OverlayRetryCard(
                 stringResource(R.string.overlay_error),
-                onOverlayRetry)
+                onOverlayRetry
+            )
+
             is OverlayState.Success
                 -> Unit
         }
@@ -420,6 +446,7 @@ fun MapScreen(
             containerColor = Color.Transparent,
             scaffoldState = scaffoldState,
             sheetPeekHeight = peekHeight,
+            sheetSwipeEnabled = atTop,
             sheetContent = {
                 BottomSheetContent(
                     area = skiArea,
@@ -427,9 +454,7 @@ fun MapScreen(
                     dangerLevel = riskState.dangerLevel,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .heightIn(min = 320.dp)
-                        .navigationBarsPadding()
-                        .padding(bottom = 12.dp),
+                        .heightIn(min = 320.dp),
                     startDate = screenState.startDate,
                     endDate = screenState.endDate,
                     selectedYear = screenState.selectedYear,
@@ -439,6 +464,7 @@ fun MapScreen(
                     onAddFavorite = onAddFavorite,
                     canAddFavorite = canAddFavorite,
                     listState = listState,
+                    nestedScrollConnection = nestedScrollConnection
                 )
             }
         ) { innerPadding ->
@@ -517,7 +543,7 @@ fun MapScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BottomSheetContent(
+private fun BottomSheetContent(
     area: ClimateArea,
     climateState: ClimateState,
     dangerLevel: DangerLevelUiModel?,
@@ -531,17 +557,20 @@ fun BottomSheetContent(
     canAddFavorite: () -> Boolean,
     onAddFavorite: () -> Unit,
     listState: LazyListState,
+    nestedScrollConnection: NestedScrollConnection
 ) {
     Box(
         modifier = modifier
             .fillMaxWidth()
             .fillMaxHeight()
     ) {
+
         LazyColumn(
             state = listState,
-            modifier = modifier
+            modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 20.dp, vertical = 8.dp),
+                .padding(horizontal = 20.dp)
+                .nestedScroll(nestedScrollConnection),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             item {
@@ -687,6 +716,15 @@ fun BottomSheetContent(
                             endDate = endDate,
                             title = stringResource(R.string.mean_wind_desc)
                         )
+
+                        HorizontalDivider()
+
+                        ClimateGraph(
+                            dataPoints = area.snowDepthData,
+                            startDate = startDate,
+                            endDate = endDate,
+                            title = stringResource(R.string.mean_snow_desc)
+                        )
                     }
                 }
             }
@@ -732,10 +770,6 @@ fun MapScreenErrorPreview() {
 @Preview(showBackground = true)
 @Composable
 fun BottomSheetPreview() {
-    val sheetState = rememberModalBottomSheetState(
-        skipPartiallyExpanded = false
-    )
-
     BottomSheetContent(
         area = previewClimateArea,
         climateState = ClimateState.Idle,
@@ -749,5 +783,6 @@ fun BottomSheetPreview() {
         onAddFavorite = { },
         canAddFavorite = { false },
         listState = rememberLazyListState(),
+        nestedScrollConnection = rememberNestedScrollInteropConnection()
     )
 }

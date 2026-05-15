@@ -3,12 +3,24 @@ package in2000.prosjekt.in2000project.ui.screen.information
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -21,23 +33,29 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import in2000.prosjekt.in2000project.R
 import in2000.prosjekt.in2000project.domain.model.enums.DangerLevel
-import in2000.prosjekt.in2000project.ui.emergency.EmergencySection
 import in2000.prosjekt.in2000project.ui.common.TopBar
+import in2000.prosjekt.in2000project.ui.emergency.EmergencySection
 import in2000.prosjekt.in2000project.ui.model.DangerLevelUiModel
 import in2000.prosjekt.in2000project.ui.model.toUiModel
 import in2000.prosjekt.in2000project.ui.risk.DangerLevelItem
 import org.koin.compose.viewmodel.koinViewModel
-import kotlin.math.exp
 
+
+/**
+ * Route-level Composable for the Info screen.
+ *
+ * @param infoViewModel ViewModel for getting info
+ * @param onSettingsClick Callback for when the settings button is clicked
+ */
 @Composable
-fun InfoScreen(
+fun InfoRoute(
     modifier: Modifier = Modifier,
-    onSettingsClick: () -> Unit = {},
-    infoViewModel: InfoViewModel = koinViewModel()
+    infoViewModel: InfoViewModel = koinViewModel(),
+    onSettingsClick: () -> Unit,
 ) {
     val uiState by infoViewModel.infoUiState.collectAsState()
 
-    InfoContent(
+    InfoScreen(
         modifier = modifier,
         state = uiState,
         onSettingsClick = onSettingsClick
@@ -45,7 +63,7 @@ fun InfoScreen(
 }
 
 @Composable
-fun InfoContent(
+private fun InfoScreen(
     modifier: Modifier = Modifier,
     state: InfoUiState,
     onSettingsClick: () -> Unit = {}
@@ -104,7 +122,7 @@ fun InfoContent(
 }
 
 @Composable
-fun DangerLevelsSection(
+private fun DangerLevelsSection(
     dangerLevels: List<DangerLevelUiModel>,
     modifier: Modifier = Modifier
 ) {
@@ -126,7 +144,7 @@ fun DangerLevelsSection(
 }
 
 @Composable
-fun InfoBox(
+private fun InfoBox(
     modifier: Modifier = Modifier,
     titleRes: Int,
     descRes: Int,
@@ -134,7 +152,8 @@ fun InfoBox(
 ) {
     var expanded by rememberSaveable { mutableStateOf(false) }
     val expandedText = stringResource(if (expanded) R.string.hide_info else R.string.show_info)
-    val expandedDescription = stringResource(if (expanded) R.string.is_expanded else R.string.is_not_expanded)
+    val expandedDescription =
+        stringResource(if (expanded) R.string.is_expanded else R.string.is_not_expanded)
 
     Surface(
         modifier = modifier
@@ -149,7 +168,8 @@ fun InfoBox(
                 role = Role.Button
             ) {
                 expanded = !expanded
-            }.semantics {
+            }
+            .semantics {
                 stateDescription = expandedDescription
             },
         shape = RoundedCornerShape(16.dp),
@@ -201,7 +221,7 @@ fun InfoBox(
 @Preview(showBackground = true)
 @Composable
 fun PreviewInfoScreen() {
-    InfoContent(
+    InfoScreen(
         state = InfoUiState(
             dangerLevels = DangerLevel.entries.map { it.toUiModel() }
         )
