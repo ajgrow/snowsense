@@ -1,6 +1,6 @@
 # IN2000 – Android app project
 
-SnowSense is an Android-app designed to help users evaluate avalanche risk and climate conditions for locations around Norway. The app allows users to search for locations, see historical climate data, gives evaluation for danger based on Frost and NVE data, and save locations as favourites for quicker access.
+SnowSense is an Android-app designed to help users evaluate avalanche risk and climate conditions for locations around Norway. The app allows users to search for locations, see historical climate data, gives evaluation for avalanche risk based on Frost and NVE data, and save locations as favourites for quicker access.
 
 # Team-members.
 
