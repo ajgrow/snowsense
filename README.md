@@ -101,15 +101,18 @@ The app does not use your device's GPS or location data. All location choices ha
 The project includes Unit tests and integration tests.
 
 - **Running unit tests:** You can run the Unit tests directly in Android Studio by right-clicking the test-folder and choosing *Run Tests*, or alternatively you can do it through the terminal:
+  
   ```
   ./gradlew test
   ```
-  - **Integration testing:** done through Frost API therefore requires that the 'FROST_CLIENT_ID' is set up in 'local.properties'), you can run this directly or through the terminal:
-    ```
-    ./gradlew test --tests "*.FrostApiIntegrationTest"
-    ```
 
-    ---
+- **Integration testing:** done through Frost API therefore requires that the 'FROST_CLIENT_ID' is set up in 'local.properties'), you can run this directly or through the terminal:
+
+  ```
+  ./gradlew test --tests "*.FrostApiIntegrationTest"
+  ```
+
+---
 
 ## Accessibility Features
 
