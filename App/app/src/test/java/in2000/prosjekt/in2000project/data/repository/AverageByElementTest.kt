@@ -2,7 +2,8 @@ package in2000.prosjekt.in2000project.data.repository
 
 import in2000.prosjekt.in2000project.data.datasource.dto.FrostV0ObservationDto
 import in2000.prosjekt.in2000project.data.datasource.makeObservation
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class AverageByElementTest {

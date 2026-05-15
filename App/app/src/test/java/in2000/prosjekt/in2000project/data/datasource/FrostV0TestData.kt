@@ -1,6 +1,11 @@
 package in2000.prosjekt.in2000project.data.datasource
 
-import in2000.prosjekt.in2000project.data.datasource.dto.*
+import in2000.prosjekt.in2000project.data.datasource.dto.FrostV0ObservationDto
+import in2000.prosjekt.in2000project.data.datasource.dto.FrostV0ObservationResponseDto
+import in2000.prosjekt.in2000project.data.datasource.dto.FrostV0ObservationsAtRefTimeDto
+import in2000.prosjekt.in2000project.data.datasource.dto.FrostV0PointDto
+import in2000.prosjekt.in2000project.data.datasource.dto.FrostV0SourceDto
+import in2000.prosjekt.in2000project.data.datasource.dto.FrostV0SourceResponseDto
 
 /** Shared factory functions for constructing Frost V0 DTOs in tests. */
 

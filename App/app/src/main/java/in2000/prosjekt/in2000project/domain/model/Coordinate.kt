@@ -2,6 +2,12 @@ package in2000.prosjekt.in2000project.domain.model
 
 import kotlinx.serialization.Serializable
 
+/**
+ * Represents a geographic coordinate.
+ *
+ * @param latitude Latitude in decimal degrees, range -90 to 90.
+ * @param longitude Longitude in decimal degrees, range -180 to 180.
+ */
 @Serializable
 data class Coordinate(
     val latitude: Double,

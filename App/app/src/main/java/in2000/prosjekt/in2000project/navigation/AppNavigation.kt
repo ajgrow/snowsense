@@ -6,17 +6,23 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.mapbox.geojson.Point
-import in2000.prosjekt.in2000project.ui.screen.home.HomeScreen
-import in2000.prosjekt.in2000project.ui.screen.information.InfoScreen
+import in2000.prosjekt.in2000project.ui.risk.RiskViewModel
+import in2000.prosjekt.in2000project.ui.screen.home.HomeRoute
+import in2000.prosjekt.in2000project.ui.screen.information.InfoRoute
 import in2000.prosjekt.in2000project.ui.screen.map.MapRoute
 import in2000.prosjekt.in2000project.ui.screen.map.MapStateHolder
-import in2000.prosjekt.in2000project.ui.risk.RiskViewModel
-import in2000.prosjekt.in2000project.ui.search.SearchViewModel
-import in2000.prosjekt.in2000project.ui.screen.settings.SettingScreen
+import in2000.prosjekt.in2000project.ui.screen.settings.SettingsRoute
 import in2000.prosjekt.in2000project.ui.screen.settings.SettingsViewModel
+import in2000.prosjekt.in2000project.ui.search.SearchViewModel
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 
+/**
+ * Holds the NavHost for the app, wiring shared ViewModels.
+ *
+ * @param navController The navigation controller.
+ * @param settingsViewModel The settings view model.
+ */
 @Composable
 fun AppNavigation(
     navController: NavHostController,
@@ -35,7 +41,7 @@ fun AppNavigation(
         modifier = modifier
     ) {
         composable(Screen.Home.route) {
-            HomeScreen(
+            HomeRoute(
                 onSettingsClick = { navController
                     .navigate(Screen
                         .Settings.route) },
@@ -52,18 +58,22 @@ fun AppNavigation(
         }
 
         composable(Screen.Map.route) {
-            MapRoute(searchViewModel = searchViewModel)
+            MapRoute(
+                mapStateHolder = mapStateHolder,
+                searchViewModel = searchViewModel,
+                riskViewModel = riskViewModel
+            )
         }
 
         composable(Screen.Info.route) {
-            InfoScreen(
+            InfoRoute(
                 onSettingsClick = { navController
                     .navigate(Screen
                         .Settings.route) })
         }
 
         composable(Screen.Settings.route) {
-            SettingScreen(
+            SettingsRoute(
                 onBackClick = navController::popBackStack,
                 settingsViewModel = settingsViewModel
             )

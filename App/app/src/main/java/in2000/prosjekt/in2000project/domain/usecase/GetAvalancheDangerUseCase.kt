@@ -6,6 +6,9 @@ import in2000.prosjekt.in2000project.domain.model.enums.DangerLevel
 import in2000.prosjekt.in2000project.domain.repository.AvalancheRiskRepository
 import in2000.prosjekt.in2000project.domain.repository.WeatherRepository
 
+/**
+ * Use case for getting the avalanche danger level for a location.
+ */
 class GetAvalancheDangerUseCase(
     private val weatherRepository: WeatherRepository,
     private val avalancheRiskRepository: AvalancheRiskRepository,

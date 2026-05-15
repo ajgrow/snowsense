@@ -5,15 +5,25 @@ import android.util.Log
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mapbox.common.Cancelable
 import com.mapbox.geojson.Point
 import com.mapbox.maps.CameraBoundsOptions
 import com.mapbox.maps.CameraOptions
 import com.mapbox.maps.CoordinateBounds
+import com.mapbox.maps.EdgeInsets
+import com.mapbox.maps.MapView
+import com.mapbox.maps.MapboxMap
 import com.mapbox.maps.Style
 import com.mapbox.maps.dsl.cameraOptions
 import com.mapbox.maps.extension.compose.MapEffect
@@ -21,24 +31,20 @@ import com.mapbox.maps.extension.compose.MapboxMap
 import com.mapbox.maps.extension.compose.animation.viewport.rememberMapViewportState
 import com.mapbox.maps.extension.style.layers.addLayer
 import com.mapbox.maps.extension.style.layers.generated.rasterLayer
+import com.mapbox.maps.extension.style.layers.properties.generated.ProjectionName
+import com.mapbox.maps.extension.style.projection.generated.Projection
+import com.mapbox.maps.extension.style.projection.generated.setProjection
 import com.mapbox.maps.extension.style.sources.addSource
 import com.mapbox.maps.extension.style.sources.generated.rasterSource
 import com.mapbox.maps.plugin.animation.MapAnimationOptions
 import com.mapbox.maps.plugin.annotation.annotations
+import com.mapbox.maps.plugin.annotation.generated.PointAnnotation
 import com.mapbox.maps.plugin.annotation.generated.PointAnnotationManager
 import com.mapbox.maps.plugin.annotation.generated.PointAnnotationOptions
 import com.mapbox.maps.plugin.annotation.generated.createPointAnnotationManager
 import com.mapbox.maps.plugin.gestures.gestures
 import com.mapbox.maps.toCameraOptions
 import in2000.prosjekt.in2000project.R
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.mapbox.maps.EdgeInsets
-import com.mapbox.maps.MapView
-import com.mapbox.maps.MapboxMap
-import com.mapbox.maps.extension.style.layers.properties.generated.ProjectionName
-import com.mapbox.maps.extension.style.projection.generated.Projection
-import com.mapbox.maps.extension.style.projection.generated.setProjection
-import com.mapbox.maps.plugin.annotation.generated.PointAnnotation
 
 private const val TAG = "SnoskredWMS"
 
@@ -59,6 +65,13 @@ private const val WMS_DETAIL =
             "&LAYERS=S2_snoskred_m_skogeffekt_Aktsomhetsomrade" +
             "&STYLES=&FORMAT=image/png&TRANSPARENT=TRUE"
 
+/**
+ * Mapbox wrapper Composable for displaying the map.
+ *
+ * @param mapStateHolder The state holder for the map.
+ * @param modifier The modifier to apply to the map.
+ * @param contentPadding The content padding to apply to the map.
+ */
 @Composable
 fun MapboxView(
     mapStateHolder: MapStateHolder,
@@ -123,9 +136,6 @@ fun MapboxView(
     val density = LocalDensity.current
     val statusBarHeightPx = with(density) {
         contentPadding.calculateTopPadding().toPx()
-    }
-    val bottomPaddingPx = with(density) {
-        contentPadding.calculateBottomPadding().toPx()
     }
 
     LaunchedEffect(Unit) {
@@ -260,7 +270,7 @@ fun MapboxView(
                     .create(PointAnnotationOptions()
                         .withPoint(point)
                         .withIconImage(bitmap)
-                        .withIconSize(0.3)
+                        .withIconSize(1.0)
                     )
             } else {
                 existing.point = point

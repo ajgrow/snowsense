@@ -1,95 +1,136 @@
 package in2000.prosjekt.in2000project.ui.screen.home
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.expandVertically
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkVertically
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Card
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.semantics.heading
-import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.font.FontWeight.Companion.Bold
-import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.sp
-import in2000.prosjekt.in2000project.R
-import in2000.prosjekt.in2000project.domain.model.Coordinate
-import in2000.prosjekt.in2000project.domain.model.NamedLocation
-import in2000.prosjekt.in2000project.ui.risk.RiskUiState
-import in2000.prosjekt.in2000project.ui.risk.RiskViewModel
-import in2000.prosjekt.in2000project.ui.emergency.EmergencySection
-import in2000.prosjekt.in2000project.ui.model.DangerLevelUiModel
-import in2000.prosjekt.in2000project.ui.search.SearchSection
-import in2000.prosjekt.in2000project.ui.search.SearchViewModel
-import org.koin.compose.viewmodel.koinViewModel
+    import androidx.compose.animation.AnimatedVisibility
+    import androidx.compose.animation.expandVertically
+    import androidx.compose.animation.fadeIn
+    import androidx.compose.animation.fadeOut
+    import androidx.compose.animation.shrinkVertically
+    import androidx.compose.foundation.Image
+    import androidx.compose.foundation.background
+    import androidx.compose.foundation.clickable
+    import androidx.compose.foundation.interaction.MutableInteractionSource
+    import androidx.compose.foundation.layout.Arrangement
+    import androidx.compose.foundation.layout.Box
+    import androidx.compose.foundation.layout.BoxWithConstraints
+    import androidx.compose.foundation.layout.Column
+    import androidx.compose.foundation.layout.PaddingValues
+    import androidx.compose.foundation.layout.Row
+    import androidx.compose.foundation.layout.Spacer
+    import androidx.compose.foundation.layout.fillMaxSize
+    import androidx.compose.foundation.layout.fillMaxWidth
+    import androidx.compose.foundation.layout.height
+    import androidx.compose.foundation.layout.offset
+    import androidx.compose.foundation.layout.padding
+    import androidx.compose.foundation.layout.size
+    import androidx.compose.foundation.layout.width
+    import androidx.compose.foundation.layout.wrapContentHeight
+    import androidx.compose.foundation.lazy.LazyColumn
+    import androidx.compose.foundation.lazy.LazyRow
+    import androidx.compose.foundation.lazy.items
+    import androidx.compose.foundation.shape.RoundedCornerShape
+    import androidx.compose.material.icons.Icons
+    import androidx.compose.material.icons.filled.Close
+    import androidx.compose.material.icons.filled.Settings
+    import androidx.compose.material3.Card
+    import androidx.compose.material3.CardDefaults
+    import androidx.compose.material3.CircularProgressIndicator
+    import androidx.compose.material3.Icon
+    import androidx.compose.material3.IconButton
+    import androidx.compose.material3.MaterialTheme
+    import androidx.compose.material3.Surface
+    import androidx.compose.material3.Text
+    import androidx.compose.runtime.Composable
+    import androidx.compose.runtime.LaunchedEffect
+    import androidx.compose.runtime.getValue
+    import androidx.compose.runtime.remember
+    import androidx.compose.ui.Alignment
+    import androidx.compose.ui.Modifier
+    import androidx.compose.ui.draw.clip
+    import androidx.compose.ui.graphics.Color
+    import androidx.compose.ui.layout.ContentScale
+    import androidx.compose.ui.platform.LocalFocusManager
+    import androidx.compose.ui.res.painterResource
+    import androidx.compose.ui.res.stringResource
+    import androidx.compose.ui.semantics.heading
+    import androidx.compose.ui.semantics.semantics
+    import androidx.compose.ui.text.font.FontWeight
+    import androidx.compose.ui.text.font.FontWeight.Companion.Bold
+    import androidx.compose.ui.text.style.TextAlign
+    import androidx.compose.ui.text.style.TextOverflow
+    import androidx.compose.ui.unit.dp
+    import androidx.compose.ui.unit.sp
+    import androidx.lifecycle.compose.collectAsStateWithLifecycle
+    import in2000.prosjekt.in2000project.R
+    import in2000.prosjekt.in2000project.domain.model.Coordinate
+    import in2000.prosjekt.in2000project.domain.model.NamedLocation
+    import in2000.prosjekt.in2000project.ui.emergency.EmergencySection
+    import in2000.prosjekt.in2000project.ui.model.DangerLevelUiModel
+    import in2000.prosjekt.in2000project.ui.risk.RiskUiState
+    import in2000.prosjekt.in2000project.ui.risk.RiskViewModel
+    import in2000.prosjekt.in2000project.ui.search.SearchSection
+    import in2000.prosjekt.in2000project.ui.search.SearchUiState
+    import in2000.prosjekt.in2000project.ui.search.SearchViewModel
+    import org.koin.compose.viewmodel.koinViewModel
+
+
+/**
+ * Route-level Composable for the Home screen.
+ *
+ * @param onSettingsClick Callback for when the settings button is clicked
+ * @param onNavigateToMap Callback for when the map button is clicked
+ * @param searchViewModel ViewModel for searching for locations
+ * @param riskViewModel ViewModel for getting risk information
+ */
 
 @Composable
-fun HomeScreen(
+fun HomeRoute(
     modifier: Modifier = Modifier,
     onSettingsClick: () -> Unit,
     onNavigateToMap: (coordinate: Coordinate) -> Unit,
     searchViewModel: SearchViewModel = koinViewModel(),
     riskViewModel: RiskViewModel = koinViewModel()
 ) {
-    val focusManager = LocalFocusManager.current
     val searchState by searchViewModel.searchState.collectAsStateWithLifecycle()
     val riskState by riskViewModel.riskState.collectAsStateWithLifecycle()
+
+    HomeScreen(
+        modifier = modifier,
+        onSettingsClick = onSettingsClick,
+        onNavigateToMap = onNavigateToMap,
+        searchState = searchState,
+        riskState = riskState,
+        onRefreshFavoriteRisks = riskViewModel::refreshFavoriteRisks,
+        onQueryChange = searchViewModel::onQueryChange,
+        onSelectResult = searchViewModel::selectSearchResult,
+        onSearchActiveChange = searchViewModel::setSearchActive,
+        onRemoveFavorite = searchViewModel::removeFavoriteLocation,
+        onRemoveRecentSearch = searchViewModel::removeRecentSearch,
+        onClearQuery = searchViewModel::clearQuery
+    )
+}
+
+@Composable
+private fun HomeScreen(
+    modifier: Modifier = Modifier,
+    searchState: SearchUiState,
+    riskState: RiskUiState,
+    onSettingsClick: () -> Unit,
+    onNavigateToMap: (coordinate: Coordinate) -> Unit,
+    onSearchActiveChange: (Boolean) -> Unit,
+    onClearQuery: () -> Unit,
+    onRefreshFavoriteRisks: (List<NamedLocation>) -> Unit,
+    onQueryChange: (String) -> Unit,
+    onSelectResult: (NamedLocation) -> Unit,
+    onRemoveFavorite: (NamedLocation) -> Unit,
+    onRemoveRecentSearch: (NamedLocation) -> Unit
+) {
+    val focusManager = LocalFocusManager.current
 
     val favorites = searchState.favorites
 
     val dismissSearch = {
         if (searchState.isSearchActive) {
-            searchViewModel.setSearchActive(false)
+            onSearchActiveChange(false)
         }
         focusManager.clearFocus()
     }
@@ -100,11 +141,11 @@ fun HomeScreen(
     }
 
     LaunchedEffect(Unit) {
-        searchViewModel.clearQuery()
+        onClearQuery()
     }
 
     LaunchedEffect(favorites) {
-        riskViewModel.refreshFavoriteRisks(favorites)
+        onRefreshFavoriteRisks(favorites)
     }
 
     Surface(
@@ -146,9 +187,9 @@ fun HomeScreen(
                         modifier = Modifier,
                         searchState = searchState,
                         onNavigateToMap = onNavigateToMapDismissing,
-                        onQueryChange = searchViewModel::onQueryChange,
-                        onSelectResult = searchViewModel::selectSearchResult,
-                        onActiveChange = searchViewModel::setSearchActive
+                        onQueryChange = onQueryChange,
+                        onSelectResult = onSelectResult,
+                        onActiveChange = onSearchActiveChange
                     )
                 }
             }
@@ -158,7 +199,7 @@ fun HomeScreen(
                     items = searchState.favorites,
                     modifier = Modifier,
                     onNavigateToMap = onNavigateToMapDismissing,
-                    onRemoveLocation = searchViewModel::removeFavoriteLocation,
+                    onRemoveLocation = onRemoveFavorite,
                     riskState = riskState
                 )
             }
@@ -168,7 +209,7 @@ fun HomeScreen(
                     items = searchState.recentSearches,
                     modifier = Modifier,
                     onNavigateToMap = onNavigateToMapDismissing,
-                    onRemoveLocation = searchViewModel::removeRecentSearch
+                    onRemoveLocation = onRemoveRecentSearch
                 )
             }
 
@@ -182,7 +223,7 @@ fun HomeScreen(
 }
 
 @Composable
-fun LogoSection(
+private fun LogoSection(
     modifier: Modifier = Modifier
 ) {
     BoxWithConstraints(
@@ -204,12 +245,12 @@ fun LogoSection(
 }
 
 @Composable
-fun FavoriteSection(
-    items: List<NamedLocation>,
+private fun FavoriteSection(
     modifier: Modifier = Modifier,
+    items: List<NamedLocation>,
+    riskState: RiskUiState,
     onNavigateToMap: (coordinate: Coordinate) -> Unit,
-    onRemoveLocation: (NamedLocation) -> Unit,
-    riskState: RiskUiState
+    onRemoveLocation: (NamedLocation) -> Unit
 ) {
     Column(
         modifier = modifier.fillMaxWidth(),
@@ -222,13 +263,14 @@ fun FavoriteSection(
             modifier = Modifier.padding(horizontal = 16.dp).semantics { heading() }
         )
         LazyRow(
-            contentPadding = PaddingValues(horizontal = 8.dp),
+            contentPadding = PaddingValues(horizontal = 16.dp),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             items(items) { location ->
                 val locationRiskState = riskState.locationRisks[location.coordinate]
                 LocationCard(
-                    location,
+                    modifier = modifier,
+                    location = location,
                     onNavigateToMap = onNavigateToMap,
                     dangerLevel = locationRiskState?.dangerLevel,
                     isLoading = locationRiskState?.isLoading == true,
@@ -242,7 +284,7 @@ fun FavoriteSection(
 }
 
 @Composable
-fun RecentSection(
+private fun RecentSection(
     items: List<NamedLocation>,
     modifier: Modifier = Modifier,
     onNavigateToMap: (coordinate: Coordinate) -> Unit,
@@ -260,12 +302,13 @@ fun RecentSection(
         )
 
         LazyRow(
-            contentPadding = PaddingValues(horizontal = 8.dp),
+            contentPadding = PaddingValues(horizontal = 16.dp),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             items(items) { location ->
                 LocationCard(
-                    location,
+                    modifier = modifier,
+                    location = location,
                     onNavigateToMap = onNavigateToMap,
                     onRemoveLocation = onRemoveLocation,
                 )
@@ -275,9 +318,9 @@ fun RecentSection(
 }
 
 @Composable
-fun LocationCard(
-    location: NamedLocation,
+private fun LocationCard(
     modifier: Modifier = Modifier,
+    location: NamedLocation,
     onNavigateToMap: (coordinate: Coordinate) -> Unit,
     onRemoveLocation: (NamedLocation) -> Unit,
     showDangerLevel: Boolean = false,
@@ -286,7 +329,7 @@ fun LocationCard(
     removeButtonAtBottom: Boolean = false,
 ) {
     Box(
-        modifier = Modifier
+        modifier = modifier
             .width(160.dp)
             .wrapContentHeight()
     ) {
@@ -308,7 +351,7 @@ fun LocationCard(
             ) {
                 Text(
                     text = location.name,
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth(0.8f),
                     fontWeight = Bold,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 1,
@@ -336,6 +379,7 @@ fun LocationCard(
                             Text(
                                 text = label,
                                 fontSize = 12.sp,
+                                lineHeight = 12.sp,
                                 fontWeight = Bold,
                                 color = Color.White,
                                 letterSpacing = 0.5.sp,

@@ -1,6 +1,6 @@
 package in2000.prosjekt.in2000project.data.repository
 
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
 import org.junit.Test
 import java.time.LocalDate
 import java.time.MonthDay
