@@ -3,7 +3,7 @@ package in2000.prosjekt.in2000project.ui.theme
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
 
-fun Typography.scaleAll(factor: Float): Typography{
+fun Typography.scaleAll(factor: Float): Typography {
 
     fun TextStyle.scaled() = copy(
         fontSize = fontSize * factor,

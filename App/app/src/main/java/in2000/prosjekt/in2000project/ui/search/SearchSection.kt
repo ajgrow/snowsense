@@ -13,11 +13,13 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.DockedSearchBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
@@ -29,6 +31,9 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import in2000.prosjekt.in2000project.R
 import in2000.prosjekt.in2000project.domain.model.Coordinate
@@ -64,7 +69,8 @@ fun SearchSection(
 
     val expanded = searchState.isSearchActive
     val isShowingRecents = searchState.query.isBlank()
-    val displayResults = if (isShowingRecents) searchState.recentSearches else searchState.searchResults
+    val displayResults =
+        if (isShowingRecents) searchState.recentSearches else searchState.searchResults
     val isNorwegian = LocalConfiguration.current.locales[0].language in listOf("no", "nb", "nn")
 
     DockedSearchBar(
@@ -76,6 +82,7 @@ fun SearchSection(
         onExpandedChange = { if (!it) onActiveChange(false) },
         inputField = {
             SearchBarDefaults.InputField(
+                modifier = Modifier.fillMaxWidth().heightIn(max = 64.dp),
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.Default.Menu,
@@ -83,10 +90,26 @@ fun SearchSection(
                     )
                 },
                 trailingIcon = {
-                    Icon(
-                        imageVector = Icons.Default.Search,
-                        contentDescription = stringResource(R.string.open_search)
-                    )
+                    if (!expanded) {
+                        Icon(
+                            imageVector = Icons.Default.Search,
+                            contentDescription = stringResource(R.string.open_search)
+                        )
+                    } else {
+                        IconButton(
+                            onClick = {
+                                onActiveChange(false)
+                            },
+                            modifier.semantics {
+                                role = Role.Button
+                            }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Clear,
+                                contentDescription = stringResource(R.string.close_search),
+                            )
+                        }
+                    }
                 },
                 query = searchState.query,
                 onQueryChange = {

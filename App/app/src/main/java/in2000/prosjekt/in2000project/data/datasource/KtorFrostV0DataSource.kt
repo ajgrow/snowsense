@@ -12,7 +12,7 @@ import io.ktor.http.isSuccess
 
 class KtorFrostV0DataSource(
     private val client: HttpClient,
-): FrostV0DataSource {
+) : FrostV0DataSource {
     override suspend fun getNearestSource(
         coordinate: Coordinate
     ): FrostV0SourceDto? {

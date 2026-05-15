@@ -1,12 +1,10 @@
 <resources>
     <string name="app_name">SnowSense</string>
-    
+
     <string name="app_logo_description">App Logo</string>
     <string name="search_placeholder">Search</string>
     <string name="favorites_title">Favorites</string>
     <string name="recent_searches_title">Recent searches</string>
-
-
 
 
     <string name="information_title">Information</string>
@@ -68,7 +66,6 @@
     <string name="retry">Retry</string>
 
     <string name="open_search">Open Search</string>
-
 
 
     <string name="nav_home_desc">Go to home screen</string>
@@ -180,6 +177,7 @@
     <string name="is_not_expanded">Is not expanded</string>
     <string name="enter_value_desc">Enter value</string>
     <string name="emergency_call_confirm_desc">Call %1$s?</string>
-    <string name="mean_snow_desc">Average snow depth</string>>
+    <string name="close_search">Close search</string>>
+    <string name="mean_snow_desc">Mean snow depth</string>>
 
 </resources>

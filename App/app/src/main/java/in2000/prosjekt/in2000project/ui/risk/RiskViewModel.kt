@@ -45,7 +45,7 @@ data class RiskUiState(
  */
 class RiskViewModel(
     private val getAvalancheDangerUseCase: GetAvalancheDangerUseCase,
-): ViewModel() {
+) : ViewModel() {
     private var _riskState = MutableStateFlow(RiskUiState())
     val riskState = _riskState.asStateFlow()
     private val loadedFavoriteCoordinates = mutableSetOf<Coordinate>()
@@ -64,7 +64,8 @@ class RiskViewModel(
             updateDangerLevel(
                 coordinate.latitude,
                 coordinate.longitude,
-                isFavorite = true)
+                isFavorite = true
+            )
 
             loadedFavoriteCoordinates += coordinate
         }
@@ -77,7 +78,7 @@ class RiskViewModel(
      * @param lon The longitude of the location.
      * @param isFavorite Whether the location is a favorite.
      */
-    fun updateDangerLevel(lat: Double, lon: Double, isFavorite: Boolean = false){
+    fun updateDangerLevel(lat: Double, lon: Double, isFavorite: Boolean = false) {
         val coordinate = Coordinate(lat, lon)
 
         if (isFavorite) {
@@ -85,7 +86,8 @@ class RiskViewModel(
                 val updatedMap = currentState.locationRisks.toMutableMap()
                 updatedMap[coordinate] = LocationRiskState(
                     coordinate = coordinate,
-                    isLoading = true)
+                    isLoading = true
+                )
                 currentState.copy(locationRisks = updatedMap)
             }
         }

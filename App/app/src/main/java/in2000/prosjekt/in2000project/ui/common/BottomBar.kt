@@ -36,27 +36,33 @@ fun BottomBar(
     ) {
         NavigationBarItem(
             selected = currentRoute == Screen.Home.route,
-            onClick = { onClick(Screen.Home.route) } ,
-            icon = { Icon(
-                imageVector = Icons.Default.Home,
-                contentDescription = stringResource(R.string.nav_home_desc),
-                ) }
+            onClick = { onClick(Screen.Home.route) },
+            icon = {
+                Icon(
+                    imageVector = Icons.Default.Home,
+                    contentDescription = stringResource(R.string.nav_home_desc),
+                )
+            }
         )
         NavigationBarItem(
             selected = currentRoute == Screen.Map.route,
             onClick = { onClick(Screen.Map.route) },
-            icon = { Icon(
-                imageVector = Icons.Default.Place,
-                contentDescription = stringResource(R.string.nav_map_desc),
-                ) }
+            icon = {
+                Icon(
+                    imageVector = Icons.Default.Place,
+                    contentDescription = stringResource(R.string.nav_map_desc),
+                )
+            }
         )
         NavigationBarItem(
             selected = currentRoute == Screen.Info.route,
             onClick = { onClick(Screen.Info.route) },
-            icon = { Icon(
-                imageVector = Icons.Default.Info,
-                contentDescription = stringResource(R.string.nav_info_desc),
-                ) }
+            icon = {
+                Icon(
+                    imageVector = Icons.Default.Info,
+                    contentDescription = stringResource(R.string.nav_info_desc),
+                )
+            }
         )
     }
 }
@@ -65,7 +71,7 @@ fun BottomBar(
 @Composable
 fun BottomBarPreview(
     modifier: Modifier = Modifier,
-){
+) {
     BottomBar(
         modifier,
         currentRoute = Screen.Home.route,
@@ -73,8 +79,7 @@ fun BottomBarPreview(
     )
 }
 
-internal fun NavDestination?.isBottomBarScreen()
-    = this?.route in setOf(
+internal fun NavDestination?.isBottomBarScreen() = this?.route in setOf(
     Screen.Home.route,
     Screen.Map.route,
     Screen.Info.route,

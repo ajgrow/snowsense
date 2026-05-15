@@ -36,10 +36,12 @@ value class FrostReferenceTime private constructor(val value: String) {
             endDate: LocalDate,
             totalPeriods: Int = 1,
         ): FrostReferenceTime {
-            require(startDate <= endDate){
-                "startDate can't be after endDate" }
+            require(startDate <= endDate) {
+                "startDate can't be after endDate"
+            }
             require(totalPeriods >= 1) {
-                "totalPeriods must be at least 1" }
+                "totalPeriods must be at least 1"
+            }
 
             val endDate = endDate.plusDays(1).toString()
 
@@ -47,7 +49,8 @@ value class FrostReferenceTime private constructor(val value: String) {
                 return FrostReferenceTime("$startDate/$endDate")
 
             return FrostReferenceTime(
-                "R$totalPeriods/$startDate/$endDate/P1Y")
+                "R$totalPeriods/$startDate/$endDate/P1Y"
+            )
         }
 
         /**
@@ -65,13 +68,14 @@ value class FrostReferenceTime private constructor(val value: String) {
             referenceDate: LocalDate = LocalDate.now(),
         ): FrostReferenceTime {
             require(yearsBack >= 0) {
-                "yearsBack must be non-negative" }
+                "yearsBack must be non-negative"
+            }
 
             val startYear = referenceDate.year - yearsBack
 
             val endYear = if (periodStart > periodEnd)
-                             startYear + 1
-                        else startYear
+                startYear + 1
+            else startYear
 
             return of(
                 periodStart.atYear(startYear),

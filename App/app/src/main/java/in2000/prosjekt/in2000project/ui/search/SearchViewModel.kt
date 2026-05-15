@@ -26,7 +26,7 @@ import kotlinx.coroutines.launch
  * @property awaitingFavoriteName The coordinate of the location being favorited.
  * @property isSearchActive Whether the search is active.
  */
-data class SearchUiState (
+data class SearchUiState(
     val query: String = "",
     val searchResults: List<NamedLocation> = emptyList(),
     val favorites: List<NamedLocation> = emptyList(),
@@ -34,6 +34,7 @@ data class SearchUiState (
     val awaitingFavoriteName: Coordinate? = null,
     val isSearchActive: Boolean = false
 )
+
 @OptIn(FlowPreview::class)
 
 /**
@@ -45,15 +46,17 @@ data class SearchUiState (
 class SearchViewModel(
     private val searchRepository: SearchRepository,
     private val locationRepository: LocationRepository
-): ViewModel(){
-    private val _searchState = MutableStateFlow(SearchUiState(
-        favorites = searchRepository.loadFavorites(),
-        recentSearches = searchRepository.loadRecentSearches()
-    ))
+) : ViewModel() {
+    private val _searchState = MutableStateFlow(
+        SearchUiState(
+            favorites = searchRepository.loadFavorites(),
+            recentSearches = searchRepository.loadRecentSearches()
+        )
+    )
     val searchState: StateFlow<SearchUiState> = _searchState.asStateFlow()
 
     //initialize with mock data for the MVP:
-    init{
+    init {
         // Update search results as user types
         viewModelScope.launch {
             _searchState
@@ -80,7 +83,7 @@ class SearchViewModel(
      * @param limit The maximum number of results to return.
      * @param offset The offset for pagination.
      */
-    fun onQueryChange(query: String){
+    fun onQueryChange(query: String) {
         _searchState.update { it.copy(query = query.take(50)) }
     }
 

@@ -104,22 +104,30 @@ class MapStateHolder {
         _cameraOptions.value = cameraOptions
     }
 
-    fun onOverlayLoading() { _overlayState.value = OverlayState.Loading }
+    fun onOverlayLoading() {
+        _overlayState.value = OverlayState.Loading
+    }
 
     /**
      * Called when the overlay is successful.
      */
-    fun onOverlayError()   { _overlayState.value = OverlayState.Error }
+    fun onOverlayError() {
+        _overlayState.value = OverlayState.Error
+    }
 
     /**
      * Called when zooming in on the map.
      */
-    fun onZoomIn()  { _commands.tryEmit(MapCommand.ZoomBy(+1.0)) }
+    fun onZoomIn() {
+        _commands.tryEmit(MapCommand.ZoomBy(+1.0))
+    }
 
     /**
      * Called when zooming out on the map.
      */
-    fun onZoomOut() { _commands.tryEmit(MapCommand.ZoomBy(-1.0)) }
+    fun onZoomOut() {
+        _commands.tryEmit(MapCommand.ZoomBy(-1.0))
+    }
 
     companion object {
         const val SEARCH_ZOOM = 12.0

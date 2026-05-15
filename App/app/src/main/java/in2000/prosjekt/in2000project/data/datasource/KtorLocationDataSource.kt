@@ -14,7 +14,7 @@ private const val FILTER = "navn.representasjonspunkt,navn.skrivemåte,navn.navn
 class KtorLocationDataSource(
     private val client: HttpClient
 ) : LocationDataSource {
-    override suspend fun getNamesResponse(query: String) : List<LocationDto>? {
+    override suspend fun getNamesResponse(query: String): List<LocationDto>? {
         val fullQuery = buildLocationQuery(query)
         return try {
             val httpResponse: LocationResponseDto = client.get(fullQuery).body()

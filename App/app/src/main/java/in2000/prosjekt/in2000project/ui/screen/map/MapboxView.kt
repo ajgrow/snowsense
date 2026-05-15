@@ -117,7 +117,8 @@ fun MapboxView(
     }
 
     var idleSubscription by remember {
-        mutableStateOf<Cancelable?>(null) }
+        mutableStateOf<Cancelable?>(null)
+    }
 
     DisposableEffect(Unit) {
         onDispose { idleSubscription?.cancel() }
@@ -127,7 +128,8 @@ fun MapboxView(
         mutableStateOf<PointAnnotationManager?>(null)
     }
     var currentPin by remember {
-        mutableStateOf<PointAnnotation?>(null) }
+        mutableStateOf<PointAnnotation?>(null)
+    }
 
     val pinPoint by mapStateHolder.pinnedPoint.collectAsStateWithLifecycle()
 
@@ -144,7 +146,8 @@ fun MapboxView(
                 0.0,
                 0.0,
                 mapStateHolder.bottomPaddingPx.value,
-                0.0)
+                0.0
+            )
 
             when (cmd) {
                 is MapStateHolder.MapCommand.FlyTo ->
@@ -156,6 +159,7 @@ fun MapboxView(
                         },
                         animationOptions
                     )
+
                 is MapStateHolder.MapCommand.Recenter -> {
                     val currentZoom = viewportState.cameraState?.zoom
                     viewportState.easeTo(
@@ -167,6 +171,7 @@ fun MapboxView(
                         animationOptions
                     )
                 }
+
                 is MapStateHolder.MapCommand.ZoomBy -> {
                     val current = viewportState.cameraState?.zoom ?: 10.0
                     viewportState.easeTo(
@@ -193,7 +198,7 @@ fun MapboxView(
                     .padding(top = with(LocalDensity.current) { statusBarHeightPx.toDp() + 40.dp })
             )
         }
-    ){
+    ) {
         MapEffect(Unit) { mapView ->
 
             val mapboxMap = mapView.mapboxMap
@@ -210,7 +215,8 @@ fun MapboxView(
 
             mapboxMap.loadStyle(
                 Style.OUTDOORS,
-                Style::addNveAvalancheRiskLayers)
+                Style::addNveAvalancheRiskLayers
+            )
 
             mapView.gestures.addOnMapClickListener { point ->
                 mapStateHolder.placePin(point)
@@ -233,7 +239,8 @@ fun MapboxView(
                 .subscribeMapIdle {
                     mapStateHolder.onCameraIdle(
                         mapView.mapboxMap
-                            .cameraState.toCameraOptions())
+                            .cameraState.toCameraOptions()
+                    )
                 }
 
             mapView.mapboxMap.subscribeMapLoadingError { error ->
@@ -259,7 +266,7 @@ fun MapboxView(
             }
 
             val existing = currentPin
-            if(existing == null) {
+            if (existing == null) {
                 val bitmap = BitmapFactory.decodeResource(
                     mapViewState?.context?.resources
                         ?: return@LaunchedEffect,
@@ -267,10 +274,11 @@ fun MapboxView(
                 )
 
                 currentPin = currentPinManager
-                    .create(PointAnnotationOptions()
-                        .withPoint(point)
-                        .withIconImage(bitmap)
-                        .withIconSize(1.0)
+                    .create(
+                        PointAnnotationOptions()
+                            .withPoint(point)
+                            .withIconImage(bitmap)
+                            .withIconSize(1.0)
                     )
             } else {
                 existing.point = point

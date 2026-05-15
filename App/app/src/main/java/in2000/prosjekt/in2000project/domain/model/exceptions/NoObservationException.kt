@@ -10,4 +10,5 @@ class NoObservationsException(
     referenceTime: String?,
 ) : Exception(
     "No observations available at station $stationName"
-    + "for $elements with reference time $referenceTime")
+            + "for $elements with reference time $referenceTime"
+)

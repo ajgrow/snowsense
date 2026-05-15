@@ -15,7 +15,7 @@ class SlabAvalancheRiskAssessorTest {
         precip: Double? = null,
     ) = DailyWeatherRecord(
         date = LocalDate.of(2026, 4, 1)
-                        .minusDays(daysAgo.toLong()),
+            .minusDays(daysAgo.toLong()),
         tempC = temp,
         precipMm = precip,
     )

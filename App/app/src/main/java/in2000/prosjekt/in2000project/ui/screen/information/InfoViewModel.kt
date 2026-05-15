@@ -23,7 +23,7 @@ data class InfoUiState(
  *
  * @param application Application context.
  */
-class InfoViewModel(application: Application): AndroidViewModel(application){
+class InfoViewModel(application: Application) : AndroidViewModel(application) {
 
     private val _infoUiState = MutableStateFlow(InfoUiState())
     val infoUiState: StateFlow<InfoUiState> = _infoUiState.asStateFlow()

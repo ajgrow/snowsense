@@ -10,7 +10,7 @@ import in2000.prosjekt.in2000project.domain.model.Coordinate
 class NoStationFoundException(
     val coordinate: Coordinate? = null,
     message: String = "No station available for the requested location"
-                    + if (coordinate != null)
-                        ": (${coordinate.latitude}, ${coordinate.longitude})"
-                    else ""
+            + if (coordinate != null)
+        ": (${coordinate.latitude}, ${coordinate.longitude})"
+    else ""
 ) : Exception(message)
